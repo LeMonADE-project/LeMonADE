@@ -26,3 +26,20 @@
 *.exe
 *.out
 *.app
+
+# other
+*.o
+*.d
+*.*~
+Debug/
+!makefile
+!*.mk
+*.bfm
+.cproject
+.project
+.kateproject
+
+/docs/html/
+/docs/latex/
+/build/*
+/Build/*

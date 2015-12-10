@@ -1,0 +1,96 @@
+########################################################
+#!version=1.0
+#Bond Fluctuation Model - simulation data file
+#Wed Mar 28 12:29:21 2012
+#monomer numbering starts at 1
+
+########################################################
+
+#explicit_solvent=0
+!number_of_monomers=64
+!box_x=64
+!box_y=64
+!box_z=64
+!periodic_x=1
+!periodic_y=1
+!periodic_z=1
+
+!set_of_bondvectors
+-2  0  0:65
+ 0 -2  0:66
+ 0  0 -2:67
+ 2  0  0:68
+ 0  2  0:69
+ 0  0  2:70
+-2 -2  0:71
+-2  0 -2:72
+ 0 -2 -2:73
+-2  2  0:74
+-2  0  2:75
+ 0 -2  2:76
+ 2 -2  0:77
+ 2  0 -2:78
+ 0  2 -2:79
+ 2  2  0:80
+ 2  0  2:81
+ 0  2  2:82
+-2 -2 -2:83
+-2 -2  2:84
+-2  2 -2:85
+ 2 -2 -2:86
+-2  2  2:87
+ 2 -2  2:88
+ 2  2 -2:89
+ 2  2  2:90
+-3 -1 -1:97
+-3 -1  1:98
+-3  1 -1:99
+ 3 -1 -1:100
+-3  1  1:101
+ 3 -1  1:102
+ 3  1 -1:103
+ 3  1  1:104
+-1 -3 -1:105
+-1 -3  1:106
+-1  3 -1:107
+ 1 -3 -1:108
+-1  3  1:109
+ 1 -3  1:110
+ 1  3 -1:111
+ 1  3  1:112
+-1 -1 -3:113
+-1 -1  3:114
+-1  1 -3:115
+ 1 -1 -3:116
+-1  1  3:117
+ 1 -1  3:118
+ 1  1 -3:119
+ 1  1  3:120
+
+
+#attributes: 0 -> normal monomer  1 -> solvent  2 -> special mono 
+
+!attributes
+1-64:0
+
+
+!mcs=0
+44 22 6 WTXYWYVVXYYWSSTSYVTUWWSSTZWUVTUYWUZXVYVVYUZVYUWUVZVXYXYXTSVZVTX
+
+!mcs=10000
+52 30 8 BEDGCdOHquRamsSqBsURGuDJqqLGJtbnBjdduoWIQNtjUaNICwZHdhjNBgOpeAp
+
+!mcs=20000
+43 17 -1 YvPObEAenaAJulPmHwwxlNJGecbujmGwilCAITDghsoNBJtihDiXfnldjBWxZbO
+
+!mcs=30000
+24 20 26 YqNsgqGvwjlHklHlLVOgBUUxpUPIBYtmAlATlljbXpMFhjpovtMtcwPDQBGstPY
+
+!mcs=40000
+11 13 15 ODNOGaGloNIvIhugtUaJgMRJNQIghCdsliKnRZlnXCdISErAvVIMdFRMtbCbTGm
+
+!mcs=50000
+18 4 6 LpPDWYIYSbAVCVgJZTlVwBgnqMnANtkJelKqTnGFhQjBGVMxVlicUsklksUKYLP
+
+!mcs=60000
+30 16 0 YZZJpLiibSnTqcNJqtdblfjgqTKavfqTfnttNNpvFTLFbjBZWUmjjXTcsAmaLnr
