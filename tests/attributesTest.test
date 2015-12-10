@@ -1,0 +1,23 @@
+!number_of_monomers=16
+
+!box_x=50
+!box_y=50
+!box_z=50
+
+!periodic_x=1
+!periodic_y=1
+!periodic_z=1
+
+!set_of_bondvectors
+0 3 0:73
+1 2 0:35
+1 -2 0:41
+
+!attributes
+2 -  4 : 5
+5-5:2
+7-15:  5
+16-16:2
+
+!mcs=0
+0 0 0 IIIIIIIIIIIIIII

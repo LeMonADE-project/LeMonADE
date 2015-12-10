@@ -1,0 +1,264 @@
+/**
+@mainpage 
+ 
+@section intro Introduction
+
+This document provides code documentation for the software LeMonADe. Further
+down this page you can find a short introduction on the purpose and structure
+of the software, as well as a getting started manual including a few
+instructive examples. These are meant to both give you an idea of how the
+software is working and also give you an idea of how you can customize it to
+your needs. 
+
+@subpage getting_started
+\n
+@subpage program_structure
+\n
+@subpage basic_examples
+\n
+@subpage advanced_examples 
+\n
+ 
+@section version Pre-Release
+
+This is an early version of the program. As of now, it
+mainly is a framework that allows for easily putting together analysis tools. 
+Please have a look at the documentation and the examples provided.
+Should you write a feature, analyzer, or updater for your personal use, 
+please let us know how you get along with the design of the program.  We would
+greatly appreciate any feedback, suggestions, or problems you may run into.
+
+@section next_version To be expected in version 0.2
+Roadmap comes here.
+  
+@page getting_started Getting Started
+
+@section compile Downloading and Compiling
+
+You can get the source code of the current Release version from the
+git-repository on gandalf. 
+For this purpose you need to have the version control system git installed on your computer. Once you
+have this, create a folder for the program and cd into this folder, for example
+@code
+mkdir PathToLeMonADe
+cd PathToLeMonADe
+@endcode 
+In the end the LeMonADe-project will be downloaded to
+@code
+/PathToLeMonADe/LeMonADe/
+@endcode 
+Then you can get the source by running:
+@code
+git clone username@gandalf:/home/users/Lemonade/LeMonADe
+@endcode
+You should now have a subfolder called LeMonADe in your current directory. It
+contains the latest release version.
+You then have to compile the source. For this you need cmake. Create a build
+directory in the just downloaded folder LeMonADe, cd there, and run cmake to
+create the make files necessary for building the source. You can then run make
+for starting the build.
+@code
+cd /PathToLeMonADe/LeMonADe/
+mkdir build
+cd build
+cmake ../
+make
+@endcode
+You should now be ready to run the provided example programs.
+
+@page program_structure Structure of the Program
+
+In this section the most important elements of the design of LeMonADe are
+reviewed. The software is designed in such a way that it can be extended or
+customized in a "Lego-like" fashion. This means that, if you want to add extra
+functionality, you do not have to change any of the existing source code, but
+rather write an extension class (which we call a "Feature"), and integrate
+this into the existing code in a very simple fashion. This modularity of the
+software makes the code very well reuseable. More information about how
+features work can be found in the section "Advanced useage" below, and in the
+documentation of the code.\n\n
+Let's go into the structure in a little more datail. The essential parts of
+the framework are sketched in the figure below.
+
+@image html ProgramStructure.jpg "Program elements" width=\textwidth
+
+The basic unit of the system is, as may be expected, monomers. These hold
+information such as a position in space, a charge, or whatever other qunatity
+that is characteristic for a particle. \n
+The monomers are organized in a structure we call "Molecules". This class
+holds additional information about connectivity (or bonds) and privides the
+interfaces to particle and bond information. In other words, "Molecules"
+organizes the particles in a graph structure, with the particles being
+vertices and the bonds being the edges.\n\n
+In order to provide the above mentioned modularity and extensibility, the
+"Molecules" are placed in a structure called "Ingredients". This structure
+manages how the different modules ("Features") work together. The important
+point here is that the whole structure is extremely modular. The users can
+decide what structure they want to use as a basic monomer unit, what features
+they want to add to the system (e.g. a simulation box, a special bondset, or
+support for use of a Boltzmann criterion), and the program will run just as
+well with any choice (with only very few prerequisites). For example, if some
+feature requires monomers to have an interface called getCharge(), then this
+interface can be added to the chosen monomer base type. Or, if a feature
+requires another feature to be there, this additional feature is added
+automatically (if several features require the same additional feature, it is
+only added once). The concept of extensions by the use of features will be
+shown in the provided examples to make the point more clear.\n\n
+Usually one would like to not only store a single conformation in the
+strucure, but rather constantly update the conformation and possibly analyze
+it. In LeMonADe, everything that has write-access to the Ingredients is called
+an "updater", whereas all structures that somehow only process the system
+information, and thus only need read-access, are called anlyzers. Updaters and
+analyzers are conveniently managed by a class TaskManager. This class
+periodically executes all defined updaters and analyzers, thus generating the
+program flow.\n\n
+In the following section basic and more advanced examples are discussed to
+show how the just described software design works in practice.
+
+
+@page basic_examples Basic Usage
+This section shows how a very simple LeMonADe program can be put together and
+used. First examples are discussed. More advanced examples, expecially for
+customization, are discussed in the next section.\n\n
+A typical LeMonADe main() function can be used almost as a script. It consists
+usually of three parts:\n
+1. Define the additional features you want to use (if any) along with what you want to use as a
+monomer base unit (e.g. integer position for lattice simulations, or double
+positions for analysis of MD data, 3D or 2D,...).\n
+2. Tell the taskmanager, which updaters and analyzers you want to use
+(e.g. ReadFile and a BFMSimulation updater could be a choice of two
+updaters).\n
+3. Tell the taskmanager to run the defined tasks.\n\n
+
+The possible ways how to do this are illustrated in the examples.\n
+Before that, the basic data structures, and the use of the random number 
+generators are explained.\n
+
+@section example0 Example 0: Using Ingredients and Molecules
+
+This example shows how to use the class template Vector3D, which is used
+as the basic data type for storing coordinates.
+@include example0/ex0main.cpp
+
+@section example1 Example 1: Random numbers 
+
+This example demonstrates the basic usage the random number generator.
+@include example1/ex1main.cpp
+
+@section example2 Example 2: class Molecules
+
+In this example the class Molecules is explained, which is the data structure holding all monomers and the bonds.
+
+@include example2/ex2main.cpp
+
+@section example3 Example 3: Features
+
+This example demonstrates the use of Features to extend the functionality
+of Ingredients (the class holding all information about our system).
+
+@include example3/ex3main.cpp
+
+@section example4 Example 4: Updaters and Analyzers
+
+The usage of updaters and analyzers, which are normally used to alter system
+properties (updater, for example creating monomers, or simulating), and to analyze the system (analyzers).
+More details on how to write your own analyzers and updaters are found in the next example.
+
+@include example4/ex4main.cpp
+
+
+@page advanced_examples Advanced Usage
+
+@section example5 Example5: Updaters and Analyzers (Advanced)
+
+Writing analyzers and updaters. As an example, a simple updater and
+a simple analyzer are constructed and used.
+
+Main program (analyzer and updater are below)
+@include example5/ex5main.cpp
+
+Analyzer
+@include example5/ex5analyzer.h
+
+Updater
+@include example5/ex5updater.h
+
+
+@section features Example 6: Writing Features
+
+This example demonstrates how one can write features to extend the
+functionality of the program. The good thing about the design of the program is
+that the features are separated from the rest of the code. This means that the
+functionality of the basic classes, i.e. Ingredients, Molecules and even the
+basic monomer type used (e.g. VectorInt3) do not have to be touched at all,
+and still their functionality can be extended by extra functions and
+variables. \n\n
+Please note that the feature shown in this example is meant as an instructive example, rather
+than a useful feature. Let's suppose we want to add a color-tag to each
+monomer, a color map to ingredients (that translates the integer-tags into
+colors), and we want to be able to read the tags as well as the map from bfm-files using custom
+commands #!color_tag and #!color_map. All this can be done using a feature, as
+demonstrated below.\n\n
+
+If a feature  requires the monomers to have certain interfaces, in our example
+setColorTag(int) and getColorTag(), these interfaces may be provided by writing
+your own monomer base class. However, you then have to use specific monomers
+for each feature. It is also possible to provide these interfaces
+in a more modular fashion, as shown here. The features can provide a Loki typelist
+containing classes, that provide the interfaces in question. By typedef'ing this
+list with the name monomer_extensions, LeMonADe can automatically extend the
+monomers by the required interfaces.\n\n
+Thus, a first step one may want to write a class that provides interfaces for
+setting and getting a color tag on a monomer, as shown below. This class is
+later used to extend the monomer base class. Note how it is completely
+separated from any other program code.
+
+@include example6/Example6ColorTag.h
+
+New features are generally derived from the class feature. Thus, the next step
+is to write our own feature (FeatureColor), which provides the color map and
+knows that it requires the monomers to be extended by the interfaces provided
+by the class ColorTag. It furthermore exports the needed routines for reading
+the custom commands #!color_tag and #!color_map to the file-reader, if
+necessary. Let's go through this step by step. Below is the sourcecode of the
+feature:
+
+@include example6/FeatureExample6.h
+
+And here are the reading commands that are exported when a file is to be
+read. They are classes that must be derived from AbstractCommand, and that 
+implement the function void execute(). If the prgram is supposed to
+also be able to write bfm-files containing these commands, this can be done
+just analoguously by writing a class derived from AbstractWrite. See the
+documentation and code of other features, as well as the tests, for more
+examples.
+
+@include example6/FeatureExample6Read.h
+
+Now we can come to the main program to see how the new feature is
+integrated. This is extremely simple and works in analogy to the other
+examples shown before:
+
+@include example6/ex6main.cpp
+
+In the folder example6 there is a bfm file provided (testfile.bfm), that has
+the commands #color_map and #color_tag in it. Simple call 
+@code
+Example6 example6/testfile.bfm
+@endcode
+to see that the feature does its job. In the output of the program you will
+find two lines saying "registered command #color_map" and "registerd command
+#color_tag". These lines indicate that the program can interpret these
+commands when they appear in bfm files.
+
+@section example7 Example 7: Grouping Particles
+
+This example shows how one can group particles with respect to some criterion
+and analyzer those groups rather than the complete set of particles in the
+system. LeMonADe provides functions and classes that can do this in a flexible
+way. However, of course, everyone is free to write their own analyzers and
+particle groups. It was shown before in example 3 how to do this in
+principle.\n\n
+
+More code here...
+*/

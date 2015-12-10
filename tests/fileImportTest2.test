@@ -1,0 +1,12 @@
+!box_x=234
+!box_y=453
+!box_z=67
+
+!periodic_x=1
+!periodic_y=0
+!periodic_z=1
+
+!firstCommand=fresh
+!secondCommand= Lemonade
+thisisnocommand
+#!thirdCommand

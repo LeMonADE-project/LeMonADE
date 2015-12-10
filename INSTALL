@@ -1,0 +1,72 @@
+== INSTALL ==
+ 1.) Windows
+ 2.) Mac OS X
+ 3.) Linux
+ 
+== Windows ==
+
+ ?
+ 
+== Mac OS X ==
+
+ Standard compilation (library+examples):
+ ----------------------------------------------------
+ mkdir build
+ cd build
+ cmake ..
+ make
+ 
+ 
+ Develop compilation (library+examples+tests):
+ Downloads gtest-1.6.0, if neccessary
+ ----------------------------------------------------
+ mkdir build
+ cd build
+ cmake -DLEMONADE_TESTS=ON ..
+ make
+ 
+ Only documentation (By Doxygen):
+ ----------------------------------------------------
+ mkdir build
+ cd build
+ cmake ..
+ make docs
+ 
+ Standard compilation of example (lib already build):
+ ----------------------------------------------------
+ cd path/to/example
+ cmake -DLEMONADE_DIR=/path/to/LeMonADE/ .
+ make
+ 
+
+== Linux ==
+
+ Standard compilation (library+examples):
+ ----------------------------------------------------
+ mkdir build
+ cd build
+ cmake ..
+ make
+ 
+ 
+ Develop compilation (library+examples+tests):
+ Downloads gtest-1.6.0, if neccessary
+ ----------------------------------------------------
+ mkdir build
+ cd build
+ cmake -DLEMONADE_TESTS=ON ..
+ make
+ 
+ Only documentation (By Doxygen):
+ ----------------------------------------------------
+ mkdir build
+ cd build
+ cmake ..
+ make docs
+ 
+ Standard compilation of example (lib already build):
+ ----------------------------------------------------
+ cd path/to/example
+ cmake -DLEMONADE_DIR=/path/to/LeMonADE/ .
+ make
+ 
