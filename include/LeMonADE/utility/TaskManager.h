@@ -143,9 +143,9 @@ public:
     }
   };
 private:
-  bool isFirstExecution;
-  unsigned int execution_period;
   AbstractAnalyzer* myAnalyzer;
+  unsigned int execution_period;
+  bool isFirstExecution;
 };
 
 /*****************************************************************************/
@@ -188,9 +188,9 @@ public:
   }
   
 private:
-  bool isFirstExecution;
-  unsigned int execution_period;
   AbstractUpdater* myUpdater;
+  unsigned int execution_period;
+  bool isFirstExecution;
 };
 
 #endif /* LEMONADE_UTILITY_TASKMANAGER_H */

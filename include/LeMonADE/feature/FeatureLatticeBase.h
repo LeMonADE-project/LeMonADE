@@ -152,7 +152,7 @@ protected:
 //!constructor
 template<template<typename> class SpecializedClass, typename ValueType>
 FeatureLatticeBase<SpecializedClass<ValueType> >::FeatureLatticeBase()
-	:lattice(NULL),proXY(0),xPro(0),_boxX(0),_boxY(0),_boxZ(0),boxXm1(0),boxYm1(0),boxZm1(0)
+	:_boxX(0),_boxY(0),_boxZ(0),boxXm1(0),boxYm1(0),boxZm1(0),xPro(0),proXY(0),lattice(NULL)
 {
 
 }

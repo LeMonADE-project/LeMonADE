@@ -126,6 +126,9 @@ private:
   
   //! The filename to be used.
   std::string _filename;
+  
+    //! Storage for data that are processed to file (mostly Ingredients).
+  const IngredientsType& ingredients;
 
   //! The output file stream.
   std::ofstream file;
@@ -136,9 +139,6 @@ private:
   //bfm Write strings with associated write objects
   //! Vector of pairs of Write-strings (e.g. !box_x) associated Write objects
   std::vector < std::pair<std::string, SuperAbstractWrite*> > WriteObjects;
-
-  //! Storage for data that are processed to file (mostly Ingredients).
-  const IngredientsType& ingredients;
 
   //init-flag to see if the initialize() routine was called. this
   //is necessary, because it opens the file and writes the header
