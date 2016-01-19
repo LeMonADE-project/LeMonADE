@@ -170,16 +170,15 @@ class ReadMcs: public ReadToDestination < IngredientsType >
 	//! Ignores if monomer position is missing in the !mcs (maybe due to solvent)
 	bool ignore_missing_monos;
 
-
+	//! The number of frames/conformations/!mcs-command in file.
+	uint32_t nFrames;
+	
 	/**
 	 * @brief Return if first !mcs is read-in, already.
 	 *
 	 * @return \a True if first call/occurance of !mcs - \a False otherwise.
 	 */
 	bool isFirstCall() const {return first_call;}
-
-	//! The number of frames/conformations/!mcs-command in file.
-	uint32_t nFrames;
 	
 	//! processes a regular mcs line from a stream
 	void processRegularLine(const std::string& line);
@@ -194,10 +193,11 @@ class ReadMcs: public ReadToDestination < IngredientsType >
  public:
   //! Empty Constructor, but delegates call to the Feature. Default: no ignoring of missing monomers.
   ReadMcs(IngredientsType& destination):ReadToDestination< IngredientsType > (destination)
-  ,ignore_missing_monos(false)
+  ,monomerCount(0)
   ,first_call(true)
+  ,ignore_missing_monos(false)
   ,nFrames(0)
-  ,monomerCount(0){}
+  {}
   
   /**
    * @brief Set this if missing monomers should ignore by read-in (maybe due to solvent).

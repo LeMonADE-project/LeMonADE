@@ -209,14 +209,15 @@ public:
   void closeFile(){file.close();}
   
 private:
-    //! ENUM-type BFM_READ_TYPE specify the read-in
-	int myReadType;
-
 	//! A reference to the IngredientsType - mainly the system
 	IngredientsType& ingredients;
 
 	//! FileImport to read-in the configurations.
 	FileImport<IngredientsType> file;
+
+	//! ENUM-type BFM_READ_TYPE specify the read-in
+	int myReadType;
+
 };
 
 #endif

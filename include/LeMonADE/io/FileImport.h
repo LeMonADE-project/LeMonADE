@@ -226,8 +226,7 @@ private:
  */
 template <class IngredientsType>
 FileImport<IngredientsType>::FileImport(const std::string& sourcefile,IngredientsType& dataStorage)
-  :bfmData(dataStorage),filename(sourcefile),firstMcs(0),
-   parser(file)
+  :bfmData(dataStorage),filename(sourcefile),parser(file),firstMcs(0)
 {
   //open the source file
   file.open(sourcefile.c_str(),std::ios_base::in|std::ios_base::binary);
