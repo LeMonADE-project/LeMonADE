@@ -44,7 +44,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @class Parser
  *
  * @brief Basic parser for files in *.bfm-format
- * 
+ * */
 /*****************************************************************************/
 class Parser
 {
