@@ -1,0 +1,45 @@
+#!/bin/sh
+function usage
+{
+    echo "usage: ./configure [-DINSTALLDIR=/path/to/install/LeMonADE/]"
+}
+
+CMD=$@
+INSTALLDIR=""
+PWD_PATH=$(pwd)
+
+while [[ $1 = -* ]]; do
+    arg=${1%=*};		# split the parameter to extract options
+    case $arg in
+        -h | --help)
+            usage         
+            exit
+            ;;
+            
+        -DINSTALLDIR_LEMONADE )		echo "Install"
+					INSTALLDIR=${1#*=}
+					;;
+				
+        * )                     echo "unknown parameter"
+				usage         
+				exit
+#				usage
+    esac
+    shift           # shift the found arg away.
+done
+
+echo $CMD
+echo $PWD_PATH
+
+if [ -d "build" ]; then
+  # Control will enter here if build-DIRECTORY exists.
+  if [ ! -d $INSTALLDIR ]; then
+    mkdir $INSTALLDIR
+  fi
+  (cd build >/dev/null 2>&1 && cmake .. $CMD)
+else
+  if [ ! -d $INSTALLDIR ]; then
+    mkdir $INSTALLDIR
+  fi
+  (mkdir build && cd build >/dev/null 2>&1 && cmake .. $CMD)
+fi

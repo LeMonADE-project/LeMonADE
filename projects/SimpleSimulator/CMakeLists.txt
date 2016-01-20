@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8)
 
-include_directories ("${LEMONADE_DIR}/include/")
-link_directories ("${LEMONADE_DIR}/lib/")
+include_directories ("${INSTALLDIR_LEMONADE}/include/")
+link_directories ("${INSTALLDIR_LEMONADE}/lib/")
 
 add_executable(SimpleSimulator main.cpp)
 
