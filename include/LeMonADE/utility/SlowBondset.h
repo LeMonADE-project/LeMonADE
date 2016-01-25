@@ -49,7 +49,6 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * than 4 or smaller than -4 are needed. It is more generally applicable
  * than Bondset, but is slower when checking bonds for validity.
  *
- * @todo Maybe rename to FeatureBondsetSlow?
  */
 /***********************************************************/
 class SlowBondset:public FastBondset
@@ -65,8 +64,8 @@ public:
 	//! Default constructor
 	SlowBondset();
 
-	//! Copy constructor (not working)
-	SlowBondset(const SlowBondset& rhs);
+	//! Copy constructor
+	SlowBondset(const SlowBondset& copyBondSet);
 
 	//! Default destructor
 	virtual ~SlowBondset();
