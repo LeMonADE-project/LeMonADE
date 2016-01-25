@@ -100,6 +100,58 @@ TEST_F(SlowBondsetTest, AddBonds){
   
 }
 
+
+/************************************************************************/
+//test the copy constructor of class SlowBondset
+/************************************************************************/
+TEST_F(SlowBondsetTest, CopyConstructor){
+  SlowBondset bondset;
+  
+  EXPECT_EQ(0,bondset.size());
+  //add some vectors
+  bondset.addBond(2,2,1,77);
+  bondset.addBond(2,1,2,78);
+  
+  EXPECT_EQ(2,bondset.size());
+  
+  //copy bondset
+  SlowBondset bondset_new(bondset);
+  
+  //check size
+  EXPECT_EQ(2,bondset_new.size());
+  
+  //try to add duplicate bondvector (same components)
+  EXPECT_THROW(bondset_new.addBond(2,2,1,37),std::runtime_error);
+  
+  //try to add duplicate bondvector (same identifier)
+  EXPECT_THROW(bondset_new.addBond(3,1,0,78),std::runtime_error);
+  
+  //check lookup table
+  VectorInt3 bondvector77(2,2,1);
+  EXPECT_TRUE(bondset_new.isValid(bondvector77));
+  EXPECT_TRUE(bondset_new.isValidStrongCheck(bondvector77));
+  
+  //check components
+  EXPECT_EQ(bondset_new.getBondVector(77).getX(),2);
+  EXPECT_EQ(bondset_new.getBondVector(77).getY(),2);
+  EXPECT_EQ(bondset_new.getBondVector(77).getZ(),1);
+  
+  //check if not only referenced to old bondset
+  bondset.addBond(1,2,2,79);
+  VectorInt3 bondvector79(1,2,2);
+  EXPECT_FALSE(bondset_new.isValid(bondvector79));
+  EXPECT_FALSE(bondset_new.isValidStrongCheck(bondvector79));
+  bondset.clear();
+  EXPECT_EQ(0,bondset.size());
+  EXPECT_EQ(2,bondset_new.size());
+  EXPECT_TRUE(bondset_new.isValid(bondvector77));
+  EXPECT_TRUE(bondset_new.isValidStrongCheck(bondvector77));
+  EXPECT_EQ(bondset_new.getBondVector(77).getX(),2);
+  EXPECT_EQ(bondset_new.getBondVector(77).getY(),2);
+  EXPECT_EQ(bondset_new.getBondVector(77).getZ(),1);
+  
+}
+
 /************************************************************************/
 //test the getBondIdentifier and getBondVector methods of class SlowBondset
 /************************************************************************/
