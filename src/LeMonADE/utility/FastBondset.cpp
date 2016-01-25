@@ -27,6 +27,13 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/utility/FastBondset.h>
 
+/***********************************************************/
+/**
+ * @file
+ * @brief Definition of methods of class FastBondset
+ */
+/***********************************************************/
+
 using namespace Lemonade;
 
 

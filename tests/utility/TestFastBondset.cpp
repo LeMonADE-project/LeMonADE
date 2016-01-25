@@ -104,7 +104,7 @@ TEST_F(BondsetTest, AddBonds){
 
 
 /************************************************************************/
-//test the copy constructor
+//test the copy constructor of class Bondset
 /************************************************************************/
 TEST_F(BondsetTest, CopyConstructor){
   FastBondset bondset;
