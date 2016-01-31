@@ -19,8 +19,9 @@ template metaprogramming in C++.
 
 ````sh
     # generates the application in build-directory
-    ./configure -DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/
+    ./configure -DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/ -DBUILDDIR=/path/to/build/
     make
+    make install #only if you want to install the software after build
 ````
 
  or
@@ -29,13 +30,26 @@ template metaprogramming in C++.
     # generates the lib and examples
     mkdir build
     cd build
-    cmake ..
+    cmake -DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/ ..
     make
+    make install #only if you want to install the software after build
 ````
+
+* The options -DINSTALLDIR_LEMONADE and -DBUILDDIR for the configure script are 
+  optional. The build directory defaults to ./build, the install directory defaults
+  to /usr/local/ . The same goes for the option -DINSTALLDIR_LEMONADE when invoking 
+  cmake (the second compilation and installation way).
+* When installing using 'make install', the library is installed to
+  /given/installation/path/lib/LeMonADE/, or if no path was specified to
+  /usr/local/lib/LeMonADE/. Similar for the header files, which go to
+  /given/installation/path/include/LeMonADE/ or /usr/local/include/LeMonADE/.
+  The binaries are installed into /given/installation/path/bin/ or /usr/local/bin/.
+* For uninstalling simply remove the files created in the installation step.
+   
 
 ## Getting Started
 
-This can be find in the documentation.
+This can be found in the documentation.
 
 
 ## Build the documentation
