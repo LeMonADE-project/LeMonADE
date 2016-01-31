@@ -49,19 +49,9 @@ SET (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release
 # Project Output Paths
 #
 SET (LEMONADE_DIR ${PROJECT_SOURCE_DIR})
+SET (EXECUTABLE_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+SET (LIBRARY_OUTPUT_PATH "${CMAKE_BINARY_DIR}/lib")
 
-#
-# Check if LEMONADE_DIR is given
-#
-if (DEFINED INSTALLDIR_LEMONADE)
-    message("INSTALLDIR_LEMONADE set to "${INSTALLDIR_LEMONADE})
-else()
-    SET (INSTALLDIR_LEMONADE "${LEMONADE_DIR}/build/")
-    message("INSTALLDIR_LEMONADE set automatically to "${INSTALLDIR_LEMONADE}". Use -DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/ for other destination")
-endif()
-
-SET (EXECUTABLE_OUTPUT_PATH "${INSTALLDIR_LEMONADE}/bin")
-SET (LIBRARY_OUTPUT_PATH "${INSTALLDIR_LEMONADE}/lib")
 
 #
 # Project Search Paths
@@ -70,15 +60,17 @@ LIST (APPEND CMAKE_PREFIX_PATH "${LEMONADE_DIR}")
 INCLUDE_DIRECTORIES("${LEMONADE_DIR}/include")
 
 
-INSTALL(DIRECTORY "${LEMONADE_DIR}/include/LeMonADE/" DESTINATION  "${INSTALLDIR_LEMONADE}/include")
 #
 # Add Build Targets
 #
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(projects)
 
-option(LEMONADE_TESTS "Build the test" OFF)
 
+#
+# Add option for building tests
+#
+option(LEMONADE_TESTS "Build the test" OFF)
 if(LEMONADE_TESTS)
     add_subdirectory(tests)
 endif(LEMONADE_TESTS)
@@ -86,6 +78,17 @@ endif(LEMONADE_TESTS)
 #
 # Add Install Targets
 #
+
+# Check if INSTALLDIR_LEMONADE is given
+if (DEFINED INSTALLDIR_LEMONADE)
+    message("INSTALLDIR_LEMONADE set to " ${INSTALLDIR_LEMONADE})
+    SET(CMAKE_INSTALL_PREFIX "${INSTALLDIR_LEMONADE}")
+else (DEFINED INSTALLDIR_LEMONADE)
+	message("INSTALLDIR_LEMONADE set to default" ${CMAKE_INSTALL_PREFIX})
+endif()
+
+
+INSTALL(DIRECTORY "${LEMONADE_DIR}/include/LeMonADE/" DESTINATION  "include/LeMonADE")
 
 #
 # Add Documentation Targets
