@@ -19,7 +19,7 @@ template metaprogramming in C++.
 
 ````sh
     # generates the application in build-directory
-    ./configure -DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/ -DBUILDDIR=/path/to/build/
+    ./configure -DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/ -DBUILDDIR=/path/to/build/ 
     make
     make install #only if you want to install the software after build
 ````
@@ -45,7 +45,18 @@ template metaprogramming in C++.
   /given/installation/path/include/LeMonADE/ or /usr/local/include/LeMonADE/.
   The binaries are installed into /given/installation/path/bin/ or /usr/local/bin/.
 * For uninstalling simply remove the files created in the installation step.
-   
+* If you do not specify the install directory, and the default /usr/local/ is used,
+  you need root access when installing. In this case
+
+````sh
+    # installs the library and headers
+    sudo make install #only if you want to install the software after build
+````
+* If you also want to compile and run the tests, there is a third option, which can be
+  passed to either the configure script (first build method), or to cmake (second build method)
+  This option is -DLEMONADE_TESTS=ON . You need internet access, because the process will
+  download the googletest library
+
 
 ## Getting Started
 

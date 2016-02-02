@@ -2,14 +2,21 @@
 
 function usage
 {
-    echo "usage: ./configure [-DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/] [-DBUILDDIR=/path/to/build/LeMonADE/]"
+    echo "usage: ./configure [options]"
+    echo "options:"
+    echo "-DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/"
+    echo "-DBUILDDIR=/path/to/build/LeMonADE/"
+    echo "-DLEMONADE_TESTS=ON/OFF"
     echo "default build directory is ./build"
     echo "default install directory is /usr/local"
+    echo "default option for tests is OFF"
 }
 
 #default values for build directory and install prefix
 PWD_PATH=$(pwd)
 BUILDDIR="build"
+INSTALLDIR_OPTION="-DINSTALLDIR_LEMONADE=/usr/local"
+TEST_ARGUMENT="-DLEMONADE_TESTS=OFF"
 
 #parse command line arguments
 for arg in "$@"; do
@@ -30,6 +37,12 @@ for arg in "$@"; do
 			echo "Build directory set to "$BUILDDIR
 			;;
 
+	-DLEMONADE_TESTS=*)
+			TEST_ARGUMENT=${arg}
+			TESTOPTION=${arg#*=}
+			echo "Compiling tests set to "$TESTOPTION
+			;;
+
 	* )                     		
 			echo "unknown parameter"
 			usage         
@@ -46,7 +59,7 @@ if [ ! -d $BUILDDIR ]; then
 fi
 
 
-(cd $BUILDDIR >/dev/null 2>&1 && cmake $INSTALLDIR_ARGUMENT $PWD_PATH)
+(cd $BUILDDIR >/dev/null 2>&1 && cmake $INSTALLDIR_ARGUMENT $TEST_ARGUMENT $PWD_PATH)
 
 ########### set up the wrapper makefile ##################
 
@@ -61,22 +74,18 @@ RM    := rm -r
 
 all: ./${BUILDDIR}/Makefile
 	@ \$(MAKE) -C ${BUILDDIR}
+.PHONY: all
 
 ./${BUILDDIR}/Makefile:
 	@ (cd ${BUILDDIR} >/dev/null 2>&1 && cmake ${INSTALLDIR_ARGUMENT} ${PWD_PATH})
 
 clean:
-	@- (cd ${BUILDDIR} >/dev/null 2>&1 && cmake .. >/dev/null 2>&1)
 	@- \$(MAKE) --silent -C ${BUILDDIR} clean || true
-	@- \$(RM) ./${BUILDDIR}/Makefile
-	@- \$(RM) ./${BUILDDIR}/src
-	@- \$(RM) ./${BUILDDIR}/projects
-	@- \$(RM) ./${BUILDDIR}/CMake*
-	@- \$(RM) ./${BUILDDIR}/*.cmake
+.PHONY: clean
 
 install:
 	@ \$(MAKE) -C ${BUILDDIR} install 
-
+.PHONY: install
 
 EOF
 
