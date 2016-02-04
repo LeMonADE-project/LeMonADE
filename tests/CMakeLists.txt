@@ -47,15 +47,15 @@ FILE (GLOB_RECURSE test_SRCS *.cpp *.cxx *.cc *.C *.c *.h *.hpp)
 SET (test_LIBS ${PROJECT_NAME} ${GTEST_LIBRARY} pthread dl)
 SET (test_BIN ${PROJECT_NAME}-tests)
 
-SET(EXECUTABLE_OUTPUT_PATH ${LEMONADE_DIR}/build/tests)
+SET(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/tests)
 
 
 IF (NOT CMAKE_CROSSCOMPILING)
-    LINK_DIRECTORIES(${LEMONADE_DIR}/lib)
+    LINK_DIRECTORIES(${CMAKE_BINARY_DIR}/lib)
     ADD_EXECUTABLE(${test_BIN} ${test_SRCS})
     TARGET_LINK_LIBRARIES(${test_BIN} ${test_LIBS})
     MESSAGE("Running LeMonADE tests...")
-    ADD_CUSTOM_TARGET(check ALL "${LEMONADE_DIR}/build/tests/${test_BIN}" DEPENDS ${test_BIN} COMMENT "Executing LeMonADE tests..." VERBATIM SOURCES ${test_SRCS})
-    ADD_CUSTOM_TARGET(testrun "${LEMONADE_DIR}/build/tests/${test_BIN}" DEPENDS ${test_BIN} COMMENT "Executing LeMonADE tests..." VERBATIM SOURCES ${test_SRCS})
+    ADD_CUSTOM_TARGET(check ALL "${CMAKE_BINARY_DIR}/tests/${test_BIN}" DEPENDS ${test_BIN} COMMENT "Executing LeMonADE tests..." VERBATIM SOURCES ${test_SRCS})
+    ADD_CUSTOM_TARGET(testrun "${CMAKE_BINARY_DIR}/tests/${test_BIN}" DEPENDS ${test_BIN} COMMENT "Executing LeMonADE tests..." VERBATIM SOURCES ${test_SRCS})
 ENDIF (NOT CMAKE_CROSSCOMPILING)
 
