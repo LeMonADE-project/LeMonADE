@@ -63,7 +63,7 @@ private:
 	
 protected:
 	
-	//! Each bond-vector is represented by a std::map <VectorInt3, int32_t>, where the identifier is stored as int32_t
+	//! Each bond-vector is represented by a std::map <int32_t, VectorInt3>, where the identifier is stored as int32_t
 	std::map < int32_t , VectorInt3> BondVectors;
 
 	//! True if bondsetLookup is already synchronized with added allowed bond-vectors, false otherwise.
@@ -74,8 +74,8 @@ public:
 	//! Default constructor
 	FastBondset();
 
-	//! Copy constructor (not working)
-	FastBondset(const FastBondset& rhs);
+	//! Copy constructor
+	FastBondset(const FastBondset& copyBondSet);
 
 	//! Default destructor
 	virtual ~FastBondset();

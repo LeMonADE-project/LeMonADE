@@ -27,18 +27,37 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/utility/FastBondset.h>
 
+/***********************************************************/
+/**
+ * @file
+ * @brief Definition of methods of class FastBondset
+ */
+/***********************************************************/
+
 using namespace Lemonade;
 
 
 FastBondset::FastBondset():lookupSynchronized(false){}
 
-/**
- * @todo implement a copy constructor for this!
- * @param rhs
- */
-FastBondset::FastBondset(const FastBondset& rhs){}
-
 FastBondset::~FastBondset(){}
+
+/***********************************************************/
+/**
+ * @brief Copy constructor for FastBondset
+ *
+ * @param copyBondSet
+ */
+FastBondset::FastBondset(const FastBondset& copyBondSet):// Copy the map Bondvectors explicitly
+  lookupSynchronized(false),
+  BondVectors(copyBondSet.BondVectors)
+	    {
+#ifdef DEBUG
+		// check call of copy constructor 
+	        std::cout << "Bondset copy constructor" << std::endl;
+#endif /*DEBUG*/
+	        // perform the lookup update
+		this->updateLookupTable();
+	    }
 
 
 /**

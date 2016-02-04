@@ -38,10 +38,30 @@ using namespace Lemonade;
 
 SlowBondset::SlowBondset():bondsetLookup(0),lookupOffset(0){}
 
+/***********************************************************/
 /**
- * @todo implement copy-constructor
+ * @brief Copy constructor for SlowBondset
+ *
+ * @param copyBondSet
  */
-SlowBondset::SlowBondset(const SlowBondset& rhs){}
+SlowBondset::SlowBondset(const SlowBondset& copyBondSet):
+  lookupOffset(copyBondSet.lookupOffset)
+	    {
+#ifdef DEBUG
+		// check call of copy constructor 
+	        std::cout << "Bondset copy constructor" << std::endl;
+#endif /*DEBUG*/
+		//copy bondset
+		this->BondVectors=copyBondSet.BondVectors;
+		
+	        // perform the lookup update
+		  // set manually field pointer to 0 to avoid memory leak
+		this->bondsetLookup=NULL;
+		  // set synchronized bool to false to refresh lookup
+		this->lookupSynchronized=false;
+		  // perform the reset
+		this->updateLookupTable();
+	    }
 
 SlowBondset::~SlowBondset(){
 
@@ -171,7 +191,7 @@ void SlowBondset::updateLookupTable()
       lookupOffset++;
       //determine the size of the lookup array in every direction (+1 vor x=y=z=0)
       int32_t lookupSize=2*(lookupOffset)+1;
-      //now allocate memory for bondseLookup and set all vectors to false
+      //now allocate memory for bondsetLookup and set all vectors to false
       bondsetLookup=new bool**[lookupSize];
       
       for(int32_t i=0;i<lookupSize;++i){
