@@ -44,17 +44,22 @@ SlowBondset::SlowBondset():bondsetLookup(0),lookupOffset(0){}
  *
  * @param copyBondSet
  */
-SlowBondset::SlowBondset(const SlowBondset& copyBondSet):// call copy constructor of FastBondset explicitly
-  lookupOffset(copyBondSet.lookupOffset),
-  FastBondset(copyBondSet)
+SlowBondset::SlowBondset(const SlowBondset& copyBondSet):
+  lookupOffset(copyBondSet.lookupOffset)
 	    {
 #ifdef DEBUG
 		// check call of copy constructor 
 	        std::cout << "Bondset copy constructor" << std::endl;
 #endif /*DEBUG*/
+		//copy bondset
+		this->BondVectors=copyBondSet.BondVectors;
+		
 	        // perform the lookup update
-		//std::cout<< this->size() <<std::endl;
-		this->resetLookupTable();
+		  // set manually field pointer to 0 to avoid memory leak
+		this->bondsetLookup=NULL;
+		  // set synchronized bool to false to refresh lookup
+		this->lookupSynchronized=false;
+		  // perform the reset
 		this->updateLookupTable();
 	    }
 
