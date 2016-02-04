@@ -87,5 +87,9 @@ install:
 	@ \$(MAKE) -C ${BUILDDIR} install 
 .PHONY: install
 
+docs:
+	@  \$(MAKE) -C ${BUILDDIR} docs
+.PHONY : docs
+
 EOF
 

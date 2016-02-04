@@ -95,22 +95,26 @@ INSTALL(DIRECTORY "${LEMONADE_DIR}/include/" DESTINATION  "include")
 #
 # Add Documentation Targets
 #
-SET (DOC_FILE_PATH "${LEMONADE_DIR}/docs")
+SET (DOC_INPUT_FILE_PATH "${LEMONADE_DIR}/docs/")
+SET (DOC_OUTPUT_FILE_PATH "${CMAKE_BINARY_DIR}/docs/")
 
 FIND_PACKAGE (Doxygen)
 IF (DOXYGEN_FOUND)
     MESSAGE("Build documentation with: make docs")
-    IF (EXISTS ${DOC_FILE_PATH})
+    IF (EXISTS ${DOC_INPUT_FILE_PATH})
         MESSAGE("Existing File documentation with doxygen")
+        configure_file(${DOC_INPUT_FILE_PATH}doxygen.conf ${DOC_OUTPUT_FILE_PATH}doxygen.conf @ONLY)
+        configure_file(${DOC_INPUT_FILE_PATH}mainpage.dox ${DOC_OUTPUT_FILE_PATH}mainpage.dox @ONLY)
+        configure_file(${DOC_INPUT_FILE_PATH}figures/ProgramStructure.jpg ${DOC_OUTPUT_FILE_PATH}figures/ProgramStructure.jpg COPYONLY)
         ADD_CUSTOM_TARGET(
             docs
-            ${DOXYGEN_EXECUTABLE} doxygen.conf
-            WORKING_DIRECTORY ${DOC_FILE_PATH}
+            ${DOXYGEN_EXECUTABLE} ${DOC_OUTPUT_FILE_PATH}doxygen.conf
+            WORKING_DIRECTORY ${DOC_OUTPUT_FILE_PATH}
             COMMENT "Generating doxygen project documentation." VERBATIM
         )
-    ELSE (EXISTS ${DOC_FILE_PATH})
+    ELSE (EXISTS ${DOC_INPUT_FILE_PATH})
         ADD_CUSTOM_TARGET(docs COMMENT "Doxyfile not found. Please generate a doxygen configuration file to use this target." VERBATIM)
-    ENDIF (EXISTS ${DOC_FILE_PATH})
+    ENDIF (EXISTS ${DOC_INPUT_FILE_PATH})
 ELSE (DOXYGEN_FOUND)
     ADD_CUSTOM_TARGET(docs COMMENT "Doxygen not found. Please install doxygen to use this target." VERBATIM)
 ENDIF (DOXYGEN_FOUND)

@@ -138,6 +138,7 @@ generators are explained.\n
 
 This example shows how to use the class template Vector3D, which is used
 as the basic data type for storing coordinates.
+
 @include example0/ex0main.cpp
 
 @section example1 Example 1: Random numbers 

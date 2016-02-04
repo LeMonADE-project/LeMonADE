@@ -43,7 +43,6 @@ template metaprogramming in C++.
   /given/installation/path/lib/LeMonADE/, or if no path was specified to
   /usr/local/lib/LeMonADE/. Similar for the header files, which go to
   /given/installation/path/include/LeMonADE/ or /usr/local/include/LeMonADE/.
-  The binaries are installed into /given/installation/path/bin/ or /usr/local/bin/.
 * For uninstalling simply remove the files created in the installation step.
 * If you do not specify the install directory, and the default /usr/local/ is used,
   you need root access when installing. In this case
@@ -67,6 +66,13 @@ This can be found in the documentation.
 
 * Install doxygen 
 * Just do for documentation, only:
+
+````sh
+    # generates the documentation
+    ./configure -DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/ -DBUILDDIR=/path/to/build/ 
+    make docs
+````
+
 
 ```sh
     # generates the docs
