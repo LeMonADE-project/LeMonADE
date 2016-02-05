@@ -28,6 +28,6 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LEMONADE_VERSION_H
 #define LEMONADE_VERSION_H
 
-const double LEMONADE_VERSION = 1.0;
+const double LEMONADE_VERSION = 1.1;
 
 #endif
