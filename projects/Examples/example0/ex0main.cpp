@@ -122,6 +122,12 @@ int main(int argc, char* argv[]){
    **********************************************************************/
   
   VectorDouble3 vectorDouble_a=vector32;  //this works
+  std::cout<<"Assignment of VectorInt3 to VectorDouble3 works:\n"
+		<<"\tDouble\tInt\n"
+	   <<"x\t"<<vectorDouble_a.getX()<<"\t"<<vector32.getX()<<"\n"
+	   <<"y\t"<<vectorDouble_a.getY()<<"\t"<<vector32.getY()<<"\n"
+	   <<"z\t"<<vectorDouble_a.getZ()<<"\t"<<vector32.getZ()<<"\n"
+	   <<std::endl;
 
   //uncommenting the following line will result in a compiler error
   //VectorInt3 vector32_d=vectorDouble;

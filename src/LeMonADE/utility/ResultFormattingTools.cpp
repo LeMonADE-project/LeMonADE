@@ -42,7 +42,7 @@ void ResultFormattingTools::addComment(std::stringstream& stream) {
 	stream.clear();
 	stream.seekp(0);//ios_base::beg);
 
-	for (int i = 0; i < v.size(); ++i) {
+	for (size_t i = 0; i < v.size(); ++i) {
 		stream << v[i];
 	}
 	return;

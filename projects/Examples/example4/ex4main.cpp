@@ -93,7 +93,7 @@ int main(int argc, char* argv[]){
     mySystem.modifyMolecules()[0].setY(0);
     mySystem.modifyMolecules()[0].setZ(0);
     
-    for(int i=1;i<polymerLength;i++){
+    for(uint32_t i=1;i<polymerLength;i++){
 	    mySystem.modifyMolecules()[i].setX(i*2);
 	    mySystem.modifyMolecules()[i].setY(i*2);	
 	    mySystem.modifyMolecules()[i].setZ(i);

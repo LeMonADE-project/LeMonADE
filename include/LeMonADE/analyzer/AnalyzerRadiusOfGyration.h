@@ -136,13 +136,12 @@ AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(const Ingred
 								    std::string filenamePrefix,
 								    uint64_t lowerMcsLimit)
 :ingredients(ing)
-,outputFilePrefix(filenamePrefix)
-,lowerLimit(lowerMcsLimit)
 ,Rg_squaredX(1)
 ,Rg_squaredY(1)
 ,Rg_squaredZ(1)
 ,Rg_squared(1)
-
+,lowerLimit(lowerMcsLimit)
+,outputFilePrefix(filenamePrefix)
 {
 	groups.push_back(MonomerGroup<molecules_type>(&(ing.getMolecules())));
 	
@@ -159,12 +158,12 @@ AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(const Ingred
 								    ,std::string filenamePrefix
 								    ,uint64_t lowerMcsLimit)
 :ingredients(ing)
-,outputFilePrefix(filenamePrefix)
-,lowerLimit(lowerMcsLimit)
 ,Rg_squaredX(1)
 ,Rg_squaredY(1)
 ,Rg_squaredZ(1)
 ,Rg_squared(1)
+,lowerLimit(lowerMcsLimit)
+,outputFilePrefix(filenamePrefix)
 {
 	//add the group given as argument to groups. groups will only consist of this single group
 	groups.push_back(g);
@@ -178,12 +177,12 @@ AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(const Ingred
 								    uint64_t lowerMcsLimit)
 :ingredients(ing)
 ,groups(g)
-,outputFilePrefix(filenamePrefix)
-,lowerLimit(lowerMcsLimit)
 ,Rg_squaredX(g.size())
 ,Rg_squaredY(g.size())
 ,Rg_squaredZ(g.size())
 ,Rg_squared(g.size())
+,lowerLimit(lowerMcsLimit)
+,outputFilePrefix(filenamePrefix)
 {
 }
 

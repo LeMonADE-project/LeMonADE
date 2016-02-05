@@ -1,0 +1,95 @@
+#!/bin/bash
+
+function usage
+{
+    echo "usage: ./configure [options]"
+    echo "options:"
+    echo "-DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/"
+    echo "-DBUILDDIR=/path/to/build/LeMonADE/"
+    echo "-DLEMONADE_TESTS=ON/OFF"
+    echo "default build directory is ./build"
+    echo "default install directory is /usr/local"
+    echo "default option for tests is OFF"
+}
+
+#default values for build directory and install prefix
+PWD_PATH=$(pwd)
+BUILDDIR="build"
+INSTALLDIR_OPTION="-DINSTALLDIR_LEMONADE=/usr/local"
+TEST_ARGUMENT="-DLEMONADE_TESTS=OFF"
+
+#parse command line arguments
+for arg in "$@"; do
+    case $arg in
+        -h | --help)
+            usage         
+            exit
+            ;;
+            
+	-DINSTALLDIR_LEMONADE=*)	       	
+			INSTALLDIR_ARGUMENT=${arg}
+			INSTALLDIR=${arg#*=}
+			echo "Install directory set to "$INSTALLDIR
+			;;
+				
+	-DBUILDDIR=*)           
+			BUILDDIR=${arg#*=}
+			echo "Build directory set to "$BUILDDIR
+			;;
+
+	-DLEMONADE_TESTS=*)
+			TEST_ARGUMENT=${arg}
+			TESTOPTION=${arg#*=}
+			echo "Compiling tests set to "$TESTOPTION
+			;;
+
+	* )                     		
+			echo "unknown parameter"
+			usage         
+			exit
+
+
+    esac
+    shift           # shift the found arg away.
+done
+
+#create build directory if it does not exist
+if [ ! -d $BUILDDIR ]; then
+    mkdir -p $BUILDDIR
+fi
+
+
+(cd $BUILDDIR >/dev/null 2>&1 && cmake $INSTALLDIR_ARGUMENT $TEST_ARGUMENT $PWD_PATH)
+
+########### set up the wrapper makefile ##################
+
+cat > ./Makefile <<EOF
+
+##############################################################
+#               CMake Project Wrapper Makefile               #
+############################################################## 
+
+SHELL := /bin/bash
+RM    := rm -r
+
+all: ./${BUILDDIR}/Makefile
+	@ \$(MAKE) -C ${BUILDDIR}
+.PHONY: all
+
+./${BUILDDIR}/Makefile:
+	@ (cd ${BUILDDIR} >/dev/null 2>&1 && cmake ${INSTALLDIR_ARGUMENT} ${PWD_PATH})
+
+clean:
+	@- \$(MAKE) --silent -C ${BUILDDIR} clean || true
+.PHONY: clean
+
+install:
+	@ \$(MAKE) -C ${BUILDDIR} install 
+.PHONY: install
+
+docs:
+	@  \$(MAKE) -C ${BUILDDIR} docs
+.PHONY : docs
+
+EOF
+

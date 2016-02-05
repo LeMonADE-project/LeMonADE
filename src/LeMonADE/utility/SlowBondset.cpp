@@ -256,7 +256,8 @@ bool SlowBondset::isValid(const VectorInt3& bondVector ) const
   uint32_t z=bondVector.getZ()+lookupOffset;
   
   //if bondvectors are within coordinate range of lookup, see if they are valid
-  if(x<=2*lookupOffset && y<=2*lookupOffset && z<=2*lookupOffset)
+  //lookup offset cannot be negative, so conversion is save
+  if(x<=2*uint32_t(lookupOffset) && y<=2*uint32_t(lookupOffset) && z<=2*uint32_t(lookupOffset))
     return bondsetLookup[x][y][z];
   //otherwise always return false
   else return false;
