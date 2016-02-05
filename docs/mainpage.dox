@@ -19,52 +19,19 @@ your needs.
 @subpage advanced_examples 
 \n
  
-@section version Pre-Release
 
-This is an early version of the program. As of now, it
-mainly is a framework that allows for easily putting together analysis tools. 
-Please have a look at the documentation and the examples provided.
-Should you write a feature, analyzer, or updater for your personal use, 
-please let us know how you get along with the design of the program.  We would
-greatly appreciate any feedback, suggestions, or problems you may run into.
-
-@section next_version To be expected in version 0.2
-Roadmap comes here.
-  
 @page getting_started Getting Started
 
 @section compile Downloading and Compiling
 
 You can get the source code of the current Release version from the
-git-repository on gandalf. 
-For this purpose you need to have the version control system git installed on your computer. Once you
-have this, create a folder for the program and cd into this folder, for example
-@code
-mkdir PathToLeMonADe
-cd PathToLeMonADe
-@endcode 
-In the end the LeMonADe-project will be downloaded to
-@code
-/PathToLeMonADe/LeMonADe/
-@endcode 
-Then you can get the source by running:
-@code
-git clone username@gandalf:/home/users/Lemonade/LeMonADe
-@endcode
-You should now have a subfolder called LeMonADe in your current directory. It
-contains the latest release version.
-You then have to compile the source. For this you need cmake. Create a build
-directory in the just downloaded folder LeMonADe, cd there, and run cmake to
-create the make files necessary for building the source. You can then run make
-for starting the build.
-@code
-cd /PathToLeMonADe/LeMonADe/
-mkdir build
-cd build
-cmake ../
-make
-@endcode
-You should now be ready to run the provided example programs.
+git-repository on github
+
+git@github.com:LeMonADE-project/LeMonADE.git
+
+Information on how to build and install the software can be found there, 
+or equivalently in the file Readme.md in the repository.
+
 
 @page program_structure Structure of the Program
 
