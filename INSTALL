@@ -35,7 +35,7 @@
  Standard compilation of example (lib already build):
  ----------------------------------------------------
  cd path/to/example
- cmake -DLEMONADE_DIR=/path/to/LeMonADE/ .
+ cmake -DLEMONADE_INCLUDE_DIR=/path/to/LeMonADE/ -DLEMONADE_LIBRARY_DIR=/path/to/LeMonADE/ .
  make
  
 
@@ -43,6 +43,11 @@
 
  Standard compilation (library+examples):
  ----------------------------------------------------
+ ./configure
+ make
+ 
+ OR
+ 
  mkdir build
  cd build
  cmake ..
@@ -52,6 +57,11 @@
  Develop compilation (library+examples+tests):
  Downloads gtest-1.6.0, if neccessary
  ----------------------------------------------------
+ ./configure -DLEMONADE_TESTS=ON
+ make
+ 
+ OR
+ 
  mkdir build
  cd build
  cmake -DLEMONADE_TESTS=ON ..
@@ -59,6 +69,10 @@
  
  Only documentation (By Doxygen):
  ----------------------------------------------------
+ ./configure
+ make docs
+ 
+ 
  mkdir build
  cd build
  cmake ..
@@ -67,6 +81,11 @@
  Standard compilation of example (lib already build):
  ----------------------------------------------------
  cd path/to/example
- cmake -DLEMONADE_DIR=/path/to/LeMonADE/ .
+ cmake cmake -DLEMONADE_INCLUDE_DIR=/path/to/LeMonADE/ -DLEMONADE_LIBRARY_DIR=/path/to/LeMonADE/ .
  make
  
+ 
+ ----------------------------------------------------
+ For additional options for installation or build path
+ see Readme.md
+ ----------------------------------------------------
