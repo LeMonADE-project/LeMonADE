@@ -42,6 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/feature/FeatureBondset.h>
 #include <LeMonADE/feature/FeatureBox.h>
+#include <LeMonADE/feature/FeatureExcludedVolume.h>
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/core/ConfigureSystem.h>
 
@@ -98,3 +99,173 @@ TEST(IngredientsTest, printMetaData){
 			
 }
 
+
+TEST(IngredientsTest, synchronize_noargument){
+	typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features1;
+	typedef ConfigureSystem<VectorInt3,Features1,3> Config1;
+	typedef Ingredients < Config1> MyIngredients1;
+	
+	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolume<>) Features2;
+	typedef ConfigureSystem<VectorInt3,Features1,3> Config2;
+	typedef Ingredients < Config2> MyIngredients2;
+	
+	
+	MyIngredients1 ingredients1;
+	MyIngredients2 ingredients2;
+
+	//exception from FeatureBox is exspected, as box size is not set
+	EXPECT_THROW(ingredients1.synchronize(),std::runtime_error);	
+	EXPECT_THROW(ingredients2.synchronize(),std::runtime_error);	
+	
+	ingredients1.setBoxX(10);
+	ingredients1.setBoxY(10);
+	ingredients1.setBoxZ(10);
+	ingredients1.setPeriodicX(true);
+	ingredients1.setPeriodicY(true);
+	
+	ingredients2.setBoxX(10);
+	ingredients2.setBoxY(10);
+	ingredients2.setBoxZ(10);
+	ingredients2.setPeriodicX(true);
+	ingredients2.setPeriodicY(false);
+	
+	//exception from FeatureBox is exspected, as periodicity not fully set
+	EXPECT_THROW(ingredients1.synchronize(),std::runtime_error);	
+	EXPECT_THROW(ingredients2.synchronize(),std::runtime_error);	
+	
+	ingredients1.setPeriodicZ(false);
+	ingredients2.setPeriodicZ(false);
+	
+	//now add the bondset and some particles so that effect of synchronize
+	//can be checked
+	ingredients1.modifyBondset().addBFMclassicBondset();
+	ingredients2.modifyBondset().addBFMclassicBondset();
+	
+	ingredients1.modifyMolecules().addMonomer(1,1,1);
+	ingredients1.modifyMolecules().addMonomer(1,4,6);
+	ingredients1.modifyMolecules().addMonomer(7,7,1);
+	//this one violates excluded volume, but excluded volume feauture is not used
+	ingredients1.modifyMolecules().addMonomer(7,8,2);
+	//in ingredients1 this one is ok, but in ingredients2 it will violate box dimensions
+	ingredients1.modifyMolecules().addMonomer(3,9,2);
+	
+	ingredients2.modifyMolecules().addMonomer(1,1,1);
+	ingredients2.modifyMolecules().addMonomer(1,4,6);
+	ingredients2.modifyMolecules().addMonomer(7,7,1);
+	//this one violates excluded volume
+	ingredients2.modifyMolecules().addMonomer(7,8,2);
+	//this one violates box dimensions due to periodicity
+	ingredients2.modifyMolecules().addMonomer(3,9,2);
+	
+	//now make some invalid bonds
+	ingredients1.modifyMolecules().connect(0,1);
+	ingredients2.modifyMolecules().connect(0,1);
+	
+	
+	//again, try to synchronize. 
+	EXPECT_THROW(ingredients1.synchronize(),std::runtime_error);
+	EXPECT_THROW(ingredients2.synchronize(),std::runtime_error);
+	
+	//change position of monomer 1, so that bond is valid.
+	ingredients1.modifyMolecules()[1].setZ(1);
+	ingredients2.modifyMolecules()[1].setZ(1);
+	
+	//again, try to synchronize. ingredients1 should work now 
+	EXPECT_NO_THROW(ingredients1.synchronize());
+	EXPECT_THROW(ingredients2.synchronize(),std::runtime_error);
+	
+	//now change the conflicting particle coordinate for excluded volume 
+	//and synchronize again..still fails due to periodicit
+	ingredients2.modifyMolecules()[3].setY(5);
+	EXPECT_THROW(ingredients2.synchronize(),std::runtime_error);
+	
+	//now change the conflicting particle coordinate for periodicity 
+	//and synchronize again..should work now
+	ingredients2.modifyMolecules()[4].setY(5);
+	EXPECT_NO_THROW(ingredients2.synchronize());
+}
+
+TEST(IngredientsTest, synchronize_withargument){
+	typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features1;
+	typedef ConfigureSystem<VectorInt3,Features1,3> Config1;
+	typedef Ingredients < Config1> MyIngredients1;
+	
+	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolume<>) Features2;
+	typedef ConfigureSystem<VectorInt3,Features1,3> Config2;
+	typedef Ingredients < Config2> MyIngredients2;
+	
+	
+	MyIngredients1 ingredients1;
+	MyIngredients2 ingredients2;
+
+	//exception from FeatureBox is exspected, as box size is not set
+	EXPECT_THROW(ingredients1.synchronize(ingredients1),std::runtime_error);	
+	EXPECT_THROW(ingredients2.synchronize(ingredients2),std::runtime_error);	
+	
+	ingredients1.setBoxX(10);
+	ingredients1.setBoxY(10);
+	ingredients1.setBoxZ(10);
+	ingredients1.setPeriodicX(true);
+	ingredients1.setPeriodicY(true);
+	
+	ingredients2.setBoxX(10);
+	ingredients2.setBoxY(10);
+	ingredients2.setBoxZ(10);
+	ingredients2.setPeriodicX(true);
+	ingredients2.setPeriodicY(false);
+	
+	//exception from FeatureBox is exspected, as periodicity not fully set
+	EXPECT_THROW(ingredients1.synchronize(ingredients1),std::runtime_error);	
+	EXPECT_THROW(ingredients2.synchronize(ingredients2),std::runtime_error);	
+	
+	ingredients1.setPeriodicZ(false);
+	ingredients2.setPeriodicZ(false);
+	
+	//now add the bondset and some particles so that effect of synchronize
+	//can be checked
+	ingredients1.modifyBondset().addBFMclassicBondset();
+	ingredients2.modifyBondset().addBFMclassicBondset();
+	
+	ingredients1.modifyMolecules().addMonomer(1,1,1);
+	ingredients1.modifyMolecules().addMonomer(1,4,6);
+	ingredients1.modifyMolecules().addMonomer(7,7,1);
+	//this one violates excluded volume, but excluded volume feauture is not used
+	ingredients1.modifyMolecules().addMonomer(7,8,2);
+	//in ingredients1 this one is ok, but in ingredients2 it will violate box dimensions
+	ingredients1.modifyMolecules().addMonomer(3,9,2);
+	
+	ingredients2.modifyMolecules().addMonomer(1,1,1);
+	ingredients2.modifyMolecules().addMonomer(1,4,6);
+	ingredients2.modifyMolecules().addMonomer(7,7,1);
+	//this one violates excluded volume
+	ingredients2.modifyMolecules().addMonomer(7,8,2);
+	//this one violates box dimensions due to periodicity
+	ingredients2.modifyMolecules().addMonomer(3,9,2);
+	
+	//now make some invalid bonds
+	ingredients1.modifyMolecules().connect(0,1);
+	ingredients2.modifyMolecules().connect(0,1);
+	
+	
+	//again, try to synchronize. 
+	EXPECT_THROW(ingredients1.synchronize(ingredients1),std::runtime_error);
+	EXPECT_THROW(ingredients2.synchronize(ingredients2),std::runtime_error);
+	
+	//change position of monomer 1, so that bond is valid.
+	ingredients1.modifyMolecules()[1].setZ(1);
+	ingredients2.modifyMolecules()[1].setZ(1);
+	
+	//again, try to synchronize. ingredients1 should work now 
+	EXPECT_NO_THROW(ingredients1.synchronize(ingredients1));
+	EXPECT_THROW(ingredients2.synchronize(ingredients2),std::runtime_error);
+	
+	//now change the conflicting particle coordinate for excluded volume 
+	//and synchronize again..still fails due to periodicity
+	ingredients2.modifyMolecules()[3].setY(5);
+	EXPECT_THROW(ingredients2.synchronize(ingredients2),std::runtime_error);
+	
+	//now change the conflicting particle coordinate for periodicity 
+	//and synchronize again..should work now
+	ingredients2.modifyMolecules()[4].setY(5);
+	EXPECT_NO_THROW(ingredients2.synchronize(ingredients2));
+}
