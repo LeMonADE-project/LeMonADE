@@ -94,12 +94,7 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
   
   //! Conversion constructor
   template < class V, uint m, class E> Molecules (const Molecules<V,m,E>& src);
-  
-  Molecules (const Molecules<Vertex,max_connectivity, Edge>& src);
-
-  //template < class V, uint m, class E >
-  //Molecules<Vertex,max_connectivity, Edge>& operator=  (const Molecules<V,m,E>& src);
-
+ 
   Molecules<Vertex,max_connectivity, Edge>& operator=  (const Molecules<Vertex,max_connectivity, Edge>& src);
 
   Molecules<Vertex,max_connectivity, Edge>& operator+=  (const Molecules<Vertex,max_connectivity, Edge>& src);
@@ -305,46 +300,8 @@ private:
 /*****************************************************************************/
 
 /**
- * Copy one object of Molecules into another, i.e. copies vertex,
- * connectivity and age information.
- *
- * @param src A reference to another graph to copy from.
- * @tparam m Maximum allowed connectivity of the source graph
- * @tparam V Vertex type of the source graph
- * @tparam E Edge type of the source graph
- */
-template < class Vertex, uint max_connectivity, class Edge>
-Molecules<Vertex,max_connectivity, Edge>::Molecules (const Molecules<Vertex,max_connectivity,Edge>& src)
-{
-  
-	clear();
-	vertices.resize(src.size());
-	
-	for ( uint i = 0 ; i < vertices.size(); ++i) {
-		//copy all vertices.
-		this->vertices[i]=static_cast<const typename Molecules<Vertex,max_connectivity, Edge>::internal_vertex_type&>(src[i]);
-		
-		///@todo rethink: this copy should not be necessary because we are also copying the topology, or?
-		
-		//copy the edges, too
-		uint32_t nNeighbours=src.getNumLinks(i);//vertices[i].getNumLinks();
-		
-		for(uint j=0; j<nNeighbours;++j){
-			// copy connections and edges contents
-			connect(i, src.getNeighborIdx(i,j), src.getLinkInfo(i,src.getNeighborIdx(i,j)));
-		}
-	}
-	
-	this->myAge = src.getAge();
-}
-
-
-
-/**
  * Copys and Converts one type of Molecules object into another, i.e. copies vertex,
  * connectivity and age information, and does type-conversion
- * 
- * @todo testing!!!
  *
  * @param src A reference to another graph to copy from.
  * @tparam m Maximum allowed connectivity of the source graph
@@ -355,29 +312,34 @@ template < class Vertex, uint max_connectivity, class Edge>
 template < class V, uint m, class E >
 Molecules<Vertex,max_connectivity, Edge>::Molecules (const Molecules<V,m,E>& src)
 {
-  
+	
 	clear();
 	vertices.resize(src.size());
-
+	
 	for ( uint i = 0 ; i < vertices.size(); ++i) {
-	    //copy all vertices.
-	    this->vertices[i]=static_cast<const typename Molecules<Vertex,max_connectivity, Edge>::internal_vertex_type&>(src[i]);
-
-	    ///@todo rethink: this copy should not be necessary because we are also copying the topology, or?
-
-
-	    //copy the edges, too
-	    uint32_t nNeighbours=src.getNumLinks(i);//vertices[i].getNumLinks();
-
-	    for(uint j=0; j<nNeighbours;++j){
-		  // copy connections and edges contents
-		  connect(i, src.getNeighborIdx(i,j), src.getLinkInfo(i,src.getNeighborIdx(i,j)));
-	    }
-
-	  }
-
-	  this->myAge = src.getAge();
-
+		
+		//this initializes a new vertex, all connectivity information is lost
+		this->vertices[i]=src[i];		
+		//copy the connectivity and edges, too
+		uint32_t nNeighbours=src.getNumLinks(i);
+		try{
+			for(uint j=0; j<nNeighbours;++j){
+				connect(i, src.getNeighborIdx(i,j), src.getLinkInfo(i,src.getNeighborIdx(i,j)));
+			}
+		}
+		catch(std::runtime_error& e){
+			std::stringstream errormessage;
+			errormessage<<"Error when copying connectivity information in "
+			<<"Molecules copy constructor.\n Original error:\n"
+			<<e.what();
+			
+			throw std::runtime_error(errormessage.str());
+		}
+		
+	}
+	
+	this->myAge = src.getAge();
+	
 }
   
 /**
@@ -398,12 +360,12 @@ Molecules<Vertex,max_connectivity, Edge>& Molecules<Vertex, max_connectivity, Ed
 	
 	for ( uint i = 0 ; i < vertices.size(); ++i) {
 		//copy all vertices.
-		this->vertices[i]=static_cast<const typename Molecules<Vertex,max_connectivity, Edge>::internal_vertex_type&>(src[i]);
+		//this does not copy the connectivity info, but it is copied 
+		//in the loop below
+		this->vertices[i]=src[i];
 		
-		///@todo rethink: this copy should not be necessary because we are also copying the topology, or?
-		
-		//copy the edges, too
-		uint32_t nNeighbours=src.getNumLinks(i);//vertices[i].getNumLinks();
+		//copy the connectivity and edges, too
+		uint32_t nNeighbours=src.getNumLinks(i);
 		
 		for(uint j=0; j<nNeighbours;++j){
 			// copy connections and edges contents
@@ -487,7 +449,7 @@ void Molecules <Vertex,max_connectivity,Edge>::connect(uint32_t a, uint32_t b, c
       vertices.at(a).connect(b);
       vertices.at(b).connect(a);
     }
-    //catch error due to non-existent indices here
+    //method vertices.at(int) might throw out_of_range exception.
     catch(std::out_of_range& exception){
     	std::stringstream messagestream;
       messagestream<<"Molecules::connect(int a, int b): a="<<a<<" and b="<<b<<std::endl;
@@ -503,10 +465,12 @@ void Molecules <Vertex,max_connectivity,Edge>::connect(uint32_t a, uint32_t b, c
       //re-throw exception
       throw std::range_error(messagestream.str());
     }
-    //catch other errormessages here (only type string)
-    catch(std::string& errormessage){
+    //catch other errormessages here. we normally use runtime_error
+    catch(std::runtime_error& e){
       std::stringstream messagestream;
+      messagestream<<"Molecules::connect(int a, int b): a="<<a<<" and b="<<b<<std::endl;
       messagestream<<"Indices were: a="<<a<<" ,b="<<b<<std::endl;
+      messagestream<<e.what();
       //re-throw exception
       throw std::runtime_error(messagestream.str());
     }
