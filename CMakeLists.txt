@@ -41,9 +41,18 @@ SET (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 
 
 #
-# Debugging Options
+# Compile options
 #
-SET (CMAKE_VERBOSE_MAKEFILE 0) # Use 1 for debugging, 0 for release
+IF(NOT CMAKE_BUILD_TYPE)
+SET (CMAKE_BUILD_TYPE "Release") #default build type is Release
+SET (CMAKE_VERBOSE_MAKEFILE 0) 
+ENDIF(NOT CMAKE_BUILD_TYPE)
+
+SET (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse2 -mssse3 -fexpensive-optimizations ")
+SET (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse2 -mssse3 -fexpensive-optimizations ")
+
+SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall -g -DDEBUG ")
+SET (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -Wall -g -DDEBUG ")
 
 #
 # Project Output Paths
