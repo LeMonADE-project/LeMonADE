@@ -7,16 +7,19 @@ function usage
     echo "-DINSTALLDIR_LEMONADE=/path/to/install/LeMonADE/"
     echo "-DBUILDDIR=/path/to/build/LeMonADE/"
     echo "-DLEMONADE_TESTS=ON/OFF"
+    echo "-DCMAKE_BUILD_TYPE=Release/Debug"
     echo "default build directory is ./build"
     echo "default install directory is /usr/local"
     echo "default option for tests is OFF"
+    echo "default option for build type is Release"
 }
 
 #default values for build directory and install prefix
 PWD_PATH=$(pwd)
 BUILDDIR="build"
-INSTALLDIR_OPTION="-DINSTALLDIR_LEMONADE=/usr/local"
-TEST_ARGUMENT="-DLEMONADE_TESTS=OFF"
+#INSTALLDIR_OPTION="-DINSTALLDIR_LEMONADE=/usr/local"
+#TEST_ARGUMENT="-DLEMONADE_TESTS=OFF"
+CMAKE_ARGUMENTS=""
 
 #parse command line arguments
 for arg in "$@"; do
@@ -27,7 +30,7 @@ for arg in "$@"; do
             ;;
             
 	-DINSTALLDIR_LEMONADE=*)	       	
-			INSTALLDIR_ARGUMENT=${arg}
+			CMAKE_ARGUMENTS+=${arg}" "
 			INSTALLDIR=${arg#*=}
 			echo "Install directory set to "$INSTALLDIR
 			;;
@@ -38,9 +41,15 @@ for arg in "$@"; do
 			;;
 
 	-DLEMONADE_TESTS=*)
-			TEST_ARGUMENT=${arg}
+			CMAKE_ARGUMENTS+=${arg}" "
 			TESTOPTION=${arg#*=}
 			echo "Compiling tests set to "$TESTOPTION
+			;;
+			
+	-DCMAKE_BUILD_TYPE=*)
+			CMAKE_ARGUMENTS+=${arg}" "
+			BUILDOPTION=${arg#*=}
+			echo "Build type set to "$BUILDOPTION
 			;;
 
 	* )                     		
@@ -58,8 +67,9 @@ if [ ! -d $BUILDDIR ]; then
     mkdir -p $BUILDDIR
 fi
 
+echo "Arguments passed to cmake are "${CMAKE_ARGUMENTS}
 
-(cd $BUILDDIR >/dev/null 2>&1 && cmake $INSTALLDIR_ARGUMENT $TEST_ARGUMENT $PWD_PATH)
+(cd $BUILDDIR >/dev/null 2>&1 && cmake $CMAKE_ARGUMENTS $PWD_PATH)
 
 ########### set up the wrapper makefile ##################
 
@@ -77,7 +87,7 @@ all: ./${BUILDDIR}/Makefile
 .PHONY: all
 
 ./${BUILDDIR}/Makefile:
-	@ (cd ${BUILDDIR} >/dev/null 2>&1 && cmake ${INSTALLDIR_ARGUMENT} ${PWD_PATH})
+	@ (cd ${BUILDDIR} >/dev/null 2>&1 && cmake ${CMAKE_ARGUMENTS} ${PWD_PATH})
 
 clean:
 	@- \$(MAKE) --silent -C ${BUILDDIR} clean || true
