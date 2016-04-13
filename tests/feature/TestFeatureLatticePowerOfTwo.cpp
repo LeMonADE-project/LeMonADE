@@ -27,7 +27,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gtest/gtest.h"
 
-#include <LeMonADE/LeMonADE.h>
+#include <LeMonADE/core/ConfigureSystem.h>
+#include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
 
 using namespace std;
