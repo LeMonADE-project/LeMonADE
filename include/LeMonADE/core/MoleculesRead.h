@@ -154,6 +154,79 @@ void ReadBonds<IngredientsType>::execute()
 
 /***********************************************************************/
 /**
+ * @class ReadBreaks
+ * @brief Handles BFM-File-Reads \b !remove_bonds.
+ *
+ * @tparam IngredientsType Ingredients class storing all system information.
+ **/
+template < class IngredientsType >
+class ReadBreaks: public ReadToDestination < IngredientsType >
+{
+ public:
+	//! Empty Constructor, but delegates call to the Feature
+	ReadBreaks(IngredientsType& destination):ReadToDestination< IngredientsType > (destination){}
+
+	void execute();
+};
+/***********************************************************************/
+/**
+ * @brief Executes the reading routine to extract \b !remove_bonds.
+ *
+ * @throw <std::runtime_error> if broken bond could not be read.
+ **/
+
+template < class IngredientsType >
+void ReadBreaks<IngredientsType>::execute()
+{
+  std::cout << "ReadBreaks:execute() : updating " <<std::endl;
+  int a,b;
+  int nBreaks=0;
+  
+  std::string line;
+  std::streampos previous;
+  //go to next line and save position of get pointer to streampos previous
+  this->getInputStream().get();
+  previous=this->getInputStream().tellg();
+
+  //get line from file for processing
+  getline(this->getInputStream(),line);
+  
+  //start processing the line
+  while(!line.empty() && this->getInputStream().good()){
+    
+    //if the line contains a bfm Read, stop the procedure and set the get pointer back
+    if(this->detectRead(line)){
+      this->getInputStream().seekg(previous);
+      break;
+    }
+    
+    //initialize a stringstream with the line for easier processing
+    std::stringstream stream(line);
+
+    //read bond partners
+    stream>>a>>b;
+    //throw exception if something went wrong
+    if(stream.fail()){
+      
+    	std::stringstream errormessage;
+      errormessage<<"ReadBreaks<IngredientsType>::execute()\n"
+		  <<"Could not read broken bond partners in "<<nBreaks+1<<" th broken bond definition\n";
+      throw std::runtime_error(errormessage.str());
+      
+    }
+      
+    //if still here, add broken bond to bondset
+    this->getDestination().modifyMolecules().disconnect(a-1,b-1);
+    nBreaks++;
+    //read next line from file
+    getline(this->getInputStream(),line);
+  }
+  
+  std::cout << "ReadBreaks:execute() : done " <<std::endl;
+}
+
+/***********************************************************************/
+/**
  * @class ReadMcs
  * @brief Handles BFM-File-Reads \b !mcs.
  *

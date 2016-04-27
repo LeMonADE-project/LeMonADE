@@ -362,5 +362,128 @@ void WriteBonds<IngredientsType>::writeStream(std::ostream& strm){
  strm<<"\n";
 }
 
+/******** write command handling !add_bonds *********************************/
+/**
+ * @class WriteAddBonds
+ * @brief Handles BFM-File-Write \b !add_bonds.
+ * 
+ * @tparam IngredientsType Ingredients class storing all system information.
+ * */
+template <class IngredientsType>
+class WriteAddBonds: public AbstractWrite<IngredientsType>
+{
+public:
+	//! constructor
+	WriteAddBonds(const IngredientsType& ingredients):AbstractWrite<IngredientsType>(ingredients){}
+// 	{this->setHeaderOnly(false);}
+	
+	//! writes to the file stream
+	void writeStream(std::ostream& strm);
+	
+private:
+  
+  //! Storage for added bonds
+  std::map<std::pair<uint32_t,uint32_t>,int> AddBonds;
+  
+  //!Storage for a copy of ingredients of the last time step
+  IngredientsType old_ingredients;
+  
+	
+	
+};
+/**********************implementation of members    *******************/
+//! Executes the routine to write \b !add_bonds.
+template <class IngredientsType>
+void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
+		
+	//get a map containing the added bond	
+	AddBonds=this->getSource().getMolecules().getEdges();
+	//get a map containing the removed bo
+	std::map<std::pair<uint32_t,uint32_t>,int> RemovedBonds=
+	old_ingredients.getMolecules().getEdges();
+	
+	//erases all bond parnters from the map which are unchanged
+	//the rest of RemovedBonds contains only bonds which are removed during
+	//the last simulation step, in contrast the rest of the map AddBonds 
+	//contains only bonds which are newly formed during the last simulation
+	//step
+	std::map<std::pair<uint32_t,uint32_t>, int>::iterator it;
+	for(it=AddBonds.begin();it!=AddBonds.end();++it){
+		if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
+		  AddBonds.erase(it);
+		  RemovedBonds.erase(RemovedBonds.find(it->first));
+		}
+	}
+	
+	//write only the bonds that were added since the last update	
+	strm<<"!add_bonds\n";
+	for(it=AddBonds.begin();it!=AddBonds.end();++it){
+		strm<<it->first.first<<" "<<it->first.second<<"\n";
+	}
+	strm<<"\n";
+	
+	old_ingredients=this->getSource();
 
+	
+}
+/******** write command handling !remove_bonds *********************************/
+/**
+ * @class WriteRemoveBonds
+ * @brief Handles BFM-File-Write \b !remove_bonds.
+ * 
+ * @tparam IngredientsType Ingredients class storing all system information.
+ * */
+template <class IngredientsType>
+class WriteRemoveBonds: public AbstractWrite<IngredientsType>
+{
+public:
+	//! constructor
+	WriteRemoveBonds(const IngredientsType& ingredients):AbstractWrite<IngredientsType>(ingredients){}
+	
+	//! writes to the file stream
+	void writeStream(std::ostream& strm);
+	
+private:
+	  
+	//! Storage for removed bonds
+	std::map<std::pair<uint32_t,uint32_t>,int> RemovedBonds;
+	
+	//!Storage for a copy of ingredients of the last time step
+	IngredientsType old_ingredients;
+	
+};
+/**********************implementation of members    *******************/
+//! Executes the routine to write \b !remove_bonds.
+template <class IngredientsType>
+void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
+		
+	//get a map containing the removed bond
+	RemovedBonds=old_ingredients.getMolecules().getEdges();
+	//get a map containing the added bond	
+	std::map<std::pair<uint32_t,uint32_t>,int> AddBonds=
+	this->getSource().getMolecules().getEdges();
+	
+	//erases all bond parnters from the map which are unchanged
+	//the rest of RemovedBonds contains only bonds which are removed during
+	//the last simulation step, in contrast the rest of the map AddBonds 
+	//contains only bonds which are newly formed during the last simulation
+	//step
+	std::map<std::pair<uint32_t,uint32_t>, int>::iterator it;
+	for(it=AddBonds.begin();it!=AddBonds.end();++it){
+		if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
+		  AddBonds.erase(it);
+		  RemovedBonds.erase(RemovedBonds.find(it->first));
+		}
+	}
+	
+	//write only the breaks that were removed since the last update
+	strm<<"!remove_bonds\n";
+	for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
+		strm<<it->first.first<<" "<<it->first.second<<"\n";
+	}
+	strm<<"\n";
+	
+	old_ingredients=this->getSource();
+	
+}
 #endif /* LEMONADE_CORE_MOLECULESWRITE_H */
