@@ -382,12 +382,13 @@ public:
 	void writeStream(std::ostream& strm);
 	
 private:
-  
-  //! Storage for added bonds
-  std::map<std::pair<uint32_t,uint32_t>,int> AddBonds;
-  
-  //!Storage for a copy of ingredients of the last time step
-  IngredientsType old_ingredients;
+  	  
+	typedef typename IngredientsType::molecules_type::edge_type edge_type;
+	//! Storage for added bonds
+	std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds;
+	
+	//!Storage for a copy of ingredients of the last time step
+	IngredientsType old_ingredients;
   
 	
 	
@@ -400,7 +401,7 @@ void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 	//get a map containing the added bond	
 	AddBonds=this->getSource().getMolecules().getEdges();
 	//get a map containing the removed bo
-	std::map<std::pair<uint32_t,uint32_t>,int> RemovedBonds=
+	std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=
 	old_ingredients.getMolecules().getEdges();
 	
 	//erases all bond parnters from the map which are unchanged
@@ -408,7 +409,7 @@ void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 	//the last simulation step, in contrast the rest of the map AddBonds 
 	//contains only bonds which are newly formed during the last simulation
 	//step
-	std::map<std::pair<uint32_t,uint32_t>, int>::iterator it;
+	typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
 	for(it=AddBonds.begin();it!=AddBonds.end();++it){
 		if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
 		  AddBonds.erase(it);
@@ -446,8 +447,10 @@ public:
 	
 private:
 	  
+	typedef typename IngredientsType::molecules_type::edge_type edge_type;
+	  
 	//! Storage for removed bonds
-	std::map<std::pair<uint32_t,uint32_t>,int> RemovedBonds;
+	std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds;
 	
 	//!Storage for a copy of ingredients of the last time step
 	IngredientsType old_ingredients;
@@ -461,7 +464,7 @@ void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
 	//get a map containing the removed bond
 	RemovedBonds=old_ingredients.getMolecules().getEdges();
 	//get a map containing the added bond	
-	std::map<std::pair<uint32_t,uint32_t>,int> AddBonds=
+	std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=
 	this->getSource().getMolecules().getEdges();
 	
 	//erases all bond parnters from the map which are unchanged
@@ -469,7 +472,7 @@ void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
 	//the last simulation step, in contrast the rest of the map AddBonds 
 	//contains only bonds which are newly formed during the last simulation
 	//step
-	std::map<std::pair<uint32_t,uint32_t>, int>::iterator it;
+	typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
 	for(it=AddBonds.begin();it!=AddBonds.end();++it){
 		if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
 		  AddBonds.erase(it);
