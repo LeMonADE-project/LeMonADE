@@ -40,7 +40,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /***********************************************************************/
 /**
  * @file
- * @brief Writing routines for bfm-Reads !number_of_monomers, !bonds and !mcs
+ * @brief Writing routines for bfm-Reads !number_of_monomers !bonds, !mcs,
+ * !add_bonds and !remove_bonds
  **/
 /***********************************************************************/
 

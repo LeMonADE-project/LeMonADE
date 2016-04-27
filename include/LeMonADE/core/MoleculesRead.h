@@ -29,8 +29,9 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #define LEMONADE_CORE_MOLECULESREAD_H
 
 /**
- *@file 
- *@brief Reading routines for bfm-Reads !number_of_monomers, !bonds and !mcs
+ * @file 
+ * @brief Reading routines for bfm-Reads !number_of_monomers, 
+ * !bonds/!add_bonds, !remove_bonds and !mcs 
  **/
 
 #include <sstream>
