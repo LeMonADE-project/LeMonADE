@@ -29,6 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #define LEMONADE_UPDATER_MOVES_MOVEADDSCMONOMER_H
 
 #include <LeMonADE/updater/moves/MoveBase.h>
+#include <LeMonADE/utility/Vector3D.h>
 
 /**
  * @class MoveAddScMonomer
