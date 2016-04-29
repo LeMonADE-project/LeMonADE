@@ -220,7 +220,7 @@ TEST_F(FeatureMoleculesIOTest, ExportWrite){
   EXPECT_TRUE(checkIngredients.getMolecules().areConnected(4,1));
   EXPECT_FALSE(checkIngredients.getMolecules().areConnected(2,3));
   //remove temporary file tmp.bfm (and let test fail if not removed)
-//   EXPECT_EQ(0,remove(filename.c_str()));
+  EXPECT_EQ(0,remove(filename.c_str()));
 
 }
 
