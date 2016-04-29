@@ -375,8 +375,10 @@ class WriteAddBonds: public AbstractWrite<IngredientsType>
 {
 public:
 	//! constructor
-	WriteAddBonds(const IngredientsType& ingredients):AbstractWrite<IngredientsType>(ingredients){}
-// 	{this->setHeaderOnly(false);}
+	WriteAddBonds(const IngredientsType& ingredients):
+	AbstractWrite<IngredientsType>(ingredients),
+	old_ingredients(ingredients)
+	{init=false;this->setHeaderOnly(false);}
 	
 	//! writes to the file stream
 	void writeStream(std::ostream& strm);
@@ -389,15 +391,16 @@ private:
 	
 	//!Storage for a copy of ingredients of the last time step
 	IngredientsType old_ingredients;
-  
 	
-	
+	//!First time of execute writeStream is initializing step 
+	bool init;
+
 };
 /**********************implementation of members    *******************/
 //! Executes the routine to write \b !add_bonds.
 template <class IngredientsType>
 void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
-		
+	if(init){
 	//get a map containing the added bond	
 	AddBonds=this->getSource().getMolecules().getEdges();
 	//get a map containing the removed bo
@@ -416,16 +419,19 @@ void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 		  RemovedBonds.erase(RemovedBonds.find(it->first));
 		}
 	}
-	
+	uint32_t number_of_monomers(this->getSource().getMolecules().size());
 	//write only the bonds that were added since the last update	
 	strm<<"!add_bonds\n";
 	for(it=AddBonds.begin();it!=AddBonds.end();++it){
-		strm<<it->first.first<<" "<<it->first.second<<"\n";
+		  strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
 	}
 	strm<<"\n";
 	
 	old_ingredients=this->getSource();
-
+	}
+	else{init=true; 
+	  old_ingredients=this->getSource();
+	}
 	
 }
 /******** write command handling !remove_bonds *********************************/
@@ -440,7 +446,10 @@ class WriteRemoveBonds: public AbstractWrite<IngredientsType>
 {
 public:
 	//! constructor
-	WriteRemoveBonds(const IngredientsType& ingredients):AbstractWrite<IngredientsType>(ingredients){}
+	WriteRemoveBonds(const IngredientsType& ingredients):
+	AbstractWrite<IngredientsType>(ingredients),
+	old_ingredients(ingredients)
+	{init=false;this->setHeaderOnly(false);}
 	
 	//! writes to the file stream
 	void writeStream(std::ostream& strm);
@@ -454,13 +463,17 @@ private:
 	
 	//!Storage for a copy of ingredients of the last time step
 	IngredientsType old_ingredients;
+
+	//!First time of execute writeStream is initializing step 
+	bool init;
+
 	
 };
 /**********************implementation of members    *******************/
 //! Executes the routine to write \b !remove_bonds.
 template <class IngredientsType>
 void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
-		
+	if(init){
 	//get a map containing the removed bond
 	RemovedBonds=old_ingredients.getMolecules().getEdges();
 	//get a map containing the added bond	
@@ -483,11 +496,15 @@ void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
 	//write only the breaks that were removed since the last update
 	strm<<"!remove_bonds\n";
 	for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
-		strm<<it->first.first<<" "<<it->first.second<<"\n";
+		strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
 	}
 	strm<<"\n";
 	
 	old_ingredients=this->getSource();
+	}
+	else{init=true; 
+	  old_ingredients=this->getSource();
+	}
 	
 }
 #endif /* LEMONADE_CORE_MOLECULESWRITE_H */
