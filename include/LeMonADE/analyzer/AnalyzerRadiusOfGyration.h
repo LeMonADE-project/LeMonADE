@@ -30,12 +30,12 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <string>
 
-#include <LeMonADE/LeMonADE.h>
+#include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/analyzer/AbstractAnalyzer.h>
 #include <LeMonADE/utility/NumericTools.h>
 #include <LeMonADE/utility/NumericFunctions.h>
 #include <LeMonADE/utility/ResultFormattingTools.h>
-#include <LeMonADE/utility/Vector3D.h>
+#include <LeMonADE/utility/MonomerGroup.h>
 
 
 /************************************************************************

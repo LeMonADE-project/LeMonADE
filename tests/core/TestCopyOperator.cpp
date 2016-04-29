@@ -35,8 +35,12 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /*****************************************************************************/
 
 #include "gtest/gtest.h"
+#include<stdint.h>
 
-#include <LeMonADE/LeMonADE.h>
+#include <LeMonADE/core/ConfigureSystem.h>
+#include <LeMonADE/core/Ingredients.h>
+#include <LeMonADE/feature/FeatureMoleculesIO.h>
+#include <LeMonADE/feature/FeatureAttributes.h>
 #include <LeMonADE/feature/FeatureExcludedVolume.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
 
