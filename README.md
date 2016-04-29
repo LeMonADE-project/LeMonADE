@@ -51,11 +51,15 @@ template metaprogramming in C++.
     # installs the library and headers
     sudo make install #only if you want to install the software after build
 ````
-* If you also want to compile and run the tests, there is a third option, which can be
+* If you also want to compile and run the tests, there is another option, which can be
   passed to either the configure script (first build method), or to cmake (second build method)
   This option is -DLEMONADE_TESTS=ON . You need internet access, because the process will
   download the googletest library
-
+* Another option that can be passed is -DCMAKE_BUILD_TYPE=Release/Debug. The default value 
+  is Release, which uses compiler flags for optimization. If the option "Debug" is chosen,
+  no compiler optimizations are used, compiler warnings are enabled by -Wall, and 
+  debugging information is compiled into the binary with -g. Other flags then "Release",
+  or "Debug" are not allowed and will lead to termination and an error message by cmake.
 
 ## Getting Started
 

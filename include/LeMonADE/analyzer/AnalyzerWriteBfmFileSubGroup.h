@@ -26,7 +26,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------*/
 
 #ifndef LEMONADE_ANALYZER_ANALYZERWRITEBFMFILESUBGROUP_H
-#ifndef LEMONADE_ANALYZER_ANALYZERWRITEBFMFILESUBGROUP_H
+#define LEMONADE_ANALYZER_ANALYZERWRITEBFMFILESUBGROUP_H
 
 #include <set>
 #include <map>

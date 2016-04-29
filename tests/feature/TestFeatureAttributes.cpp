@@ -184,3 +184,41 @@ TEST_F(FeatureAttributesTest,ReadAttributesClass)
   
   
 }
+
+TEST_F(FeatureAttributesTest,CopyConstructor)
+{
+	typedef MyIngredients::molecules_type MyMolecules;
+	MyMolecules molecules1;
+	
+	//check if attributes are copied corriectly by copy constructor
+	molecules1.resize(5);
+	molecules1[0].setAttributeTag(1);
+	molecules1[1].setAttributeTag(2);
+	molecules1[2].setAttributeTag(3);
+	molecules1[3].setAttributeTag(4);
+	molecules1[4].setAttributeTag(5);
+	//create new objects from molecules1
+	
+	typedef ConfigureSystem<VectorInt3,Features,8> Config8;
+	typedef Ingredients<Config8> MyIngredients8;
+	typedef MyIngredients8::molecules_type MyMolecules8;
+	MyMolecules molecules2(molecules1);
+	MyMolecules8 molecules3(molecules2);
+	
+	EXPECT_EQ(molecules1[0].getAttributeTag(),molecules2[0].getAttributeTag());
+	EXPECT_EQ(molecules1[0].getAttributeTag(),molecules3[0].getAttributeTag());
+	
+	EXPECT_EQ(molecules1[1].getAttributeTag(),molecules2[1].getAttributeTag());
+	EXPECT_EQ(molecules1[1].getAttributeTag(),molecules3[1].getAttributeTag());
+	
+	EXPECT_EQ(molecules1[2].getAttributeTag(),molecules2[2].getAttributeTag());
+	EXPECT_EQ(molecules1[2].getAttributeTag(),molecules3[2].getAttributeTag());
+	
+	EXPECT_EQ(molecules1[3].getAttributeTag(),molecules2[3].getAttributeTag());
+	EXPECT_EQ(molecules1[3].getAttributeTag(),molecules3[3].getAttributeTag());
+	
+	EXPECT_EQ(molecules1[4].getAttributeTag(),molecules2[4].getAttributeTag());
+	EXPECT_EQ(molecules1[4].getAttributeTag(),molecules3[4].getAttributeTag());
+	
+}
+
