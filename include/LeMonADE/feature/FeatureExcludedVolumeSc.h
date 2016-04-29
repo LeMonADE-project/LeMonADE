@@ -199,7 +199,9 @@ template<template<typename> class SpecializedClass, typename ValueType>
 template < class IngredientsType> 
 bool FeatureExcludedVolumeSc< SpecializedClass<ValueType> >::checkMove( const IngredientsType& ingredients, const MoveLocalSc& move ) const
 {
-
+	if(!latticeFilledUp)
+	  throw std::runtime_error("*****FeatureExcludedVolumeSc_T::checkMove....lattice is not populated. Run synchronize!\n");
+	
 	//get the position of the monomer to be moved (assume "lower left corner")
 	VectorInt3 refPos=ingredients.getMolecules()[move.getIndex()];
 	//get the direction of the move

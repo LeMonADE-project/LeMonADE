@@ -31,6 +31,9 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveBase.h>
 
 /**
+ * @file
+ * 
+ * @author Hauke
  * @class MoveAddScMonomer
  *
  * @brief Standard local bfm-move on simple cubic lattice for the scBFM to add a vertex/monomer
@@ -38,8 +41,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @deprecated Untested!!
  *
  * @todo Test!
- *
- * @todo Comment!
+ * 
+ * @todo Code doubling with MoveAddBccMonomer! Specialized class only neccessary to enable the features to handle the moves types differently.
  **/
 class MoveAddScMonomer:public MoveBase
 {
@@ -53,18 +56,30 @@ public:
 
   //! Apply the move to the system given as argument
   template< class IngredientsType> void apply(IngredientsType& ing);
-    
+  
+  //! setter function for type of new monomer
   void setType(int32_t t){type=t;}
+  //! setter function for position of new monomer taking a VectorInt3
   void setPosition(VectorInt3 pos){position=pos;}
+  //! setter function for position of new monomer taking a triple of ints
   void setPosition(int32_t x,int32_t y,int32_t z){position.setX(x);position.setY(y);position.setZ(z);}
+  //! getter function for the type of the new monomer
   int32_t getType() const{return type;}
+  //! getter function for the position of the new monomer returning a VectorInt3
   const VectorInt3 getPosition() const {return position;}
+  //! getter function for index of the new monomer. This is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
   size_t getParticleIndex() const {return particleIndex;}
   
 private:
+  //! position where the new monomer is placed in the simulation box
   VectorInt3 position;
+  //! type that is applied to the new monomer, requires Feature FeatureAttributes with int-Type
   int32_t type;
-  size_t particleIndex; /*set when apply is called. useful if Features want to alter the particle when applying the move*/
+  /** 
+   * @brief Index of new PartileThis is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
+   * @details It is set when apply is called. useful if Features want to alter the particle when applying the move
+   */
+  size_t particleIndex;
 };
 
 
@@ -73,7 +88,7 @@ private:
 /////////// implementation of the members ///////////////////////////////////
 
 /*****************************************************************************/
-/*
+/**
  * @brief reset the probability
  */
 template <class IngredientsType>
@@ -84,8 +99,8 @@ void MoveAddScMonomer::init(const IngredientsType& ing)
 }
 
 /*****************************************************************************/
-/*
- * check if the move is allowed by the system given as argument.
+/**
+ * @brief check if the move is allowed by the system given as argument.
  */
 template <class IngredientsType>
 bool MoveAddScMonomer::check(IngredientsType& ing)
@@ -95,8 +110,8 @@ bool MoveAddScMonomer::check(IngredientsType& ing)
 }
   
 /*****************************************************************************/
-/*
- * apply the move to the system given as argument
+/**
+ * @brief apply the move to the system given as argument
  */
 template< class IngredientsType>
 void MoveAddScMonomer::apply(IngredientsType& ing)
@@ -107,7 +122,7 @@ void MoveAddScMonomer::apply(IngredientsType& ing)
   particleIndex=ing.getMolecules().size()-1;
   //now apply it to the features so that the features can make alterations,
   //for example set the attribute tag, if the FeatureAttributes is used
-  ing.applyMove(ing,*this);		
+  ing.applyMove(ing,*this);
 }
 
-#endif
+#endif //LEMONADE_UPDATER_MOVES_MOVEADDSCMONOMER_H
