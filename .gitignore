@@ -43,3 +43,4 @@ Debug/
 /docs/latex/
 /build/*
 /Build/*
+Makefile
