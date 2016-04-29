@@ -102,9 +102,8 @@ public:
 		}
 		else
 			throw std::runtime_error("ReadBFMFile::init()...read type must have value READ_LAST_CONFIG_SAVE(0), READ_LAST_CONFIG_FAST(1), or READ_STEPWISE(2)\n");
-
-
-		ingredients.synchronize(ingredients);
+		
+		ingredients.synchronize();
   };
 
 
@@ -145,7 +144,7 @@ public:
 		throw std::runtime_error("ReadBFMFile::execute()...read type must have value READ_LAST_CONFIG_SAVE(0), READ_LAST_CONFIG_FAST(1), or READ_STEPWISE(2)\n");
 		
 		  
-	ingredients.synchronize(ingredients); 
+	ingredients.synchronize(); 
 	return retVal;	  
   }
 

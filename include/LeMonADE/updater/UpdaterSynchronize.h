@@ -69,7 +69,7 @@ public:
 template<class T >
 bool UpdaterSynchronize<T>::execute()
 {
-	this->getIngredients().synchronize( this->getIngredients() );
+	this->getIngredients().synchronize();
 	return true;
 }
 

@@ -245,7 +245,7 @@ TEST_F(MoleculesTest, Constructors){
   //this should throw an exception, because the max connectivity of molecules1 
   //is too high
   EXPECT_ANY_THROW( (Molecules<VectorInt3, 2> (molecules1)) );
-  
+
   //create new objects from molecules1
   Molecules<VectorInt3> molecules2(molecules1);
   Molecules<VectorInt3, 8> molecules3(molecules2);
@@ -259,6 +259,43 @@ TEST_F(MoleculesTest, Constructors){
   EXPECT_EQ(molecules2[1],molecules3[1]);
   EXPECT_EQ(molecules1.getLinkInfo(0,4),molecules2.getLinkInfo(0,4));
   EXPECT_EQ(molecules2.getLinkInfo(0,4),molecules3.getLinkInfo(0,4));
+}
+
+TEST_F(MoleculesTest, AssignmentOperator){
+  
+  //setup of a molecules object first
+  Molecules <VectorInt3> molecules1;
+  
+  molecules1.resize(10);
+  molecules1.connect(0,1);
+  molecules1.connect(0,2);
+  molecules1.connect(0,3);
+  molecules1.connect(0,4,2);
+  molecules1[1].setAllCoordinates(2,3,4);
+  
+  //copy to molecules object of same type, and with higher max
+  //connectivity...should both work
+  Molecules<VectorInt3> molecules2;
+  molecules2=molecules1;
+  Molecules<VectorInt3, 8> molecules3;
+  molecules3=molecules2;
+  
+  //check if everything was copied correctly
+  EXPECT_EQ(7,molecules2.getMaxConnectivity());
+  EXPECT_EQ(8,molecules3.getMaxConnectivity());
+  EXPECT_EQ(10,molecules2.size());
+  EXPECT_EQ(10,molecules3.size());
+  EXPECT_EQ(molecules1[1],molecules2[1]);
+  EXPECT_EQ(molecules2[1],molecules3[1]);
+  EXPECT_EQ(molecules1.getLinkInfo(0,4),molecules2.getLinkInfo(0,4));
+  EXPECT_EQ(molecules2.getLinkInfo(0,4),molecules3.getLinkInfo(0,4));
+  
+  
+  //now try to assign to molecules object with too low max connectivity
+  //this should throw an exception
+  Molecules<VectorInt3, 2> molecules4;
+  EXPECT_ANY_THROW( molecules4=molecules1) ;
+  
 }
 
 TEST_F(MoleculesTest,Clear){

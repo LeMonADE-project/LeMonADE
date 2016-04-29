@@ -204,6 +204,37 @@ public:
 	}
 
 	/**
+	 * @brief Synchronizes the Features and establishing consistency in the system.
+	 *
+	 * @details This function only calls the function 
+	 * context_type::synchronize(Ingredients&) with itsself as argument. Thus
+	 * it causes all features to subsequently call their synchonize routines.
+	 * Calling this function on an instance ( "ingredients.synchronize();" )
+	 * is equivalent to calling  "ingredients.synchonize(ingredients));"
+	 */
+	void synchronize()
+	{
+		context_type::synchronize(*this);
+	}
+	
+	/**
+	 * @brief Synchronizes the Features and establishing consistency in the system.
+	 *
+	 * @details This function only calls the function 
+	 * context_type::synchronize(Ingredients& ing). Thus it causes all features 
+	 * to subsequently call their synchonize routines with the same argument.
+	 * This function allows to synchronize one instance of Ingredients with
+	 * another instance.
+	 *
+	 * @param ingredients A reference to the Ingredients instance to synchronize with
+	 */
+	template<class IngredientsType>
+	void synchronize(IngredientsType& ing)
+	{
+		context_type::synchronize(ing);
+	}
+	
+	/**
 	 * @brief Export the relevant functionality of all meta-information and molecules
 	 * for reading bfm-files.
 	 *
