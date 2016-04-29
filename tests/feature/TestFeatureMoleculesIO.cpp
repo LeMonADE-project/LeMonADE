@@ -363,7 +363,7 @@ TEST_F(FeatureMoleculesIOTest,WriteReadAdditionalBonds)
   EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,3));
   inputFile.closeFile();
   
-//   EXPECT_EQ(0,remove(filename.c_str()));
+  EXPECT_EQ(0,remove(filename.c_str()));
   
   
 }
