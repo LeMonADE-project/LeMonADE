@@ -182,19 +182,26 @@ TEST_F(FeatureMoleculesIOTest, ExportWrite){
   ingredients.modifyMolecules().connect(8,9);
   ingredients.modifyMolecules().connect(1,4);
 
-
+  //add bonds
+  //add reflected bonds for consistency 
   ingredients.modifyBondset().addBond(1,1,1,')');
   ingredients.modifyBondset().addBond(0,3,0,'o');
   ingredients.modifyBondset().addBond(-1,2,1,':');
-
+  ingredients.modifyBondset().addBond(-1,-1,-1,'/');
+  ingredients.modifyBondset().addBond(0,-3,0,';');
+  ingredients.modifyBondset().addBond(1,-2,-1,'-');
+  
+  
   //now create file with the information entered above
   string filename("tmpMoleculesRW.bfm");
   AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
   outputFile.initialize();
+  cerr<<"try execute" <<endl;
   outputFile.execute();
+  cerr<<"done execute "<<endl;
   outputFile.closeFile();
 
-  cout<<"start reading"<<endl;
+  cerr<<"start reading"<<endl;
   //now read the file back in and compare
   MyIngredients checkIngredients;
   FileImport<MyIngredients> inputFile(filename,checkIngredients);
@@ -213,10 +220,97 @@ TEST_F(FeatureMoleculesIOTest, ExportWrite){
   EXPECT_TRUE(checkIngredients.getMolecules().areConnected(4,1));
   EXPECT_FALSE(checkIngredients.getMolecules().areConnected(2,3));
   //remove temporary file tmp.bfm (and let test fail if not removed)
-  EXPECT_EQ(0,remove(filename.c_str()));
+//   EXPECT_EQ(0,remove(filename.c_str()));
 
 }
 
+
+//test the if the read commands !add_bonds and !_remove_bonds
+//are exported correctly and work.
+// TEST_F(FeatureMoleculesIOTest,WriteReadAdditionalBonds)
+// {
+//   MyIngredients ingredients;
+//   //set some values on ingredients
+//   //ingredients.modifyMolecules().resize(9);
+//   ingredients.modifyMolecules().setAge(10000);
+//   ingredients.setPeriodicX(true);
+//   ingredients.setPeriodicY(true);
+//   ingredients.setPeriodicZ(true);
+//   ingredients.setBoxX(128);
+//   ingredients.setBoxY(128);
+//   ingredients.setBoxZ(128);
+// 
+//   VectorInt3 monomer1; monomer1.setAllCoordinates(1,1,1);
+//   VectorInt3 monomer2; monomer2.setAllCoordinates(2,2,2);
+//   VectorInt3 monomer3; monomer3.setAllCoordinates(3,3,3);
+//   VectorInt3 monomer4; monomer4.setAllCoordinates(1,4,1);
+//   VectorInt3 monomer5; monomer5.setAllCoordinates(2,5,2);
+//   VectorInt3 monomer6; monomer6.setAllCoordinates(3,6,3);
+//   VectorInt3 monomer7; monomer7.setAllCoordinates(7,7,7);
+//   VectorInt3 monomer8; monomer8.setAllCoordinates(6,9,8);
+//   VectorInt3 monomer9; monomer9.setAllCoordinates(6,12,8);
+//   VectorInt3 monomer10; monomer10.setAllCoordinates(7,13,9);
+// 
+//   ingredients.modifyMolecules().addMonomer(monomer1);
+//   ingredients.modifyMolecules().addMonomer(monomer2);
+//   ingredients.modifyMolecules().addMonomer(monomer3);
+//   ingredients.modifyMolecules().addMonomer(monomer4);
+//   ingredients.modifyMolecules().addMonomer(monomer5);
+//   ingredients.modifyMolecules().addMonomer(monomer6);
+//   ingredients.modifyMolecules().addMonomer(monomer7);
+//   ingredients.modifyMolecules().addMonomer(monomer8);
+//   ingredients.modifyMolecules().addMonomer(monomer9);
+//   ingredients.modifyMolecules().addMonomer(monomer10);
+// 
+//   ingredients.modifyMolecules().connect(0,1);
+//   ingredients.modifyMolecules().connect(1,2);
+//   ingredients.modifyMolecules().connect(3,4);
+//   ingredients.modifyMolecules().connect(4,5);
+//   ingredients.modifyMolecules().connect(6,7);
+//   ingredients.modifyMolecules().connect(7,8);
+//   ingredients.modifyMolecules().connect(8,9);
+//   ingredients.modifyMolecules().connect(1,4);
+// 
+// 
+//   ingredients.modifyBondset().addBond(1,1,1,')');
+//   ingredients.modifyBondset().addBond(0,3,0,'o');
+//   ingredients.modifyBondset().addBond(-1,2,1,':');
+//   ingredients.modifyBondset().addBond(,,,';');
+//     //now create file with the information entered above
+//   string filename("tests/tmpMoleculesAddRemove.bfm");
+//   AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
+//   outputFile.initialize();
+//   outputFile.execute();
+//   ingredients.modifyMolecules().disconnect(1,2);
+//   ingredients.modifyMolecules().disconnect(4,5);
+//   ingredients.modifyMolecules().connect(1,2);
+//   outputFile.execute();
+//   ingredients.modifyMolecules().connect(4,5);
+//   ingredients.modifyMolecules().disconnect(6,7);
+//   ingredients.modifyMolecules().disconnect(8,9);
+//   ingredients.modifyMolecules().disconnect(3,4);
+//   outputFile.execute();
+//   ingredients.modifyMolecules().connect(2,8)
+//   outputFile.closeFile();
+//   
+// //   MyIngredients testIngredients;
+// //   UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
+// //   inputFile.initialize();
+// //   inputFile.execute();
+// //   inputFile.execute();
+// //   EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+// //   EXPECT_FALSE(testIngredients.getMolecules().areConnected(4,5));
+// //   inputFile.execute();
+// //   EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+// //   EXPECT_FALSE(testIngredients.getMolecules().areConnected(6,7));
+// //   EXPECT_FALSE(testIngredients.getMolecules().areConnected(8,9));
+// //   EXPECT_FALSE(testIngredients.getMolecules().areConnected(3,4));  
+// //   inputFile.closeFile();
+//   
+// //   EXPECT_EQ(0,remove(filename.c_str()));
+//   
+//   
+// }
 
 
 TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)
