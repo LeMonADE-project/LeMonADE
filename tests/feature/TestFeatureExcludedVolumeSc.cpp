@@ -27,12 +27,14 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "gtest/gtest.h"
 
-#include <LeMonADE/LeMonADE.h>
+#include <LeMonADE/core/ConfigureSystem.h>
+#include <LeMonADE/core/Ingredients.h>
+#include <LeMonADE/feature/FeatureBondset.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 
 using namespace std;
 
-TEST(TestFeatureExcludedVolumeSc,CheckMoves)
+TEST(TestFeatureExcludedVolumeSc,Moves)
 {
  
   typedef LOKI_TYPELIST_2(FeatureBondset< >,FeatureExcludedVolumeSc< >) Features;
@@ -191,36 +193,6 @@ TEST(TestFeatureExcludedVolumeSc,CheckMoves)
     EXPECT_FALSE(addmove.check(ingredients));
     
 }
-
-TEST(TestFeatureExcludedVolumeSc,ApplyMoves)
-{
- 
-  typedef LOKI_TYPELIST_2(FeatureBondset< >,FeatureExcludedVolumeSc< >) Features;
-
-  typedef ConfigureSystem<VectorInt3,Features> Config;
-  typedef Ingredients<Config> Ing;
-  Ing ingredients;
-  
-  //prepare ingredients
-  ingredients.setBoxX(32);
-  ingredients.setBoxY(32);
-  ingredients.setBoxZ(32);
-  ingredients.setPeriodicX(1);
-  ingredients.setPeriodicY(1);
-  ingredients.setPeriodicZ(1);
-  
-  ingredients.modifyMolecules().resize(1);
-  ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
-  
-  ingredients.synchronize(ingredients);
-  
-  MoveBase basemove;
-  basemove.init(ingredients);
-  basemove.apply(ingredients);
-  EXPECT_EQ(ingredients.getMolecules()[0],VectorInt3(0,0,0));
-    
-}
-    
     
 TEST(TestFeatureExcludedVolumeSc,CheckInterface)
 {
