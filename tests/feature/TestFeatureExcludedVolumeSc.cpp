@@ -192,6 +192,20 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
     addmove.init(ingredients);
     EXPECT_FALSE(addmove.check(ingredients));
     
+    //create random system and check it by synchronize
+    std::cout << "create random config by addmove and check by snychronize"<<std::endl;
+    for(uint32_t i=0;i<2000;i++){
+      bool accept_move(false);
+      while(!accept_move){
+        addmove.setPosition(std::rand()%32,std::rand()%32,std::rand()%32);
+	if(addmove.check(ingredients)){
+	  addmove.apply(ingredients);
+	  accept_move=true;
+	}
+      }
+    }
+    EXPECT_NO_THROW(ingredients.synchronize());
+   
 }
     
 TEST(TestFeatureExcludedVolumeSc,CheckInterface)
