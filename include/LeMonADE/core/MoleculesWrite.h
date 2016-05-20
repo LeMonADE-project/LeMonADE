@@ -373,15 +373,25 @@ void WriteBonds<IngredientsType>::writeStream(std::ostream& strm){
 template <class IngredientsType>
 class WriteAddBonds: public AbstractWrite<IngredientsType>
 {
+  	enum BFM_WRITE_TYPE_EXPANDED{
+	  C_APPEND=3,	//!< The configuration (excl. header) is append to the file  
+	  C_OVERWRITE=4,  //!< The configuration (incl. header) overwrites the existing file
+	  C_NEWFILE=5,	//!< The configuration (incl. header) is written to a new file
+	  C_APPNOFILE=6,	//!< The file doenst exist
+	};
+	
 public:
 	//! constructor
-	WriteAddBonds(const IngredientsType& ingredients):
+	WriteAddBonds(const IngredientsType& ingredients, int writeType=C_APPEND):
 	AbstractWrite<IngredientsType>(ingredients),
+	myWriteType(writeType),
 	old_ingredients(ingredients)
-	{init=false;this->setHeaderOnly(false);}
+	{this->setHeaderOnly(false);}
 	
 	//! writes to the file stream
 	void writeStream(std::ostream& strm);
+	
+
 	
 private:
   	  
@@ -392,45 +402,48 @@ private:
 	//!Storage for a copy of ingredients of the last time step
 	IngredientsType old_ingredients;
 	
-	//!First time of execute writeStream is initializing step 
-	bool init;
+	//! ENUM-type BFM_WRITE_TYPE specify the write-out
+	int myWriteType;
+	
 
 };
 /**********************implementation of members    *******************/
 //! Executes the routine to write \b !add_bonds.
 template <class IngredientsType>
 void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
-	if(init){
-	//get a map containing the added bond	
-	AddBonds=this->getSource().getMolecules().getEdges();
-	//get a map containing the removed bo
-	std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=
-	old_ingredients.getMolecules().getEdges();
-	
-	//erases all bond parnters from the map which are unchanged
-	//the rest of RemovedBonds contains only bonds which are removed during
-	//the last simulation step, in contrast the rest of the map AddBonds 
-	//contains only bonds which are newly formed during the last simulation
-	//step
-	typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
-	for(it=AddBonds.begin();it!=AddBonds.end();++it){
-		if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
-		  AddBonds.erase(it);
-		  RemovedBonds.erase(RemovedBonds.find(it->first));
+	switch(myWriteType)
+	{ case C_APPEND: {
+		//get a map containing the added bond	
+		AddBonds=this->getSource().getMolecules().getEdges();
+		//get a map containing the removed bo
+		std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=
+		old_ingredients.getMolecules().getEdges();
+		
+		//erases all bond parnters from the map which are unchanged
+		//the rest of RemovedBonds contains only bonds which are removed during
+		//the last simulation step, in contrast the rest of the map AddBonds 
+		//contains only bonds which are newly formed during the last simulation
+		//step
+		typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
+		for(it=AddBonds.begin();it!=AddBonds.end();++it){
+			if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
+			  AddBonds.erase(it);
+			  RemovedBonds.erase(RemovedBonds.find(it->first));
+			}
 		}
-	}
-	uint32_t number_of_monomers(this->getSource().getMolecules().size());
-	//write only the bonds that were added since the last update	
-	strm<<"!add_bonds\n";
-	for(it=AddBonds.begin();it!=AddBonds.end();++it){
-		  strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
-	}
-	strm<<"\n";
-	
-	old_ingredients=this->getSource();
-	}
-	else{init=true; 
-	  old_ingredients=this->getSource();
+		uint32_t number_of_monomers(this->getSource().getMolecules().size());
+		//write only the bonds that were added since the last update	
+		strm<<"!add_bonds\n";
+		for(it=AddBonds.begin();it!=AddBonds.end();++it){
+			  strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+		}
+		strm<<"\n";
+		
+		old_ingredients=this->getSource();
+		break;}
+	  case C_OVERWRITE: { break;} 
+	  case C_NEWFILE: {myWriteType=C_APPEND; break;}
+	  case C_APPNOFILE: {myWriteType=C_APPEND; break;}
 	}
 	
 }
@@ -444,13 +457,22 @@ void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 template <class IngredientsType>
 class WriteRemoveBonds: public AbstractWrite<IngredientsType>
 {
+  enum BFM_WRITE_TYPE{
+	  C_APPEND=3,	//!< The configuration (excl. header) is append to the file  
+	  C_OVERWRITE=4,  //!< The configuration (incl. header) overwrites the existing file
+	  C_NEWFILE=5,	//!< The configuration (incl. header) is written to a new file
+	  C_APPNOFILE=6,	//!< The file doenst exist
+	};
+	
 public:
 	//! constructor
-	WriteRemoveBonds(const IngredientsType& ingredients):
+	WriteRemoveBonds(const IngredientsType& ingredients, int writeType=C_APPEND):
 	AbstractWrite<IngredientsType>(ingredients),
+	myWriteType(writeType),
 	old_ingredients(ingredients)
-	{init=false;this->setHeaderOnly(false);}
+	{this->setHeaderOnly(false);}
 	
+
 	//! writes to the file stream
 	void writeStream(std::ostream& strm);
 	
@@ -464,8 +486,11 @@ private:
 	//!Storage for a copy of ingredients of the last time step
 	IngredientsType old_ingredients;
 
-	//!First time of execute writeStream is initializing step 
-	bool init;
+	//! ENUM-type BFM_WRITE_TYPE specify the write-out
+	int myWriteType;
+	
+	
+
 
 	
 };
@@ -473,38 +498,42 @@ private:
 //! Executes the routine to write \b !remove_bonds.
 template <class IngredientsType>
 void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
-	if(init){
-	//get a map containing the removed bond
-	RemovedBonds=old_ingredients.getMolecules().getEdges();
-	//get a map containing the added bond	
-	std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=
-	this->getSource().getMolecules().getEdges();
-	
-	//erases all bond parnters from the map which are unchanged
-	//the rest of RemovedBonds contains only bonds which are removed during
-	//the last simulation step, in contrast the rest of the map AddBonds 
-	//contains only bonds which are newly formed during the last simulation
-	//step
-	typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
-	for(it=AddBonds.begin();it!=AddBonds.end();++it){
-		if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
-		  AddBonds.erase(it);
-		  RemovedBonds.erase(RemovedBonds.find(it->first));
-		}
+	switch(myWriteType)
+	{ case C_APPEND: {
+	      //get a map containing the removed bond
+	      RemovedBonds=old_ingredients.getMolecules().getEdges();
+	      //get a map containing the added bond	
+	      std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=
+	      this->getSource().getMolecules().getEdges();
+	      
+	      //erases all bond parnters from the map which are unchanged
+	      //the rest of RemovedBonds contains only bonds which are removed during
+	      //the last simulation step, in contrast the rest of the map AddBonds 
+	      //contains only bonds which are newly formed during the last simulation
+	      //step
+	      typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
+	      for(it=AddBonds.begin();it!=AddBonds.end();++it){
+		      if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
+			AddBonds.erase(it);
+			RemovedBonds.erase(RemovedBonds.find(it->first));
+		      }
+	      }
+	      
+	      //write only the breaks that were removed since the last update
+	      strm<<"!remove_bonds\n";
+	      for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
+		      strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+	      }
+	      strm<<"\n";
+	      
+	      old_ingredients=this->getSource();
+	      break;}
+	  case C_OVERWRITE: { break;} 
+	  case C_NEWFILE: {myWriteType=C_APPEND; break;}
+	  case C_APPNOFILE: {myWriteType=C_APPEND; break;}
 	}
-	
-	//write only the breaks that were removed since the last update
-	strm<<"!remove_bonds\n";
-	for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
-		strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
-	}
-	strm<<"\n";
-	
-	old_ingredients=this->getSource();
-	}
-	else{init=true; 
-	  old_ingredients=this->getSource();
-	}
+
+
 	
 }
 #endif /* LEMONADE_CORE_MOLECULESWRITE_H */
