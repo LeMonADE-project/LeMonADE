@@ -77,6 +77,21 @@ public:
 	NEWFILE=1,	//!< The configuration (incl. header) is written to a new file
 	OVERWRITE=2 //!< The configuration (incl. header) overwrites the existing file
   };
+  
+  /**
+   * @enum BFM_WRITE_TYPE_EXPANDED
+   *
+   * @brief Specifiers the write type for the command handling of !add_bonds 
+   * and !remove_bonds
+   **/
+  enum BFM_WRITE_TYPE_EXPANDED{
+	  C_APPEND=3,	//!< The configuration (excl. header) is append to the file  
+	  C_OVERWRITE=4,  //!< The configuration (incl. header) overwrites the existing file
+	  C_NEWFILE=5,	//!< The configuration (incl. header) is written to a new file
+	  C_APPNOFILE=6,	//!< The file doenst exist
+  };
+  
+  
 
   //! Triggers writing of the Writes that need to be written for every step (i.e. excluding header)
   virtual bool execute();
@@ -108,6 +123,9 @@ public:
   //! Returns the filename used in this class
   std::string getFilename(){return _filename;}
   
+  //! Returns the enum type for command handling
+  int getCommandType(){return myCommandWriteType;}
+  
 
   /**
    * @brief This function is called \a once in the end of the TaskManager.
@@ -135,6 +153,9 @@ private:
 
   //! ENUM-type BFM_WRITE_TYPE specify the write-out
   const int myWriteType;
+  
+  //! ENUM-type BFM_WRITE_TYPE_EXPANDED specify command handling
+  int myCommandWriteType;
 
   //bfm Write strings with associated write objects
   //! Vector of pairs of Write-strings (e.g. !box_x) associated Write objects
@@ -164,6 +185,15 @@ template <class IngredientsType>
 AnalyzerWriteBfmFile<IngredientsType>::AnalyzerWriteBfmFile(const std::string& filename, const IngredientsType& ing, int writeType)
     :_filename(filename),ingredients(ing),myWriteType(writeType),isInitialized(false)
 {
+   if(myWriteType==APPEND && fileExists(_filename)) {myCommandWriteType=C_APPEND;}
+    else if(myWriteType==APPEND && !fileExists(_filename)) {myCommandWriteType=C_APPNOFILE;}
+    else if(myWriteType==NEWFILE) {myCommandWriteType=C_NEWFILE;}
+    else if(myWriteType==OVERWRITE) {myCommandWriteType=C_OVERWRITE;}
+    else/*flag incorrectly set*/
+    {	std::cerr<<"AnalyzerWriteBfmFile:invalid flag " <<myCommandWriteType<<std::endl;
+        throw std::runtime_error("WriteBfmFile: invalid flag set for writing. Valid options are APPEND or NEWFILE.\n");
+    }
+    
     //get the writing routines of all features
     ingredients.exportWrite(*this);
 
@@ -416,12 +446,12 @@ void AnalyzerWriteBfmFile<IngredientsType>::initialize()
         std::cout<<"WriteBfmFile:appending to existing file "<<_filename<<std::endl;
         file.open(_filename.c_str(),std::ios_base::in|std::ios_base::out|std::ios_base::app|std::ios_base::binary);
         if(file.fail()) throw std::runtime_error(std::string("WriteBfmFile: error opening output file ")+_filename);
-
     }
     else if(myWriteType==APPEND && !fileExists(_filename))
     {
         std::cout<<"WriteBfmFile:file "<<_filename<<" does not exist. Creating new file instead"<<std::endl;
         startNewFile(_filename);
+	
     }
     else if(myWriteType==NEWFILE)
     {
@@ -434,13 +464,15 @@ void AnalyzerWriteBfmFile<IngredientsType>::initialize()
                       <<"Choose a different filename or use APPPEND option in constructor of WriteBfmFile."<<std::endl;
             throw std::runtime_error(errormessage.str());
         }
+
     }
     else if(myWriteType==OVERWRITE)
     {
     	startOverwriteNewFile(_filename);
+
     }
     else/*flag incorrectly set*/
-    {
+    {	
         throw std::runtime_error("WriteBfmFile: invalid flag set for writing. Valid options are APPEND or NEWFILE.\n");
     }
     isInitialized=true;
@@ -449,6 +481,7 @@ void AnalyzerWriteBfmFile<IngredientsType>::initialize()
     if(myWriteType==OVERWRITE)
     {
     	isInitialized=false;
+
     }
 }
 
