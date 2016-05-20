@@ -153,8 +153,8 @@ void FeatureMoleculesIO::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& file
 	const IngredientsType& source=fileWriter.getIngredients_();
 	fileWriter.registerWrite("!number_of_monomers", new WriteNrOfMonomers <IngredientsType> (source));
 	fileWriter.registerWrite("!bonds", new WriteBonds <IngredientsType> (source));
-	fileWriter.registerWrite("!add_bonds", new WriteAddBonds<IngredientsType> (source));
-	fileWriter.registerWrite("!remove_bonds", new WriteRemoveBonds<IngredientsType> (source));
+	fileWriter.registerWrite("!add_bonds", new WriteAddBonds<IngredientsType> (source,fileWriter.getCommandType()));
+	fileWriter.registerWrite("!remove_bonds", new WriteRemoveBonds<IngredientsType> (source,fileWriter.getCommandType()));
 	fileWriter.registerWrite("!mcs", new WriteMcs <IngredientsType> (source));
 }
 
