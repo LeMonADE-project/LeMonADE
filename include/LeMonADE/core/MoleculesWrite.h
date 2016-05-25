@@ -391,7 +391,6 @@ public:
 	//! writes to the file stream
 	void writeStream(std::ostream& strm);
 	
-
 	
 private:
   	  
@@ -405,7 +404,6 @@ private:
 	//! ENUM-type BFM_WRITE_TYPE specify the write-out
 	int myWriteType;
 	
-
 };
 /**********************implementation of members    *******************/
 //! Executes the routine to write \b !add_bonds.
@@ -413,9 +411,10 @@ template <class IngredientsType>
 void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 	switch(myWriteType)
 	{ case C_APPEND: {
+
 		//get a map containing the added bond	
 		AddBonds=this->getSource().getMolecules().getEdges();
-		//get a map containing the removed bo
+		//get a map containing the removed bonds
 		std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=
 		old_ingredients.getMolecules().getEdges();
 		
@@ -441,8 +440,8 @@ void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 		
 		old_ingredients=this->getSource();
 		break;}
-	  case C_OVERWRITE: { break;} 
-	  case C_NEWFILE: {myWriteType=C_APPEND; break;}
+	  case C_OVERWRITE: {break;} 
+	  case C_NEWFILE: 
 	  case C_APPNOFILE: {myWriteType=C_APPEND; break;}
 	}
 	
@@ -485,14 +484,10 @@ private:
 	
 	//!Storage for a copy of ingredients of the last time step
 	IngredientsType old_ingredients;
-
+	
 	//! ENUM-type BFM_WRITE_TYPE specify the write-out
 	int myWriteType;
-	
-	
 
-
-	
 };
 /**********************implementation of members    *******************/
 //! Executes the routine to write \b !remove_bonds.
@@ -500,7 +495,8 @@ template <class IngredientsType>
 void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
 	switch(myWriteType)
 	{ case C_APPEND: {
-	      //get a map containing the removed bond
+	  
+	      //get a map containing the removed bonds
 	      RemovedBonds=old_ingredients.getMolecules().getEdges();
 	      //get a map containing the added bond	
 	      std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=
@@ -528,8 +524,8 @@ void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
 	      
 	      old_ingredients=this->getSource();
 	      break;}
-	  case C_OVERWRITE: { break;} 
-	  case C_NEWFILE: {myWriteType=C_APPEND; break;}
+	  case C_OVERWRITE: {break;} 
+	  case C_NEWFILE: 
 	  case C_APPNOFILE: {myWriteType=C_APPEND; break;}
 	}
 
