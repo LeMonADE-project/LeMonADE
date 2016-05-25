@@ -183,21 +183,7 @@ private:
  */
 template <class IngredientsType>
 AnalyzerWriteBfmFile<IngredientsType>::AnalyzerWriteBfmFile(const std::string& filename, const IngredientsType& ing, int writeType)
-    :_filename(filename),ingredients(ing),myWriteType(writeType),isInitialized(false)
-{
-   if(myWriteType==APPEND && fileExists(_filename)) {myCommandWriteType=C_APPEND;}
-    else if(myWriteType==APPEND && !fileExists(_filename)) {myCommandWriteType=C_APPNOFILE;}
-    else if(myWriteType==NEWFILE) {myCommandWriteType=C_NEWFILE;}
-    else if(myWriteType==OVERWRITE) {myCommandWriteType=C_OVERWRITE;}
-    else/*flag incorrectly set*/
-    {	std::cerr<<"AnalyzerWriteBfmFile:invalid flag " <<myCommandWriteType<<std::endl;
-        throw std::runtime_error("WriteBfmFile: invalid flag set for writing. Valid options are APPEND or NEWFILE.\n");
-    }
-    
-    //get the writing routines of all features
-    ingredients.exportWrite(*this);
-
-}
+    :_filename(filename),ingredients(ing),myWriteType(writeType),isInitialized(false){}
 
 /***********************************************************************/
 //destructor
@@ -402,7 +388,7 @@ bool AnalyzerWriteBfmFile<IngredientsType>::fileExists(std::string fname){
 template <class IngredientsType>
 bool AnalyzerWriteBfmFile<IngredientsType>::execute(){
  
-    if(isInitialized==false) initialize();
+  if(myWriteType==OVERWRITE) startOverwriteNewFile(_filename);
 
   std::vector< std::pair<std::string,SuperAbstractWrite*> >::iterator it;
   SuperAbstractWrite* mcsCommand=0;
@@ -439,6 +425,16 @@ bool AnalyzerWriteBfmFile<IngredientsType>::execute(){
 template <class IngredientsType>
 void AnalyzerWriteBfmFile<IngredientsType>::initialize()
 {
+    if(myWriteType==APPEND && fileExists(_filename)) {myCommandWriteType=C_APPEND;}
+    else if(myWriteType==APPEND && !fileExists(_filename)) {myCommandWriteType=C_APPNOFILE;}
+    else if(myWriteType==NEWFILE) {myCommandWriteType=C_NEWFILE;}
+    else if(myWriteType==OVERWRITE) {myCommandWriteType=C_OVERWRITE;}
+    else/*flag incorrectly set*/
+    {	std::cerr<<"AnalyzerWriteBfmFile:invalid flag " <<myCommandWriteType<<std::endl;
+        throw std::runtime_error("WriteBfmFile: invalid flag set for writing. Valid options are APPEND or NEWFILE.\n");
+    }
+      //get the writing routines of all features
+    ingredients.exportWrite(*this);
     //open the file. depending on whether or not the file exists,
     //and on the flag APPEND or NEWFILE a new file is created or not
     if(myWriteType==APPEND && fileExists(_filename))
@@ -476,13 +472,7 @@ void AnalyzerWriteBfmFile<IngredientsType>::initialize()
         throw std::runtime_error("WriteBfmFile: invalid flag set for writing. Valid options are APPEND or NEWFILE.\n");
     }
     isInitialized=true;
-
-    // make sure that every time the file is overwritten
-    if(myWriteType==OVERWRITE)
-    {
-    	isInitialized=false;
-
-    }
+   
 }
 
 /***********************************************************************/
