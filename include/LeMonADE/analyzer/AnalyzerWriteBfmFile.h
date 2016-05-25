@@ -435,6 +435,7 @@ void AnalyzerWriteBfmFile<IngredientsType>::initialize()
     }
       //get the writing routines of all features
     ingredients.exportWrite(*this);
+    
     //open the file. depending on whether or not the file exists,
     //and on the flag APPEND or NEWFILE a new file is created or not
     if(myWriteType==APPEND && fileExists(_filename))
