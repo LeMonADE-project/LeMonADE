@@ -212,16 +212,8 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
   uint32_t   getNumLinks(uint32_t idx) const 	{return vertices.at(idx).getNumLinks();}
   
 
-  /**
-   * @brief Returns the index in the graph of the j-th connection (bond partner) of the vertex with index \a idx.
-   *
-   * @throw <runtime_error> if no \a j-th connection exist in the graph.
-   *
-   * @param idx The index of vertex (monomer) in the graph.
-   * @param j The j-th connection of the vertex (monomer) in the graph.
-   * @return Returns the index of the connected vertex (monomer) in the graph to vertex with index \a idx.
-   */
-  uint32_t   getNeighborIdx(uint32_t idx, uint32_t j) const {return vertices.at(idx).getNeighborIdx(j);}
+  //! Returns the index in the graph of the j-th connection (bond partner) of the vertex with index \a idx.
+  uint32_t   getNeighborIdx(uint32_t idx, uint32_t j) const;
 
   
   /**
@@ -495,6 +487,31 @@ void Molecules <Vertex,max_connectivity, Edge>::disconnect(uint32_t a, uint32_t 
    vertices.at(b).disconnect(a);
    IndexPair idx(std::min(a,b),std::max(a,b));
    edges.erase(idx);
+}
+
+
+
+  /**
+   * @param idx The index of vertex (monomer) in the graph.
+   * @param j The j-th connection of the vertex (monomer) in the graph.
+   * 
+   * @throw <runtime_error> if no \a j-th connection exist in the graph.
+   * 
+   * @return Returns the index of the connected vertex (monomer) in the graph to vertex with index \a idx.
+   */
+template < class Vertex, uint max_connectivity, class Edge>
+uint32_t Molecules <Vertex,max_connectivity,Edge>::getNeighborIdx(uint32_t idx, uint32_t j) const
+{
+//in the debug mode we give more useful output in case of error,
+//than the usual exception coming from the return statement can provide	
+#ifdef DEBUG
+	if(j>=getNumLinks(idx)){
+		std::stringstream messagestream;
+		messagestream<<"getNeighborIdx(i, j): j="<<j<<" is out of range for monomer i="<<idx<<std::endl;
+		throw std::runtime_error(messagestream.str());
+	}
+#endif
+	return vertices.at(idx).getNeighborIdx(j);
 }
 
 

@@ -187,8 +187,11 @@ template<class Vertex,uint max_connectivity>
 uint32_t Connected<Vertex,max_connectivity>::getNeighborIdx(uint32_t i) const {
 	if (i < this->getNumLinks())
 		return links[i];
-	else
-		throw std::runtime_error("Connected::getNeighborIdx( idx ): 'idx' is exceeding the number of connected neighbors.");
+	else{
+		std::stringstream errormessage;
+		errormessage<<"Connected::getNeighborIdx( idx ): idx="<<i<<" is exceeding the number of connected neighbors.";
+		throw std::runtime_error(errormessage.str());
+	}
 }
 
 
