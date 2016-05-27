@@ -35,6 +35,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
 #include <LeMonADE/updater/moves/MoveAddScMonomer.h>
+#include <LeMonADE/updater/moves/MoveLocalBcc.h>
+#include <LeMonADE/updater/moves/MoveAddBccMonomer.h>
 
 /*****************************************************************************/
 /**
@@ -115,9 +117,17 @@ public:
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveLocalSc& move) const;
 	
+	//! check bcc move: Throw error if wrong lattice Type is used
+	template<class IngredientsType>
+	bool checkMove(const IngredientsType& ingredients, const MoveLocalBcc& move) const;
+	
 	//! check move for adding an sc monomer
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveAddScMonomer& move) const;
+	
+	//! check bcc addmove: Throw error if wrong lattice Type is used
+	template<class IngredientsType>
+	bool checkMove(const IngredientsType& ingredients, const MoveAddBccMonomer& move) const;
 
 	//! apply move for basic moves - does nothing
 	template<class IngredientsType>
@@ -160,7 +170,6 @@ private:
  * @return true Always!
  */
 /******************************************************************************/
-//template<class  LatticeClassType<LatticeValueType> >
 template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
 bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove(const IngredientsType& ingredients, const MoveBase& move) const
@@ -187,6 +196,42 @@ void FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::applyMove(In
 
 /******************************************************************************/
 /**
+ * @fn bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveLocalBcc& move )const
+ * @brief Throws a runtime error because the lattice type is inconsitent with the move type
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move MoveLocalBcc, which is the wrong one in this case
+ * @return false, throws an exception
+ */
+/******************************************************************************/
+template<template<typename> class LatticeClassType, typename LatticeValueType>
+template<class IngredientsType>
+bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove(const IngredientsType& ingredients, const MoveLocalBcc& move) const
+{
+	throw std::runtime_error("*****FeatureExcludedVolumeSc::check MoveLocalBcc: wrong lattice type ... \n");
+	return false;
+}
+
+/******************************************************************************/
+/**
+ * @fn bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddBccMonomer& addmove )const
+ * @brief Throws a runtime error because the lattice type is inconsitent with the move type
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move MoveAddBccMonomer, which is the wrong one in this case
+ * @return false, throws an exception
+ */
+/******************************************************************************/
+template<template<typename> class LatticeClassType, typename LatticeValueType>
+template<class IngredientsType>
+bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove(const IngredientsType& ingredients, const MoveAddBccMonomer& addmove) const
+{
+	throw std::runtime_error("*****FeatureExcludedVolumeSc::check MoveAddBccMonomer: wrong lattice type ... \n");
+	return false;
+}
+
+/******************************************************************************/
+/**
  * @fn bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveLocalSc& move )const
  * @brief checks excluded volume for moves of type MoveLocalSc
  * 
@@ -200,7 +245,7 @@ template < class IngredientsType>
 bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveLocalSc& move ) const
 {
 	if(!latticeFilledUp)
-	  throw std::runtime_error("*****FeatureExcludedVolumeSc_T::checkMove....lattice is not populated. Run synchronize!\n");
+	  throw std::runtime_error("*****FeatureExcludedVolumeSc::checkMove....lattice is not populated. Run synchronize!\n");
 	
 	//get the position of the monomer to be moved (assume "lower left corner")
 	VectorInt3 refPos=ingredients.getMolecules()[move.getIndex()];
@@ -304,7 +349,7 @@ template < class IngredientsType>
 bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddScMonomer& move ) const
 {
   if (!latticeFilledUp)
-	throw std::runtime_error("*****FeatureExcludedVolume_T::checkMove....lattice is not populated. Run synchronize!\n");
+	throw std::runtime_error("*****FeatureExcludedVolumeSc::checkMove....lattice is not populated. Run synchronize!\n");
   
   //check if the lattice sites are free
   VectorInt3 pos=move.getPosition();
@@ -370,7 +415,7 @@ void FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::synchronize(
 {
 	//note: the lattice entries are set to 0 before by the 
 	//synchronize function of FeatureLattice
-	std::cout << "FeatureExcludedVolumeSc_T::synchronizing lattice occupation...\n";
+	std::cout << "FeatureExcludedVolumeSc::synchronizing lattice occupation...\n";
 	fillLattice(ingredients);
 	std::cout << "done\n";
 }

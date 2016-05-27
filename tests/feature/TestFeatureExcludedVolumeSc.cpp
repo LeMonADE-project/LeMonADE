@@ -63,6 +63,16 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
     
     ingredients.synchronize(ingredients);
     
+    // **************   check inconsistent moves   *****
+    MoveLocalBcc bccmove;
+    bccmove.init(ingredients);
+    EXPECT_ANY_THROW(bccmove.check(ingredients));
+    
+    MoveAddBccMonomer addbccmove;
+    addbccmove.init(ingredients);
+    EXPECT_ANY_THROW(addbccmove.check(ingredients));
+    
+    
     // **************   check base move   **************
     basemove.init(ingredients);
     EXPECT_TRUE(basemove.check(ingredients));

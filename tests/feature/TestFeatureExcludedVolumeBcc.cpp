@@ -65,6 +65,15 @@ TEST(TestFeatureExcludedVolumeBcc,Moves)
     std::cout<< "first synchronize\n"; 
     ingredients.synchronize(ingredients);
     
+    // **************   check inconsistent moves   *****
+    MoveLocalSc scmove;
+    scmove.init(ingredients);
+    EXPECT_ANY_THROW(scmove.check(ingredients));
+    
+    MoveAddScMonomer addscmove;
+    addscmove.init(ingredients);
+    EXPECT_ANY_THROW(addscmove.check(ingredients));
+    
     // **************   check base move   **************
     basemove.init(ingredients);
     EXPECT_TRUE(basemove.check(ingredients));
