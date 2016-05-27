@@ -50,34 +50,34 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @details The excluded volume is checked by a lattice occupation algorithm
  * on a body centered cubic lattice.
  * The feature is implemented as a class template, where the template parameters 
- * \a SpecializedClass and \a ValueTypes specify, what
+ * \a LatticeClassType and \a LatticeValueTypes specify, what
  * type of lattice is used and which kind of value is saved on the lattice.
  * This feature requires FeatureLattice.
  * Notice: only implementations of Bcc moves included to avoid a mix of 
  * FeatureExcludedVolumeBcc and MoveLocalSc.
  *
- * @tparam <SpecializedClass<ValueType>> name of the specialized class.
+ * @tparam <LatticeClassType<LatticeValueType>> name of the specialized class.
  * Default is FeatureLattice.
  * 
- * @tparam <ValueType> type of the lattice value. Default is bool.
+ * @tparam <LatticeValueType> type of the lattice value. Default is bool.
  * */
 /*****************************************************************************/
 
 /**
  * @brief Forward declaration. Equivalent to FeatureExcludedVolumeBcc< FeatureLattice <bool> >
  */
-template<class SpecializedClass = FeatureLattice<> > class FeatureExcludedVolumeBcc;
+template<class LatticeClassType = FeatureLattice<> > class FeatureExcludedVolumeBcc;
 
 ///////////////////////////////////////////////////////////////////////////////
 //DEFINITION OF THE CLASS TEMPLATE   	                                ///////
 //Implementation of the members below					///////
 ///////////////////////////////////////////////////////////////////////////////
 
-template<template<typename> class SpecializedClass, typename ValueType>
-class FeatureExcludedVolumeBcc< SpecializedClass<ValueType> > : public Feature {
+template<template<typename> class LatticeClassType, typename LatticeValueType>
+class FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> > : public Feature {
 public:
 	//! This Feature requires a lattice.
-	typedef LOKI_TYPELIST_1(SpecializedClass<ValueType>) required_features_front;
+	typedef LOKI_TYPELIST_1(LatticeClassType<LatticeValueType>) required_features_front;
 
 	//constructor
 	FeatureExcludedVolumeBcc() :
@@ -154,7 +154,7 @@ private:
 
 /******************************************************************************/
 /**
- * @fn bool FeatureExcludedVolumeSc< SpecializedClass<ValueType> >::checkMove( const IngredientsType& ingredients, const MoveBase& move )const
+ * @fn bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveBase& move )const
  * @brief Returns true for all moves other than the ones that have specialized versions of this function.
  * This dummy function is implemented for generality.
  *
@@ -163,10 +163,10 @@ private:
  * @return true Always!
  */
 /******************************************************************************/
-//template<class  SpecializedClass<ValueType> >
-template<template<typename> class SpecializedClass, typename ValueType>
+//template<class  LatticeClassType<LatticeValueType> >
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove(
+bool FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::checkMove(
 		const IngredientsType& ingredients, const MoveBase& move) const
 		{
 	return true;
@@ -174,7 +174,7 @@ bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove(
 
 /******************************************************************************/
 /**
- * @fn void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove(IngredientsType& ing, const MoveBase& move)
+ * @fn void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing, const MoveBase& move)
  * @brief This function applies for unknown moves other than the ones that have specialized versions of this function.
  * It does nothing and is implemented for generality.
  *
@@ -182,9 +182,9 @@ bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove(
  * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
  */
 /******************************************************************************/
-template<template<typename> class SpecializedClass, typename ValueType>
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove(IngredientsType& ing,
+void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing,
 const MoveBase& move)
 {
 
@@ -192,7 +192,7 @@ const MoveBase& move)
 
 /******************************************************************************/
 /**
- * @fn bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove( const IngredientsType& ingredients, const MoveLocalBcc& move )const
+ * @fn bool FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveLocalBcc& move )const
  * @brief checks excluded volume for moves of type MoveLocalBcc
  * 
  * @param [in] ingredients A reference to the IngredientsType - mainly the system.
@@ -200,9 +200,9 @@ const MoveBase& move)
  * @return if move is allowed (\a true) or rejected (\a false).
  */
 /******************************************************************************/
-template<template<typename> class SpecializedClass, typename ValueType>
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove(const IngredientsType& ingredients, const MoveLocalBcc& move) const
+bool FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::checkMove(const IngredientsType& ingredients, const MoveLocalBcc& move) const
 {
 	if(!latticeFilledUp)
 	  throw std::runtime_error("*****FeatureExcludedVolumeBcc_T::checkMove....lattice is not populated. Run synchronize!\n");
@@ -232,16 +232,16 @@ bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove(const In
 
 /******************************************************************************/
 /**
- * @fn void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove(IngredientsType& ing, const MoveLocalBcc& move)
+ * @fn void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing, const MoveLocalBcc& move)
  * @brief Updates the lattice occupation according to the move for moves of type MoveLocalBcc. 
  * 
  * @param [in] ingredients A reference to the IngredientsType - mainly the system.
  * @param [in] move A reference to MoveLocalSBcc.
  * */
 /******************************************************************************/
-template<template<typename> class SpecializedClass, typename ValueType>
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove(IngredientsType& ing, const MoveLocalBcc& move)
+void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing, const MoveLocalBcc& move)
 {
 	if (!latticeFilledUp)
 		throw std::runtime_error("*****FeatureExcludedVolumeBcc_T::applyMove....lattice is not populated. Run synchronize!\n");
@@ -256,16 +256,16 @@ void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove(Ingredie
 
 /******************************************************************************/
 /**
- * @fn bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddBccMonomer& move )const
+ * @fn bool FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddBccMonomer& move )const
  * @brief check excluded volume for insertion of a monomer on a bcc lattice
  * 
  * @param [in] ingredients A reference to the IngredientsType - mainly the system.
  * @param [in] move A reference to MoveAddBccMonomer.
  * */
 /******************************************************************************/
-template<template<typename> class SpecializedClass, typename ValueType>
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template < class IngredientsType>
-bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddBccMonomer& move ) const
+bool FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddBccMonomer& move ) const
 {
   if (!latticeFilledUp)
 	throw std::runtime_error("*****FeatureExcludedVolume_T::checkMove....lattice is not populated. Run synchronize!\n");
@@ -310,16 +310,16 @@ bool FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::checkMove( const I
 
 /******************************************************************************/
 /**
- * @fn void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove( const IngredientsType& ingredients, const MoveAddBccMonomer& move )const
+ * @fn void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::applyMove( const IngredientsType& ingredients, const MoveAddBccMonomer& move )const
  * @brief apply excluded volume for MoveAddBccMonomer.
  * 
  * @param [in] ingredients A reference to the IngredientsType - mainly the system.
  * @param [in] move A reference to MoveAddBccMonomer.
  * */
 /******************************************************************************/
-template<template<typename> class SpecializedClass, typename ValueType>
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType> 
-void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove(IngredientsType& ing, const MoveAddBccMonomer& move)
+void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing, const MoveAddBccMonomer& move)
 {
   ing.setLatticeEntry(move.getPosition(),1);
 }
@@ -330,9 +330,9 @@ void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::applyMove(Ingredie
  *
  * @param ingredients A reference to the IngredientsType - mainly the system.
  */
-template<template<typename> class SpecializedClass, typename ValueType>
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::synchronize(
+void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::synchronize(
 		IngredientsType& ingredients)
 		{
 	//note: the lattice entries are set to 0 before by the 
@@ -351,9 +351,9 @@ void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::synchronize(
  * @param ingredients A reference to the IngredientsType - mainly the system.
  */
 
-template<template<typename> class SpecializedClass, typename ValueType>
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-void FeatureExcludedVolumeBcc< SpecializedClass<ValueType> >::fillLattice(
+void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::fillLattice(
 		IngredientsType& ingredients)
 		{
 	const typename IngredientsType::molecules_type& molecules =
