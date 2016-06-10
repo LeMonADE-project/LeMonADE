@@ -257,8 +257,8 @@ bool FeatureExcludedVolume< SpecializedClass<ValueType> >::checkMove(
 	throw std::runtime_error("*****FeatureExcludedVolume_T::checkMove....lattice is not populated. Run synchronize!\n");
 #endif
 
-	int x, y, z;
-	char dx, dy, dz;
+	int32_t x, y, z;
+	int8_t dx, dy, dz;
 	x = ingredients.getMolecules()[move.getIndex()][0];
 	y = ingredients.getMolecules()[move.getIndex()][1];
 	z = ingredients.getMolecules()[move.getIndex()][2];

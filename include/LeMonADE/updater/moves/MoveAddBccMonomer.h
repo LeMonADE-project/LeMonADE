@@ -25,26 +25,22 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_UPDATER_MOVES_MOVEADDSCMONOMER_H
-#define LEMONADE_UPDATER_MOVES_MOVEADDSCMONOMER_H
+#ifndef LEMONADE_UPDATER_MOVES_MOVEADDBCCMONOMER_H
+#define LEMONADE_UPDATER_MOVES_MOVEADDBCCMONOMER_H
 
 #include <LeMonADE/updater/moves/MoveBase.h>
 
 /**
  * @file
- * 
- * @author Hauke
- * @class MoveAddScMonomer
+ * @date   2016/03/14
+ * @author Martin
+ * @class MoveAddBccMonomer
  *
- * @brief Standard local bfm-move on simple cubic lattice for the scBFM to add a vertex/monomer
+ * @brief Add monomer move for the bccBFM to add a vertex/monomer
  *
- * @deprecated Untested!!
- *
- * @todo Test!
- * 
- * @todo Code doubling with MoveAddBccMonomer! Specialized class only neccessary to enable the features to handle the moves types differently.
+ * @todo Code doubling with MoveAddScMonomer! Specialized class only neccessary to enable the features to handle the moves types differently.
  **/
-class MoveAddScMonomer:public MoveBase
+class MoveAddBccMonomer:public MoveBase
 {
 public:
   
@@ -89,10 +85,10 @@ private:
 
 /*****************************************************************************/
 /**
- * @brief reset the probability
+ * @brief reset the probability and calculate particle index
  */
 template <class IngredientsType>
-void MoveAddScMonomer::init(const IngredientsType& ing)
+void MoveAddBccMonomer::init(const IngredientsType& ing)
 {
     this->resetProbability();
     particleIndex=ing.getMolecules().size();
@@ -103,7 +99,7 @@ void MoveAddScMonomer::init(const IngredientsType& ing)
  * @brief check if the move is allowed by the system given as argument.
  */
 template <class IngredientsType>
-bool MoveAddScMonomer::check(IngredientsType& ing)
+bool MoveAddBccMonomer::check(IngredientsType& ing)
 {
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
@@ -114,7 +110,7 @@ bool MoveAddScMonomer::check(IngredientsType& ing)
  * @brief apply the move to the system given as argument
  */
 template< class IngredientsType>
-void MoveAddScMonomer::apply(IngredientsType& ing)
+void MoveAddBccMonomer::apply(IngredientsType& ing)
 {
   //first add the new monomer at the desired position. this is because
   //some features may want to do things with it
@@ -122,7 +118,7 @@ void MoveAddScMonomer::apply(IngredientsType& ing)
   particleIndex=ing.getMolecules().size()-1;
   //now apply it to the features so that the features can make alterations,
   //for example set the attribute tag, if the FeatureAttributes is used
-  ing.applyMove(ing,*this);
+  ing.applyMove(ing,*this);		
 }
 
 #endif //LEMONADE_UPDATER_MOVES_MOVEADDSCMONOMER_H
