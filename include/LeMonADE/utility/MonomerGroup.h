@@ -43,7 +43,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 template < class MoleculesType > class MonomerGroup 
 {
   
-  const MoleculesType* m;
+  const MoleculesType* moleculesGroup;
   
   std::vector < int > indices;
   
@@ -51,8 +51,7 @@ public:
   
   typedef typename MoleculesType::vertex_type vertex_type;
   
-  MonomerGroup( const MoleculesType* m):m(m){}
-//   MonomerGroup( const MonomerGroup& src):m(src.m),indices(src.indices){}
+  MonomerGroup( const MoleculesType& moleculesGroup_):moleculesGroup(&moleculesGroup_){}
   
   void push_back(int idx){indices.push_back(idx);}
   
@@ -62,13 +61,33 @@ public:
   //! removes the monomer with index n from the group. here n is the true index of the particle in MoleculesType m
   void removeFromGroup(int n);
   
-  const vertex_type& operator[] (int i) const { return (*m)[indices.at(i)];}
+  const vertex_type& operator[] (int i) const { return (*moleculesGroup)[indices.at(i)];}
+  
+  void operator += (const MonomerGroup& rhs) {
+    //loop over all elemtns of right hand side
+    for(size_t i=0;i<rhs.indices.size();i++){
+      std::vector<int>::iterator it;
+      for(it=indices.begin();it!=indices.end();++it){
+	//check if element is already there
+	if(*it == rhs.indices.at(i)) break;
+      }
+      if(it==indices.end()){
+	// if not, add element
+	indices.push_back(rhs.indices.at(i));
+      }
+    }
+  }
+  
+  MonomerGroup& operator = (const MonomerGroup& src) {
+    this->moleculesGroup = src.moleculesGroup;
+    this-> indices = src.indices;
+  }
   
   size_t size() const { return indices.size();}
   
   int trueIndex( int i ) const {return indices.at(i);}
   
-  const uint64_t getAge() const {return m->getAge();}
+  const uint64_t getAge() const {return moleculesGroup->getAge();}
   
   MoleculesType copyGroup() const;
   
@@ -103,19 +122,19 @@ MoleculesType MonomerGroup<MoleculesType>::copyGroup() const
 		int originalIndex=indices.at(n);
 		
 		//copy this monomer to the new molecules
-		mol[n]=(*m)[originalIndex];
+		mol[n]=(*moleculesGroup)[originalIndex];
 		
 		//now copy the bonds and bond information
 		//loop over all bond partners of the current monomer
-		for(size_t l=0; l<m->getNumLinks(originalIndex); l++)
+		for(size_t l=0; l<moleculesGroup->getNumLinks(originalIndex); l++)
 		{
 			//index of the l-th neighbor in original molecules
-			int origNeighborIndex=m->getNeighborIdx(originalIndex,l);
+			int origNeighborIndex=moleculesGroup->getNeighborIdx(originalIndex,l);
 			
 // 			//if that neighbor is also part of this group, copy the link
 			if( mapOrigToGroupIndex.count(origNeighborIndex)>0 && mol.areConnected(n,mapOrigToGroupIndex.at(origNeighborIndex))==false )
 			{
-				mol.connect(n,mapOrigToGroupIndex.at(origNeighborIndex),m->getLinkInfo(originalIndex,origNeighborIndex));
+				mol.connect(n,mapOrigToGroupIndex.at(origNeighborIndex),moleculesGroup->getLinkInfo(originalIndex,origNeighborIndex));
 			}
 		}
 		
