@@ -1,7 +1,40 @@
-#ifndef FEATURE_NN_INTERACTION_H
-#define FEATURE_NN_INTERACTION_H
+/*--------------------------------------------------------------------------------
+    ooo      L   attice-based  |
+  o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
+ o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
+oo---0---oo  A   lgorithm and  |
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+  o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
+    ooo                        | 
+----------------------------------------------------------------------------------
 
-#include<limits>
+This file is part of LeMonADE.
+
+LeMonADE is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+LeMonADE is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
+
+--------------------------------------------------------------------------------*/
+
+
+#ifndef FEATURE_CONTACT_INTERACTION_H
+#define FEATURE_CONTACT_INTERACTION_H
+
+
+/// @file
+/// @date 2016/06/18
+/// @author Hauke Rabbel
+/// @brief Definition and implementation of class template FeatureContactInteractionSc
+
 
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
@@ -9,190 +42,190 @@
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureBoltzmann.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
-
-#include <LeMonADE/feature/NNInteractionReadWrite.h>
-
+#include <LeMonADE/feature/FeatureContactInteractionReadWrite.h>
 
 
-/******************************************************************************
- *this feature implements nearest neighbour contact interactions.
- *in the bfm file, as well as in the code, the interactions are defined as
- *for each nearest neighbor contact between two types A,B in kT.
- *bfm-command example:
- *#!interaction 1 2 1.6
- *defines an interaction of 1.6 kT per contact for monomer types 1,2
- *
- *as default the feature is implemented for use with ExcludedVolumeSC (writes
- *8 points per monomer on the lattice), but code for ExcludedVolume (writing only
- *1 point) is also there. just un-comment the marked regions.
- *
- *the feature provides two #! bfm-commands: #!interaction_base and #!interaction
- *
- *****************************************************************************/
+/// @class FeatureContactInteractionSc
+/// @brief Provides interaction of monomers on distances d<=sqrt(6) for standard BFM
+///
+/// @tparam FeatureLatticeType Underlying lattice feature, e.g. FeatureLattice or 
+/// FeatureLatticePowerOfTwo (template template parameter)
+///
+/// @details
+/// The interaction energy can be set for pairs of monomer-types A,B, where
+/// the type can be any integer between 1 and 255. 
+/// The feature automatically adds FeatureExcludedVolumeSc<FeatureLatticeType<uint8_t>
+/// to the system. Given an energy E in kT between  two types, the interaction potential 
+/// as a function of the distance d is:
+/// - inf d<2 (implicitly through excluded volume)
+/// - 4*E d=2
+/// - 2*E d=sqrt(5)
+/// - 1*E d=sqrt(6)
+/// - 0   d>sqrt(6)
+/// .
+/// Usage: In the feature list defining Ingredients use this feature as
+/// FeatureContactInteractionSc<FeatureLattice> (arbitrary lattices), or as
+/// FeatureContactInteractionSc<FeatureLatticePowerOfTwo> (2**n lattices)
+/// The feature adds the bfm-file command !contact_interaction A B E
+/// for monomers of types A B with interaction energy of E in kT.
+
+
 template<template<typename> class FeatureLatticeType>
-class FeatureNNInteractionSc:public Feature
+class FeatureContactInteractionSc:public Feature
 {
 
 private:
+  //! Type for the underlying lattice, used as template parameter for FeatureLatticeType<...>
   typedef uint8_t lattice_value_type;
 
+  //! Interaction energies between monomer types. Max. type=255 given by max(uint8_t)=255 
   double interactionTable[256][256];
-    double probabilityLookup[256][256];
+  
+  //! Lookup table for exp(-interactionTable[a][b])
+  double probabilityLookup[256][256];
 
-    template<class IngredientsType>
-    double calculateAcceptanceProbability(const IngredientsType& ingredients, const MoveLocalSc& move) const;
+  //! Returns this feature's factor for the acceptance probability for the given Monte Carlo move
+  template<class IngredientsType>
+  double calculateAcceptanceProbability(const IngredientsType& ingredients, 
+					const MoveLocalSc& move) const;
 
-    template<class IngredientsType>
-    void fillLattice(IngredientsType& ingredients);
+  //! Occupies the lattice with the attribute tags of all monomers
+  template<class IngredientsType>
+  void fillLattice(IngredientsType& ingredients);
 
-    double getProbabilityFactor(int32_t typeA,int32_t typeB) const;
+  //! Access to array probabilityLookup with extra checks in Debug mode
+  double getProbabilityFactor(int32_t typeA,int32_t typeB) const;
 
 
 public:
 
-    FeatureNNInteractionSc();
-    ~FeatureNNInteractionSc();
+  FeatureContactInteractionSc();
+  ~FeatureContactInteractionSc(){}
 
     
-    //and this feature re-initializes it (overwriting the values from excluded volume)
-    typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
+  //This feature adds interaction energies, so it requires FeatureBoltzmann
+  typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
 
-    //FeatureExcludedVulumeSc needs to be in front, because FeatureNNInteractionSc
-    //re-initializes the lattice and overwrites what FeatureExcludedVolumeSc has written
-    typedef LOKI_TYPELIST_2(FeatureAttributes,FeatureExcludedVolumeSc<FeatureLatticeType<lattice_value_type> >) required_features_front;
+  //FeatureExcludedVolumeSc needs to be in front, because FeatureContactInteractionSc
+  //re-initializes the lattice and overwrites what FeatureExcludedVolumeSc has written.
+  //FeatureAttributes needs to be in front, because when a monomer is added to the system
+  //by a MoveAddScMonomer, its attribute has to be set before it is written to the lattice.
+  typedef LOKI_TYPELIST_2(
+      FeatureAttributes,
+      FeatureExcludedVolumeSc<FeatureLatticeType<lattice_value_type> >) 
+    required_features_front;
 
 
-    //check- and apply-functions for different types of moves
-    template<class IngredientsType>
-    bool checkMove(const IngredientsType& ingredients,const MoveBase& move) const;
+  //! check for all Monte Carlo moves without special check functions (always true)
+  template<class IngredientsType>
+  bool checkMove(const IngredientsType& ingredients,const MoveBase& move) const;
 
-    template<class IngredientsType>
-    bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
+  //! check for standard sc-BFM local move
+  template<class IngredientsType>
+  bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
 
-    template<class IngredientsType>
-    void applyMove(IngredientsType& ing, const MoveBase& move){}
+  //! check move for bcc-BFM local move. always throws std::runtime_error
+  template<class IngredientsType>
+  bool checkMove(const IngredientsType& ingredients,const MoveLocalBcc& move) const;
 
-    template<class IngredientsType>
-    void applyMove(IngredientsType& ing, const MoveAddScMonomer& move);
+  //TODO should we implement a check for MoveAddScMonomer (needs calculation of partition function)?
 
-    //synchronize initializes the lattice with the attribute-tags of the monomers
-    template<class IngredientsType>
-    void synchronize(IngredientsType& ingredients);
+  //! apply function for all Monte Carlo moves without special apply functions (does nothing)
+  template<class IngredientsType>
+  void applyMove(const IngredientsType& ing, const MoveBase& move);
 
-    //add interaction between two types of monomers
-    void setContactInteraction(int32_t typeA,int32_t typeB,double energy);
+  //! apply function for bcc-BFM local move (always throws std::runtime_error)
+  template<class IngredientsType>
+  void applyMove(const IngredientsType& ing, const MoveLocalBcc& move);
 
-    //returns the interaction between two types of monomers in units of interactionBase
-    double getContactInteraction(int32_t typeA,int32_t typeB) const;
+  //! apply function for adding a monomer in sc-BFM
+  template<class IngredientsType>
+  void applyMove(IngredientsType& ing, const MoveAddScMonomer& move);
 
-    //export read and write functionality
-    template <class IngredientsType>
-    void exportRead(FileImport <IngredientsType>& fileReader);
+  //note: apply function for sc-BFM local move is not necessary, because 
+  //job of moving lattice entries is done by the underlying FeatureLatticeType
 
-    template <class IngredientsType>
-    void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& fileWriter) const;
+  //! guarantees that the lattice is properly occupied with monomer attributes
+  template<class IngredientsType>
+  void synchronize(IngredientsType& ingredients);
+
+  //!adds interaction energy between two types of monomers
+  void setContactInteraction(int32_t typeA,int32_t typeB,double energy);
+
+  //!returns the interaction energy between two types of monomers
+  double getContactInteraction(int32_t typeA,int32_t typeB) const;
+
+  //!export bfm-file read command !contact_interaction
+  template <class IngredientsType>
+  void exportRead(FileImport <IngredientsType>& fileReader);
+
+  //!export bfm-file write command !contact_interaction
+  template <class IngredientsType>
+  void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& fileWriter) const;
 
 };
 
 
+//////////////////  IMPLEMENTATION OF MEMBERS //////////////////////////////////
 
 
-
-/*******************************************************************************
- *implementation of template and inline members
- *(non-template members in FeatureNNInteraction.cpp)
- ******************************************************************************/
 template<template<typename> class LatticeClassType>
-inline double FeatureNNInteractionSc<LatticeClassType>::getProbabilityFactor(int32_t typeA,int32_t typeB) const
+FeatureContactInteractionSc<LatticeClassType>::FeatureContactInteractionSc()
 {
-#ifdef DEBUG
-
-  if(typeA<0 || typeA>255 || typeB<0 || typeB>255){
-    std::stringstream errormessage;
-    errormessage<<"***FeatureNaNInteractionSc::getInteraction(typeA,typeB)***\n";
-    errormessage<<"probability undefined between types "<<typeA<<" and "<<typeB<<std::endl;
-    errormessage<<"types are out of the allowed range";
-
-    throw std::runtime_error(errormessage.str());
-}
-#endif
-
-	return probabilityLookup[typeA][typeB];
-
+  //initialize the energy and probability lookups with default values
+  for(size_t n=0;n<256;n++)
+    {
+      for(size_t m=0;m<256;m++)
+        {
+	  interactionTable[m][n]=0.0;
+	  probabilityLookup[m][n]=1.0;
+        }
+    }
 }
 
 
-/*******************************************************************************
- *exportRead and exportWrite: export of command #!nn_interaction
- ******************************************************************************/
-template<template<typename> class LatticeClassType>
-template<class IngredientsType>
-void FeatureNNInteractionSc<LatticeClassType>::exportRead(FileImport< IngredientsType >& fileReader)
-{
-  typedef FeatureNNInteractionSc<LatticeClassType> my_type;
-  fileReader.registerRead("!nn_interaction",new ReadInteraction<my_type>(*this));
-}
 
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteractionSc<LatticeClassType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
-{
-  typedef FeatureNNInteractionSc<LatticeClassType> my_type;
-  fileWriter.registerWrite("!nn_interaction",new WriteInteraction<my_type>(*this));
-}
-
-
-/*******************************************************************************
- *checkMove for unknown moves: does nothing
- ******************************************************************************/
-template<template<typename> class LatticeClassType>
-template<class IngredientsType>
-bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, const MoveBase& move) const
+bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+							 const MoveBase& move) const
 {
     return true;
 }
 
-/*******************************************************************************
- *checkMove for MoveLocalSc: gets the transition probability and adds it to
- *the move. the metropolis step is performed later in FeatureBoltzmann (in
- *case other features also add some probability)
- ******************************************************************************/
+
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const
+bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+							 MoveLocalSc& move) const
 {
-    double prob=calculateAcceptanceProbability(ingredients,move);
-    move.multiplyProbability(prob);
-    return true;
+  //add the probability factor coming from this feature, then return true,
+  //because the total probability is evaluated by FeatureBoltzmann at the end
+  double prob=calculateAcceptanceProbability(ingredients,move);
+  move.multiplyProbability(prob);
+  return true;
+}
+
+template<template<typename> class LatticeClassType>
+template<class IngredientsType>
+bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+							 const MoveLocalBcc& move) const
+{
+  //throw exception in case someone accidentaly uses a bcc-BFM move with this feature
+  std::stringstream errormessage;
+  errormessage<<"FeatureContactInteractionSc::checkMove(...):\n";
+  errormessage<<"attempting to use bcc-BFM move, which is not allowed\n";
+  throw std::runtime_error(errormessage.str());
+
+  return false;
 }
 
 
 
-/*******************************************************************************
- *synchronize:
- ******************************************************************************/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteractionSc<LatticeClassType>::synchronize(IngredientsType& ingredients)
-{
-
-    //refill the lattice with attribute tags
-    //caution: this overwrites, what is currently written on the lattice
-    fillLattice(ingredients);
-
-}
-
-
-/*******************************************************************************
- *applyMove for MoveAddScMonomer: updates the lattice with attribute tag of the
- *added monomer
- *works only when 8 positions are written on the lattice per monomer. for
- *the other case use the function in the lower part of this file
- ******************************************************************************/
-//////////////// version for use with FeatureExcludedVolumeSc //////////////////
-template<template<typename> class LatticeClassType>
-template<class IngredientsType>
-void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing, const MoveAddScMonomer& move)
+void FeatureContactInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing, 
+							 const MoveAddScMonomer& move)
 {
     //get the position and attribute tag of the monomer to be inserted
     VectorInt3 pos=move.getPosition();
@@ -212,19 +245,77 @@ void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing, c
     ing.setLatticeEntry(pos+dz+dx+dy,type);
 }
 
-/*******************************************************************************
- *fillLattice: fills the lattice with attribute tags of the monomers.
- *this is the version for use with ExcludedVolumeSC (it writes 8 positions
- *per monomer)
- *if you want to use a version where only one position is written per monomer,
- *comment this function and uncomment the appropriate one in the section at the
- *end of this file.
- ******************************************************************************/
+
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteractionSc<LatticeClassType>::fillLattice(IngredientsType& ingredients)
+void FeatureContactInteractionSc<LatticeClassType>::applyMove(const IngredientsType& ing, 
+							 const MoveLocalBcc& move)
+{
+  //throw exception in case someone accidentaly uses a bcc-BFM move with this feature
+  std::stringstream errormessage;
+  errormessage<<"FeatureContactInteractionSc::applyMove(...):\n";
+  errormessage<<"attempting to use bcc-BFM move, which is not allowed\n";
+  throw std::runtime_error(errormessage.str());
+
+}
+
+template<template<typename> class LatticeClassType>
+template<class IngredientsType>
+void FeatureContactInteractionSc<LatticeClassType>::synchronize(IngredientsType& ingredients)
+{
+
+    //refill the lattice with attribute tags
+    //caution: this overwrites, what is currently written on the lattice
+    fillLattice(ingredients);
+
+}
+
+
+template<template<typename> class LatticeClassType>
+inline double FeatureContactInteractionSc<LatticeClassType>::getProbabilityFactor(int32_t typeA,
+									     int32_t typeB) const
+{
+#ifdef DEBUG
+  //extra checks only in debug mode, because this is very frequently called
+  //and this costs performance
+  if(typeA<0 || typeA>255 || typeB<0 || typeB>255){
+    std::stringstream errormessage;
+    errormessage<<"***FeatureNaNInteractionSc::getInteraction(typeA,typeB)***\n";
+    errormessage<<"probability undefined between types "<<typeA<<" and "<<typeB<<std::endl;
+    errormessage<<"types are out of the allowed range";
+    throw std::runtime_error(errormessage.str());
+  }
+#endif /*DEBUG*/
+
+  return probabilityLookup[typeA][typeB];
+
+}
+
+
+template<template<typename> class LatticeClassType>
+template<class IngredientsType>
+void FeatureContactInteractionSc<LatticeClassType>::exportRead(FileImport< IngredientsType >& fileReader)
+{
+  typedef FeatureContactInteractionSc<LatticeClassType> my_type;
+  fileReader.registerRead("!contact_interaction",new ReadInteraction<my_type>(*this));
+}
+
+
+template<template<typename> class LatticeClassType>
+template<class IngredientsType>
+void FeatureContactInteractionSc<LatticeClassType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
+{
+  typedef FeatureContactInteractionSc<LatticeClassType> my_type;
+  fileWriter.registerWrite("!contact_interaction",new WriteInteraction<my_type>(*this));
+}
+
+
+template<template<typename> class LatticeClassType>
+template<class IngredientsType>
+void FeatureContactInteractionSc<LatticeClassType>::fillLattice(IngredientsType& ingredients)
 {
     const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+
     for(size_t n=0;n<molecules.size();n++)
     {
         VectorInt3 pos=molecules[n];
@@ -251,16 +342,10 @@ void FeatureNNInteractionSc<LatticeClassType>::fillLattice(IngredientsType& ingr
 
 }
 
-/*******************************************************************************
- *calculateAcceptanceProb:
- *calculates the probability of acceptance for the move based on change of contacts
- *with surrounding monomers
- *this function works only when 8 positions are written per monomer. For other
- *case comment it out and use the function in the lower section of this file.
- ******************************************************************************/
+
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-double FeatureNNInteractionSc<LatticeClassType>::calculateAcceptanceProbability(
+double FeatureContactInteractionSc<LatticeClassType>::calculateAcceptanceProbability(
     const IngredientsType& ingredients,
     const MoveLocalSc& move) const
 {
@@ -359,52 +444,32 @@ double FeatureNNInteractionSc<LatticeClassType>::calculateAcceptanceProbability(
 }
 
 
-/*******************************************************************************
- *constructor: initializes the lookup arrays
- ******************************************************************************/
 template<template<typename> class LatticeClassType>
-FeatureNNInteractionSc<LatticeClassType>::FeatureNNInteractionSc()
-{
-    for(size_t n=0;n<256;n++)
-    {
-        for(size_t m=0;m<256;m++)
-        {
-            interactionTable[m][n]=0.0;
-            probabilityLookup[m][n]=1.0;
-        }
-    }
-}
-
-/*******************************************************************************
- *destructor
- ******************************************************************************/
-template<template<typename> class LatticeClassType>
-FeatureNNInteractionSc<LatticeClassType>::~FeatureNNInteractionSc(){}
-
-template<template<typename> class LatticeClassType>
-void FeatureNNInteractionSc<LatticeClassType>::setContactInteraction(int32_t typeA,int32_t typeB,double energy)
+void FeatureContactInteractionSc<LatticeClassType>::setContactInteraction(int32_t typeA,
+								     int32_t typeB,
+								     double energy)
 {
     if(0<typeA && typeA<=255 && 0<typeB && typeB<=255)
-    {
+      {
         interactionTable[typeA][typeB]=energy;
         interactionTable[typeB][typeA]=energy;
         probabilityLookup[typeA][typeB]=exp(-energy);
         probabilityLookup[typeB][typeA]=exp(-energy);
-        std::cout<<"set interation between types "<<typeA<<" and "<<typeB<<" to "<<energy<<"kT\n";
-    }
+        std::cout<<"set interation between types ";
+	std::cout<<typeA<<" and "<<typeB<<" to "<<energy<<"kT\n";
+      }
     else
-    {
-      std::stringstream errormessage;
-      errormessage<<"FeatureNNInteractionSc::setContactInteraction(typeA,typeB,energy).\n";
-      errormessage<<"typeA "<<typeA<<" typeB "<<typeB<<": Types out of range\n";
-      throw std::runtime_error(errormessage.str());
-    }
+      {
+	std::stringstream errormessage;
+	errormessage<<"FeatureContactInteractionSc::setContactInteraction(typeA,typeB,energy).\n";
+	errormessage<<"typeA "<<typeA<<" typeB "<<typeB<<": Types out of range\n";
+	throw std::runtime_error(errormessage.str());
+      }
 }
 
-//returns the interaction between two types of monomers in units of interactionBase
-//int32_t FeatureNNInteraction::getInteraction(uint32_t typeA,uint32_t typeB) const
+
 template<template<typename> class LatticeClassType>
-double FeatureNNInteractionSc<LatticeClassType>::getContactInteraction(int32_t typeA,
+double FeatureContactInteractionSc<LatticeClassType>::getContactInteraction(int32_t typeA,
 								       int32_t typeB) const
 {
 
@@ -413,7 +478,7 @@ double FeatureNNInteractionSc<LatticeClassType>::getContactInteraction(int32_t t
     else
     {
       std::stringstream errormessage;
-      errormessage<<"FeatureNNInteractionSc::getContactInteraction(typeA,typeB).\n";
+      errormessage<<"FeatureContactInteractionSc::getContactInteraction(typeA,typeB).\n";
       errormessage<<"typeA "<<typeA<<" typeB "<<typeB<<": Types out of range\n";
       throw std::runtime_error(errormessage.str());
     }
@@ -421,4 +486,4 @@ double FeatureNNInteractionSc<LatticeClassType>::getContactInteraction(int32_t t
 }
 
 
-#endif /*FEATURE_NN_INTERACTION_H*/
+#endif /*FEATURE_CONTACT_INTERACTION_H*/
