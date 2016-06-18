@@ -12,7 +12,7 @@
 #include <LeMonADE/utility/TaskManager.h>
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
 #include <LeMonADE/updater/UpdaterSimpleSimulator.h>
-
+#include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
 #include <LeMonADE/feature/FeatureNNInteraction.h>
 
 int main(int argc, char* argv[])
@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 	rng.seedAll();
 	
 	// FeatureExcludedVolume<> is equivalent to FeatureExcludedVolume<FeatureLattice<bool> >
-	typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes,FeatureNNInteraction) Features;
+	typedef LOKI_TYPELIST_2(FeatureMoleculesIO,FeatureNNInteractionSc<FeatureLatticePowerOfTwo>) Features;
 	
 	typedef ConfigureSystem<VectorInt3,Features, 6> Config;
 	typedef Ingredients<Config> Ing;

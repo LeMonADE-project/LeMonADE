@@ -1,6 +1,7 @@
 #ifndef FEATURE_NN_INTERACTION_H
 #define FEATURE_NN_INTERACTION_H
 
+#include<limits>
 
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
@@ -28,24 +29,38 @@
  *the feature provides two #! bfm-commands: #!interaction_base and #!interaction
  *
  *****************************************************************************/
-class FeatureNNInteraction:public Feature
+template<template<typename> class FeatureLatticeType>
+class FeatureNNInteractionSc:public Feature
 {
+
+private:
+  typedef uint8_t lattice_value_type;
+
+  double interactionTable[256][256];
+    double probabilityLookup[256][256];
+
+    template<class IngredientsType>
+    double calculateAcceptanceProbability(const IngredientsType& ingredients, const MoveLocalSc& move) const;
+
+    template<class IngredientsType>
+    void fillLattice(IngredientsType& ingredients);
+
+    double getProbabilityFactor(int32_t typeA,int32_t typeB) const;
+
+
 public:
 
-    FeatureNNInteraction();
-    ~FeatureNNInteraction();
+    FeatureNNInteractionSc();
+    ~FeatureNNInteractionSc();
 
-    //excluded volume needs to be in front, because it pre-initializes the lattice
+    
     //and this feature re-initializes it (overwriting the values from excluded volume)
     typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
 
-    ///////// for use with FeatureExcludedVolumeSc /////////////////////////////
-    typedef LOKI_TYPELIST_2(FeatureAttributes,FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<uint8_t> >) required_features_front;
-    ///////// end version with Feature ExcludedVolumeSc ////////////////////////
+    //FeatureExcludedVulumeSc needs to be in front, because FeatureNNInteractionSc
+    //re-initializes the lattice and overwrites what FeatureExcludedVolumeSc has written
+    typedef LOKI_TYPELIST_2(FeatureAttributes,FeatureExcludedVolumeSc<FeatureLatticeType<lattice_value_type> >) required_features_front;
 
-    ///////////for use with FeatureExcludedVolume //////////////////////////////
-    //typedef LOKI_TYPELIST_2(FeatureAttributes,FeatureExcludedVolume<uint8_t>) required_features_front;
-    ///////// end version with Feature ExcludedVolume //////////////////////////
 
     //check- and apply-functions for different types of moves
     template<class IngredientsType>
@@ -65,10 +80,10 @@ public:
     void synchronize(IngredientsType& ingredients);
 
     //add interaction between two types of monomers
-    void setInteraction(uint32_t typeA,uint32_t typeB,double energy);
+    void setContactInteraction(int32_t typeA,int32_t typeB,double energy);
 
     //returns the interaction between two types of monomers in units of interactionBase
-    double getInteraction(uint32_t typeA,uint32_t typeB) const;
+    double getContactInteraction(int32_t typeA,int32_t typeB) const;
 
     //export read and write functionality
     template <class IngredientsType>
@@ -77,26 +92,6 @@ public:
     template <class IngredientsType>
     void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& fileWriter) const;
 
-private:
-
-    double interactionTable[11][11];
-    double probabilityLookup[11][11];
-
-    template<class IngredientsType>
-    double calculateAcceptanceProb(const IngredientsType& ingredients, const MoveLocalSc& move) const;
-
-    template<class IngredientsType>
-    void fillLattice(IngredientsType& ingredients);
-
-    //defined inline in the header (turns out to be faster)
-    double getProbabilityFactor(uint32_t typeA,uint32_t typeB) const;
-
-//////////// for use with FeatureExcludedVolume uncomment the block below///////
-//
-//    static const VectorInt3 contactShell_1[24];
-//    static const VectorInt3 contactShell_2[24];
-//    static const VectorInt3 contactShell_4[6];
-///////// end version with Feature ExcludedVolume //////////////////////////////
 };
 
 
@@ -107,19 +102,22 @@ private:
  *implementation of template and inline members
  *(non-template members in FeatureNNInteraction.cpp)
  ******************************************************************************/
-inline double FeatureNNInteraction::getProbabilityFactor(uint32_t typeA,uint32_t typeB) const
+template<template<typename> class LatticeClassType>
+inline double FeatureNNInteractionSc<LatticeClassType>::getProbabilityFactor(int32_t typeA,int32_t typeB) const
 {
-#if DEBUG
-	if(0<typeA && typeA<=10 && 0<typeB && typeB<=10)
-#endif
+#ifdef DEBUG
 
+  if(typeA<0 || typeA>255 || typeB<0 || typeB>255){
+    std::stringstream errormessage;
+    errormessage<<"***FeatureNaNInteractionSc::getInteraction(typeA,typeB)***\n";
+    errormessage<<"probability undefined between types "<<typeA<<" and "<<typeB<<std::endl;
+    errormessage<<"types are out of the allowed range";
+
+    throw std::runtime_error(errormessage.str());
+}
+#endif
 
 	return probabilityLookup[typeA][typeB];
-
-#if DEBUG
-	else
-		throw std::runtime_error("***FeatureNNInteraction::getInteraction()...trying to get undefined probability***\n");
-#endif
 
 }
 
@@ -127,24 +125,29 @@ inline double FeatureNNInteraction::getProbabilityFactor(uint32_t typeA,uint32_t
 /*******************************************************************************
  *exportRead and exportWrite: export of command #!nn_interaction
  ******************************************************************************/
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteraction::exportRead(FileImport< IngredientsType >& fileReader)
+void FeatureNNInteractionSc<LatticeClassType>::exportRead(FileImport< IngredientsType >& fileReader)
 {
-    fileReader.registerRead("#!nn_interaction",new ReadInteraction<FeatureNNInteraction>(*this));
+  typedef FeatureNNInteractionSc<LatticeClassType> my_type;
+  fileReader.registerRead("!nn_interaction",new ReadInteraction<my_type>(*this));
 }
 
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteraction::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
+void FeatureNNInteractionSc<LatticeClassType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
-    fileWriter.registerWrite("#!nn_interaction",new WriteInteraction<FeatureNNInteraction>(*this));
+  typedef FeatureNNInteractionSc<LatticeClassType> my_type;
+  fileWriter.registerWrite("!nn_interaction",new WriteInteraction<my_type>(*this));
 }
 
 
 /*******************************************************************************
  *checkMove for unknown moves: does nothing
  ******************************************************************************/
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureNNInteraction::checkMove(const IngredientsType& ingredients, const MoveBase& move) const
+bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, const MoveBase& move) const
 {
     return true;
 }
@@ -154,10 +157,11 @@ bool FeatureNNInteraction::checkMove(const IngredientsType& ingredients, const M
  *the move. the metropolis step is performed later in FeatureBoltzmann (in
  *case other features also add some probability)
  ******************************************************************************/
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureNNInteraction::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const
+bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const
 {
-    double prob=calculateAcceptanceProb(ingredients,move);
+    double prob=calculateAcceptanceProbability(ingredients,move);
     move.multiplyProbability(prob);
     return true;
 }
@@ -167,8 +171,9 @@ bool FeatureNNInteraction::checkMove(const IngredientsType& ingredients, MoveLoc
 /*******************************************************************************
  *synchronize:
  ******************************************************************************/
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteraction::synchronize(IngredientsType& ingredients)
+void FeatureNNInteractionSc<LatticeClassType>::synchronize(IngredientsType& ingredients)
 {
 
     //refill the lattice with attribute tags
@@ -177,7 +182,6 @@ void FeatureNNInteraction::synchronize(IngredientsType& ingredients)
 
 }
 
-//////////////// version for use with FeatureExcludedVolumeSc //////////////////
 
 /*******************************************************************************
  *applyMove for MoveAddScMonomer: updates the lattice with attribute tag of the
@@ -185,8 +189,10 @@ void FeatureNNInteraction::synchronize(IngredientsType& ingredients)
  *works only when 8 positions are written on the lattice per monomer. for
  *the other case use the function in the lower part of this file
  ******************************************************************************/
+//////////////// version for use with FeatureExcludedVolumeSc //////////////////
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteraction::applyMove(IngredientsType& ing, const MoveAddScMonomer& move)
+void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing, const MoveAddScMonomer& move)
 {
     //get the position and attribute tag of the monomer to be inserted
     VectorInt3 pos=move.getPosition();
@@ -214,22 +220,32 @@ void FeatureNNInteraction::applyMove(IngredientsType& ing, const MoveAddScMonome
  *comment this function and uncomment the appropriate one in the section at the
  *end of this file.
  ******************************************************************************/
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteraction::fillLattice(IngredientsType& ingredients)
+void FeatureNNInteractionSc<LatticeClassType>::fillLattice(IngredientsType& ingredients)
 {
     const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
     for(size_t n=0;n<molecules.size();n++)
     {
         VectorInt3 pos=molecules[n];
+	lattice_value_type attribute=lattice_value_type(molecules[n].getAttributeTag());
 
-        ingredients.setLatticeEntry(pos,molecules[n].getAttributeTag());
-        ingredients.setLatticeEntry(pos+VectorInt3(1,0,0),molecules[n].getAttributeTag());
-        ingredients.setLatticeEntry(pos+VectorInt3(0,1,0),molecules[n].getAttributeTag());
-        ingredients.setLatticeEntry(pos+VectorInt3(1,1,0),molecules[n].getAttributeTag());
-        ingredients.setLatticeEntry(pos+VectorInt3(0,0,1),molecules[n].getAttributeTag());
-        ingredients.setLatticeEntry(pos+VectorInt3(1,0,1),molecules[n].getAttributeTag());
-        ingredients.setLatticeEntry(pos+VectorInt3(0,1,1),molecules[n].getAttributeTag());
-        ingredients.setLatticeEntry(pos+VectorInt3(1,1,1),molecules[n].getAttributeTag());
+	if(int32_t(attribute)!=molecules[n].getAttributeTag()){
+	  std::stringstream errormessage;
+	  errormessage<<"***FeatureNaNInteractionSc::fillLattice()***\n";
+	  errormessage<<"type "<<attribute<<" is out of the allowed range";
+
+	  throw std::runtime_error(errormessage.str());
+	}
+
+        ingredients.setLatticeEntry(pos,attribute);
+        ingredients.setLatticeEntry(pos+VectorInt3(1,0,0),attribute);
+        ingredients.setLatticeEntry(pos+VectorInt3(0,1,0),attribute);
+        ingredients.setLatticeEntry(pos+VectorInt3(1,1,0),attribute);
+        ingredients.setLatticeEntry(pos+VectorInt3(0,0,1),attribute);
+        ingredients.setLatticeEntry(pos+VectorInt3(1,0,1),attribute);
+        ingredients.setLatticeEntry(pos+VectorInt3(0,1,1),attribute);
+        ingredients.setLatticeEntry(pos+VectorInt3(1,1,1),attribute);
 
     }
 
@@ -242,17 +258,18 @@ void FeatureNNInteraction::fillLattice(IngredientsType& ingredients)
  *this function works only when 8 positions are written per monomer. For other
  *case comment it out and use the function in the lower section of this file.
  ******************************************************************************/
+template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-double FeatureNNInteraction::calculateAcceptanceProb(const IngredientsType& ingredients,  const MoveLocalSc& move) const
+double FeatureNNInteractionSc<LatticeClassType>::calculateAcceptanceProbability(
+    const IngredientsType& ingredients,
+    const MoveLocalSc& move) const
 {
-    //stupid implementation for now.
+    
     VectorInt3 oldPos=ingredients.getMolecules()[move.getIndex()];
     VectorInt3 direction=move.getDir();
 
-
-
     double prob=1.0;
-    uint32_t monoType=ingredients.getMolecules()[move.getIndex()].getAttributeTag();
+    int32_t monoType=ingredients.getMolecules()[move.getIndex()].getAttributeTag();
 
     /*get two directions perpendicular to vector directon of the move*/
     VectorInt3 perp1,perp2;
@@ -283,135 +300,125 @@ double FeatureNNInteraction::calculateAcceptanceProb(const IngredientsType& ingr
     actual+=direction;
 
     actual-=perp1;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp2;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual+perp2+perp1;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp1;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual+perp1-perp2;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=perp2;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual-perp1-perp2;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=perp1;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual+perp2+direction;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp2;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp1;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=perp2;
-    prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
 
     //now check back side (contacts taken away)
     double prob_div=1.0;
     actual=oldPos;
     if(direction.getX()<0 || direction.getY()<0 || direction.getZ()<0) actual-=direction;
     actual-=perp1;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp2;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual+perp2+perp1;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp1;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual+perp1-perp2;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=perp2;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual-perp1-perp2;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=perp1;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual=actual+perp2-direction;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp2;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=perp1;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=perp2;
-    prob_div*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
 
     prob/=prob_div;
     return prob;
 
 }
 
-///////////////// end version with FeatureExcludedVolumeSc ////////////////////
 
-
-////////////////  version with FeatureExcludedVolume  ////////////////////////////
-//
-//
-// template<class IngredientsType>
-// double FeatureNNInteraction::calculateAcceptanceProb(const IngredientsType& ingredients,  const MoveLocalSc& move) const
-// {
-//    //stupid implementation for now.
-//    VectorInt3 oldPos=ingredients.getMolecules()[move.getIndex()];
-//    VectorInt3 newPos=oldPos+move.getDir();
-//
-//    double prob=1.0;
-//    double prob_divide=1.0;
-//    uint32_t monoType=ingredients.getMolecules()[move.getIndex()].getAttributeTag();
-//
-//
-//    for(size_t n=0;n<24;n++)
-//    {
-//        prob*=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(newPos+contactShell_1[n])));
-//        prob_divide/=getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(oldPos+contactShell_1[n])));
-//    }
-//    for(size_t n=0;n<24;n++)
-//    {
-//        prob*=pow(getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(newPos+contactShell_2[n]))),2.0);
-//        prob_divide/=pow(getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(oldPos+contactShell_2[n]))),2.0);
-//    }
-//    for(size_t n=0;n<6;n++)
-//    {
-//        prob*=pow(getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(newPos+contactShell_4[n]))),4.0);
-//        prob_divide/=pow(getProbabilityFactor(monoType,uint32_t(ingredients.getLatticeEntry(oldPos+contactShell_4[n]))),4.0);
-//    }
-//
-//
-//
-//    return prob/prob_divide;
-//
-// }
-//
-//
-//
-//
-// template<class IngredientsType>
-// void FeatureNNInteraction::fillLattice(IngredientsType& ingredients)
-// {
-//        const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
-//        for(size_t n=0;n<molecules.size();n++)
-//        {
-//          ingredients.setLatticeEntry(molecules[n],uint8_t( molecules[n].getAttributeTag()));
-//
-//        }
-// }
-//
-//
-// template<class IngredientsType>
-// void FeatureNNInteraction::applyMove(IngredientsType& ing, const MoveAddScMonomer& move)
-// {
-//     //get the position and attribute tag of the monomer to be inserted
-//     VectorInt3 pos=move.getPosition();
-//     int32_t type=move.getType();
-//
-//     //update lattice
-//     ing.setLatticeEntry(pos,type);
-//
-// }
-//////////////// end version with FeatureExcludedVolume/////////////////////////
-
-/******************************************************************************
- *implementation of read and write classes
+/*******************************************************************************
+ *constructor: initializes the lookup arrays
  ******************************************************************************/
+template<template<typename> class LatticeClassType>
+FeatureNNInteractionSc<LatticeClassType>::FeatureNNInteractionSc()
+{
+    for(size_t n=0;n<256;n++)
+    {
+        for(size_t m=0;m<256;m++)
+        {
+            interactionTable[m][n]=0.0;
+            probabilityLookup[m][n]=1.0;
+        }
+    }
+}
+
+/*******************************************************************************
+ *destructor
+ ******************************************************************************/
+template<template<typename> class LatticeClassType>
+FeatureNNInteractionSc<LatticeClassType>::~FeatureNNInteractionSc(){}
+
+template<template<typename> class LatticeClassType>
+void FeatureNNInteractionSc<LatticeClassType>::setContactInteraction(int32_t typeA,int32_t typeB,double energy)
+{
+    if(0<typeA && typeA<=255 && 0<typeB && typeB<=255)
+    {
+        interactionTable[typeA][typeB]=energy;
+        interactionTable[typeB][typeA]=energy;
+        probabilityLookup[typeA][typeB]=exp(-energy);
+        probabilityLookup[typeB][typeA]=exp(-energy);
+        std::cout<<"set interation between types "<<typeA<<" and "<<typeB<<" to "<<energy<<"kT\n";
+    }
+    else
+    {
+      std::stringstream errormessage;
+      errormessage<<"FeatureNNInteractionSc::setContactInteraction(typeA,typeB,energy).\n";
+      errormessage<<"typeA "<<typeA<<" typeB "<<typeB<<": Types out of range\n";
+      throw std::runtime_error(errormessage.str());
+    }
+}
+
+//returns the interaction between two types of monomers in units of interactionBase
+//int32_t FeatureNNInteraction::getInteraction(uint32_t typeA,uint32_t typeB) const
+template<template<typename> class LatticeClassType>
+double FeatureNNInteractionSc<LatticeClassType>::getContactInteraction(int32_t typeA,
+								       int32_t typeB) const
+{
+
+    if(0<typeA && typeA<=255 && 0<typeB && typeB<=255)
+        return interactionTable[typeA][typeB];
+    else
+    {
+      std::stringstream errormessage;
+      errormessage<<"FeatureNNInteractionSc::getContactInteraction(typeA,typeB).\n";
+      errormessage<<"typeA "<<typeA<<" typeB "<<typeB<<": Types out of range\n";
+      throw std::runtime_error(errormessage.str());
+    }
+
+}
 
 
 #endif /*FEATURE_NN_INTERACTION_H*/

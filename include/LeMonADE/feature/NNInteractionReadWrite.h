@@ -37,7 +37,7 @@ void ReadInteraction<IngredientsType>::execute()
     std::istream& file=this->getInputStream();
 
 
-    uint32_t typeA,typeB;
+    int32_t typeA,typeB;
     double interactionConstant;
 
 
@@ -75,7 +75,7 @@ void ReadInteraction<IngredientsType>::execute()
 
 
     //now save the interaction tuple just read from the file
-    ingredients.setInteraction(typeA,typeB,interactionConstant);
+    ingredients.setContactInteraction(typeA,typeB,interactionConstant);
 
 
 }
@@ -85,16 +85,16 @@ void ReadInteraction<IngredientsType>::execute()
 template<class IngredientsType>
 void WriteInteraction<IngredientsType>::writeStream(std::ostream& stream)
 {
-    size_t nSpecies=10;
+    size_t nSpecies=255;
     stream<<"## nearest neighbor interactions between types in kT (default 0.0kT)\n";
 
     for(size_t typeA=1;typeA<=nSpecies;typeA++)
     {
         for(size_t typeB=1;typeB<typeA;typeB++)
         {
-            if(this->getSource().getInteraction(typeA,typeB)!=0.0)
+            if(this->getSource().getContactInteraction(typeA,typeB)!=0.0)
             {
-                stream<<"#!nn_interaction "<<typeB<<" "<<typeA<<" "<<this->getSource().getInteraction(typeB,typeA)<<"\n";
+                stream<<"!nn_interaction "<<typeB<<" "<<typeA<<" "<<this->getSource().getContactInteraction(typeB,typeA)<<"\n";
             }
 
         }
