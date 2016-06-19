@@ -42,7 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureBoltzmann.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
-#include <LeMonADE/feature/NNInteractionReadWrite.h>
+#include <LeMonADE/feature/FeatureContactInteractionReadWrite.h>
 
 /**
  * @class FeatureContactInteractionSc

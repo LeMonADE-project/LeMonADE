@@ -13,7 +13,7 @@
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
 #include <LeMonADE/updater/UpdaterSimpleSimulator.h>
 #include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
-#include <LeMonADE/feature/FeatureNNInteraction.h>
+#include <LeMonADE/feature/FeatureContactInteractionSc.h>
 
 int main(int argc, char* argv[])
 {
