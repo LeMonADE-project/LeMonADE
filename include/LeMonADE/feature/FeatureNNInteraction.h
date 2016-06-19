@@ -29,12 +29,12 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef FEATURE_CONTACT_INTERACTION_H
 #define FEATURE_CONTACT_INTERACTION_H
 
-
-/// @file
-/// @date 2016/06/18
-/// @author Hauke Rabbel
-/// @brief Definition and implementation of class template FeatureContactInteractionSc
-
+/**
+ * @file
+ * @date 2016/06/18
+ * @author Hauke Rabbel
+ * @brief Definition and implementation of class template FeatureContactInteractionSc
+**/
 
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
@@ -44,31 +44,31 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureAttributes.h>
 #include <LeMonADE/feature/NNInteractionReadWrite.h>
 
-
-/// @class FeatureContactInteractionSc
-/// @brief Provides interaction of monomers on distances d<=sqrt(6) for standard BFM
-///
-/// @tparam FeatureLatticeType Underlying lattice feature, e.g. FeatureLattice or 
-/// FeatureLatticePowerOfTwo (template template parameter)
-///
-/// @details
-/// The interaction energy can be set for pairs of monomer-types A,B, where
-/// the type can be any integer between 1 and 255. 
-/// The feature automatically adds FeatureExcludedVolumeSc<FeatureLatticeType<uint8_t>
-/// to the system. Given an energy E in kT between  two types, the interaction potential 
-/// as a function of the distance d is:
-/// - inf d<2 (implicitly through excluded volume)
-/// - 4*E d=2
-/// - 2*E d=sqrt(5)
-/// - 1*E d=sqrt(6)
-/// - 0   d>sqrt(6)
-/// .
-/// Usage: In the feature list defining Ingredients use this feature as
-/// FeatureContactInteractionSc<FeatureLattice> (arbitrary lattices), or as
-/// FeatureContactInteractionSc<FeatureLatticePowerOfTwo> (2**n lattices)
-/// The feature adds the bfm-file command !contact_interaction A B E
-/// for monomers of types A B with interaction energy of E in kT.
-
+/**
+ * @class FeatureContactInteractionSc
+ * @brief Provides interaction of monomers on distances d<=sqrt(6) for standard BFM
+ *
+ * @tparam FeatureLatticeType Underlying lattice feature, e.g. FeatureLattice or 
+ * FeatureLatticePowerOfTwo (template template parameter)
+ *
+ * @details
+ * The interaction energy can be set for pairs of monomer-types A,B, where
+ * the type can be any integer between 1 and 255. 
+ * The feature automatically adds FeatureExcludedVolumeSc<FeatureLatticeType<uint8_t>
+ * to the system. Given an energy E in kT between  two types, the interaction potential 
+ * as a function of the distance d is:
+ * - inf d<2 (implicitly through excluded volume)
+ * - 4*E d=2
+ * - 2*E d=sqrt(5)
+ * - 1*E d=sqrt(6)
+ * - 0   d>sqrt(6)
+ * .
+ * Usage: In the feature list defining Ingredients use this feature as
+ * FeatureContactInteractionSc<FeatureLattice> (arbitrary lattices), or as
+ * FeatureContactInteractionSc<FeatureLatticePowerOfTwo> (2**n lattices)
+ * The feature adds the bfm-file command !contact_interaction A B E
+ * for monomers of types A B with interaction energy of E in kT.
+**/
 
 template<template<typename> class FeatureLatticeType>
 class FeatureContactInteractionSc:public Feature
@@ -166,7 +166,9 @@ public:
 
 //////////////////  IMPLEMENTATION OF MEMBERS //////////////////////////////////
 
-
+/**
+ * @brief Constructor
+ **/
 template<template<typename> class LatticeClassType>
 FeatureContactInteractionSc<LatticeClassType>::FeatureContactInteractionSc()
 {
@@ -181,8 +183,13 @@ FeatureContactInteractionSc<LatticeClassType>::FeatureContactInteractionSc()
     }
 }
 
-
-
+/**
+ * @details Returns true for all moves other than the ones that have specialized versions of this function.
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move Monte Carlo move other than moves with specialized functions.
+ * @return true (always)
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
@@ -191,7 +198,14 @@ bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsT
     return true;
 }
 
-
+/**
+ * @details calculates the factor for the acceptance probability of the move
+ * arising from the contact interactions and adds it to the move.
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move Monte Carlo move of type MoveLocalSc
+ * @return true (always)
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
@@ -204,6 +218,16 @@ bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsT
   return true;
 }
 
+/**
+ * @details Because moves of type MoveLocalBcc must not be used with this
+ * feature, this function always throws an exception when called. The function
+ * is only implemented for savety purposes.
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move Monte Carlo move of type MoveLocalBcc
+ * @throw std::runtime_error
+ * @return false always throws exception before returning
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
@@ -219,7 +243,15 @@ bool FeatureContactInteractionSc<LatticeClassType>::checkMove(const IngredientsT
 }
 
 
-
+/**
+ * @details When a new monomer is added to the system, the lattice sites occupied
+ * by this monomer must be filled with the attribute tag. This function takes care
+ * of this.
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move Monte Carlo move of type MoveAddScMonomer
+ * @throw std::runtime_error if attribute tag is not in range [1,255]
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing, 
@@ -230,8 +262,18 @@ void FeatureContactInteractionSc<LatticeClassType>::applyMove(IngredientsType& i
     VectorInt3 dx(1,0,0);
     VectorInt3 dy(0,1,0);
     VectorInt3 dz(0,0,1);
-    int32_t type=move.getType();
+    lattice_value_type type=lattice_value_type(move.getType());
 
+    //the feature is based on a uint8_t lattice, thus the max type must not
+    //exceed the max value of uint8_t (255)
+    if(int32_t(type) != move.getType())
+      {
+	std::stringstream errormessage;
+	errormessage<<"FeatureContactInteractionSc::applyMove(MoveAddScMonomer)\n";
+	errormessage<<"Trying to add monomer with type "<<int32_t(type)<<">maxType=255\n";
+	throw std::runtime_error(errormessage.str());
+      }
+    
     //update lattice
     ing.setLatticeEntry(pos,type);
     ing.setLatticeEntry(pos+dx,type);
@@ -243,7 +285,15 @@ void FeatureContactInteractionSc<LatticeClassType>::applyMove(IngredientsType& i
     ing.setLatticeEntry(pos+dz+dx+dy,type);
 }
 
-
+/**
+ * @details Because moves of type MoveLocalBcc must not be used with this
+ * feature, this function always throws an exception when called. The function
+ * is only implemented for savety purposes.
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move Monte Carlo move of type MoveLocalBcc
+ * @throw std::runtime_error
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::applyMove(const IngredientsType& ing, 
@@ -257,6 +307,10 @@ void FeatureContactInteractionSc<LatticeClassType>::applyMove(const IngredientsT
 
 }
 
+/**
+ * @tparam IngredientsType The type of the system including all features
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::synchronize(IngredientsType& ingredients)
@@ -269,6 +323,14 @@ void FeatureContactInteractionSc<LatticeClassType>::synchronize(IngredientsType&
 }
 
 
+/**
+ * @details If not compiled with DEBUG flag this function only returns the content
+ * of the lookup table probabilityLookup. If compiled with DEBUG flag it checks 
+ * that the attribute tags typeA, typeB are within the allowed range.
+ * @param typeA monomer attribute type in range [1,255]
+ * @param typeB monomer attribute type in range [1,255]
+ * @throw std::runtime_error In debug mode, if types are not in range [1,255]
+ **/
 template<template<typename> class LatticeClassType>
 inline double FeatureContactInteractionSc<LatticeClassType>::getProbabilityFactor(int32_t typeA,
 									     int32_t typeB) const
@@ -289,7 +351,17 @@ inline double FeatureContactInteractionSc<LatticeClassType>::getProbabilityFacto
 
 }
 
-
+/**
+ * @details The function is called by the Ingredients class when an object of type Ingredients
+ * is associated with an object of type FileImport. The export of the Reads is thus
+ * taken care automatically when it becomes necessary.\n
+ * Registered Read-In Commands:
+ * - !contactInteraction
+ * .
+ *
+ * @tparam IngredientsType The type of the system including all features
+ * @param fileReader File importer for the bfm-file
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::exportRead(FileImport< IngredientsType >& fileReader)
@@ -299,6 +371,16 @@ void FeatureContactInteractionSc<LatticeClassType>::exportRead(FileImport< Ingre
 }
 
 
+/**
+ * The function is called by the Ingredients class when an object of type Ingredients
+ * is associated with an object of type AnalyzerWriteBfmFile. The export of the Writes is thus
+ * taken care automatically when it becomes necessary.\n
+ * Registered Write-Out Commands:
+ * - !contact_interaction
+ *
+ * @tparam IngredientsType The type of the system including all features
+ * @param fileWriter File writer for the bfm-file.
+ */
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
@@ -307,7 +389,15 @@ void FeatureContactInteractionSc<LatticeClassType>::exportWrite(AnalyzerWriteBfm
   fileWriter.registerWrite("!contact_interaction",new WriteContactInteraction<my_type>(*this));
 }
 
-
+/**
+ * @details occupies the lattice with the attribute tags of the monomers
+ * as this is required to determine the contact interactions in this feature.
+ * An additional check is performed asserting that the tags are in the range [1,255]
+ *
+ * @tparam IngredientsType The type of the system including all features
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @throw std::runtime_error In case a monomer has attribute tag not in [1,255]
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::fillLattice(IngredientsType& ingredients)
@@ -341,6 +431,18 @@ void FeatureContactInteractionSc<LatticeClassType>::fillLattice(IngredientsType&
 }
 
 
+/**
+ * @details The function calculates the factor for the acceptance probability
+ * for the local move given as argument. The calculation is based on the lattice
+ * entries in the vicinity of the monomer to be moved. If the move is accepted,
+ * 12 new contacts can potentially be made, and 12 contacts are lost. Thus a number
+ * of 24 lattice positions around the monomer have to be checked.
+ *
+ * @tparam IngredientsType The type of the system including all features
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move reference to the local move for which the calculation is performed
+ * @return acceptance probability factor for the move arising from nearest neighbor contacts
+ **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 double FeatureContactInteractionSc<LatticeClassType>::calculateAcceptanceProbability(
@@ -441,7 +543,12 @@ double FeatureContactInteractionSc<LatticeClassType>::calculateAcceptanceProbabi
 
 }
 
-
+/**
+ * @param typeA monomer attribute tag in range [1,255]
+ * @param typeB monomer attribute tag in range [1,255]
+ * @param interaction energy between typeA and typeB
+ * @throw std::runtime_error In case typeA or typeB exceed range [1,255]
+ **/
 template<template<typename> class LatticeClassType>
 void FeatureContactInteractionSc<LatticeClassType>::setContactInteraction(int32_t typeA,
 								     int32_t typeB,
@@ -465,7 +572,12 @@ void FeatureContactInteractionSc<LatticeClassType>::setContactInteraction(int32_
       }
 }
 
-
+/**
+ * @param typeA monomer attribute tag in range [1,255]
+ * @param typeB monomer attribute tag in range [1,255]
+ * @throw std::runtime_error In case typeA or typeB exceed range [1,255]
+ * @return interaction energy per nearest neighbor contact for typeA,typeB
+ **/
 template<template<typename> class LatticeClassType>
 double FeatureContactInteractionSc<LatticeClassType>::getContactInteraction(int32_t typeA,
 								       int32_t typeB) const
@@ -483,6 +595,5 @@ double FeatureContactInteractionSc<LatticeClassType>::getContactInteraction(int3
 
 }
 
-//TODO: rename files, change IO, tests, comments for doxygen
 
 #endif /*FEATURE_CONTACT_INTERACTION_H*/
