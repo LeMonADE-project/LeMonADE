@@ -42,7 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureBoltzmann.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
-#include <LeMonADE/feature/FeatureContactInteractionReadWrite.h>
+#include <LeMonADE/feature/NNInteractionReadWrite.h>
 
 
 /// @class FeatureContactInteractionSc
@@ -118,29 +118,27 @@ public:
 
   //! check for all Monte Carlo moves without special check functions (always true)
   template<class IngredientsType>
-  bool checkMove(const IngredientsType& ingredients,const MoveBase& move) const;
+    bool checkMove(const IngredientsType& ingredients,const MoveBase& move) const;
 
   //! check for standard sc-BFM local move
   template<class IngredientsType>
-  bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
+    bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
 
   //! check move for bcc-BFM local move. always throws std::runtime_error
   template<class IngredientsType>
-  bool checkMove(const IngredientsType& ingredients,const MoveLocalBcc& move) const;
-
-  //TODO should we implement a check for MoveAddScMonomer (needs calculation of partition function)?
+    bool checkMove(const IngredientsType& ingredients,const MoveLocalBcc& move) const;
 
   //! apply function for all Monte Carlo moves without special apply functions (does nothing)
   template<class IngredientsType>
-  void applyMove(const IngredientsType& ing, const MoveBase& move);
+    void applyMove(const IngredientsType& ing, const MoveBase& move){}
 
   //! apply function for bcc-BFM local move (always throws std::runtime_error)
   template<class IngredientsType>
-  void applyMove(const IngredientsType& ing, const MoveLocalBcc& move);
+    void applyMove(const IngredientsType& ing, const MoveLocalBcc& move);
 
   //! apply function for adding a monomer in sc-BFM
   template<class IngredientsType>
-  void applyMove(IngredientsType& ing, const MoveAddScMonomer& move);
+    void applyMove(IngredientsType& ing, const MoveAddScMonomer& move);
 
   //note: apply function for sc-BFM local move is not necessary, because 
   //job of moving lattice entries is done by the underlying FeatureLatticeType
@@ -297,7 +295,7 @@ template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::exportRead(FileImport< IngredientsType >& fileReader)
 {
   typedef FeatureContactInteractionSc<LatticeClassType> my_type;
-  fileReader.registerRead("!contact_interaction",new ReadInteraction<my_type>(*this));
+  fileReader.registerRead("!contact_interaction",new ReadContactInteraction<my_type>(*this));
 }
 
 
@@ -306,7 +304,7 @@ template<class IngredientsType>
 void FeatureContactInteractionSc<LatticeClassType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
   typedef FeatureContactInteractionSc<LatticeClassType> my_type;
-  fileWriter.registerWrite("!contact_interaction",new WriteInteraction<my_type>(*this));
+  fileWriter.registerWrite("!contact_interaction",new WriteContactInteraction<my_type>(*this));
 }
 
 
@@ -323,7 +321,7 @@ void FeatureContactInteractionSc<LatticeClassType>::fillLattice(IngredientsType&
 
 	if(int32_t(attribute)!=molecules[n].getAttributeTag()){
 	  std::stringstream errormessage;
-	  errormessage<<"***FeatureNaNInteractionSc::fillLattice()***\n";
+	  errormessage<<"***FeatureContactInteractionSc::fillLattice()***\n";
 	  errormessage<<"type "<<attribute<<" is out of the allowed range";
 
 	  throw std::runtime_error(errormessage.str());
@@ -485,5 +483,6 @@ double FeatureContactInteractionSc<LatticeClassType>::getContactInteraction(int3
 
 }
 
+//TODO: rename files, change IO, tests, comments for doxygen
 
 #endif /*FEATURE_CONTACT_INTERACTION_H*/
