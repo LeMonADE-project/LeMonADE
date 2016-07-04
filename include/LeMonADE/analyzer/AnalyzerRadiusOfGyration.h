@@ -48,7 +48,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @tparam IngredientsType Ingredients class storing all system information( e.g. monomers, bonds, etc).
  * 
- * @details For the MonomerGroups provided as argument to the constructor, this 
+ * @details For the MonomerGroups provided as argument to the constructor or set using the function
+ * void setMonomerGroups(std::vector<MonomerGroup<molecules_type> >), this 
  * Analyzer calculates the squared radius of gyration and saves the time series
  * of this data to disk in the format 
  * mcs Rg2_x_g1, Rg2_y_g1, Rg2_z_g1,Rg2_tot_g1...Rg2_x_gn, Rg2_y_gn, Rg2_z_gn,Rg2_tot_gn
@@ -65,7 +66,7 @@ private:
 	//! reference to the complete system
 	const IngredientsType& ingredients;
 	//! Rg2 is calculated for the groups in this vector
-	const std::vector<MonomerGroup<molecules_type> >& groups;
+	std::vector<MonomerGroup<molecules_type> > groups;
 	//! timeseries of the Rg^2 of all groups. Values are saved to disk in intervals of saveInterval 
 	std::vector< std::vector<double> > Rg2TimeSeriesX,Rg2TimeSeriesY,Rg2TimeSeriesZ,Rg2TimeSeriesTotal;
 	//! vector of mcs times for writing the time series
@@ -85,7 +86,6 @@ public:
   
 	//! constructor
 	AnalyzerRadiusOfGyration(const IngredientsType& ing,
-				 const std::vector<MonomerGroup<molecules_type> >& groupVector,
 			  std::string filename=std::string("Rg2TimeSeries.dat"));
 	
 	//! destructor. does nothing
@@ -98,6 +98,8 @@ public:
 	virtual void cleanup();
 	//! Set the number of values, after which the time series is saved to disk
 	void setSaveInterval(uint32_t interval){saveInterval=interval;}
+	//! Set the groups to be analyzed
+	void setMonomerGroups(std::vector<MonomerGroup<molecules_type> > groupVector){groups=groupVector;}
 	
 };
 
@@ -107,37 +109,34 @@ public:
 
 /**
  * @param ing reference to the object holding all information of the system
- * @param groupVector vector of MonomerGroup to be analyzed
  * @param filename output file name. defaults to "Rg2TimeSeries.dat".
  * */
 template<class IngredientsType>
 AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(
 	const IngredientsType& ing, 
-	const std::vector< MonomerGroup< molecules_type > >& groupVector,
 	std::string filename)
 :ingredients(ing)
-,groups(groupVector)
 ,saveInterval(100)
 ,outputFile(filename)
 ,isFirstFileDump(true)
 {
 }
 
+
 /**
- * @throw std::runtime_error if there are no monomers in the groups
+ * @details fills all monomers into the groups vector as a single group,
+ * if the group size is zero. Normally this should always be the case,
+ * unless the groups were already set explicitly by using the setter function
+ * setMonomerGroups
  * */
 template< class IngredientsType >
 void AnalyzerRadiusOfGyration<IngredientsType>::initialize()
 {
 	//test if the groups contain monomers and exit otherwise
-	if(groups.size()==0)
-		throw std::runtime_error("AnalyzerRadiusOfGyration::initialize(): no monomers to analyze");
-	//give a warning if a single group is empty
-	for(size_t n=0;n<groups.size();n++){
-		if(groups[n].size()==0){
-			std::cerr<<"AnalyzerRadiusOfGyration::initialize():\n";
-			std::cerr<<"Warning: group "<<n<<" of "<<groups.size()<<" is empty\n";
-		}
+	if(groups.size()==0){
+		groups.push_back(MonomerGroup<molecules_type>(ingredients.getMolecules()));
+		for(size_t n=0;n<ingredients.getMolecules().size();n++)
+			groups[0].push_back(n);
 	}
 	
 	//resize the vectors to the number of groups

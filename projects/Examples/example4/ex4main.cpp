@@ -148,11 +148,9 @@ int main(int argc, char* argv[]){
     //add the radius of gyration calculation. we execute this only 
     //every 10th time
     //the first argument to the analyzer is the system to be analyzed,
-    //the second is a string defining a prefix for the name of the output file,
-    //i.e. if we put "polymer", the output files will be named
-    //"polymer_RgSquaredTimeseries.dat" and "polymer_RgSquaredAverages.dat".
+    //the second is a string defining the name of the output file.
     taskmanager.addAnalyzer(new 
-    AnalyzerRadiusOfGyration<MyIngredients>(mySystem,"polymer"),10);
+    AnalyzerRadiusOfGyration<MyIngredients>(mySystem,"Rg2.dat"),10);
     
     /* ****************************************************************
       * For running the desired tasks, the taskmanager provides four 
