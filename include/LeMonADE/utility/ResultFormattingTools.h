@@ -167,8 +167,12 @@ void ResultFormattingTools::appendToResultFile(std::string filename,ResultType& 
 	//check if all column have the same size
 	int columnSize = results[0].size();
 	for (int i = 0; i < results.size(); ++i) {
-		if (results[i].size() != columnSize)
-			throw std::runtime_error("ResultFormattingTools::appendToResultFile():Columns do not have the same size\n");
+		if (results[i].size() != columnSize){
+			std::stringstream errormessage;
+			errormessage<<"ResultFormattingTools::appendToResultFile():Columns do not have the same size\n";
+			errormessage<<"first colums size "<<columnSize<<" column no "<<i<<" size "<<results[i].size()<<std::endl;
+			throw std::runtime_error(errormessage.str());
+		}
 	}
 
 	//write content
