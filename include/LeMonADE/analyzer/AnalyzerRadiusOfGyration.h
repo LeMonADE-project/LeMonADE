@@ -104,6 +104,8 @@ public:
 	void setBufferSize(uint32_t size){bufferSize=size;}
 	//! Set the groups to be analyzed
 	void setMonomerGroups(std::vector<MonomerGroup<molecules_type> > groupVector){groups=groupVector;}
+	//! Change the output file name
+	void setOutputFile(std::string filename){outputFile=filename;isFirstFileDump=true;}
 	
 };
 
