@@ -138,7 +138,8 @@ AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(
 template< class IngredientsType >
 void AnalyzerRadiusOfGyration<IngredientsType>::initialize()
 {
-	//test if the groups contain monomers and exit otherwise
+	//if no groups are set, use the complete system by default
+	//groups can be set using the provided access function
 	if(groups.size()==0){
 		groups.push_back(MonomerGroup<molecules_type>(ingredients.getMolecules()));
 		for(size_t n=0;n<ingredients.getMolecules().size();n++)
