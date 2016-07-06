@@ -59,13 +59,13 @@ protected:
   RandomNumberGenerators rng;
   
   //! function to add a monomer to a parent monomer
-  bool add_monomer_to_parent(uint32_t parent_id, int32_t type);
+  bool add_monomer_to_parent(uint32_t parent_id, int32_t type=1);
   //! function to add a standalone monomer
-  bool add_lonely_monomer(int32_t type);
+  bool add_lonely_monomer(int32_t type=1);
   //! function to move the whole system
   void move_system(int32_t nsteps);
   //! function to add a monomer at a spezific place
-  bool add_monomer_to_position(VectorInt3 pos, int32_t type);
+  bool add_monomer_to_position(VectorInt3 pos, int32_t type=1);
   
 };
 
@@ -105,7 +105,7 @@ void UpdaterAbstractCreate<IngredientsType>::cleanup(){
  * @param parent_id id of monomer to connect with
  */
 template<class IngredientsType>
-bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t parent_id, int32_t type=1){
+bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t parent_id, int32_t type){
   // set properties of add Monomer Move
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
@@ -141,7 +141,7 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t pare
  * @brief function to add a standalone monomer
  */
 template<class IngredientsType>
-bool UpdaterAbstractCreate<IngredientsType>::add_lonely_monomer(int32_t type=1){
+bool UpdaterAbstractCreate<IngredientsType>::add_lonely_monomer(int32_t type){
   // set properties of add Monomer Move
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
@@ -189,7 +189,7 @@ void UpdaterAbstractCreate<IngredientsType>::move_system(int32_t nsteps){
  * @return <b false> if position is not free, <b true> if move was applied
  */
 template<class IngredientsType>
-bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_position(VectorInt3 position, int32_t type=1){
+bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_position(VectorInt3 position, int32_t type){
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
   addmove.setPosition(position);
