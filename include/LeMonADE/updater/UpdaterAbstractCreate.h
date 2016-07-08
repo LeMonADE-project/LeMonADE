@@ -42,6 +42,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  **/
 
 #include <LeMonADE/updater/AbstractUpdater.h>
+#include <LeMonADE/utility/MonomerGroup.h>
+#include <LeMonADE/utility/DepthIterator.h>
 #include <LeMonADE/utility/Vector3D.h>
 
 template<class IngredientsType>
@@ -58,14 +60,23 @@ protected:
   IngredientsType& ingredients;
   RandomNumberGenerators rng;
   
-  //! function to add a monomer to a parent monomer
-  bool add_monomer_to_parent(uint32_t parent_id, int32_t type=1);
   //! function to add a standalone monomer
   bool add_lonely_monomer(int32_t type=1);
-  //! function to move the whole system
-  void move_system(int32_t nsteps);
+  
+  //! function to add a monomer to a parent monomer
+  bool add_monomer_to_parent(uint32_t parent_id, int32_t type=1);
+  
   //! function to add a monomer at a spezific place
   bool add_monomer_to_position(VectorInt3 pos, int32_t type=1);
+  
+  //! function to add a new monomer inbetween two others
+  bool add_monomer_inside_connected_pair(uint32_t indexA, uint32_t indexB, int32_t type=1);
+  
+  //! function to move the whole system
+  void move_system(int32_t nsteps);
+  
+  //! function to find groups of connected monomers
+  void linearize_system();
   
 };
 
@@ -101,8 +112,38 @@ void UpdaterAbstractCreate<IngredientsType>::cleanup(){
 
 /******************************************************************************/
 /**
+ * @brief function to add a standalone monomer
+ * @param type attribute tag of the new monomer
+ * @return <b false> if position is not free, <b true> if move was applied
+ */
+template<class IngredientsType>
+bool UpdaterAbstractCreate<IngredientsType>::add_lonely_monomer(int32_t type){
+  // set properties of add Monomer Move
+  MoveAddScMonomer addmove;
+  addmove.init(ingredients);
+  
+  int32_t counter(0);
+  while(counter<10000){
+    VectorInt3 newPosition((rng.r250_rand32() % (ingredients.getBoxX()-1)),
+				  (rng.r250_rand32() % (ingredients.getBoxY()-1)),
+				  (rng.r250_rand32() % (ingredients.getBoxZ()-1)));
+    addmove.setPosition(newPosition);
+    if(addmove.check(ingredients)==true){
+      addmove.setType(type);
+      addmove.apply(ingredients);
+      return true;
+    }
+    counter++;
+  }
+  return false;
+}
+
+/******************************************************************************/
+/**
  * @brief function to add a monomer to a parent monomer
  * @param parent_id id of monomer to connect with
+ * @param type attribute tag of the new monomer
+ * @return <b false> if position is not free, <b true> if move was applied
  */
 template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t parent_id, int32_t type){
@@ -138,30 +179,76 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t pare
 
 /******************************************************************************/
 /**
- * @brief function to add a standalone monomer
+ * @brief function to add a monomer to a specific position. if position is not free return false 
+ * @param VectorInt3 position
+ * @param type attribute tag of the new monomer
+ * @return <b false> if position is not free, <b true> if move was applied
  */
 template<class IngredientsType>
-bool UpdaterAbstractCreate<IngredientsType>::add_lonely_monomer(int32_t type){
-  // set properties of add Monomer Move
+bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_position(VectorInt3 position, int32_t type){
+  MoveAddScMonomer addmove;
+  addmove.init(ingredients);
+  addmove.setPosition(position);
+  if(addmove.check(ingredients)==true){
+    addmove.setType(type);
+    addmove.apply(ingredients);
+    return true;
+  }else{
+    return false;
+  }
+  
+}
+
+/******************************************************************************/
+/**
+ * @brief function to add a new monomer between two already existing ones instead of a bond.
+ * @param indexA
+ * @param indexB
+ * @param type attribute tag of the new monomer
+ * @return <b false> if position is not free, <b true> if move was applied
+ */
+template<class IngredientsType>
+bool UpdaterAbstractCreate<IngredientsType>::add_monomer_inside_connected_pair(uint32_t indexA, uint32_t indexB, int32_t type){
+  //first check if monomers are connected
+  if( ! ingredients.getMolecules().areConnected(indexA,indexB))
+    return false;
+  
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
   
   int32_t counter(0);
+  
   while(counter<10000){
-    VectorInt3 newPosition((rng.r250_rand32() % (ingredients.getBoxX()-1)),
-				  (rng.r250_rand32() % (ingredients.getBoxY()-1)),
-				  (rng.r250_rand32() % (ingredients.getBoxZ()-1)));
-    addmove.setPosition(newPosition);
-    if(addmove.check(ingredients)==true){
-      addmove.setType(type);
-      addmove.apply(ingredients);
-      return true;
+    //try at most 30 random bondvectors to find a new monomer position
+    for(uint i=0;i<30;i++){
+      // get id of random bondvector with index <= 22, also P(2,0,0)
+      std::size_t randBondVectorID((rng.r250_rand32() % 6)+17);
+      VectorInt3 bondvector(ingredients.getBondset().getBondVector(randBondVectorID));
+      // set position of new monomer
+      addmove.setPosition(ingredients.getMolecules()[indexA]+bondvector);
+    
+      // check new position (excluded volume, other features)
+      if(addmove.check(ingredients)==true){
+	//check the new bondvector bewten the new monomer and indexB
+	VectorInt3 checkBV(addmove.getPosition()-ingredients.getMolecules()[indexB]);
+	if( (checkBV.getLength() < 3) && (ingredients.getBondset().isValidStrongCheck(checkBV)) ){
+	  addmove.setType(type);
+	  addmove.apply(ingredients);
+	  ingredients.modifyMolecules().connect( indexA, (ingredients.getMolecules().size()-1) );
+	  ingredients.modifyMolecules().connect( indexB, (ingredients.getMolecules().size()-1) );
+	  ingredients.modifyMolecules().disconnect( indexA, indexB );
+	  return true;
+	}
+      }
     }
+    // if no position matches, we need to move the system a bit
+    move_system(2);
     counter++;
   }
+  // create a meaningful return message
+  std::cout << "UpdaterAbstractCreate::add_monomer_inside_connected_pair:  could not add new monomer between "<<indexA<< " and "<<indexB<<std::endl; 
   return false;
 }
-
 
 /******************************************************************************/
 /**
@@ -184,30 +271,10 @@ void UpdaterAbstractCreate<IngredientsType>::move_system(int32_t nsteps){
 
 /******************************************************************************/
 /**
- * @brief function to add a monomer to a specific position. if position is not free return false 
- * @param VectorInt3 position
- * @return <b false> if position is not free, <b true> if move was applied
+ * @brief function to find groups of connected monomers and resort ingredients 
+ * to write out longest possible bondvector series
  */
-template<class IngredientsType>
-bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_position(VectorInt3 position, int32_t type){
-  MoveAddScMonomer addmove;
-  addmove.init(ingredients);
-  addmove.setPosition(position);
-  if(addmove.check(ingredients)==true){
-    addmove.setType(type);
-    addmove.apply(ingredients);
-    return true;
-  }else{
-    return false;
-  }
-  
-}
 
-/******************************************************************************/
-/**
- * @brief function to rearrange monomers to get linear strands
- */
-/*
 template<class IngredientsType>
 void UpdaterAbstractCreate<IngredientsType>::linearize_system(){
   //call ingredients copy constructor
@@ -216,15 +283,18 @@ void UpdaterAbstractCreate<IngredientsType>::linearize_system(){
   //delete all the informations in molecules
   newIngredients.modifyMolecules().clear();
   
-  //create a death iterator object, only one template parameter gives the default "always true"
-  GraphIteratorDepthFirst<MoleculesType> iterator(ingredients.getMolecules());
-  
-  typedef std::vector < MonomerGroup<typename IngredientsType::molecules_type> > MonomerGroupVector;
+  std::vector < MonomerGroup<typename IngredientsType::molecules_type> > LinearMonomerGroupsVector;
 
-  MonomerGroupVector LinearMonomerGroupsVector;
-
-  fill_connected_groups( ingredients.getMolecules(), LinearMonomerGroupsVector, MonomerGroup<typename IngredientsType::molecules_type>(&(ingredients.getMolecules())), alwaysTrue );
+  fill_connected_groups( ingredients.getMolecules(), LinearMonomerGroupsVector, MonomerGroup<typename IngredientsType::molecules_type>(ingredients.getMolecules()), alwaysTrue() );
   
+  for(size_t groups=0; groups < LinearMonomerGroupsVector.size(); ++groups){
+    if(groups==0)
+      newIngredients.modifyMolecules() = LinearMonomerGroupsVector[groups].copyGroup();
+    else
+      newIngredients.modifyMolecules() += LinearMonomerGroupsVector[groups].copyGroup();
+  }
+  
+  ingredients=newIngredients;
   
 }/* */
 

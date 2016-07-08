@@ -101,7 +101,15 @@ public:
       checker=add_monomer_to_position(VectorInt3( ingredients.getBoxX()/2,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),4);
       checker=add_monomer_to_parent(0,3);
     }else if(numExec==2){
-      
+      checker=add_monomer_to_parent(1,3);
+    }else if(numExec==3){
+      move_system(20);
+    }else if(numExec==4){
+      checker=add_monomer_inside_connected_pair(1,2,4);
+      checker=add_monomer_inside_connected_pair(1,ingredients.getMolecules().size()-1,4);
+      checker=add_monomer_inside_connected_pair(1,ingredients.getMolecules().size()-1,4);
+    }else if(numExec==5){
+      linearize_system();
     }
     
     numExec++;
@@ -121,7 +129,9 @@ private:
   using BaseClass::add_monomer_to_parent;
   using BaseClass::add_lonely_monomer;
   using BaseClass::add_monomer_to_position;
+  using BaseClass::add_monomer_inside_connected_pair;
   using BaseClass::move_system;
+  using BaseClass::linearize_system;
 };
 
 TEST_F(UpdaterAbstractCreateTest, Constructor)
@@ -132,12 +142,12 @@ TEST_F(UpdaterAbstractCreateTest, Constructor)
   
   IngredientsType ingredients;
   
-  //run the public functions
-  UpdaterAbstractCreate<IngredientsType> Timmy(ingredients);
+  //Constructor call
+  EXPECT_NO_THROW(UpdaterAbstractCreate<IngredientsType> Timmy(ingredients));
   
   //nothing should happen here
   Timmy.initialize();
-  Timmy.execute();
+  EXPECT_TRUE(Timmy.execute());
   Timmy.cleanup();
 }
 
@@ -148,9 +158,9 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   typedef Ingredients<Config> IngredientsType;
   
   IngredientsType ingredients;
-  ingredients.setBoxX(8);
-  ingredients.setBoxY(8);
-  ingredients.setBoxZ(8);
+  ingredients.setBoxX(16);
+  ingredients.setBoxY(16);
+  ingredients.setBoxZ(16);
   ingredients.setPeriodicX(true);
   ingredients.setPeriodicY(true);
   ingredients.setPeriodicZ(true);
@@ -175,9 +185,9 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   EXPECT_EQ(2,ingredients.getMolecules().size());
   EXPECT_EQ(4,ingredients.getMolecules()[0].getAttributeTag());
   EXPECT_EQ(3,ingredients.getMolecules()[1].getAttributeTag());
-  EXPECT_EQ(4,ingredients.getMolecules()[0].getX());
-  EXPECT_EQ(4,ingredients.getMolecules()[0].getY());
-  EXPECT_EQ(4,ingredients.getMolecules()[0].getZ());
+  EXPECT_EQ(8,ingredients.getMolecules()[0].getX());
+  EXPECT_EQ(8,ingredients.getMolecules()[0].getY());
+  EXPECT_EQ(8,ingredients.getMolecules()[0].getZ());
   EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(1,0));
   EXPECT_EQ(2,(ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength());
@@ -185,6 +195,87 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   //second execution
   EXPECT_EQ(2,Tommy.getNumExec());
   EXPECT_TRUE(Tommy.execute());
+  EXPECT_EQ(3,ingredients.getMolecules().size());
+  EXPECT_EQ(4,ingredients.getMolecules()[0].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[1].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[2].getAttributeTag());
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(2,1));
+  EXPECT_GE(3.1,(ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength());
+  EXPECT_GE(6.3,(ingredients.getMolecules()[0]-ingredients.getMolecules()[2]).getLength());
+  
+  //third execution
+  EXPECT_EQ(3,Tommy.getNumExec());
+  EXPECT_TRUE(Tommy.execute());
+  EXPECT_EQ(3,ingredients.getMolecules().size());
+  EXPECT_EQ(4,ingredients.getMolecules()[0].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[1].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[2].getAttributeTag());
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(1,2));
+  EXPECT_GE(3.1,(ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength());
+  EXPECT_GE(6.3,(ingredients.getMolecules()[0]-ingredients.getMolecules()[2]).getLength());
+  
+  //fourth execution
+  EXPECT_EQ(4,Tommy.getNumExec());
+  EXPECT_TRUE(Tommy.execute());
+  EXPECT_EQ(6,ingredients.getMolecules().size());
+  EXPECT_EQ(4,ingredients.getMolecules()[0].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[1].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[2].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[3].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[4].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[5].getAttributeTag());
+  
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(1,5));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(5,4));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(4,3));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(3,2));
+  
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(0,5));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(0,4));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(0,3));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(0,2));
+  
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(1,4));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(1,3));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(1,2));
+  
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(5,0));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(5,3));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(5,2));
+  
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(4,0));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(4,1));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(4,2));
+  
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(3,0));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(3,1));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(3,5));
+  
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(2,1));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(2,5));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(2,4));
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(2,0));
+  
+  //fifth execution
+  EXPECT_EQ(5,Tommy.getNumExec());
+  EXPECT_TRUE(Tommy.execute());
+  EXPECT_EQ(6,ingredients.getMolecules().size());
+  EXPECT_EQ(4,ingredients.getMolecules()[0].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[1].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[2].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[3].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[4].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[5].getAttributeTag());
+  
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(2,3));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(4,5));
   
 }
 
