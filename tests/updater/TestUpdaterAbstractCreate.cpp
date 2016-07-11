@@ -42,8 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureMoleculesIO.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
-
-#include "UpdaterAbstractCreate.h"
+#include <LeMonADE/updater/UpdaterAbstractCreate.h>
 
 using namespace std;
 
@@ -144,11 +143,6 @@ TEST_F(UpdaterAbstractCreateTest, Constructor)
   
   //Constructor call
   EXPECT_NO_THROW(UpdaterAbstractCreate<IngredientsType> Timmy(ingredients));
-  
-  //nothing should happen here
-  Timmy.initialize();
-  EXPECT_TRUE(Timmy.execute());
-  Timmy.cleanup();
 }
 
 TEST_F(UpdaterAbstractCreateTest, TestUpdater)
