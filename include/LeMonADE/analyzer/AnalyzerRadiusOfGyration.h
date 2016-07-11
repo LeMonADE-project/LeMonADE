@@ -143,7 +143,7 @@ AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(const Ingred
 ,lowerLimit(lowerMcsLimit)
 ,outputFilePrefix(filenamePrefix)
 {
-	groups.push_back(MonomerGroup<molecules_type>(&(ing.getMolecules())));
+	groups.push_back(MonomerGroup<molecules_type>((ing.getMolecules())));
 	
 	//add all monomers to the group
 	for(size_t n=0; n<ing.getMolecules().size();++n)
