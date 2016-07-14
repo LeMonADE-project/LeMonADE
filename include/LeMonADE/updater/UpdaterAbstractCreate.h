@@ -121,6 +121,7 @@ bool UpdaterAbstractCreate<IngredientsType>::add_lonely_monomer(int32_t type){
   // set properties of add Monomer Move
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
+  addmove.setType(type);
   
   int32_t counter(0);
   while(counter<10000){
@@ -129,7 +130,6 @@ bool UpdaterAbstractCreate<IngredientsType>::add_lonely_monomer(int32_t type){
 				  (rng.r250_rand32() % (ingredients.getBoxZ()-1)));
     addmove.setPosition(newPosition);
     if(addmove.check(ingredients)==true){
-      addmove.setType(type);
       addmove.apply(ingredients);
       return true;
     }
@@ -150,6 +150,7 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t pare
   // set properties of add Monomer Move
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
+  addmove.setType(type);
   
   int32_t counter(0);
   
@@ -164,7 +165,6 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t pare
     
       // check new position (excluded volume)
       if(addmove.check(ingredients)==true){
-	addmove.setType(type);
 	addmove.apply(ingredients);
 	ingredients.modifyMolecules().connect( parent_id, (ingredients.getMolecules().size()-1) );
 	return true;
@@ -188,9 +188,10 @@ template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_position(VectorInt3 position, int32_t type){
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
+  addmove.setType(type);
+  
   addmove.setPosition(position);
   if(addmove.check(ingredients)==true){
-    addmove.setType(type);
     addmove.apply(ingredients);
     return true;
   }else{
@@ -215,6 +216,7 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_inside_connected_pair(u
   
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
+  addmove.setType(type);
   
   int32_t counter(0);
   
@@ -232,7 +234,6 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_inside_connected_pair(u
 	//check the new bondvector bewten the new monomer and indexB
 	VectorInt3 checkBV(addmove.getPosition()-ingredients.getMolecules()[indexB]);
 	if( (checkBV.getLength() < 3) && (ingredients.getBondset().isValidStrongCheck(checkBV)) ){
-	  addmove.setType(type);
 	  addmove.apply(ingredients);
 	  ingredients.modifyMolecules().connect( indexA, (ingredients.getMolecules().size()-1) );
 	  ingredients.modifyMolecules().connect( indexB, (ingredients.getMolecules().size()-1) );
