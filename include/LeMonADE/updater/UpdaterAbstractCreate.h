@@ -58,16 +58,15 @@ public:
   
 protected:
   IngredientsType& ingredients;
-  RandomNumberGenerators rng;
   
   //! function to add a standalone monomer
-  bool add_lonely_monomer(int32_t type=1);
+  bool add_single_monomer(int32_t type=1);
   
   //! function to add a monomer to a parent monomer
   bool add_monomer_to_parent(uint32_t parent_id, int32_t type=1);
   
   //! function to add a monomer at a spezific place
-  bool add_monomer_to_position(VectorInt3 pos, int32_t type=1);
+  bool add_monomer_at_position(VectorInt3 pos, int32_t type=1);
   
   //! function to add a new monomer inbetween two others
   bool add_monomer_inside_connected_pair(uint32_t indexA, uint32_t indexB, int32_t type=1);
@@ -77,6 +76,12 @@ protected:
   
   //! function to find groups of connected monomers
   void linearize_system();
+  
+  //! function to get a random bondvector of length 2
+  VectorInt3 random_bondvector();
+  
+private:
+  RandomNumberGenerators rng;
   
 };
 
@@ -117,7 +122,7 @@ void UpdaterAbstractCreate<IngredientsType>::cleanup(){
  * @return <b false> if position is not free, <b true> if move was applied
  */
 template<class IngredientsType>
-bool UpdaterAbstractCreate<IngredientsType>::add_lonely_monomer(int32_t type){
+bool UpdaterAbstractCreate<IngredientsType>::add_single_monomer(int32_t type){
   // set properties of add Monomer Move
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
@@ -157,9 +162,7 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t pare
   while(counter<10000){
     //try at most 30 random bondvectors to find a new monomer position
     for(uint i=0;i<30;i++){
-      // get id of random bondvector with index <= 22, also P(2,0,0)
-      std::size_t randBondVectorID((rng.r250_rand32() % 6)+17);
-      VectorInt3 bondvector(ingredients.getBondset().getBondVector(randBondVectorID));
+      VectorInt3 bondvector(random_bondvector());
       // set position of new monomer
       addmove.setPosition(ingredients.getMolecules()[parent_id]+bondvector);
     
@@ -185,7 +188,7 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_parent(uint32_t pare
  * @return <b false> if position is not free, <b true> if move was applied
  */
 template<class IngredientsType>
-bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_position(VectorInt3 position, int32_t type){
+bool UpdaterAbstractCreate<IngredientsType>::add_monomer_at_position(VectorInt3 position, int32_t type){
   MoveAddScMonomer addmove;
   addmove.init(ingredients);
   addmove.setType(type);
@@ -197,7 +200,6 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_to_position(VectorInt3 
   }else{
     return false;
   }
-  
 }
 
 /******************************************************************************/
@@ -246,8 +248,6 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_inside_connected_pair(u
     move_system(2);
     counter++;
   }
-  // create a meaningful return message
-  std::cout << "UpdaterAbstractCreate::add_monomer_inside_connected_pair:  could not add new monomer between "<<indexA<< " and "<<indexB<<std::endl; 
   return false;
 }
 
@@ -297,6 +297,36 @@ void UpdaterAbstractCreate<IngredientsType>::linearize_system(){
   
   ingredients=newIngredients;
   
-}/* */
+}
+
+/******************************************************************************/
+/**
+ * @brief function to get a random bondvector of length 2 which is part of the bondvectorset
+ * @param nsteps number of MCS to move
+ */
+template<class IngredientsType>
+VectorInt3 UpdaterAbstractCreate<IngredientsType>::random_bondvector(){
+  uint32_t randBondVectorID((rng.r250_rand32() % 6));
+  VectorInt3 bondvector;
+  if(randBondVectorID==0)
+    bondvector.setAllCoordinates(2,0,0);
+  else if(randBondVectorID==1)
+    bondvector.setAllCoordinates(0,2,0);
+  else if(randBondVectorID==2)
+    bondvector.setAllCoordinates(0,0,2);
+  else if(randBondVectorID==3)
+    bondvector.setAllCoordinates(-2,0,0);
+  else if(randBondVectorID==4)
+    bondvector.setAllCoordinates(0,-2,0);
+  else if(randBondVectorID==5)
+    bondvector.setAllCoordinates(0,0,-2);
+  
+  //check if bondvector is part of the bondvectorset
+  if(ingredients.getBondset().isValid(bondvector)){
+    std::cout << randBondVectorID<<":"<<bondvector<<std::endl;
+    return bondvector;
+  }else
+    throw std::runtime_error("UpdaterAbstractCreate::random_bondvector: bondvectors not part of the bondvectorset.");
+}
 
 #endif /* LEMONADE_UPDATER_ABSTRACT_CREATE_H */

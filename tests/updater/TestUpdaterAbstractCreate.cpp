@@ -90,14 +90,14 @@ public:
   virtual bool execute(){
     bool checker(true);
     if(numExec==0){
-      checker=add_lonely_monomer(1);
-      checker=add_lonely_monomer(2);
-      checker=add_lonely_monomer(3);
+      checker=add_single_monomer(1);
+      checker=add_single_monomer(2);
+      checker=add_single_monomer(3);
     }else if(numExec==1){
       ingredients.modifyMolecules().resize(0);
       ingredients.synchronize();
       
-      checker=add_monomer_to_position(VectorInt3( ingredients.getBoxX()/2,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),4);
+      checker=add_monomer_at_position(VectorInt3( ingredients.getBoxX()/2,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),4);
       checker=add_monomer_to_parent(0,3);
     }else if(numExec==2){
       checker=add_monomer_to_parent(1,3);
@@ -123,11 +123,9 @@ private:
   int32_t numExec;
   using BaseClass::ingredients;
   
-  using BaseClass::rng;
-  
   using BaseClass::add_monomer_to_parent;
-  using BaseClass::add_lonely_monomer;
-  using BaseClass::add_monomer_to_position;
+  using BaseClass::add_single_monomer;
+  using BaseClass::add_monomer_at_position;
   using BaseClass::add_monomer_inside_connected_pair;
   using BaseClass::move_system;
   using BaseClass::linearize_system;
@@ -196,8 +194,9 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(1,2));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(2,1));
-  EXPECT_GE(3.1,(ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength());
-  EXPECT_GE(6.3,(ingredients.getMolecules()[0]-ingredients.getMolecules()[2]).getLength());
+  EXPECT_EQ(2,(ingredients.getMolecules()[1]-ingredients.getMolecules()[2]).getLength());
+  EXPECT_GE(3.17,(ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength());
+  EXPECT_GE(5.17,(ingredients.getMolecules()[0]-ingredients.getMolecules()[2]).getLength());
   
   //third execution
   EXPECT_EQ(3,Tommy.getNumExec());
@@ -208,8 +207,8 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   EXPECT_EQ(3,ingredients.getMolecules()[2].getAttributeTag());
   EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(1,2));
-  EXPECT_GE(3.1,(ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength());
-  EXPECT_GE(6.3,(ingredients.getMolecules()[0]-ingredients.getMolecules()[2]).getLength());
+  EXPECT_GE(3.17,(ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength());
+  EXPECT_GE(6.34,(ingredients.getMolecules()[0]-ingredients.getMolecules()[2]).getLength());
   
   //fourth execution
   EXPECT_EQ(4,Tommy.getNumExec());
