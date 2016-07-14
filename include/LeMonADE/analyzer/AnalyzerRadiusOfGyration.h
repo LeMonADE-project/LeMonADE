@@ -90,7 +90,7 @@ public:
   
 	//! constructor
 	AnalyzerRadiusOfGyration(const IngredientsType& ing,
-			  std::string filename=std::string("Rg2TimeSeries.dat"));
+			  std::string filename="Rg2TimeSeries.dat");
 	
 	//! destructor. does nothing
 	virtual ~AnalyzerRadiusOfGyration(){}
@@ -125,6 +125,7 @@ AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(
 ,bufferSize(100)
 ,outputFile(filename)
 ,isFirstFileDump(true)
+,Rg2TimeSeries(4,std::vector<double>(0))
 {
 }
 
@@ -145,8 +146,7 @@ void AnalyzerRadiusOfGyration<IngredientsType>::initialize()
 		for(size_t n=0;n<ingredients.getMolecules().size();n++)
 			groups[0].push_back(n);
 	}
-	//initialize the buffer 
-	Rg2TimeSeries.resize(4,std::vector<double>(0));
+	
 }
 
 /**

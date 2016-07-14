@@ -162,8 +162,7 @@ void ResultFormattingTools::appendToResultFile(std::string filename,ResultType& 
 	
 	if(!file.is_open())
 		throw std::runtime_error("ResultFormattingTools::appendToResultFile(): error opening output file"+filename+"\n");
-	std::stringstream contents;
-
+	
 	//check if all column have the same size
 	int columnSize = results[0].size();
 	for (int i = 0; i < results.size(); ++i) {
