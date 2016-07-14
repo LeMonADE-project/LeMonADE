@@ -37,6 +37,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include<iostream>
 #include<LeMonADE/io/AbstractRead.h>
+#include<LeMonADE/io/AbstractWrite.h>
 
 /**
  * @class ReadContactInteraction
