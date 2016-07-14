@@ -267,7 +267,6 @@ void UpdaterAbstractCreate<IngredientsType>::move_system(int32_t nsteps){
       }
     }
   }
-  ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+nsteps);
 }
 
 /******************************************************************************/
