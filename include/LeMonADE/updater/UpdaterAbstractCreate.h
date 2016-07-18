@@ -225,9 +225,8 @@ bool UpdaterAbstractCreate<IngredientsType>::add_monomer_inside_connected_pair(u
   while(counter<10000){
     //try at most 30 random bondvectors to find a new monomer position
     for(uint i=0;i<30;i++){
-      // get id of random bondvector with index <= 22, also P(2,0,0)
-      std::size_t randBondVectorID((rng.r250_rand32() % 6)+17);
-      VectorInt3 bondvector(ingredients.getBondset().getBondVector(randBondVectorID));
+      // get a random bondvector
+      VectorInt3 bondvector(random_bondvector());
       // set position of new monomer
       addmove.setPosition(ingredients.getMolecules()[indexA]+bondvector);
     
@@ -305,20 +304,30 @@ void UpdaterAbstractCreate<IngredientsType>::linearize_system(){
  */
 template<class IngredientsType>
 VectorInt3 UpdaterAbstractCreate<IngredientsType>::random_bondvector(){
+  //get a random direction for the bondvector of length 2
   uint32_t randBondVectorID((rng.r250_rand32() % 6));
   VectorInt3 bondvector;
-  if(randBondVectorID==0)
-    bondvector.setAllCoordinates(2,0,0);
-  else if(randBondVectorID==1)
-    bondvector.setAllCoordinates(0,2,0);
-  else if(randBondVectorID==2)
-    bondvector.setAllCoordinates(0,0,2);
-  else if(randBondVectorID==3)
-    bondvector.setAllCoordinates(-2,0,0);
-  else if(randBondVectorID==4)
-    bondvector.setAllCoordinates(0,-2,0);
-  else if(randBondVectorID==5)
-    bondvector.setAllCoordinates(0,0,-2);
+  switch (randBondVectorID)
+  {
+    case 0:
+      bondvector.setAllCoordinates(2,0,0);
+      break;
+    case 1:
+      bondvector.setAllCoordinates(0,2,0);
+      break;
+    case 2:
+      bondvector.setAllCoordinates(0,0,2);
+      break;
+    case 3:
+      bondvector.setAllCoordinates(-2,0,0);
+      break;
+    case 4:
+      bondvector.setAllCoordinates(0,-2,0);
+      break;
+    case 5:
+      bondvector.setAllCoordinates(0,0,-2);
+      break;
+  }
   
   //check if bondvector is part of the bondvectorset
   if(ingredients.getBondset().isValid(bondvector)){
