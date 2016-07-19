@@ -90,25 +90,25 @@ public:
   virtual bool execute(){
     bool checker(true);
     if(numExec==0){
-      checker=add_single_monomer(1);
-      checker=add_single_monomer(2);
-      checker=add_single_monomer(3);
+      checker=addSingleMonomer(1);
+      checker=addSingleMonomer(2);
+      checker=addSingleMonomer(3);
     }else if(numExec==1){
       ingredients.modifyMolecules().resize(0);
       ingredients.synchronize();
       
-      checker=add_monomer_at_position(VectorInt3( ingredients.getBoxX()/2,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),4);
-      checker=add_monomer_to_parent(0,3);
+      checker=addMonomerAtPosition(VectorInt3( ingredients.getBoxX()/2,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),4);
+      checker=addMonomerToParent(0,3);
     }else if(numExec==2){
-      checker=add_monomer_to_parent(1,3);
+      checker=addMonomerToParent(1,3);
     }else if(numExec==3){
-      move_system(20);
+      moveSystem(20);
     }else if(numExec==4){
-      checker=add_monomer_inside_connected_pair(1,2,4);
-      checker=add_monomer_inside_connected_pair(1,ingredients.getMolecules().size()-1,4);
-      checker=add_monomer_inside_connected_pair(1,ingredients.getMolecules().size()-1,4);
+      checker=addMonomerInsideConnectedPair(1,2,4);
+      checker=addMonomerInsideConnectedPair(1,ingredients.getMolecules().size()-1,4);
+      checker=addMonomerInsideConnectedPair(1,ingredients.getMolecules().size()-1,4);
     }else if(numExec==5){
-      linearize_system();
+      linearizeSystem();
     }
     
     numExec++;
@@ -123,12 +123,12 @@ private:
   int32_t numExec;
   using BaseClass::ingredients;
   
-  using BaseClass::add_monomer_to_parent;
-  using BaseClass::add_single_monomer;
-  using BaseClass::add_monomer_at_position;
-  using BaseClass::add_monomer_inside_connected_pair;
-  using BaseClass::move_system;
-  using BaseClass::linearize_system;
+  using BaseClass::addMonomerToParent;
+  using BaseClass::addSingleMonomer;
+  using BaseClass::addMonomerAtPosition;
+  using BaseClass::addMonomerInsideConnectedPair;
+  using BaseClass::moveSystem;
+  using BaseClass::linearizeSystem;
 };
 
 TEST_F(UpdaterAbstractCreateTest, Constructor)
