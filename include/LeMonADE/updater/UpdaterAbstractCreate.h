@@ -331,7 +331,6 @@ VectorInt3 UpdaterAbstractCreate<IngredientsType>::randomBondvector(){
   
   //check if bondvector is part of the bondvectorset
   if(ingredients.getBondset().isValid(bondvector)){
-    std::cout << randBondVectorID<<":"<<bondvector<<std::endl;
     return bondvector;
   }else
     throw std::runtime_error("UpdaterAbstractCreate::randomBondvector: bondvectors not part of the bondvectorset.");
