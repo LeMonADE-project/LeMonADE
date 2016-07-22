@@ -1,29 +1,29 @@
 /*--------------------------------------------------------------------------------
-    ooo      L   attice-based  |
-  o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
- o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
-oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
-  o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
-----------------------------------------------------------------------------------
-
-This file is part of LeMonADE.
-
-LeMonADE is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-LeMonADE is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
-
---------------------------------------------------------------------------------*/
+ *    ooo      L   attice-based  |
+ *  o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
+ * o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
+ * oo---0---oo  A   lgorithm and  |
+ * o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ *  o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
+ *    ooo                        | 
+ * ----------------------------------------------------------------------------------
+ * 
+ * This file is part of LeMonADE.
+ * 
+ * LeMonADE is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * LeMonADE is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * --------------------------------------------------------------------------------*/
 
 /*****************************************************************************/
 /**
@@ -57,104 +57,119 @@ using namespace std;
 /*****************************************************************************/
 class AnalyzerRadiusOfGyrationTest: public ::testing::Test{
 protected:
-  //! check if file with given name exists
-  bool fileExists(string _filename){
-	  std::ifstream file(_filename.c_str());
-	  if(file.is_open()){
-		  file.close();
-		  return true;
-	  }
-	  else return false;
-  }
-  //! count the number of lines containing data (i.e. no comments beginning with #)
-  uint32_t fileNLines(string _filename){
-	  std::ifstream file(_filename.c_str());
-	  if(file.is_open()){
- 		  uint32_t linecount=0;
-		  while(file.eof()==false){
-			  std::string comment;
-			  std::getline(file,comment);
-			  if(comment.size()>0 && comment[0]!='#')
-				  linecount++;
-		  }
-		  file.close();
-		  return linecount;
-	  }
-	  else return 0;
-  
-  }
-  
-  //! get the value from lineNo,columnNo in file given
-  double getValueFromFile(string _filename,size_t lineNo,size_t columnNo){
-	  std::ifstream file(_filename.c_str());
-	  if(file.is_open()){
-		  std::string line;
-		  uint32_t linecount=0;
-		  while(file.eof()==false){
-			  
-			  std::getline(file,line);
-			  if(line.size()>0 && line[0]!='#'){
-				  if(linecount==lineNo) break;
-				  linecount++;
-			  }
-		  }
-		  std::stringstream lineStream(line);
-		  uint32_t columncount=0;
-		  double value;
-		  while(columncount<=columnNo && lineStream.good()){
-			  lineStream>>value;
-			  columncount++;
-		  }
-		  if(!lineStream.good())
-			  throw std::runtime_error("AnalyzerRadiusOfGyrationTest::getValue(): could not find column");
-			  
-		  file.close();
-		  return value;
-	  }
-	  else throw std::runtime_error("AnalyzerRadiusOfGyrationTest::getValue(): could not open file");
-	  
-  }
-  
-  //! set the system into one of two model configs, designed to give easily calculated Rg^2
-  void setConfig1()
-  {
-	  ingredients.modifyMolecules().resize(4);
-	  ingredients.modifyMolecules()[0].setAllCoordinates(-2,0,0);
-	  ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
-	  ingredients.modifyMolecules()[2].setAllCoordinates(0,-2,0);
-	  ingredients.modifyMolecules()[3].setAllCoordinates(0,2,0);
-  }
-  
-  //! set the system into one of two model configs, designed to give easily calculated Rg^2
-  void setConfig2()
-  {
-	  ingredients.modifyMolecules().resize(4);
-	  ingredients.modifyMolecules()[0].setAllCoordinates(-3,0,0);
-	  ingredients.modifyMolecules()[1].setAllCoordinates(3,0,0);
-	  ingredients.modifyMolecules()[2].setAllCoordinates(0,-3,0);
-	  ingredients.modifyMolecules()[3].setAllCoordinates(0,3,0);
-  }
-  //define system
-  typedef LOKI_TYPELIST_1(FeatureAttributes) Features;
-  typedef ConfigureSystem<VectorInt3,Features> Config;
-  typedef Ingredients < Config> MyIngredients;
-  MyIngredients ingredients;
-  
-  /* suppress cout output for better readability -->un/comment here:*/    
-public:
-  //redirect cout output
-  virtual void SetUp(){
-    originalBuffer=cout.rdbuf();
-    cout.rdbuf(tempStream.rdbuf());
-  };
-  //restore original output
-  virtual void TearDown(){
-    cout.rdbuf(originalBuffer);
-  };
+	//! check if file with given name exists
+	bool fileExists(string _filename){
+		std::ifstream file(_filename.c_str());
+		if(file.is_open()){
+			file.close();
+			return true;
+		}
+		else return false;
+	}
+	//! count the number of lines containing data (i.e. no comments beginning with #)
+	uint32_t fileNLines(string _filename){
+		std::ifstream file(_filename.c_str());
+		if(file.is_open()){
+			uint32_t linecount=0;
+			while(file.eof()==false){
+				std::string comment;
+				std::getline(file,comment);
+				if(comment.size()>0 && comment[0]!='#')
+					linecount++;
+			}
+			file.close();
+			return linecount;
+		}
+		else return 0;
+		
+	}
+	
+	//! get the value from lineNo,columnNo in file given
+	double getValueFromFile(string _filename,size_t lineNo,size_t columnNo){
+		std::ifstream file(_filename.c_str());
+		if(file.is_open()){
+			std::string line;
+			uint32_t linecount=0;
+			while(file.eof()==false){
+				
+				std::getline(file,line);
+				if(line.size()>0 && line[0]!='#'){
+					if(linecount==lineNo) break;
+					linecount++;
+				}
+			}
+			std::stringstream lineStream(line);
+			uint32_t columncount=0;
+			double value;
+			while(columncount<=columnNo && lineStream.good()){
+				lineStream>>value;
+				columncount++;
+			}
+			if(!lineStream.good())
+				throw std::runtime_error("AnalyzerRadiusOfGyrationTest::getValue(): could not find column");
+			
+			file.close();
+			return value;
+		}
+		else throw std::runtime_error("AnalyzerRadiusOfGyrationTest::getValue(): could not open file");
+		
+	}
+	
+	//! set the system into one of two model configs, designed to give easily calculated Rg^2
+	void setConfig1()
+	{
+		ingredients.modifyMolecules().resize(4);
+		ingredients.modifyMolecules()[0].setAllCoordinates(-2,0,0);
+		ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
+		ingredients.modifyMolecules()[2].setAllCoordinates(0,-2,0);
+		ingredients.modifyMolecules()[3].setAllCoordinates(0,2,0);
+	}
+	
+	//! set the system into one of two model configs, designed to give easily calculated Rg^2
+	void setConfig2()
+	{
+		ingredients.modifyMolecules().resize(4);
+		ingredients.modifyMolecules()[0].setAllCoordinates(-3,0,0);
+		ingredients.modifyMolecules()[1].setAllCoordinates(3,0,0);
+		ingredients.modifyMolecules()[2].setAllCoordinates(0,-3,0);
+		ingredients.modifyMolecules()[3].setAllCoordinates(0,3,0);
+	}
+	//define system
+	typedef LOKI_TYPELIST_1(FeatureAttributes) Features;
+	typedef ConfigureSystem<VectorInt3,Features> Config;
+	typedef Ingredients < Config> MyIngredients;
+	MyIngredients ingredients;
+	
+	//! nested derived class from AnalyzerRadiusOfGyration to test protected function
+	class RgAnalyzerDerived:public AnalyzerRadiusOfGyration<MyIngredients>
+	{
+	public:
+		RgAnalyzerDerived(const MyIngredients& ing)
+		:AnalyzerRadiusOfGyration<MyIngredients >(ing){}
+		
+		void setMonomerGroups(std::vector<MonomerGroup<MyIngredients::molecules_type> > groupVector)
+		{
+			AnalyzerRadiusOfGyration<MyIngredients>::setMonomerGroups(groupVector);	  
+		}
+		
+	};
+	/* suppress cout output for better readability -->un/comment here:*/    
+	public:
+		//redirect cout output
+		virtual void SetUp(){
+			originalBuffer=cout.rdbuf();
+			cout.rdbuf(tempStream.rdbuf());
+		};
+		//restore original output
+		virtual void TearDown(){
+			cout.rdbuf(originalBuffer);
+		};
+		
+		
 private:
-  std::streambuf* originalBuffer;
-  std::ostringstream tempStream;
-  /* ** */
+	std::streambuf* originalBuffer;
+	std::ostringstream tempStream;
+	/* ** */
 };
 
 /*****************************************************************************/
@@ -298,7 +313,9 @@ TEST_F(AnalyzerRadiusOfGyrationTest, CheckGroups)
 	groupVector2.push_back(group2);
 	
 	setConfig1();
-	AnalyzerRadiusOfGyration<MyIngredients> analyzer(ingredients);
+	//using the nested derived analyzer class here, which provides a public
+	//interface for setting groups
+	RgAnalyzerDerived analyzer(ingredients);
 	analyzer.setMonomerGroups(groupVector1);
 	analyzer.initialize();
 	analyzer.execute();

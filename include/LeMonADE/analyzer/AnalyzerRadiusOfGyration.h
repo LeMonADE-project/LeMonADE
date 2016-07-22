@@ -85,7 +85,9 @@ private:
 	void dumpTimeSeries();
 	//! calculate the Rg squared of the monomer group
 	VectorDouble3 calculateRg2Components(const MonomerGroup<molecules_type>& group) const;
-	
+protected:
+	//! Set the groups to be analyzed. This function is meant to be used in initialize() of derived classes.
+	void setMonomerGroups(std::vector<MonomerGroup<molecules_type> > groupVector){groups=groupVector;}
 public:
   
 	//! constructor
@@ -102,8 +104,6 @@ public:
 	virtual void cleanup();
 	//! Set the number of values, after which the time series is saved to disk
 	void setBufferSize(uint32_t size){bufferSize=size;}
-	//! Set the groups to be analyzed
-	void setMonomerGroups(std::vector<MonomerGroup<molecules_type> > groupVector){groups=groupVector;}
 	//! Change the output file name
 	void setOutputFile(std::string filename){outputFile=filename;isFirstFileDump=true;}
 	
