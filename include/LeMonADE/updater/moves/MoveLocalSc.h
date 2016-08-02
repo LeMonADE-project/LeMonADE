@@ -122,7 +122,7 @@ void MoveLocalSc::init(const IngredientsType& ing, uint32_t index)
   this->resetProbability();
   
   //set index
-  if( (index > 0) && (index < (ing.getMolecules().size()-1)) )
+  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
     throw std::runtime_error("MoveLocalSc::init(ing, index): index out of range!");
@@ -179,7 +179,7 @@ void MoveLocalSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 di
   this->resetProbability();
   
   //set index
-  if( (index > 0) && (index < (ing.getMolecules().size()-1)) )
+  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
     throw std::runtime_error("MoveLocalSc::init(ing, index): index out of range!");
