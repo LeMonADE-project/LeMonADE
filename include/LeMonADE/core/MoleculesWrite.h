@@ -516,7 +516,6 @@ void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
 	      //write only the breaks that were removed since the last update
 	      strm<<"!remove_bonds\n";
 	      for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
-		std::cout<<"removed Bonds"<<it->first.first+1<<" "<<it->first.second+1<<std::endl;
 		      strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
 	      }
 	      strm<<"\n";
