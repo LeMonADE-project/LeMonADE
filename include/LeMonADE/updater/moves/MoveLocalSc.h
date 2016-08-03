@@ -159,7 +159,7 @@ void MoveLocalSc::init(const IngredientsType& ing, VectorInt3 dir)
     dir==steps[5]  )
     this->setDir(dir);
   else
-    throw std::runtime_error("MoveLocalSc::init(ing, index, dir): direction vector out of range!");
+    throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
 
 }
 
@@ -182,7 +182,7 @@ void MoveLocalSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 di
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
-    throw std::runtime_error("MoveLocalSc::init(ing, index): index out of range!");
+    throw std::runtime_error("MoveLocalSc::init(ing, index, dir): index out of range!");
   
   //set direction
   if(dir==steps[0] ||

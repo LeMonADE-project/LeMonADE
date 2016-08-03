@@ -71,6 +71,9 @@ class MoveLocalBase:public MoveBase
 	
 	//here come the functions that are implemented by the specialization
 	template <class IngredientsType> void init(const IngredientsType& ingredients);
+	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
+	template <class IngredientsType> void init(const IngredientsType& ing, VectorInt3 dir);
+	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
 	template <class IngredientsType> void check(const IngredientsType& ingredients);
 	template <class IngredientsType> void apply(IngredientsType& ingredients);
 	
@@ -134,6 +137,56 @@ void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients)
   static_cast<SpecializedMove*>(this)->init(ingredients);
 }
 
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given monomer index. Done by the SpecializedMove.
+ *
+ * @details Here, this is only redirected to the implementation
+ * given in the template parameter
+ *
+ * @tparam <SpecializedMove> name of the specialized move.
+ **/
+/*****************************************************************************/
+template <class SpecializedMove>
+template <class IngredientsType> 
+void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index)
+{
+  static_cast<SpecializedMove*>(this)->init(ingredients, uint32_t index);
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given direction. Done by the SpecializedMove.
+ *
+ * @details Here, this is only redirected to the implementation
+ * given in the template parameter
+ *
+ * @tparam <SpecializedMove> name of the specialized move.
+ **/
+/*****************************************************************************/
+template <class SpecializedMove>
+template <class IngredientsType> 
+void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, VectorInt3 dir)
+{
+  static_cast<SpecializedMove*>(this)->init(ingredients, VectorInt3 dir);
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given monomer index and direction. Done by the SpecializedMove.
+ *
+ * @details Here, this is only redirected to the implementation
+ * given in the template parameter
+ *
+ * @tparam <SpecializedMove> name of the specialized move.
+ **/
+/*****************************************************************************/
+template <class SpecializedMove>
+template <class IngredientsType> 
+void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, VectorInt3 dir)
+{
+  static_cast<SpecializedMove*>(this)->init(ingredients, uint32_t index, VectorInt3 dir);
+}
 /*****************************************************************************/
 /**
  * @brief Check if the move is accepted by the system. Done by the SpecializedMove.
