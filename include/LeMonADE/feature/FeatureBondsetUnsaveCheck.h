@@ -58,6 +58,8 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
   //! Standard destructor (empty)
   virtual ~FeatureBondsetUnsaveCheck(){}
 
+  using FeatureBondset<BondSetType>::bondset;
+  
   /**
    * @brief Updates the bond-set lookup table if necessary
    *
@@ -83,19 +85,13 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
 	  std::ostringstream errorMessage;
 	  errorMessage << "FeatureBondsetUnsaveCheck::synchronize(): Invalid bond vector between monomer " << i << " at " << molecules[i] << " and " << n << " at " <<  molecules[n] <<  ".\n";throw std::runtime_error(errorMessage.str());
 	}
+
     }
     }
   }
 
  private:
- 
-  //! Stores the set of allowed bond-vectors.
-  BondSetType bondset;
-  
 
-  /* if you want to use the SlowBondset, comment the line above and uncomment
-   * the line below.*/
-  //SlowBondset bondset;
 };
 
 #endif
