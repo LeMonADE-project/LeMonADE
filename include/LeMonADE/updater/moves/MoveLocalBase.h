@@ -151,7 +151,7 @@ template <class SpecializedMove>
 template <class IngredientsType> 
 void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index)
 {
-  static_cast<SpecializedMove*>(this)->init(ingredients, uint32_t index);
+  static_cast<SpecializedMove*>(this)->init(ingredients, index);
 }
 
 /*****************************************************************************/
@@ -168,7 +168,7 @@ template <class SpecializedMove>
 template <class IngredientsType> 
 void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, VectorInt3 dir)
 {
-  static_cast<SpecializedMove*>(this)->init(ingredients, VectorInt3 dir);
+  static_cast<SpecializedMove*>(this)->init(ingredients, dir);
 }
 
 /*****************************************************************************/
@@ -185,7 +185,7 @@ template <class SpecializedMove>
 template <class IngredientsType> 
 void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, VectorInt3 dir)
 {
-  static_cast<SpecializedMove*>(this)->init(ingredients, uint32_t index, VectorInt3 dir);
+  static_cast<SpecializedMove*>(this)->init(ingredients, index, dir);
 }
 /*****************************************************************************/
 /**
