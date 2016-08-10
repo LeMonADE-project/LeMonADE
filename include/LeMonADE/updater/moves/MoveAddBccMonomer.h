@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #define LEMONADE_UPDATER_MOVES_MOVEADDBCCMONOMER_H
 
 #include <LeMonADE/utility/Vector3D.h>
-#include <LeMonADE/updater/moves/MoveBase.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerBase.h>
 
 /**
  * @file
@@ -41,9 +41,11 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @todo Code doubling with MoveAddScMonomer! Specialized class only neccessary to enable the features to handle the moves types differently.
  **/
-class MoveAddBccMonomer:public MoveBase
+class MoveAddBccMonomer:public MoveAddMonomerBase<MoveAddBccMonomer>
 {
 public:
+  MoveAddBccMonomer(){};
+  virtual ~MoveAddBccMonomer(){};
   
   //! Reset the probability
   template <class IngredientsType> void init(const IngredientsType& ing);
@@ -53,30 +55,6 @@ public:
 
   //! Apply the move to the system given as argument
   template< class IngredientsType> void apply(IngredientsType& ing);
-  
-  //! setter function for type of new monomer
-  void setType(int32_t t){type=t;}
-  //! setter function for position of new monomer taking a VectorInt3
-  void setPosition(VectorInt3 pos){position=pos;}
-  //! setter function for position of new monomer taking a triple of ints
-  void setPosition(int32_t x,int32_t y,int32_t z){position.setX(x);position.setY(y);position.setZ(z);}
-  //! getter function for the type of the new monomer
-  int32_t getType() const{return type;}
-  //! getter function for the position of the new monomer returning a VectorInt3
-  const VectorInt3 getPosition() const {return position;}
-  //! getter function for index of the new monomer. This is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
-  size_t getParticleIndex() const {return particleIndex;}
-  
-private:
-  //! position where the new monomer is placed in the simulation box
-  VectorInt3 position;
-  //! type that is applied to the new monomer, requires Feature FeatureAttributes with int-Type
-  int32_t type;
-  /** 
-   * @brief Index of new PartileThis is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
-   * @details It is set when apply is called. useful if Features want to alter the particle when applying the move
-   */
-  size_t particleIndex;
 };
 
 
@@ -92,7 +70,7 @@ template <class IngredientsType>
 void MoveAddBccMonomer::init(const IngredientsType& ing)
 {
     this->resetProbability();
-    particleIndex=ing.getMolecules().size();
+    this->setParticleIndex(ing.getMolecules().size());
 }
 
 /*****************************************************************************/
@@ -115,8 +93,8 @@ void MoveAddBccMonomer::apply(IngredientsType& ing)
 {
   //first add the new monomer at the desired position. this is because
   //some features may want to do things with it
-  ing.modifyMolecules().addMonomer(position.getX(),position.getY(),position.getZ());
-  particleIndex=ing.getMolecules().size()-1;
+  ing.modifyMolecules().addMonomer(this->getPosition().getX(),this->getPosition().getY(),this->getPosition().getZ());
+  this->setParticleIndex(ing.getMolecules().size()-1);
   //now apply it to the features so that the features can make alterations,
   //for example set the attribute tag, if the FeatureAttributes is used
   ing.applyMove(ing,*this);		
