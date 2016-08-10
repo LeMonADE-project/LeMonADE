@@ -153,20 +153,6 @@ TEST_F(TestMoveAddBccMonomer, checkAndApply)
   addmove.setPosition(8,8,8);
   EXPECT_FALSE(addmove.check(ingredients));
   
-  //check "x" lattice
-  addmove.setPosition(10,10,8);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,10,10);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(10,10,10);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,6,6);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(6,6,8);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(6,6,6);
-  EXPECT_FALSE(addmove.check(ingredients));
-  
   //check "o" lattice
   addmove.setPosition(7,7,7);
   EXPECT_FALSE(addmove.check(ingredients));
@@ -204,26 +190,35 @@ TEST_F(TestMoveAddBccMonomer, checkAndApply)
   EXPECT_TRUE(addmove.check(ingredients));
   
   //check box boundaries
-  addmove.setPosition(0,15,0);
+  addmove.setPosition(1,15,1);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(15,0,0);
+  addmove.setPosition(15,1,1);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(0,15,15);
+  addmove.setPosition(1,15,15);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(15,15,0);
+  addmove.setPosition(15,15,1);
   EXPECT_FALSE(addmove.check(ingredients));
+  //true:
   addmove.setPosition(15,15,15);
   EXPECT_FALSE(addmove.check(ingredients));
   
   addmove.setPosition(0,0,0);
   EXPECT_TRUE(addmove.check(ingredients));
-  addmove.setPosition(0,0,15);
+  addmove.setPosition(1,1,15);
   EXPECT_TRUE(addmove.check(ingredients));
   
+  addmove.setPosition(8,6,6);
+  EXPECT_TRUE(addmove.check(ingredients));
   addmove.apply(ingredients);
   EXPECT_NO_THROW(ingredients.synchronize());
   EXPECT_EQ(2,ingredients.getMolecules().size());
-  EXPECT_EQ(VectorInt3 (0,0,15),ingredients.getMolecules()[1]);
+  EXPECT_EQ(VectorInt3(8,6,6),ingredients.getMolecules()[1]);
   EXPECT_EQ(5,ingredients.getMolecules()[1].getAttributeTag());
+  
+  //check "x" lattice
+  addmove.setPosition(8,8,6);
+  EXPECT_FALSE(addmove.check(ingredients));
+  addmove.setPosition(8,6,8);
+  EXPECT_FALSE(addmove.check(ingredients));
   
 }

@@ -42,7 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerBase.h>
 
 
 /*****************************************************************/
@@ -298,7 +298,7 @@ public:
 	
 
 	/**
-	 * @brief Overloaded for MoveAddScMonomer
+	 * @brief Overloaded for MoveAddMonomerBase(MoveAddScMonomer and MoveAddBccMonomer)
 	 *
 	 * @details Returns true if the moves doesn´t violate the p.b.c. The periodicity is set to \a false ,
 	 * the faces of rectangular cuboid behave like hard walls. In fact, the new position \a pos of the monomer can not exceed
@@ -307,15 +307,14 @@ public:
 	 * If the periodicity is set to \a true , the Move is not limited to the (virtual) simulation box.
 	 *
 	 * @param [in] ingredients A reference to the IngredientsType - mainly the system
-	 * @param [in] move Move of type MoveAddScMonomer
+	 * @param [in] addmove Move of type MoveAddScMonomer or MoveAddBccMonomer
 	 * @return True if move is allowed with p.b.c. or rejected (false).
 	 *
 	 */
-	template<class IngredientsType> 
-	bool checkMove(const IngredientsType& ingredients, const MoveAddScMonomer& move) const
+	template<class IngredientsType,class AddMoveType> 
+	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType>& addmove) const
 	{
-		VectorInt3 pos=move.getPosition();
-		
+		VectorInt3 pos=addmove.getPosition();
 		
 		if(	(periodicX || (pos.getX()<(getBoxX()-1) && pos.getX()>=0) ) &&
 			(periodicY || (pos.getY()<(getBoxY()-1) && pos.getY()>=0) ) &&
@@ -326,6 +325,7 @@ public:
 			return false;
 			
 	}
+	
 	
 private:
  
