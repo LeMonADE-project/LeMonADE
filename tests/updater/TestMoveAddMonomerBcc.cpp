@@ -28,7 +28,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /*****************************************************************************/
 /**
  * @file
- * @brief Tests for the class MoveAddMonomerSc
+ * @brief Tests for the class MoveAddMonomerBcc
  * @author Martin
  * */
 /*****************************************************************************/
@@ -38,16 +38,16 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/feature/FeatureMoleculesIO.h>
-#include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
+#include <LeMonADE/feature/FeatureExcludedVolumeBcc.h>
 #include <LeMonADE/feature/FeatureFixedMonomers.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
 
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddBccMonomer.h>
 
 
-class TestMoveAddScMonomer: public ::testing::Test{
+class TestMoveAddBccMonomer: public ::testing::Test{
 public:
-  typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
+  typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes, FeatureExcludedVolumeBcc<FeatureLatticePowerOfTwo<bool> >) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
   
@@ -70,7 +70,7 @@ private:
   std::ostringstream tempStream;
 };
 
-TEST_F(TestMoveAddScMonomer, initialiseSetterGetter)
+TEST_F(TestMoveAddBccMonomer, initialiseSetterGetter)
 {
   //IngredientsType ingredients;
   ingredients.setBoxX(16);
@@ -84,7 +84,7 @@ TEST_F(TestMoveAddScMonomer, initialiseSetterGetter)
   
   EXPECT_NO_THROW(ingredients.synchronize());
   
-  MoveAddScMonomer addmove;
+  MoveAddBccMonomer addmove;
   
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
@@ -127,7 +127,7 @@ TEST_F(TestMoveAddScMonomer, initialiseSetterGetter)
   
 }
 
-TEST_F(TestMoveAddScMonomer, checkAndApply)
+TEST_F(TestMoveAddBccMonomer, checkAndApply)
 {
   //IngredientsType ingredients;
   ingredients.setBoxX(16);
@@ -135,13 +135,13 @@ TEST_F(TestMoveAddScMonomer, checkAndApply)
   ingredients.setBoxZ(16);
   ingredients.setPeriodicX(false);
   ingredients.setPeriodicY(false);
-  ingredients.setPeriodicZ(false);
+  ingredients.setPeriodicZ(true);
   ingredients.modifyBondset().addBFMclassicBondset();
   ingredients.modifyMolecules().addMonomer(8,8,8);
   
   EXPECT_NO_THROW(ingredients.synchronize());
   
-  MoveAddScMonomer addmove;
+  MoveAddBccMonomer addmove;
   
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
@@ -152,48 +152,58 @@ TEST_F(TestMoveAddScMonomer, checkAndApply)
   //check FeatureExcludedVolumeSc (all lattice positions of monomer 0)
   addmove.setPosition(8,8,8);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(9,8,8);
+  
+  //check "x" lattice
+  addmove.setPosition(10,10,8);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,9,8);
+  addmove.setPosition(8,10,10);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,8,9);
+  addmove.setPosition(10,10,10);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(9,9,8);
+  addmove.setPosition(8,6,6);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(9,8,9);
+  addmove.setPosition(6,6,8);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,9,9);
+  addmove.setPosition(6,6,6);
+  EXPECT_FALSE(addmove.check(ingredients));
+  
+  //check "o" lattice
+  addmove.setPosition(7,7,7);
+  EXPECT_FALSE(addmove.check(ingredients));
+  addmove.setPosition(9,7,7);
+  EXPECT_FALSE(addmove.check(ingredients));
+  addmove.setPosition(7,9,7);
+  EXPECT_FALSE(addmove.check(ingredients));
+  addmove.setPosition(7,7,9);
+  EXPECT_FALSE(addmove.check(ingredients));
+  addmove.setPosition(9,9,7);
+  EXPECT_FALSE(addmove.check(ingredients));
+  addmove.setPosition(7,9,9);
   EXPECT_FALSE(addmove.check(ingredients));
   addmove.setPosition(9,9,9);
   EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(7,8,8);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,7,8);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,8,7);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(7,7,8);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(8,7,7);
-  EXPECT_FALSE(addmove.check(ingredients));
-  addmove.setPosition(7,7,7);
+  
+  //check inconsistent coordinates
+  addmove.setPosition(6,3,3);
   EXPECT_FALSE(addmove.check(ingredients));
   
   //check some free positions
   addmove.setPosition(8,8,6);
   EXPECT_TRUE(addmove.check(ingredients));
-  addmove.setPosition(8,7,6);
+  addmove.setPosition(8,6,8);
   EXPECT_TRUE(addmove.check(ingredients));
-  addmove.setPosition(6,8,7);
+  addmove.setPosition(6,8,8);
   EXPECT_TRUE(addmove.check(ingredients));
-  addmove.setPosition(7,8,6);
+  addmove.setPosition(8,8,10);
   EXPECT_TRUE(addmove.check(ingredients));
-  addmove.setPosition(9,6,8);
+  addmove.setPosition(8,10,8);
+  EXPECT_TRUE(addmove.check(ingredients));
+  addmove.setPosition(10,8,8);
+  EXPECT_TRUE(addmove.check(ingredients));
+  addmove.setPosition(5,11,13);
   EXPECT_TRUE(addmove.check(ingredients));
   
   //check box boundaries
-  addmove.setPosition(0,0,15);
-  EXPECT_FALSE(addmove.check(ingredients));
   addmove.setPosition(0,15,0);
   EXPECT_FALSE(addmove.check(ingredients));
   addmove.setPosition(15,0,0);
@@ -207,10 +217,13 @@ TEST_F(TestMoveAddScMonomer, checkAndApply)
   
   addmove.setPosition(0,0,0);
   EXPECT_TRUE(addmove.check(ingredients));
+  addmove.setPosition(0,0,15);
+  EXPECT_TRUE(addmove.check(ingredients));
   
   addmove.apply(ingredients);
   EXPECT_NO_THROW(ingredients.synchronize());
   EXPECT_EQ(2,ingredients.getMolecules().size());
-  EXPECT_EQ(VectorInt3(0,0,0),ingredients.getMolecules()[1]);
+  EXPECT_EQ(VectorInt3 (0,0,15),ingredients.getMolecules()[1]);
   EXPECT_EQ(5,ingredients.getMolecules()[1].getAttributeTag());
+  
 }

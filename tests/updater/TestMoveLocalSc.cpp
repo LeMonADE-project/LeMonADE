@@ -68,7 +68,7 @@ private:
   std::ostringstream tempStream;
 };
 
-TEST_F(TestMoveLocalSc, initialise)
+TEST_F(TestMoveLocalSc, initialiseSetterGetter)
 {
   //IngredientsType ingredients;
   ingredients.setBoxX(16);

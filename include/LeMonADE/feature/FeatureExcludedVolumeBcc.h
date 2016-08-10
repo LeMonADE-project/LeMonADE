@@ -411,8 +411,13 @@ void FeatureExcludedVolumeBcc< LatticeClassType<LatticeValueType> >::fillLattice
 	//copy the lattice occupation from the monomer coordinates
 	for (size_t n = 0; n < molecules.size(); n++)
 	{
+		//check if monomer positions are consistent with the bcc model (all even or all odd)
+		if( !( ((molecules[n].getX()&1)==1 && (molecules[n].getY()&1)==1 && (molecules[n].getZ()&1)==1) ||
+		  ((molecules[n].getX()&1)==0 && (molecules[n].getY()&1)==0 && (molecules[n].getZ()&1)==0) ) ){
+		  throw std::runtime_error("FeatureExcludedVolumeBcc<>::fillLattice(): monomer position not consistent with bcc model");
+		}
+	  
 		// iterates over the monomer cube.
-
 		for ( int x = -1 ; x < 2; ++x)
 		for ( int y = -1 ; y < 2; ++y)
 		for ( int z = -1 ; z < 2; ++z)

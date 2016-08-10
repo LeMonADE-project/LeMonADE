@@ -34,7 +34,26 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-TEST(TestFeatureExcludedVolumeSc,Moves)
+class TestFeatureExcludedVolumeSc: public ::testing::Test{
+public:
+  
+  //redirect cout output
+  virtual void SetUp(){
+    originalBuffer=std::cout.rdbuf();
+    std::cout.rdbuf(tempStream.rdbuf());
+  };
+  
+  //restore original output
+  virtual void TearDown(){
+    std::cout.rdbuf(originalBuffer);
+  };
+  
+private:
+  std::streambuf* originalBuffer;
+  std::ostringstream tempStream;
+};
+
+TEST_F(TestFeatureExcludedVolumeSc,Moves)
 {
  
   typedef LOKI_TYPELIST_2(FeatureBondset< >,FeatureExcludedVolumeSc< >) Features;
@@ -203,7 +222,6 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
     EXPECT_FALSE(addmove.check(ingredients));
     
     //create random system and check it by synchronize
-    std::cout << "create random config by addmove and check by snychronize"<<std::endl;
     for(uint32_t i=0;i<2000;i++){
       bool accept_move(false);
       while(!accept_move){
@@ -218,7 +236,7 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
    
 }
     
-TEST(TestFeatureExcludedVolumeSc,CheckInterface)
+TEST_F(TestFeatureExcludedVolumeSc,CheckInterface)
 {
 	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc< >) Features;
 
