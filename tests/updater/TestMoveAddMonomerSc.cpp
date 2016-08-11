@@ -145,7 +145,6 @@ TEST_F(TestMoveAddScMonomer, checkAndApply)
   
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
-  
   addmove.setType(5);
   addmove.setPosition(8,8,8);
   
@@ -205,9 +204,11 @@ TEST_F(TestMoveAddScMonomer, checkAndApply)
   addmove.setPosition(15,15,15);
   EXPECT_FALSE(addmove.check(ingredients));
   
+  // check corner position
   addmove.setPosition(0,0,0);
   EXPECT_TRUE(addmove.check(ingredients));
   
+  //apply a move and check consistency
   addmove.apply(ingredients);
   EXPECT_NO_THROW(ingredients.synchronize());
   EXPECT_EQ(2,ingredients.getMolecules().size());

@@ -145,7 +145,6 @@ TEST_F(TestMoveAddBccMonomer, checkAndApply)
   
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
-  
   addmove.setType(5);
   addmove.setPosition(8,8,8);
   
@@ -169,7 +168,7 @@ TEST_F(TestMoveAddBccMonomer, checkAndApply)
   addmove.setPosition(9,9,9);
   EXPECT_FALSE(addmove.check(ingredients));
   
-  //check inconsistent coordinates
+  //check inconsistent coordinates (first even, last two odd)
   addmove.setPosition(6,3,3);
   EXPECT_FALSE(addmove.check(ingredients));
   
@@ -198,7 +197,6 @@ TEST_F(TestMoveAddBccMonomer, checkAndApply)
   EXPECT_FALSE(addmove.check(ingredients));
   addmove.setPosition(15,15,1);
   EXPECT_FALSE(addmove.check(ingredients));
-  //true:
   addmove.setPosition(15,15,15);
   EXPECT_FALSE(addmove.check(ingredients));
   
@@ -215,7 +213,7 @@ TEST_F(TestMoveAddBccMonomer, checkAndApply)
   EXPECT_EQ(VectorInt3(8,6,6),ingredients.getMolecules()[1]);
   EXPECT_EQ(5,ingredients.getMolecules()[1].getAttributeTag());
   
-  //check "x" lattice
+  //check "x" lattice with two monomers in the box
   addmove.setPosition(8,8,6);
   EXPECT_FALSE(addmove.check(ingredients));
   addmove.setPosition(8,6,8);
