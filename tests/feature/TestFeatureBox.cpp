@@ -35,7 +35,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 using namespace std;
 
@@ -355,7 +355,7 @@ TEST_F(FeatureBoxTest, checkAddMonomerMove)
 	// coordinates for non-periodicity 0 <= x,y,z <= BOX-2 (Wall at BOX)
 	
 	// first check with periodic boundary conditions
-	MoveAddScMonomer move;
+	MoveAddMonomerSc move;
 	
 	move.init(ingredients);
 	move.setPosition(-1,3,5);

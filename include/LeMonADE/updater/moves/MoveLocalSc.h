@@ -53,7 +53,12 @@ public:
 	steps[5]=VectorInt3(0,0,-1);	
   }
   
+  // overload initialise function to be able to set the moves index and direction if neccessary
   template <class IngredientsType> void init(const IngredientsType& ing);
+  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
+  template <class IngredientsType> void init(const IngredientsType& ing, VectorInt3 dir);
+  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
+  
   template <class IngredientsType> bool check(IngredientsType& ing);
   template< class IngredientsType> void apply(IngredientsType& ing);
     
@@ -92,13 +97,103 @@ template <class IngredientsType>
 void MoveLocalSc::init(const IngredientsType& ing)
 {
   this->resetProbability();
+  
   //draw index
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
+  
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
-  
   this->setDir(steps[randomDir]);
 
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given monomer index.
+ *
+ * @details Resets the move probability to unity. Dice a new random direction.
+ *
+ * @param ing A reference to the IngredientsType - mainly the system
+ * @param index index of the monomer to be moved
+ **/
+template <class IngredientsType>
+void MoveLocalSc::init(const IngredientsType& ing, uint32_t index)
+{
+  this->resetProbability();
+  
+  //set index
+  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+    this->setIndex( index );
+  else
+    throw std::runtime_error("MoveLocalSc::init(ing, index): index out of range!");
+  
+  //draw direction
+  uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
+  this->setDir(steps[randomDir]);
+
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given direction.
+ *
+ * @details Resets the move probability to unity. Dice a random monomer index and set move direction.
+ *
+ * @param ing A reference to the IngredientsType - mainly the system
+ * @param dir The direction of the move: must be one of the vectors P+-(1,0,0).
+ **/
+template <class IngredientsType>
+void MoveLocalSc::init(const IngredientsType& ing, VectorInt3 dir)
+{
+  this->resetProbability();
+  
+  //draw index
+  this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
+  
+  //set direction
+  if(dir==steps[0] ||
+    dir==steps[1] ||
+    dir==steps[2] ||
+    dir==steps[3] ||
+    dir==steps[4] ||
+    dir==steps[5]  )
+    this->setDir(dir);
+  else
+    throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
+
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given monomer index and a given direction.
+ *
+ * @details Resets the move probability to unity and set the move properties index and direction.
+ *
+ * @param ing A reference to the IngredientsType - mainly the system
+ * @param index index of the monomer to be moved
+ * @param dir The direction of the move: must be one of the vectors P+-(1,0,0).
+ **/
+template <class IngredientsType>
+void MoveLocalSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir)
+{
+  this->resetProbability();
+  
+  //set index
+  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+    this->setIndex( index );
+  else
+    throw std::runtime_error("MoveLocalSc::init(ing, index, dir): index out of range!");
+  
+  //set direction
+  if(dir==steps[0] ||
+    dir==steps[1] ||
+    dir==steps[2] ||
+    dir==steps[3] ||
+    dir==steps[4] ||
+    dir==steps[5]  )
+    this->setDir(dir);
+  else
+    throw std::runtime_error("MoveLocalSc::init(ing, index, dir): direction vector out of range!");
 }
 
 /*****************************************************************************/

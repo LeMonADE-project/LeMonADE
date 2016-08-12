@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2016 by 
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        | 
 ----------------------------------------------------------------------------------
@@ -32,9 +32,29 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureBondset.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 
+
 using namespace std;
 
-TEST(TestFeatureExcludedVolumeSc,Moves)
+class TestFeatureExcludedVolumeSc: public ::testing::Test{
+public:
+  
+  //redirect cout output
+  virtual void SetUp(){
+    originalBuffer=std::cout.rdbuf();
+    std::cout.rdbuf(tempStream.rdbuf());
+  };
+  
+  //restore original output
+  virtual void TearDown(){
+    std::cout.rdbuf(originalBuffer);
+  };
+  
+private:
+  std::streambuf* originalBuffer;
+  std::ostringstream tempStream;
+};
+
+TEST_F(TestFeatureExcludedVolumeSc,Moves)
 {
  
   typedef LOKI_TYPELIST_2(FeatureBondset< >,FeatureExcludedVolumeSc< >) Features;
@@ -54,7 +74,7 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
     //one move of every type
     MoveBase basemove;
     MoveLocalSc scmove;
-    MoveAddScMonomer addmove;
+    MoveAddMonomerSc addmove;
     
     ingredients.modifyMolecules().resize(3);
     ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
@@ -68,7 +88,7 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
     bccmove.init(ingredients);
     EXPECT_ANY_THROW(bccmove.check(ingredients));
     
-    MoveAddBccMonomer addbccmove;
+    MoveAddMonomerBcc addbccmove;
     addbccmove.init(ingredients);
     EXPECT_ANY_THROW(addbccmove.check(ingredients));
     
@@ -203,7 +223,6 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
     EXPECT_FALSE(addmove.check(ingredients));
     
     //create random system and check it by synchronize
-    std::cout << "create random config by addmove and check by snychronize"<<std::endl;
     for(uint32_t i=0;i<2000;i++){
       bool accept_move(false);
       while(!accept_move){
@@ -218,7 +237,7 @@ TEST(TestFeatureExcludedVolumeSc,Moves)
    
 }
     
-TEST(TestFeatureExcludedVolumeSc,CheckInterface)
+TEST_F(TestFeatureExcludedVolumeSc,CheckInterface)
 {
 	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc< >) Features;
 

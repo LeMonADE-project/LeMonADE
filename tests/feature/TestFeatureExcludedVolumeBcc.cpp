@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2016 by 
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        | 
 ----------------------------------------------------------------------------------
@@ -34,14 +34,33 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-TEST(TestFeatureExcludedVolumeBcc,Moves)
+class TestFeatureExcludedVolumeBcc: public ::testing::Test{
+public:
+  
+  //redirect cout output
+  virtual void SetUp(){
+    originalBuffer=std::cout.rdbuf();
+    std::cout.rdbuf(tempStream.rdbuf());
+  };
+  
+  //restore original output
+  virtual void TearDown(){
+    std::cout.rdbuf(originalBuffer);
+  };
+  
+private:
+  std::streambuf* originalBuffer;
+  std::ostringstream tempStream;
+};
+
+TEST_F(TestFeatureExcludedVolumeBcc,Moves)
 {
  
   typedef LOKI_TYPELIST_2(FeatureBondset< >,FeatureExcludedVolumeBcc< >) Features;
 
   typedef ConfigureSystem<VectorInt3,Features> Config;
-  typedef Ingredients<Config> Ing;
-  Ing ingredients;
+  typedef Ingredients<Config> IngredientsType;
+  IngredientsType ingredients;
   
   //prepare ingredients
     ingredients.setBoxX(32);
@@ -54,7 +73,7 @@ TEST(TestFeatureExcludedVolumeBcc,Moves)
     //one move of every type
     MoveBase basemove;
     MoveLocalBcc bccmove;
-    MoveAddBccMonomer addmove;
+    MoveAddMonomerBcc addmove;
     
     ingredients.modifyMolecules().resize(4);
     ingredients.modifyMolecules()[0].setAllCoordinates(1,1,1);
@@ -62,15 +81,14 @@ TEST(TestFeatureExcludedVolumeBcc,Moves)
     ingredients.modifyMolecules()[2].setAllCoordinates(31,3,1);
     ingredients.modifyMolecules()[3].setAllCoordinates(1,1,3);
     
-    std::cout<< "first synchronize\n"; 
-    ingredients.synchronize(ingredients);
+    EXPECT_NO_THROW(ingredients.synchronize(ingredients));
     
     // **************   check inconsistent moves   *****
     MoveLocalSc scmove;
     scmove.init(ingredients);
     EXPECT_ANY_THROW(scmove.check(ingredients));
     
-    MoveAddScMonomer addscmove;
+    MoveAddMonomerSc addscmove;
     addscmove.init(ingredients);
     EXPECT_ANY_THROW(addscmove.check(ingredients));
     
@@ -121,8 +139,7 @@ TEST(TestFeatureExcludedVolumeBcc,Moves)
     
     //shift monomer and try again
     ingredients.modifyMolecules()[1].setAllCoordinates(4,2,2);
-    std::cout<< "second synchronize\n"; 
-    ingredients.synchronize(ingredients);
+    EXPECT_NO_THROW(ingredients.synchronize(ingredients));
     
     //some possible moves
     while((bccmove.getDir().getX()!=-1) || (bccmove.getIndex()!=1)) bccmove.init(ingredients);
@@ -146,12 +163,10 @@ TEST(TestFeatureExcludedVolumeBcc,Moves)
     EXPECT_FALSE(bccmove.check(ingredients));
     
     // **************   check add move   **************
-    std::cout<< "check addmoves\n";
     ingredients.modifyMolecules().resize(2);
     ingredients.modifyMolecules()[0].setAllCoordinates(1,1,1);
     ingredients.modifyMolecules()[1].setAllCoordinates(5,1,1);
-    std::cout<< "third synchronize\n"; 
-    ingredients.synchronize(ingredients);
+    EXPECT_NO_THROW(ingredients.synchronize(ingredients));
     
     addmove.init(ingredients);
     
@@ -239,13 +254,13 @@ TEST(TestFeatureExcludedVolumeBcc,Moves)
     
 }
 
-TEST(TestFeatureExcludedVolumeBcc,CheckInterface)
+TEST_F(TestFeatureExcludedVolumeBcc,CheckInterface)
 {
 	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeBcc< >) Features;
 
 	typedef ConfigureSystem<VectorInt3,Features> Config;
-	typedef Ingredients<Config> Ing;
-	Ing ingredients;
+	typedef Ingredients<Config> IngredientsType;
+	IngredientsType ingredients;
 
 	 //prepare ingredients1
 	    ingredients.setBoxX(32);
@@ -255,17 +270,17 @@ TEST(TestFeatureExcludedVolumeBcc,CheckInterface)
 	    ingredients.setPeriodicY(1);
 	    ingredients.setPeriodicZ(1);
 	    //set up ingredients
-	    typename Ing::molecules_type& molecules=ingredients.modifyMolecules();
+	    typename IngredientsType::molecules_type& molecules=ingredients.modifyMolecules();
 
 	    molecules.resize(3);
-	    molecules[0].setAllCoordinates(9,10,10);
-	    molecules[1].setAllCoordinates(13,10,10);
+	    molecules[0].setAllCoordinates(10,10,10);
+	    molecules[1].setAllCoordinates(14,10,10);
 
 	    //initially is set to false
 	    //before synchronize: latticeIsNotUpdated
 	    EXPECT_FALSE(ingredients.isLatticeFilledUp());
 
-	    ingredients.synchronize(ingredients);
+	    EXPECT_NO_THROW(ingredients.synchronize(ingredients));
 
 	    //after synchronize: latticeIsUpdated
 	    EXPECT_TRUE(ingredients.isLatticeFilledUp());
@@ -279,7 +294,11 @@ TEST(TestFeatureExcludedVolumeBcc,CheckInterface)
 	    EXPECT_TRUE(ingredients.isLatticeFilledUp());
 
 	    //before synchronize: latticeIsNotUpdated
-	    ingredients.synchronize(ingredients);
+	    EXPECT_NO_THROW(ingredients.synchronize(ingredients));
 	    EXPECT_TRUE(ingredients.isLatticeFilledUp());
+	    
+	    //set inconsistent monomer coordinates (not all even or all odd)
+	    molecules[2].setAllCoordinates(24,1,1);
+	    EXPECT_ANY_THROW(ingredients.synchronize(ingredients));
 
 }

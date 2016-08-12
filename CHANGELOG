@@ -1,0 +1,23 @@
+13.07.2016:(issue4)
+*Splited FeatureExcludedVolume to Sc and Bcc version to provide the best performace implementations for local moves
+*Added MoveAddMonomersc/Bcc 
+
+22.07.2016:(issue6)
+*Added general Updater for system setup
+*Improved AnalyzerRadiusOfGyration to get rid of many different constructors
+*Cleaned up numeric functions, deleted all unused utility headers
+
+03.08.2016:(issue40) 
+*Deleted old FeatureExlcudedVolume and corresponding test
+*Deleted FeatureVisualize 
+
+11.08.2016:(issue39, 41, 43)
+*Added new init interfaces for MoveLocalSc/Bcc to set monomer id and move direction
+*Added base move for MoveAddMonomerSc/Bcc, applied corresponding changes in FeatureBox and FeatureAttributes
+*Added tests for all specialized moves
+
+12.08.2016:(issue44)
+*Added a CHANGELOG
+*Renamed MoveAddSc/BccMonomer to MoveAddMonomerSc/Bcc and according changes in all Features and tests
+*Changed attributes interface in addmoves: setType->setTag and get.. the same
+

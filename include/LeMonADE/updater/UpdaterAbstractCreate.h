@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2016 by 
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers
     ooo                        | 
 ----------------------------------------------------------------------------------
@@ -124,9 +124,9 @@ void UpdaterAbstractCreate<IngredientsType>::cleanup(){
 template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::addSingleMonomer(int32_t type){
   // set properties of add Monomer Move
-  MoveAddScMonomer addmove;
+  MoveAddMonomerSc addmove;
   addmove.init(ingredients);
-  addmove.setType(type);
+  addmove.setTag(type);
   
   int32_t counter(0);
   while(counter<10000){
@@ -153,9 +153,9 @@ bool UpdaterAbstractCreate<IngredientsType>::addSingleMonomer(int32_t type){
 template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::addMonomerToParent(uint32_t parent_id, int32_t type){
   // set properties of add Monomer Move
-  MoveAddScMonomer addmove;
+  MoveAddMonomerSc addmove;
   addmove.init(ingredients);
-  addmove.setType(type);
+  addmove.setTag(type);
   
   int32_t counter(0);
   
@@ -189,9 +189,9 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerToParent(uint32_t parent_
  */
 template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtPosition(VectorInt3 position, int32_t type){
-  MoveAddScMonomer addmove;
+  MoveAddMonomerSc addmove;
   addmove.init(ingredients);
-  addmove.setType(type);
+  addmove.setTag(type);
   
   addmove.setPosition(position);
   if(addmove.check(ingredients)==true){
@@ -216,9 +216,9 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerInsideConnectedPair(uint3
   if( ! ingredients.getMolecules().areConnected(indexA,indexB))
     return false;
   
-  MoveAddScMonomer addmove;
+  MoveAddMonomerSc addmove;
   addmove.init(ingredients);
-  addmove.setType(type);
+  addmove.setTag(type);
   
   int32_t counter(0);
   
