@@ -42,10 +42,10 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureFixedMonomers.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
 
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 
-class TestMoveAddScMonomer: public ::testing::Test{
+class TestMoveAddMonomerSc: public ::testing::Test{
 public:
   typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
@@ -70,7 +70,7 @@ private:
   std::ostringstream tempStream;
 };
 
-TEST_F(TestMoveAddScMonomer, initialiseSetterGetter)
+TEST_F(TestMoveAddMonomerSc, initialiseSetterGetter)
 {
   //IngredientsType ingredients;
   ingredients.setBoxX(16);
@@ -84,13 +84,13 @@ TEST_F(TestMoveAddScMonomer, initialiseSetterGetter)
   
   EXPECT_NO_THROW(ingredients.synchronize());
   
-  MoveAddScMonomer addmove;
+  MoveAddMonomerSc addmove;
   
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
   
   //check particle index
-  EXPECT_EQ(1,addmove.getParticleIndex());
+  EXPECT_EQ(1,addmove.getMonomerIndex());
   //check probability
   EXPECT_DOUBLE_EQ(1.0,addmove.getProbability());
   //change and reset probability
@@ -100,12 +100,12 @@ TEST_F(TestMoveAddScMonomer, initialiseSetterGetter)
   EXPECT_DOUBLE_EQ(1.0,addmove.getProbability());
   
   //check setter/getter for type
-  addmove.setType(3);
-  EXPECT_EQ(3,addmove.getType());
+  addmove.setTag(3);
+  EXPECT_EQ(3,addmove.getTag());
   
   //check overwriting of type
-  addmove.setType(9);
-  EXPECT_EQ(9,addmove.getType());
+  addmove.setTag(9);
+  EXPECT_EQ(9,addmove.getTag());
   
   //check setter/getter of position VectorInt3
   VectorInt3 position(0,8,8);
@@ -127,7 +127,7 @@ TEST_F(TestMoveAddScMonomer, initialiseSetterGetter)
   
 }
 
-TEST_F(TestMoveAddScMonomer, checkAndApply)
+TEST_F(TestMoveAddMonomerSc, checkAndApply)
 {
   //IngredientsType ingredients;
   ingredients.setBoxX(16);
@@ -141,11 +141,11 @@ TEST_F(TestMoveAddScMonomer, checkAndApply)
   
   EXPECT_NO_THROW(ingredients.synchronize());
   
-  MoveAddScMonomer addmove;
+  MoveAddMonomerSc addmove;
   
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
-  addmove.setType(5);
+  addmove.setTag(5);
   addmove.setPosition(8,8,8);
   
   //check FeatureExcludedVolumeSc (all lattice positions of monomer 0)

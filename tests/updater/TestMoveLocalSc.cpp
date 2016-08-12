@@ -70,7 +70,6 @@ private:
 
 TEST_F(TestMoveLocalSc, initialiseSetterGetter)
 {
-  //IngredientsType ingredients;
   ingredients.setBoxX(16);
   ingredients.setBoxY(16);
   ingredients.setBoxZ(16);
@@ -81,6 +80,7 @@ TEST_F(TestMoveLocalSc, initialiseSetterGetter)
   ingredients.modifyMolecules().addMonomer(8,8,8);
   
   EXPECT_NO_THROW(ingredients.synchronize());
+  EXPECT_EQ(1,ingredients.getMolecules().size());
   
   MoveLocalSc move;
   
@@ -106,7 +106,7 @@ TEST_F(TestMoveLocalSc, initialiseSetterGetter)
   // ######################################################################## //
   // use index init interface: set the index and dice a random move direction
   
-  EXPECT_NO_THROW(move.init(getIngredients(),uint32_t(0)));
+  EXPECT_NO_THROW(move.init(getIngredients(),0));
   EXPECT_EQ(1.0,move.getProbability());
   EXPECT_EQ(0,move.getIndex());
   EXPECT_EQ(1,move.getDir().getLength());
@@ -114,13 +114,16 @@ TEST_F(TestMoveLocalSc, initialiseSetterGetter)
   move.multiplyProbability(0.5);
   
   EXPECT_EQ(2,ingredients.getMolecules().size());
-  EXPECT_NO_THROW(move.init(getIngredients(),uint32_t(1)));
+  EXPECT_NO_THROW(move.init(getIngredients(),1));
   EXPECT_EQ(1.0,move.getProbability());
   EXPECT_EQ(1,move.getIndex());
   EXPECT_EQ(1,move.getDir().getLength());
   
-  EXPECT_ANY_THROW(move.init(getIngredients(),uint32_t(2)));
-  EXPECT_ANY_THROW(move.init(getIngredients(),int32_t(-1)));
+  //check wrong index by initialize
+  EXPECT_ANY_THROW(move.init(getIngredients(),ingredients.getMolecules().size()));
+  EXPECT_ANY_THROW(move.init(getIngredients(),2)); // ( =same as molecules.size() )
+  EXPECT_ANY_THROW(move.init(getIngredients(),-1));
+  EXPECT_ANY_THROW(move.init(getIngredients(),68468468));
   
   // ######################################################################## //
   // use direction init interface: dice an index and set the move direction
@@ -132,7 +135,31 @@ TEST_F(TestMoveLocalSc, initialiseSetterGetter)
   //change probability
   move.multiplyProbability(0.5);
   
+  direction.setAllCoordinates(0,1,0);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(0,0,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,0,0);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
   direction.setAllCoordinates(0,-1,0);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(0,0,-1);
   EXPECT_NO_THROW(move.init(getIngredients(),direction));
   EXPECT_EQ(1.0,move.getProbability());
   EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
@@ -145,35 +172,60 @@ TEST_F(TestMoveLocalSc, initialiseSetterGetter)
   
   // ######################################################################## //
   // use direction and index init interface: set index and the move direction
+  //check all possible directions
   direction.setAllCoordinates(1,0,0);
-  EXPECT_NO_THROW(move.init(getIngredients(),uint32_t(0),direction));
+  EXPECT_NO_THROW(move.init(getIngredients(),0,direction));
   EXPECT_EQ(1.0,move.getProbability());
   EXPECT_EQ(0,move.getIndex());
   EXPECT_EQ(direction,move.getDir());
   //change probability
   move.multiplyProbability(0.5);
   
-  direction.setAllCoordinates(0,0,-1);
-  EXPECT_NO_THROW(move.init(getIngredients(),uint32_t(1),direction));
+  direction.setAllCoordinates(0,1,0);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
   EXPECT_EQ(1.0,move.getProbability());
   EXPECT_EQ(1,move.getIndex());
   EXPECT_EQ(direction,move.getDir());
   
-  EXPECT_ANY_THROW(move.init(getIngredients(),uint32_t(2),direction));
-  EXPECT_ANY_THROW(move.init(getIngredients(),int32_t(-1),direction));
+  direction.setAllCoordinates(0,0,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,0,0);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(0,-1,0);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(0,0,-1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  //check some forbidden directions and idicees
+  EXPECT_ANY_THROW(move.init(getIngredients(),2,direction));
+  EXPECT_ANY_THROW(move.init(getIngredients(),-1,direction));
   direction.setAllCoordinates(2,0,0);
-  EXPECT_ANY_THROW(move.init(getIngredients(),uint32_t(1),direction));
+  EXPECT_ANY_THROW(move.init(getIngredients(),1,direction));
   direction.setAllCoordinates(0,-1,1);
-  EXPECT_ANY_THROW(move.init(getIngredients(),uint32_t(1),direction));
-  EXPECT_ANY_THROW(move.init(getIngredients(),uint32_t(2),direction));
+  EXPECT_ANY_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_ANY_THROW(move.init(getIngredients(),2,direction));
   
 }
 
 TEST_F(TestMoveLocalSc, checkAndApply)
 {
-  //checkMove with some features: FeatureMoleculesIO, FeatureFixedMonomers, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >
-  
-  //IngredientsType ingredients;
+  // starting here with a new instance of ingredients! 
+  // class member lifetime is only one testcase!
   ingredients.setBoxX(16);
   ingredients.setBoxY(16);
   ingredients.setBoxZ(16);
@@ -185,6 +237,7 @@ TEST_F(TestMoveLocalSc, checkAndApply)
   ingredients.modifyMolecules().addMonomer(0,8,8);
   
   EXPECT_NO_THROW(ingredients.synchronize());
+  EXPECT_EQ(2,ingredients.getMolecules().size());
   
   MoveLocalSc move;
   
@@ -236,6 +289,14 @@ TEST_F(TestMoveLocalSc, checkAndApply)
   EXPECT_NO_THROW(move.init(getIngredients(),0,direction));
   EXPECT_FALSE(move.check(ingredients));
   
+  direction.setAllCoordinates(-1,0,0);
+  EXPECT_NO_THROW(move.init(getIngredients(),0,direction));
+  EXPECT_TRUE(move.check(ingredients));
+  move.apply(ingredients);
+  EXPECT_EQ(VectorInt3(2,8,8),VectorInt3(ingredients.getMolecules()[0]));
+  EXPECT_EQ(VectorInt3(0,8,8),VectorInt3(ingredients.getMolecules()[1]));
+  // now monomers are at positions 2,8,8 and 0,8,8
+  
   //nonperiodic wall
   direction.setAllCoordinates(-1,0,0);
   EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
@@ -247,13 +308,13 @@ TEST_F(TestMoveLocalSc, checkAndApply)
   EXPECT_NO_THROW(move.init(getIngredients(),0));
   EXPECT_FALSE(move.check(ingredients));
   
-  direction.setAllCoordinates(1,0,0);
+  direction.setAllCoordinates(0,1,0);
   EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
   EXPECT_TRUE(move.check(ingredients));
   
   move.apply(ingredients);
   
-  EXPECT_EQ(VectorInt3(3,8,8),ingredients.getMolecules()[0]);
-  EXPECT_EQ(VectorInt3(1,8,8),ingredients.getMolecules()[1]);
+  EXPECT_EQ(VectorInt3(2,8,8),VectorInt3(ingredients.getMolecules()[0]));
+  EXPECT_EQ(VectorInt3(0,9,8),VectorInt3(ingredients.getMolecules()[1]));
   
 }

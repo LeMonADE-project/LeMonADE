@@ -114,8 +114,10 @@ TEST_F(TestMoveLocalBcc, initialiseSetterGetter)
   EXPECT_EQ(1,move.getIndex());
   
   //check wrong index by initialize
-  EXPECT_ANY_THROW(move.init(getIngredients(),2));
+  EXPECT_ANY_THROW(move.init(getIngredients(),ingredients.getMolecules().size()));
+  EXPECT_ANY_THROW(move.init(getIngredients(),2)); // ( =same as molecules.size() )
   EXPECT_ANY_THROW(move.init(getIngredients(),-1));
+  EXPECT_ANY_THROW(move.init(getIngredients(),68468468));
   
   // ######################################################################## //
   // use direction init interface: dice an index and set the move direction
@@ -126,6 +128,42 @@ TEST_F(TestMoveLocalBcc, initialiseSetterGetter)
   EXPECT_EQ(direction,move.getDir());
   //change probability
   move.multiplyProbability(0.5);
+  
+  direction.setAllCoordinates(1,1,-1);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(1,-1,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,1,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,-1,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(1,-1,-1);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,1,-1);
+  EXPECT_NO_THROW(move.init(getIngredients(),direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_TRUE((0==move.getIndex()) || (1==move.getIndex()));
+  EXPECT_EQ(direction,move.getDir());
   
   direction.setAllCoordinates(-1,-1,-1);
   EXPECT_NO_THROW(move.init(getIngredients(),direction));
@@ -148,7 +186,43 @@ TEST_F(TestMoveLocalBcc, initialiseSetterGetter)
   //change probability
   move.multiplyProbability(0.5);
   
+  direction.setAllCoordinates(1,1,-1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(1,-1,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,1,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
   direction.setAllCoordinates(1,-1,-1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,-1,1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,1,-1);
+  EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
+  EXPECT_EQ(1.0,move.getProbability());
+  EXPECT_EQ(1,move.getIndex());
+  EXPECT_EQ(direction,move.getDir());
+  
+  direction.setAllCoordinates(-1,-1,-1);
   EXPECT_NO_THROW(move.init(getIngredients(),1,direction));
   EXPECT_EQ(1.0,move.getProbability());
   EXPECT_EQ(1,move.getIndex());
@@ -165,7 +239,8 @@ TEST_F(TestMoveLocalBcc, initialiseSetterGetter)
 
 TEST_F(TestMoveLocalBcc, checkAndApply)
 {
-  //IngredientsType ingredients;
+  // starting here with a new instance of ingredients! 
+  // class member lifetime is only one testcase!
   ingredients.setBoxX(16);
   ingredients.setBoxY(16);
   ingredients.setBoxZ(16);

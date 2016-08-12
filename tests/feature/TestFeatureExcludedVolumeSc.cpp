@@ -32,6 +32,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureBondset.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 
+
 using namespace std;
 
 class TestFeatureExcludedVolumeSc: public ::testing::Test{
@@ -73,7 +74,7 @@ TEST_F(TestFeatureExcludedVolumeSc,Moves)
     //one move of every type
     MoveBase basemove;
     MoveLocalSc scmove;
-    MoveAddScMonomer addmove;
+    MoveAddMonomerSc addmove;
     
     ingredients.modifyMolecules().resize(3);
     ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
@@ -87,7 +88,7 @@ TEST_F(TestFeatureExcludedVolumeSc,Moves)
     bccmove.init(ingredients);
     EXPECT_ANY_THROW(bccmove.check(ingredients));
     
-    MoveAddBccMonomer addbccmove;
+    MoveAddMonomerBcc addbccmove;
     addbccmove.init(ingredients);
     EXPECT_ANY_THROW(addbccmove.check(ingredients));
     

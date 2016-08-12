@@ -298,7 +298,7 @@ public:
 	
 
 	/**
-	 * @brief Overloaded for MoveAddMonomerBase(MoveAddScMonomer and MoveAddBccMonomer)
+	 * @brief Overloaded for MoveAddMonomerBase(MoveAddMonomerSc and MoveAddMonomerBcc)
 	 *
 	 * @details Returns true if the moves doesn´t violate the p.b.c. The periodicity is set to \a false ,
 	 * the faces of rectangular cuboid behave like hard walls. In fact, the new position \a pos of the monomer can not exceed
@@ -307,7 +307,7 @@ public:
 	 * If the periodicity is set to \a true , the Move is not limited to the (virtual) simulation box.
 	 *
 	 * @param [in] ingredients A reference to the IngredientsType - mainly the system
-	 * @param [in] addmove Move of type MoveAddScMonomer or MoveAddBccMonomer
+	 * @param [in] addmove Move of type MoveAddMonomerSc or MoveAddMonomerBcc
 	 * @return True if move is allowed with p.b.c. or rejected (false).
 	 *
 	 */

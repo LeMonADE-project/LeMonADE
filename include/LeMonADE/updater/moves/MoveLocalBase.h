@@ -54,9 +54,6 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @tparam <SpecializedMove> name of the specialized move.
  *
- * @todo Rename to LocalMoveBase or LocalMove?
- *
- * @todo Test for MoveLocalBase
  **/
 /*****************************************************************************/
 template <class SpecializedMove> 

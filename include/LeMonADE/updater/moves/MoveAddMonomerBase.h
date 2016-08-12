@@ -38,23 +38,22 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @class MoveAddMonomerBase
  *
- * @brief Base class for all add monomer bfm-moves. Specialized versions are MoveAddScMonomer and MoveAddBccMonomer.
+ * @brief Base class for all add monomer bfm-moves. Specialized versions are MoveAddMonomerSc and MoveAddMonomerBcc.
  *
  * @details This class provides a base add monomer moves. The implementation
- * details (i.e. MoveAddScMonomer, MoveAddBccMonomer, optimized versions,etc.) are given by the template parameter.
+ * details (i.e. MoveAddMonomerSc, MoveAddMonomerBcc, optimized versions,etc.) are given by the template parameter.
  * This way, using the "Curiously Recurring Template Pattern (CRTP) to avoid virtual functions
  * but still providing their functionality. A specialized local
- * move type derived from this class must then be constructed in the following
+ * move monomerTag derived from this class must then be constructed in the following
  * way: "class MySpecialMove:public MoveAddMonomerBase<MySpecialMove>".
  * It must implement the functions init,check and apply. Calls to the corresponding
  * functions in this base class are then redirected to the specialized implementation.
- * See for an example the class MoveAddScMonomer. 
+ * See for an example the class MoveAddMonomerSc. 
  * Since this class simply serves as a common base, the functions apply(), check(), and init() don't do
  * anything particular.
  *
  * @tparam <SpecializedMove> name of the specialized move.
  *
- * @todo Test for this Base class?
  **/
 /*****************************************************************************/
 template <class SpecializedMove> 
@@ -69,32 +68,32 @@ public:
   //! Apply the move to the system given as argument
   template <class IngredientsType> void apply(IngredientsType& ingredients);
   
-  //! setter function for type of new monomer
-  void setType(int32_t t){type=t;}
+  //! setter function for monomerTag of new monomer
+  void setTag(int32_t tag){monomerTag=tag;}
   //! setter function for position of new monomer taking a VectorInt3
   void setPosition(VectorInt3 pos){position=pos;}
   //! setter function for position of new monomer taking a triple of ints
   void setPosition(int32_t x,int32_t y,int32_t z){position.setX(x);position.setY(y);position.setZ(z);}
-  //! getter function for the type of the new monomer
-  int32_t getType() const{return type;}
+  //! getter function for the monomerTag of the new monomer
+  int32_t getTag() const{return monomerTag;}
   //! getter function for the position of the new monomer returning a VectorInt3
   const VectorInt3 getPosition() const {return position;}
   //! getter function for index of the new monomer. This is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
-  size_t getParticleIndex() const {return particleIndex;}
+  size_t getMonomerIndex() const {return monomerIndex;}
   
 protected:
-  void setParticleIndex(size_t index){particleIndex=index;}
+  void setMonomerIndex(size_t index){monomerIndex=index;}
   
 private:
   //! position where the new monomer is placed in the simulation box
   VectorInt3 position;
-  //! type that is applied to the new monomer, requires Feature FeatureAttributes with int-Type
-  int32_t type;
+  //! monomerTag that is applied to the new monomer, requires Feature FeatureAttributes with int-Type
+  int32_t monomerTag;
   /** 
    * @brief Index of new PartileThis is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
    * @details It is set when apply is called. useful if Features want to alter the particle when applying the move
    */
-  size_t particleIndex;
+  size_t monomerIndex;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,4 +150,4 @@ void MoveAddMonomerBase<SpecializedMove>::apply(IngredientsType& ingredients)
   static_cast<SpecializedMove*>(this)->apply(ingredients);
 }
 
-#endif
+#endif //LEMONADE_UPDATER_MOVES_MOVEADDMOVEBASE_H
