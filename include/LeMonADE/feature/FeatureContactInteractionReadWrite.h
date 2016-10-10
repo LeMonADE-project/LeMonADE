@@ -127,7 +127,7 @@ void WriteContactInteraction<IngredientsType>::writeStream(std::ostream& stream)
 
   for(int32_t typeA=1;typeA<=nSpecies;typeA++)
     {
-      for(int32_t typeB=1;typeB<typeA;typeB++)
+      for(int32_t typeB=1;typeB<=typeA;typeB++)
         {
 	  if(this->getSource().getContactInteraction(typeA,typeB)!=0.0)
             {

@@ -264,7 +264,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::applyMove(IngredientsType& 
 
     //the feature is based on a uint8_t lattice, thus the max type must not
     //exceed the max value of uint8_t (255)
-    if(int32_t(type) != move.getType())
+    if(int32_t(type) != move.getType() || int32_t(type)==0)
       {
 	std::stringstream errormessage;
 	errormessage<<"FeatureContactInteractionBcc::applyMove(MoveAddBccMonomer)\n";
@@ -435,8 +435,6 @@ double FeatureContactInteractionBcc<LatticeClassType>::calculateAcceptanceProbab
     
     VectorInt3 oldPos=ingredients.getMolecules()[move.getIndex()];
     VectorInt3 direction=move.getDir();
-
-    double prob=1.0;
     int32_t monoType=ingredients.getMolecules()[move.getIndex()].getAttributeTag();
 
     //get three directions that define which lattice sites have to be checked
@@ -455,92 +453,93 @@ double FeatureContactInteractionBcc<LatticeClassType>::calculateAcceptanceProbab
     //lookup using getProbabilityFactor. For new contacts this factor is multiplied
     //with the probability, for contacts taken away the probability is devided.
     VectorInt3 actual=oldPos;
-
+    double prob_div=1.0;
+    
     actual-=v2;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v1;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v1;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v1;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v2;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v1;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v1;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v2;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v1;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v1;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     
     //now check back side (contacts taken away)
     //again, not the complete contact shell has to be checked. the sites 
     //-v1,-v1-v2,-v1-v3,... relative to the new position cannot be occupied
     //because they were previously blocked by the excluded volume of the monomer
     //to be moved.
-    double prob_div=1.0;
+    double prob=1.0;
     actual=oldPos+direction;
     
     actual+=v2;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v1;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v1;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v1;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v2;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v1;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v1;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v2;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v1;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual+=v1;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
     actual-=v3;
-    prob_div*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
+    prob*=getProbabilityFactor(monoType,int32_t(ingredients.getLatticeEntry(actual)));
 
     prob/=prob_div;
     return prob;

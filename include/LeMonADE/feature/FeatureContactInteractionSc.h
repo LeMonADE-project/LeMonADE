@@ -266,7 +266,7 @@ void FeatureContactInteractionSc<LatticeClassType>::applyMove(IngredientsType& i
 
     //the feature is based on a uint8_t lattice, thus the max type must not
     //exceed the max value of uint8_t (255)
-    if(int32_t(type) != move.getType())
+    if(int32_t(type) != move.getType() || int32_t(type)==0)
       {
 	std::stringstream errormessage;
 	errormessage<<"FeatureContactInteractionSc::applyMove(MoveAddScMonomer)\n";
