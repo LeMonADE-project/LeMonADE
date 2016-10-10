@@ -7,7 +7,8 @@ SET_DIRECTORY_PROPERTIES(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/third_party)
 # Add gtest
 ExternalProject_Add(
     googletest
-    URL http://googletest.googlecode.com/files/gtest-1.6.0.zip
+    GIT_REPOSITORY https://github.com/google/googletest
+    GIT_TAG release-1.6.0
     # Disable install step
     INSTALL_COMMAND ""
     # Wrap download, configure and build steps in a script to log output
