@@ -26,14 +26,14 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------*/
 
 
-#ifndef FEATURE_CONTACT_INTERACTION_BCC_H
-#define FEATURE_CONTACT_INTERACTION_BCC_H
+#ifndef FEATURE_NN_INTERACTION_BCC_H
+#define FEATURE_NN_INTERACTION_BCC_H
 
 /**
  * @file
  * @date 2016/06/18
  * @author Hauke Rabbel
- * @brief Definition and implementation of class template FeatureContactInteractionBcc
+ * @brief Definition and implementation of class template FeatureNNInteractionBcc
  * 
  * @todo MoveAddBccMonomer is used here, which might be obsolete. 
 **/
@@ -45,10 +45,10 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureExcludedVolumeBcc.h>
 #include <LeMonADE/feature/FeatureBoltzmann.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
-#include <LeMonADE/feature/FeatureContactInteractionReadWrite.h>
+#include <LeMonADE/feature/FeatureNNInteractionReadWrite.h>
 
 /**
- * @class FeatureContactInteractionBcc
+ * @class FeatureNNInteractionBcc
  * @brief Provides interaction of monomers on distances d<=sqrt(12)a for bccBFM
  *
  * @tparam FeatureLatticeType Underlying lattice feature, e.g. FeatureLattice or 
@@ -65,14 +65,14 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * - 0   d>sqrt(12)
  * .
  * Usage: In the feature list defining Ingredients use this feature as
- * FeatureContactInteractionBcc<FeatureLattice> (arbitrary lattices), or as
- * FeatureContactInteractionBcc<FeatureLatticePowerOfTwo> (2**n lattices)
- * The feature adds the bfm-file command !contact_interaction A B E
+ * FeatureNNInteractionBcc<FeatureLattice> (arbitrary lattices), or as
+ * FeatureNNInteractionBcc<FeatureLatticePowerOfTwo> (2**n lattices)
+ * The feature adds the bfm-file command !nn_interaction A B E
  * for monomers of types A B with interaction energy of E in kT.
 **/
 
 template<template<typename> class FeatureLatticeType>
-class FeatureContactInteractionBcc:public Feature
+class FeatureNNInteractionBcc:public Feature
 {
 
 private:
@@ -100,14 +100,14 @@ private:
 
 public:
 
-  FeatureContactInteractionBcc();
-  ~FeatureContactInteractionBcc(){}
+  FeatureNNInteractionBcc();
+  ~FeatureNNInteractionBcc(){}
 
     
   //This feature adds interaction energies, so it requires FeatureBoltzmann
   typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
 
-  //FeatureExcludedVolumeSc needs to be in front, because FeatureContactInteractionBcc
+  //FeatureExcludedVolumeSc needs to be in front, because FeatureNNInteractionBcc
   //re-initializes the lattice and overwrites what FeatureExcludedVolumeSc has written.
   //FeatureAttributes needs to be in front, because when a monomer is added to the system
   //by a MoveAddScMonomer, its attribute has to be set before it is written to the lattice.
@@ -149,16 +149,16 @@ public:
   void synchronize(IngredientsType& ingredients);
 
   //!adds interaction energy between two types of monomers
-  void setContactInteraction(int32_t typeA,int32_t typeB,double energy);
+  void setNNInteraction(int32_t typeA,int32_t typeB,double energy);
 
   //!returns the interaction energy between two types of monomers
-  double getContactInteraction(int32_t typeA,int32_t typeB) const;
+  double getNNInteraction(int32_t typeA,int32_t typeB) const;
 
-  //!export bfm-file read command !contact_interaction
+  //!export bfm-file read command !nn_interaction
   template <class IngredientsType>
   void exportRead(FileImport <IngredientsType>& fileReader);
 
-  //!export bfm-file write command !contact_interaction
+  //!export bfm-file write command !nn_interaction
   template <class IngredientsType>
   void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& fileWriter) const;
 
@@ -171,7 +171,7 @@ public:
  * @brief Constructor
  **/
 template<template<typename> class LatticeClassType>
-FeatureContactInteractionBcc<LatticeClassType>::FeatureContactInteractionBcc()
+FeatureNNInteractionBcc<LatticeClassType>::FeatureNNInteractionBcc()
 {
   //initialize the energy and probability lookups with default values
   for(size_t n=0;n<256;n++)
@@ -193,7 +193,7 @@ FeatureContactInteractionBcc<LatticeClassType>::FeatureContactInteractionBcc()
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureContactInteractionBcc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+bool FeatureNNInteractionBcc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
 							 const MoveBase& move) const
 {
     return true;
@@ -209,7 +209,7 @@ bool FeatureContactInteractionBcc<LatticeClassType>::checkMove(const Ingredients
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureContactInteractionBcc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+bool FeatureNNInteractionBcc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
 							 MoveLocalBcc& move) const
 {
   //add the probability factor coming from this feature, then return true,
@@ -231,12 +231,12 @@ bool FeatureContactInteractionBcc<LatticeClassType>::checkMove(const Ingredients
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureContactInteractionBcc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+bool FeatureNNInteractionBcc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
 							 const MoveLocalSc& move) const
 {
   //throw exception in case someone accidentaly uses a bcc-BFM move with this feature
   std::stringstream errormessage;
-  errormessage<<"FeatureContactInteractionBcc::checkMove(...):\n";
+  errormessage<<"FeatureNNInteractionBcc::checkMove(...):\n";
   errormessage<<"attempting to use sc-BFM move, which is not allowed\n";
   throw std::runtime_error(errormessage.str());
 
@@ -255,7 +255,7 @@ bool FeatureContactInteractionBcc<LatticeClassType>::checkMove(const Ingredients
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureContactInteractionBcc<LatticeClassType>::applyMove(IngredientsType& ing, 
+void FeatureNNInteractionBcc<LatticeClassType>::applyMove(IngredientsType& ing, 
 							 const MoveAddBccMonomer& move)
 {
     //get the position and attribute tag of the monomer to be inserted
@@ -267,7 +267,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::applyMove(IngredientsType& 
     if(int32_t(type) != move.getType() || int32_t(type)==0)
       {
 	std::stringstream errormessage;
-	errormessage<<"FeatureContactInteractionBcc::applyMove(MoveAddBccMonomer)\n";
+	errormessage<<"FeatureNNInteractionBcc::applyMove(MoveAddBccMonomer)\n";
 	errormessage<<"Trying to add monomer with type "<<int32_t(type)<<">maxType=255\n";
 	throw std::runtime_error(errormessage.str());
       }
@@ -287,12 +287,12 @@ void FeatureContactInteractionBcc<LatticeClassType>::applyMove(IngredientsType& 
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureContactInteractionBcc<LatticeClassType>::applyMove(const IngredientsType& ing, 
+void FeatureNNInteractionBcc<LatticeClassType>::applyMove(const IngredientsType& ing, 
 							 const MoveLocalSc& move)
 {
   //throw exception in case someone accidentaly uses a sc-BFM move with this feature
   std::stringstream errormessage;
-  errormessage<<"FeatureContactInteractionBcc::applyMove(...):\n";
+  errormessage<<"FeatureNNInteractionBcc::applyMove(...):\n";
   errormessage<<"attempting to use sc-BFM move, which is not allowed\n";
   throw std::runtime_error(errormessage.str());
 
@@ -304,7 +304,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::applyMove(const Ingredients
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureContactInteractionBcc<LatticeClassType>::synchronize(IngredientsType& ingredients)
+void FeatureNNInteractionBcc<LatticeClassType>::synchronize(IngredientsType& ingredients)
 {
 
     //refill the lattice with attribute tags
@@ -323,7 +323,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::synchronize(IngredientsType
  * @throw std::runtime_error In debug mode, if types are not in range [1,255]
  **/
 template<template<typename> class LatticeClassType>
-inline double FeatureContactInteractionBcc<LatticeClassType>::getProbabilityFactor(int32_t typeA,
+inline double FeatureNNInteractionBcc<LatticeClassType>::getProbabilityFactor(int32_t typeA,
 									     int32_t typeB) const
 {
 #ifdef DEBUG
@@ -331,7 +331,7 @@ inline double FeatureContactInteractionBcc<LatticeClassType>::getProbabilityFact
   //and this costs performance
   if(typeA<0 || typeA>255 || typeB<0 || typeB>255){
     std::stringstream errormessage;
-    errormessage<<"***FeatureContactInteractionBcc::getInteraction(typeA,typeB)***\n";
+    errormessage<<"***FeatureNNInteractionBcc::getInteraction(typeA,typeB)***\n";
     errormessage<<"probability undefined between types "<<typeA<<" and "<<typeB<<std::endl;
     errormessage<<"types are out of the allowed range";
     throw std::runtime_error(errormessage.str());
@@ -347,7 +347,7 @@ inline double FeatureContactInteractionBcc<LatticeClassType>::getProbabilityFact
  * is associated with an object of type FileImport. The export of the Reads is thus
  * taken care automatically when it becomes necessary.\n
  * Registered Read-In Commands:
- * - !contactInteraction
+ * - !nnInteraction
  * .
  *
  * @tparam IngredientsType The type of the system including all features
@@ -355,10 +355,10 @@ inline double FeatureContactInteractionBcc<LatticeClassType>::getProbabilityFact
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureContactInteractionBcc<LatticeClassType>::exportRead(FileImport< IngredientsType >& fileReader)
+void FeatureNNInteractionBcc<LatticeClassType>::exportRead(FileImport< IngredientsType >& fileReader)
 {
-  typedef FeatureContactInteractionBcc<LatticeClassType> my_type;
-  fileReader.registerRead("!contact_interaction",new ReadContactInteraction<my_type>(*this));
+  typedef FeatureNNInteractionBcc<LatticeClassType> my_type;
+  fileReader.registerRead("!nn_interaction",new ReadNNInteraction<my_type>(*this));
 }
 
 
@@ -367,17 +367,17 @@ void FeatureContactInteractionBcc<LatticeClassType>::exportRead(FileImport< Ingr
  * is associated with an object of type AnalyzerWriteBfmFile. The export of the Writes is thus
  * taken care automatically when it becomes necessary.\n
  * Registered Write-Out Commands:
- * - !contact_interaction
+ * - !nn_interaction
  *
  * @tparam IngredientsType The type of the system including all features
  * @param fileWriter File writer for the bfm-file.
  */
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureContactInteractionBcc<LatticeClassType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
+void FeatureNNInteractionBcc<LatticeClassType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
-  typedef FeatureContactInteractionBcc<LatticeClassType> my_type;
-  fileWriter.registerWrite("!contact_interaction",new WriteContactInteraction<my_type>(*this));
+  typedef FeatureNNInteractionBcc<LatticeClassType> my_type;
+  fileWriter.registerWrite("!nn_interaction",new WriteNNInteraction<my_type>(*this));
 }
 
 /**
@@ -391,7 +391,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::exportWrite(AnalyzerWriteBf
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureContactInteractionBcc<LatticeClassType>::fillLattice(IngredientsType& ingredients)
+void FeatureNNInteractionBcc<LatticeClassType>::fillLattice(IngredientsType& ingredients)
 {
     const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 
@@ -402,7 +402,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::fillLattice(IngredientsType
 
 	if(int32_t(attribute)!=molecules[n].getAttributeTag()){
 	  std::stringstream errormessage;
-	  errormessage<<"***FeatureContactInteractionBcc::fillLattice()***\n";
+	  errormessage<<"***FeatureNNInteractionBcc::fillLattice()***\n";
 	  errormessage<<"type "<<attribute<<" is out of the allowed range";
 
 	  throw std::runtime_error(errormessage.str());
@@ -428,7 +428,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::fillLattice(IngredientsType
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-double FeatureContactInteractionBcc<LatticeClassType>::calculateAcceptanceProbability(
+double FeatureNNInteractionBcc<LatticeClassType>::calculateAcceptanceProbability(
     const IngredientsType& ingredients,
     const MoveLocalBcc& move) const
 {
@@ -553,7 +553,7 @@ double FeatureContactInteractionBcc<LatticeClassType>::calculateAcceptanceProbab
  * @throw std::runtime_error In case typeA or typeB exceed range [1,255]
  **/
 template<template<typename> class LatticeClassType>
-void FeatureContactInteractionBcc<LatticeClassType>::setContactInteraction(int32_t typeA,
+void FeatureNNInteractionBcc<LatticeClassType>::setNNInteraction(int32_t typeA,
 								     int32_t typeB,
 								     double energy)
 {
@@ -569,7 +569,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::setContactInteraction(int32
     else
       {
 	std::stringstream errormessage;
-	errormessage<<"FeatureContactInteractionBcc::setContactInteraction(typeA,typeB,energy).\n";
+	errormessage<<"FeatureNNInteractionBcc::setNNInteraction(typeA,typeB,energy).\n";
 	errormessage<<"typeA "<<typeA<<" typeB "<<typeB<<": Types out of range\n";
 	throw std::runtime_error(errormessage.str());
       }
@@ -582,7 +582,7 @@ void FeatureContactInteractionBcc<LatticeClassType>::setContactInteraction(int32
  * @return interaction energy per nearest neighbor contact for typeA,typeB
  **/
 template<template<typename> class LatticeClassType>
-double FeatureContactInteractionBcc<LatticeClassType>::getContactInteraction(int32_t typeA,
+double FeatureNNInteractionBcc<LatticeClassType>::getNNInteraction(int32_t typeA,
 								       int32_t typeB) const
 {
 
@@ -591,7 +591,7 @@ double FeatureContactInteractionBcc<LatticeClassType>::getContactInteraction(int
     else
     {
       std::stringstream errormessage;
-      errormessage<<"FeatureContactInteractionBcc::getContactInteraction(typeA,typeB).\n";
+      errormessage<<"FeatureNNInteractionBcc::getNNInteraction(typeA,typeB).\n";
       errormessage<<"typeA "<<typeA<<" typeB "<<typeB<<": Types out of range\n";
       throw std::runtime_error(errormessage.str());
     }
@@ -599,4 +599,4 @@ double FeatureContactInteractionBcc<LatticeClassType>::getContactInteraction(int
 }
 
 
-#endif /*FEATURE_CONTACT_INTERACTION_BCC_H*/
+#endif /*FEATURE_NN_INTERACTION_BCC_H*/

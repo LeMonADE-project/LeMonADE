@@ -8,13 +8,13 @@
 #include <LeMonADE/feature/FeatureBondset.h>
 #include <LeMonADE/feature/FeatureLattice.h>
 #include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
-#include <LeMonADE/feature/FeatureContactInteractionBcc.h>
+#include <LeMonADE/feature/FeatureNNInteractionBcc.h>
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
 #include <LeMonADE/updater/moves/MoveAddBccMonomer.h>
 
 using namespace std;
 
-class ContactInteractionBccTest: public ::testing::Test{
+class NNInteractionBccTest: public ::testing::Test{
   /* suppress cout output for better readability -->un-/comment here:*/    
 public:
   //redirect cout output
@@ -33,9 +33,9 @@ private:
 };
 
 
-TEST_F(ContactInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
+TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureContactInteractionBcc<FeatureLatticePowerOfTwo>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionBcc<FeatureLatticePowerOfTwo>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;
@@ -51,7 +51,7 @@ TEST_F(ContactInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     myIngredients1.setPeriodicZ(1);
 
     //set interaction between types 1,2
-    myIngredients1.setContactInteraction(1,2,0.8);
+    myIngredients1.setNNInteraction(1,2,0.8);
     double epsilon0=0.8;
 
     //add two monomers. the test then proceeds like this: monomer 1 is moved
@@ -514,9 +514,9 @@ TEST_F(ContactInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
 
 //same test but with any lattice
 
-TEST_F(ContactInteractionBccTest,CheckApplyBccMoveAnyLattice)
+TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureContactInteractionBcc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionBcc<FeatureLattice>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;
@@ -532,7 +532,7 @@ TEST_F(ContactInteractionBccTest,CheckApplyBccMoveAnyLattice)
     myIngredients1.setPeriodicZ(1);
 
     //set interaction between types 1,2
-    myIngredients1.setContactInteraction(1,2,0.8);
+    myIngredients1.setNNInteraction(1,2,0.8);
     double epsilon0=0.8;
 
     //add two monomers. the test then proceeds like this: monomer 1 is moved
@@ -997,9 +997,9 @@ TEST_F(ContactInteractionBccTest,CheckApplyBccMoveAnyLattice)
 
 
 
-TEST_F(ContactInteractionBccTest,getSetInteraction)
+TEST_F(NNInteractionBccTest,getSetInteraction)
 {
-    typedef LOKI_TYPELIST_2(FeatureBondset<>,FeatureContactInteractionBcc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_2(FeatureBondset<>,FeatureNNInteractionBcc<FeatureLattice>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients;
@@ -1008,31 +1008,31 @@ TEST_F(ContactInteractionBccTest,getSetInteraction)
     {
         for(int32_t j=1;j<=255;j++)
         {
-            EXPECT_DOUBLE_EQ(myIngredients.getContactInteraction(i,j),0.0);
+            EXPECT_DOUBLE_EQ(myIngredients.getNNInteraction(i,j),0.0);
         }
     }
-    EXPECT_THROW(myIngredients.getContactInteraction(-1,5),std::runtime_error);
-    EXPECT_THROW(myIngredients.getContactInteraction(1,-5),std::runtime_error);
-    EXPECT_THROW(myIngredients.getContactInteraction(0,1),std::runtime_error);
-    EXPECT_THROW(myIngredients.getContactInteraction(1,0),std::runtime_error);
-    EXPECT_THROW(myIngredients.getContactInteraction(0,256),std::runtime_error);
-    EXPECT_THROW(myIngredients.getContactInteraction(256,0),std::runtime_error);
+    EXPECT_THROW(myIngredients.getNNInteraction(-1,5),std::runtime_error);
+    EXPECT_THROW(myIngredients.getNNInteraction(1,-5),std::runtime_error);
+    EXPECT_THROW(myIngredients.getNNInteraction(0,1),std::runtime_error);
+    EXPECT_THROW(myIngredients.getNNInteraction(1,0),std::runtime_error);
+    EXPECT_THROW(myIngredients.getNNInteraction(0,256),std::runtime_error);
+    EXPECT_THROW(myIngredients.getNNInteraction(256,0),std::runtime_error);
     
     //set interaction between types 1,2
-    myIngredients.setContactInteraction(1,2,0.8);
-    EXPECT_DOUBLE_EQ(myIngredients.getContactInteraction(1,2),0.8);
+    myIngredients.setNNInteraction(1,2,0.8);
+    EXPECT_DOUBLE_EQ(myIngredients.getNNInteraction(1,2),0.8);
 
-    myIngredients.setContactInteraction(1,2,-0.8);
-    EXPECT_DOUBLE_EQ(myIngredients.getContactInteraction(1,2),-0.8);
+    myIngredients.setNNInteraction(1,2,-0.8);
+    EXPECT_DOUBLE_EQ(myIngredients.getNNInteraction(1,2),-0.8);
 
 
-    myIngredients.setContactInteraction(1,2,0.0);
-    EXPECT_DOUBLE_EQ(myIngredients.getContactInteraction(1,2),0.0);
+    myIngredients.setNNInteraction(1,2,0.0);
+    EXPECT_DOUBLE_EQ(myIngredients.getNNInteraction(1,2),0.0);
 }
 
-TEST_F(ContactInteractionBccTest,Synchronize)
+TEST_F(NNInteractionBccTest,Synchronize)
 {
-    typedef LOKI_TYPELIST_2(FeatureBondset<>,FeatureContactInteractionBcc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_2(FeatureBondset<>,FeatureNNInteractionBcc<FeatureLattice>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;
@@ -1083,19 +1083,19 @@ TEST_F(ContactInteractionBccTest,Synchronize)
 
 }
 
-TEST_F(ContactInteractionBccTest,ReadWrite)
+TEST_F(NNInteractionBccTest,ReadWrite)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureContactInteractionBcc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionBcc<FeatureLattice>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients;
 
 
     //set interaction between types 1,2
-    myIngredients.setContactInteraction(1,2,0.8);
-    myIngredients.setContactInteraction(1,3,-0.8);
-    myIngredients.setContactInteraction(2,3,0.0);
-    myIngredients.setContactInteraction(9,4,10.0);
+    myIngredients.setNNInteraction(1,2,0.8);
+    myIngredients.setNNInteraction(1,3,-0.8);
+    myIngredients.setNNInteraction(2,3,0.0);
+    myIngredients.setNNInteraction(9,4,10.0);
 
     //prepare myIngredients
     myIngredients.setBoxX(32);
@@ -1126,7 +1126,7 @@ TEST_F(ContactInteractionBccTest,ReadWrite)
     {
         for(int32_t j=1;j<=255;j++)
         {
-            EXPECT_DOUBLE_EQ(myIngredients.getContactInteraction(i,j),myIngredients2.getContactInteraction(i,j));
+            EXPECT_DOUBLE_EQ(myIngredients.getNNInteraction(i,j),myIngredients2.getNNInteraction(i,j));
         }
     }
 
@@ -1139,9 +1139,9 @@ TEST_F(ContactInteractionBccTest,ReadWrite)
 }
 
 
-TEST_F(ContactInteractionBccTest,ApplyMoveAddBccMonomer)
+TEST_F(NNInteractionBccTest,ApplyMoveAddBccMonomer)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureContactInteractionBcc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionBcc<FeatureLattice>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;

@@ -25,14 +25,14 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef FEATURE_CONTACT_INTERACTION_READ_WRITE_H
-#define FEATURE_CONTACT_INTERACTION_READ_WRITE_H
+#ifndef FEATURE_NN_INTERACTION_READ_WRITE_H
+#define FEATURE_NN_INTERACTION_READ_WRITE_H
 
 /**
  * @file
  * @date 2016/06/18
  * @author Hauke Rabbel
- * @brief Def. and impl. of class templates ReadContactInteraction and WriteContactInteraction
+ * @brief Def. and impl. of class templates ReadNNInteraction and WriteNNInteraction
 **/
 
 #include<iostream>
@@ -40,35 +40,35 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include<LeMonADE/io/AbstractWrite.h>
 
 /**
- * @class ReadContactInteraction
- * @brief Handles BFM-file read command !contact_interaction
+ * @class ReadNNInteraction
+ * @brief Handles BFM-file read command !nn_interaction
  * @tparam IngredientsType Ingredients class storing all system information.
 **/
 template < class IngredientsType>
-class ReadContactInteraction: public ReadToDestination<IngredientsType>
+class ReadNNInteraction: public ReadToDestination<IngredientsType>
 {
 public:
-    ReadContactInteraction(IngredientsType& i):ReadToDestination<IngredientsType>(i){}
-    virtual ~ReadContactInteraction(){}
+    ReadNNInteraction(IngredientsType& i):ReadToDestination<IngredientsType>(i){}
+    virtual ~ReadNNInteraction(){}
     virtual void execute();
 };
 
 /**
- * @class WriteContactInteraction
- * @brief Handles BFM-file write command !contact_interaction
+ * @class WriteNNInteraction
+ * @brief Handles BFM-file write command !nn_interaction
  * @tparam IngredientsType Ingredients class storing all system information.
 **/
 template <class IngredientsType>
-class WriteContactInteraction:public AbstractWrite<IngredientsType>
+class WriteNNInteraction:public AbstractWrite<IngredientsType>
 {
 public:
 
   //constructor sets the headerOnly tag, such that the interaction
   //is written only once at the beginning of the output file.
-    WriteContactInteraction(const IngredientsType& i)
+    WriteNNInteraction(const IngredientsType& i)
         :AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
 
-    virtual ~WriteContactInteraction(){}
+    virtual ~WriteNNInteraction(){}
 
     virtual void writeStream(std::ostream& strm);
 };
@@ -76,12 +76,12 @@ public:
 /////////////MEMBER IMPLEMENTATIONS ////////////////////////////////////////////
 
 /**
- * @brief Executes the reading routine to extract \b !contact_interaction.
+ * @brief Executes the reading routine to extract \b !nn_interaction.
  *
  * @throw <std::runtime_error> fail to read monomer types or interaction energy.
  **/
 template<class IngredientsType>
-void ReadContactInteraction<IngredientsType>::execute()
+void ReadNNInteraction<IngredientsType>::execute()
 {
     IngredientsType& ingredients=this->getDestination();
     std::istream& file=this->getInputStream();
@@ -101,14 +101,14 @@ void ReadContactInteraction<IngredientsType>::execute()
     catch(std::ifstream::failure e)
       {
 	std::stringstream errormessage;
-	errormessage<<"ReadContactInteraction::execute().\n";
+	errormessage<<"ReadNNInteraction::execute().\n";
 	errormessage<<"Could not read interaction from file\n";
 	errormessage<<"Previous error: "<<e.what()<<std::endl;
 	throw std::runtime_error(errormessage.str());
       }
     
     //now save the interaction tuple just read from the file
-    ingredients.setContactInteraction(typeA,typeB,interactionConstant);
+    ingredients.setNNInteraction(typeA,typeB,interactionConstant);
 
     //unset exception on fail
     file.exceptions(file.exceptions() & (~std::ifstream::failbit));
@@ -116,11 +116,11 @@ void ReadContactInteraction<IngredientsType>::execute()
 
 
 /**
- * @brief Executes the routine to write \b !contact_interaction.
+ * @brief Executes the routine to write \b !nn_interaction.
  * @arg stream file stream to write into
  **/
 template<class IngredientsType>
-void WriteContactInteraction<IngredientsType>::writeStream(std::ostream& stream)
+void WriteNNInteraction<IngredientsType>::writeStream(std::ostream& stream)
 {
   int32_t nSpecies=255; //number must fit into 8 bit (uint8_t based lattice)
   stream<<"## nearest neighbor interactions between types in kT (default 0.0kT)\n";
@@ -129,9 +129,9 @@ void WriteContactInteraction<IngredientsType>::writeStream(std::ostream& stream)
     {
       for(int32_t typeB=1;typeB<=typeA;typeB++)
         {
-	  if(this->getSource().getContactInteraction(typeA,typeB)!=0.0)
+	  if(this->getSource().getNNInteraction(typeA,typeB)!=0.0)
             {
-	      stream<<"!contact_interaction "<<typeB<<" "<<typeA<<" "<<this->getSource().getContactInteraction(typeB,typeA)<<"\n";
+	      stream<<"!nn_interaction "<<typeB<<" "<<typeA<<" "<<this->getSource().getNNInteraction(typeB,typeA)<<"\n";
             }
 
         }
@@ -144,4 +144,4 @@ void WriteContactInteraction<IngredientsType>::writeStream(std::ostream& stream)
 
 
 
-#endif // FEATURE_CONTACT_INTERACTION_READ_WRITE_H
+#endif // FEATURE_NN_INTERACTION_READ_WRITE_H
