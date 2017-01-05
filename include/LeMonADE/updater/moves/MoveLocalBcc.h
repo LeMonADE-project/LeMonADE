@@ -61,6 +61,9 @@ public:
 	virtual ~MoveLocalBcc(){};
 
 	template <class IngredientsType> void init(const IngredientsType& ing);
+	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
+	template <class IngredientsType> void init(const IngredientsType& ing, VectorInt3 dir);
+	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
 	template <class IngredientsType> bool check(IngredientsType& ing);
 	template< class IngredientsType> void apply(IngredientsType& ing);
 
@@ -85,17 +88,104 @@ template <class IngredientsType>
 void MoveLocalBcc::init(const IngredientsType& ing)
 {
   this->resetProbability();
+  
   //draw index
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
   
   //draw direction
   uint32_t randNumber=this->randomNumbers.r250_rand32();
-  
-  
   this->setDir(VectorInt3(
 	((randNumber & 1) ? 1 :  -1),
 	((randNumber & 2) ? 1 :  -1),
 	((randNumber & 4) ? 1 :  -1)	)	);
+
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given monomer index.
+ *
+ * @details Resets the move probability to unity. Dice a new random direction and
+ * set the index of the moved monomer to the argument passed.
+ *
+ * @param ing A reference to the IngredientsType - mainly the system
+ * @param index index of the monomer to be moved
+ */
+template <class IngredientsType>
+void MoveLocalBcc::init(const IngredientsType& ing, uint32_t index)
+{
+  this->resetProbability();
+  
+  //set index
+  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+    this->setIndex( index );
+  else
+    throw std::runtime_error("MoveLocalBcc::init(ing, index): index out of range!");
+  
+  //draw direction
+  uint32_t randNumber=this->randomNumbers.r250_rand32();
+  this->setDir(VectorInt3(
+	((randNumber & 1) ? 1 :  -1),
+	((randNumber & 2) ? 1 :  -1),
+	((randNumber & 4) ? 1 :  -1)	)	);
+
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given move direction.
+ *
+ * @details Resets the move probability to unity. Dice a Vertex (monomer) index 
+ * inside the graph and set the move direction to the argument passed.
+ *
+ * @param ing A reference to the IngredientsType - mainly the system
+ * @param dir The direction of the move: must be one of the vectors P+-(1,1,1).
+ */
+template <class IngredientsType>
+void MoveLocalBcc::init(const IngredientsType& ing, VectorInt3 dir)
+{
+  this->resetProbability();
+  
+  //draw index
+  this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
+  
+  //set direction
+  if( (dir.getX()==1 || dir.getX()==-1 ) &&
+    (dir.getY()==1 || dir.getY()==-1 ) &&
+    (dir.getZ()==1 || dir.getZ()==-1 )  )
+    this->setDir(dir);
+  else
+    throw std::runtime_error("MoveLocalBcc::init(ing, dir): direction vector out of range!");
+
+}
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move.
+ *
+ * @details Resets the move probability to unity. Dice a new random direction and
+ * Vertex (monomer) index inside the graph.
+ *
+ * @param ing A reference to the IngredientsType - mainly the system
+ */
+template <class IngredientsType>
+void MoveLocalBcc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir)
+{
+  this->resetProbability();
+  
+  //draw index
+  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+    this->setIndex( index );
+  else
+    throw std::runtime_error("MoveLocalBcc::init(ing, index, dir): index out of range!");
+  
+  //set direction
+  if( (dir.getX()==1 || dir.getX()==-1 ) &&
+    (dir.getY()==1 || dir.getY()==-1 ) &&
+    (dir.getZ()==1 || dir.getZ()==-1 )  )
+    this->setDir(dir);
+  else
+    throw std::runtime_error("MoveLocalBcc::init(ing, index, dir): direction vector out of range!");
 
 }
 

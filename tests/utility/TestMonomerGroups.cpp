@@ -85,7 +85,7 @@ TEST(MonomerGroups, DifferentGroupTypes)
   GroupList connectedObjectsList;
   GroupList linearStrandsList;
   // fills list of groups with connected objects, which belong to a linear strand (including ends)
-  fill_connected_groups( ingredients.getMolecules(), linearStrandsList,    Group(), belongsToLinearStrand() ); 
+  fill_connected_groups( ingredients.getMolecules(), linearStrandsList, Group(), belongsToLinearStrand() ); 
   
   // vector-based groups:
   typedef vector < MonomerGroup<MyIngredients::molecules_type> > MonomerGroupVector;
@@ -93,7 +93,7 @@ TEST(MonomerGroups, DifferentGroupTypes)
 
   fill_connected_groups( ingredients.getMolecules(), 
 			linearStrandsVector,  
-			MonomerGroup<MyIngredients::molecules_type>(&ingredients.getMolecules()), 
+			MonomerGroup<MyIngredients::molecules_type>(ingredients.getMolecules()), 
 			belongsToLinearStrand() );
 
   //now check that the two groups are the same (subgroups have same size)
@@ -133,7 +133,7 @@ TEST(MonomerGroups, CopyGroup)
 	myIngredients.modifyMolecules().connect(0,2,100);
 	
 	//now open a group
-	MonomerGroup<Ing::molecules_type> myGroup(&(myIngredients.getMolecules()));
+	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
 	myGroup.push_back(0);
 	myGroup.push_back(1);
@@ -196,7 +196,7 @@ TEST(MonomerGroups, ClearGroup)
 	myIngredients.modifyMolecules().connect(0,2,100);
 	
 	//now open a group
-	MonomerGroup<Ing::molecules_type> myGroup(&(myIngredients.getMolecules()));
+	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
 	myGroup.push_back(0);
 	myGroup.push_back(1);
@@ -252,7 +252,7 @@ TEST(MonomerGroups, Erase)
 	myIngredients.modifyMolecules().connect(0,2,100);
 	
 	//now open a group
-	MonomerGroup<Ing::molecules_type> myGroup(&(myIngredients.getMolecules()));
+	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
 	myGroup.push_back(0);
 	myGroup.push_back(1);
@@ -312,7 +312,7 @@ TEST(MonomerGroups, RemoveFromGroup)
 	myIngredients.modifyMolecules().connect(0,2,100);
 	
 	//now open a group
-	MonomerGroup<Ing::molecules_type> myGroup(&(myIngredients.getMolecules()));
+	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
 	myGroup.push_back(0);
 	myGroup.push_back(1);

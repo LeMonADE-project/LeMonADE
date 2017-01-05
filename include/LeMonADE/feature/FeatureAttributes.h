@@ -34,7 +34,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/io/AbstractWrite.h>
 #include <LeMonADE/io/FileImport.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerBase.h>
 
 /**
  * @file
@@ -127,9 +127,9 @@ public:
   template<class IngredientsType> 
     void applyMove(IngredientsType& ing, const MoveBase& move){};
 
-  //! Overloaded for moves of type MoveAddScMonomer to set the attribute tag by inserting a monomer
-  template<class IngredientsType> 
-    void applyMove(IngredientsType& ing, const MoveAddScMonomer& move);
+  //! Overloaded for moves of type MoveAddMonomerBase to set the attribute tag by inserting a monomer
+  template<class IngredientsType,class AddMoveType> 
+    void applyMove(IngredientsType& ing, const MoveAddMonomerBase<AddMoveType>& move);
 
 };
 
@@ -178,12 +178,12 @@ void FeatureAttributes::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fil
  * This function updates the attribute tag given by move itself (most cases Zero).
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move Add monomer scBFM-move.
+ * @param [in] move general addmove (MoveAddScMonomer/MoveAddBccMonomer)
  */
-template<class IngredientsType> 
-void FeatureAttributes::applyMove(IngredientsType& ingredients, const MoveAddScMonomer& move)
+template<class IngredientsType,class AddMoveType> 
+void FeatureAttributes::applyMove(IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType>& move)
 {
-	ingredients.modifyMolecules()[move.getParticleIndex()].setAttributeTag(move.getType());
+	ingredients.modifyMolecules()[move.getMonomerIndex()].setAttributeTag(move.getTag());
 }
 
 
