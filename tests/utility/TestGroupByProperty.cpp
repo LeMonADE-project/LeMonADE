@@ -102,7 +102,7 @@ TEST(GroupByPropertyTest,CreateGroups)
   //to demonstrate that this works just as well. 
   
   std::vector<MonomerGroup < Molecules <VectorInt3> > > zCoordinateGroups;
-  group_by_property(molecules,zCoordinateGroups,MonomerGroup<Molecules<VectorInt3> >(&molecules),ZCoordinate());
+  group_by_property(molecules,zCoordinateGroups,MonomerGroup<Molecules<VectorInt3> >(molecules),ZCoordinate());
   
   //now check if the monomers are correctly sorted into groups
   //start with the connectivityGroups

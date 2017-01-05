@@ -42,7 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/feature/FeatureBondset.h>
 #include <LeMonADE/feature/FeatureBox.h>
-#include <LeMonADE/feature/FeatureExcludedVolume.h>
+#include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/core/ConfigureSystem.h>
 
@@ -105,7 +105,7 @@ TEST(IngredientsTest, synchronize_noargument){
 	typedef ConfigureSystem<VectorInt3,Features1,3> Config1;
 	typedef Ingredients < Config1> MyIngredients1;
 	
-	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolume<>) Features2;
+	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolumeSc<>) Features2;
 	typedef ConfigureSystem<VectorInt3,Features1,3> Config2;
 	typedef Ingredients < Config2> MyIngredients2;
 	
@@ -190,7 +190,7 @@ TEST(IngredientsTest, synchronize_withargument){
 	typedef ConfigureSystem<VectorInt3,Features1,3> Config1;
 	typedef Ingredients < Config1> MyIngredients1;
 	
-	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolume<>) Features2;
+	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolumeSc<>) Features2;
 	typedef ConfigureSystem<VectorInt3,Features1,3> Config2;
 	typedef Ingredients < Config2> MyIngredients2;
 	
