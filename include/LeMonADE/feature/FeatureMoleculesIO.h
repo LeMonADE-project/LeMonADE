@@ -28,6 +28,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LEMONADE_FEATURE_FEATUREMOLECULESIO_H
 #define LEMONADE_FEATURE_FEATUREMOLECULESIO_H
 
+#include<stdint.h>
+
 #include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
 #include <LeMonADE/core/MoleculesWrite.h>
 #include <LeMonADE/core/MoleculesRead.h>
