@@ -10,7 +10,7 @@
 #include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
 #include <LeMonADE/feature/FeatureNNInteractionBcc.h>
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
-#include <LeMonADE/updater/moves/MoveAddBccMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerBcc.h>
 
 using namespace std;
 
@@ -1046,7 +1046,7 @@ TEST_F(NNInteractionBccTest,Synchronize)
 
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
     molecules1.resize(2);
-    molecules1[0].setAllCoordinates(9,10,10);
+    molecules1[0].setAllCoordinates(9,9,9);
     molecules1[1].setAllCoordinates(1,1,1);
     molecules1[0].setAttributeTag(1);
     molecules1[1].setAttributeTag(2);
@@ -1063,7 +1063,7 @@ TEST_F(NNInteractionBccTest,Synchronize)
             {
                 //get the lattice entry
                 pos.setAllCoordinates(x,y,z);
-                if(pos==VectorInt3(9,10,10))
+                if(pos==VectorInt3(9,9,9))
                     EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
                 else if(pos==VectorInt3(1,1,1))
                     EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
@@ -1107,7 +1107,7 @@ TEST_F(NNInteractionBccTest,ReadWrite)
 
     typename Ing1::molecules_type& molecules1=myIngredients.modifyMolecules();
     molecules1.resize(2);
-    molecules1[0].setAllCoordinates(9,10,10);
+    molecules1[0].setAllCoordinates(9,9,9);
     molecules1[1].setAllCoordinates(1,1,1);
     molecules1[0].setAttributeTag(1);
     molecules1[1].setAttributeTag(2);
@@ -1139,7 +1139,7 @@ TEST_F(NNInteractionBccTest,ReadWrite)
 }
 
 
-TEST_F(NNInteractionBccTest,ApplyMoveAddBccMonomer)
+TEST_F(NNInteractionBccTest,ApplyMoveAddMonomerBcc)
 {
     typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionBcc<FeatureLattice>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
@@ -1158,33 +1158,33 @@ TEST_F(NNInteractionBccTest,ApplyMoveAddBccMonomer)
     
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
     
-    MoveAddBccMonomer addMonomer;
+    MoveAddMonomerBcc addMonomer;
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(256);
+    addMonomer.setTag(256);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(0);
+    addMonomer.setTag(0);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(-1);
+    addMonomer.setTag(-1);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(2);
+    addMonomer.setTag(2);
     addMonomer.apply(myIngredients1);
     
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,6,7));
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(255);
+    addMonomer.setTag(255);
     addMonomer.apply(myIngredients1);
     
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,6,7)));

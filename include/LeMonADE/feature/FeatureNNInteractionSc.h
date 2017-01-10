@@ -109,7 +109,7 @@ public:
   //FeatureExcludedVolumeSc needs to be in front, because FeatureNNInteractionSc
   //re-initializes the lattice and overwrites what FeatureExcludedVolumeSc has written.
   //FeatureAttributes needs to be in front, because when a monomer is added to the system
-  //by a MoveAddScMonomer, its attribute has to be set before it is written to the lattice.
+  //by a MoveAddMonomerSc, its attribute has to be set before it is written to the lattice.
   typedef LOKI_TYPELIST_2(
       FeatureAttributes,
       FeatureExcludedVolumeSc<FeatureLatticeType<lattice_value_type> >) 
@@ -138,7 +138,7 @@ public:
 
   //! apply function for adding a monomer in sc-BFM
   template<class IngredientsType>
-    void applyMove(IngredientsType& ing, const MoveAddScMonomer& move);
+    void applyMove(IngredientsType& ing, const MoveAddMonomerSc& move);
 
   //note: apply function for sc-BFM local move is not necessary, because 
   //job of moving lattice entries is done by the underlying FeatureLatticeType
@@ -249,27 +249,27 @@ bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& 
  * of this.
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move Monte Carlo move of type MoveAddScMonomer
+ * @param [in] move Monte Carlo move of type MoveAddMonomerSc
  * @throw std::runtime_error if attribute tag is not in range [1,255]
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing, 
-							 const MoveAddScMonomer& move)
+							 const MoveAddMonomerSc& move)
 {
     //get the position and attribute tag of the monomer to be inserted
     VectorInt3 pos=move.getPosition();
     VectorInt3 dx(1,0,0);
     VectorInt3 dy(0,1,0);
     VectorInt3 dz(0,0,1);
-    lattice_value_type type=lattice_value_type(move.getType());
+    lattice_value_type type=lattice_value_type(move.getTag());
 
     //the feature is based on a uint8_t lattice, thus the max type must not
     //exceed the max value of uint8_t (255)
-    if(int32_t(type) != move.getType() || int32_t(type)==0)
+    if(int32_t(type) != move.getTag() || int32_t(type)==0)
       {
 	std::stringstream errormessage;
-	errormessage<<"FeatureNNInteractionSc::applyMove(MoveAddScMonomer)\n";
+	errormessage<<"FeatureNNInteractionSc::applyMove(MoveAddMonomerSc)\n";
 	errormessage<<"Trying to add monomer with type "<<int32_t(type)<<">maxType=255\n";
 	throw std::runtime_error(errormessage.str());
       }

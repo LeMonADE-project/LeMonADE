@@ -10,7 +10,7 @@
 #include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
 #include <LeMonADE/feature/FeatureNNInteractionSc.h>
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 using namespace std;
 
@@ -2302,7 +2302,7 @@ TEST_F(NNInteractionScTest,ReadWrite)
 }
 
 
-TEST_F(NNInteractionScTest,ApplyMoveAddScMonomer)
+TEST_F(NNInteractionScTest,ApplyMoveAddMonomerSc)
 {
     typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc<FeatureLattice>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
@@ -2321,26 +2321,26 @@ TEST_F(NNInteractionScTest,ApplyMoveAddScMonomer)
     
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
     
-    MoveAddScMonomer addMonomer;
+    MoveAddMonomerSc addMonomer;
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(256);
+    addMonomer.setTag(256);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(0);
+    addMonomer.setTag(0);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(-1);
+    addMonomer.setTag(-1);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(2);
+    addMonomer.setTag(2);
     addMonomer.apply(myIngredients1);
     
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,6,7));
@@ -2354,7 +2354,7 @@ TEST_F(NNInteractionScTest,ApplyMoveAddScMonomer)
     
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setType(255);
+    addMonomer.setTag(255);
     addMonomer.apply(myIngredients1);
     
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,6,7)));

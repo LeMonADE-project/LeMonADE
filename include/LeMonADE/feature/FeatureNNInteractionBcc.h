@@ -35,13 +35,13 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @author Hauke Rabbel
  * @brief Definition and implementation of class template FeatureNNInteractionBcc
  * 
- * @todo MoveAddBccMonomer is used here, which might be obsolete. 
+ * @todo MoveAddMonomerBcc is used here, which might be obsolete. 
 **/
 
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBcc.h>
-#include <LeMonADE/updater/moves/MoveAddBccMonomer.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerBcc.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeBcc.h>
 #include <LeMonADE/feature/FeatureBoltzmann.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
@@ -139,7 +139,7 @@ public:
 
   //! apply function for adding a monomer in bcc-BFM
   template<class IngredientsType>
-    void applyMove(IngredientsType& ing, const MoveAddBccMonomer& move);
+    void applyMove(IngredientsType& ing, const MoveAddMonomerBcc& move);
 
   //note: apply function for bcc-BFM local move is not necessary, because 
   //job of moving lattice entries is done by the underlying FeatureLatticeType
@@ -250,24 +250,24 @@ bool FeatureNNInteractionBcc<LatticeClassType>::checkMove(const IngredientsType&
  * of this.
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move Monte Carlo move of type MoveAddBccMonomer
+ * @param [in] move Monte Carlo move of type MoveAddMonomerBcc
  * @throw std::runtime_error if attribute tag is not in range [1,255]
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureNNInteractionBcc<LatticeClassType>::applyMove(IngredientsType& ing, 
-							 const MoveAddBccMonomer& move)
+							 const MoveAddMonomerBcc& move)
 {
     //get the position and attribute tag of the monomer to be inserted
     VectorInt3 pos=move.getPosition();
-    lattice_value_type type=lattice_value_type(move.getType());
+    lattice_value_type type=lattice_value_type(move.getTag());
 
     //the feature is based on a uint8_t lattice, thus the max type must not
     //exceed the max value of uint8_t (255)
-    if(int32_t(type) != move.getType() || int32_t(type)==0)
+    if(int32_t(type) != move.getTag() || int32_t(type)==0)
       {
 	std::stringstream errormessage;
-	errormessage<<"FeatureNNInteractionBcc::applyMove(MoveAddBccMonomer)\n";
+	errormessage<<"FeatureNNInteractionBcc::applyMove(MoveAddMonomerBcc)\n";
 	errormessage<<"Trying to add monomer with type "<<int32_t(type)<<">maxType=255\n";
 	throw std::runtime_error(errormessage.str());
       }
