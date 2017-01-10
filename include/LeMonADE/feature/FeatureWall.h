@@ -36,97 +36,138 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
-//#include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/io/AbstractRead.h>
 #include <LeMonADE/io/AbstractWrite.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 
+/**
+ * @file
+ * @brief Enable arbitrary walls in the simulation box by the FeatureWall
+ * @details For the \b sc-BFM this feature can hold an arbitrary 
+ * number of walls with normal vectors (1,0,0), (0,1,0) and (0,0,1) being the
+ * unit vectors along the principal lattice directions.
+ * 
+ * @todo Enable this feature for the \b bcc-BFM.
+ * */
 
+/**
+ * @class Wall
+ * @brief class providing a single wall with definitions, setter and getter functions 
+ * */
 class Wall
 {
     
 public:
-    
+    //! standard constructor creating an empty wall
     Wall(): base(), normal() {}
     
+    //! getter function for the base vector of the wall
     const VectorInt3 getBase() const {
         return base;
     }
     
-    VectorInt3 setBase(uint32_t basX_, uint32_t basY_, uint32_t basZ_) {
-        base.setAllCoordinates(basX_,basY_,basZ_);
+    //! setter function for the base vector of the wall
+    VectorInt3 setBase(uint32_t baseX_, uint32_t baseY_, uint32_t baseZ_) {
+        base.setAllCoordinates(baseX_,baseY_,baseZ_);
     }
     
+    //! getter function for the normal vector of the wall
     const VectorInt3 getNormal() const {
         return normal;
     }
     
+    //! setter function for the normal vector of the wall
     VectorInt3 setNormal(uint32_t norX_, uint32_t norY_, uint32_t norZ_) {
+      VectorInt3 test(norX_, norY_, norZ_);
+      if(test==VectorInt3(1,0,0) || test==VectorInt3(0,1,0) || test==VectorInt3(0,0,1) ){
         normal.setAllCoordinates(norX_,norY_,norZ_);
+      }else{
+	throw std::runtime_error("normal vector should be P(1,0,0)");
+      }
     }
     
 private:
     
+    //! base vector of the wall: arbitrary position somewhere on the wall to provide a well defined wall
     VectorInt3 base;
     
+    //! normal vector of the wall: vector perpendiculat to the walls surface
     VectorInt3 normal;
     
 };
 
 
-
+/**
+ * @class FeatureWall
+ * @brief Feature holding a vector of walls. 
+ * */
 class FeatureWall: public Feature
 {
 public:
     
-    //constructor
+    //! standard constructor
     FeatureWall() {}
     
-    //destructor
+    //! standard destructor
     virtual ~FeatureWall(){}
     
-    //read and write wall in/from bfm-file
+    //! read walls from bfm file
     template<class IngredientsType> 
     void exportRead(FileImport<IngredientsType>& fileReader);
     
+    //! write walls to bfm file
     template<class IngredientsType> 
     void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
     
-    //checks if move is allowed by the Metropolis-criterion.
-	template<class IngredientsType> 
-	bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move);
+    //! check move function for local sc move
+    template<class IngredientsType> 
+    bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move);
     
+    //! check move function for add sc move
     template<class IngredientsType>
-    bool checkMove(const IngredientsType& ingredients,MoveAddScMonomer& addmove); 
+    bool checkMove(const IngredientsType& ingredients,MoveAddMonomerSc& addmove); 
     
+    //! implemantation of synchronize
     template<class IngredientsType>
     void synchronize(const IngredientsType& ingredients);
     
-    std::vector<Wall> getWalls() const
-    {
+    //! getter function for the walls container
+    std::vector<Wall> getWalls() const{
         return walls;
     }
     
-    void addWall(Wall wall)
-    {
+    /** 
+     * @brief add function to add a wall to the walls container
+     * @throw <std::runtime_error> monomer occupies a position on the walls
+     **/
+    void addWall(Wall wall){
+      if(wall.getNormal().getLength()!=0.0)
         walls.push_back(wall);
+      else
+	throw std::runtime_error("wall is not well defined: normal vector has length 0");
     }
     
-    void clearAllWalls()
-    {
+    //! empty walls container
+    void clearAllWalls(){
         walls.clear();
     }
     
     
 private:
-    
+    //! walls container
     std::vector<Wall> walls;
         
 };
 
 
-
+/*****************************************************************/
+/**
+ * @class WriteWall
+ *
+ * @brief Handles BFM-File-Write \b #!wall
+ * @tparam [in] IngredientsType Ingredients class storing all system information.
+ **/
 template <class IngredientsType>
 class WriteWall: public AbstractWrite<IngredientsType>
 {
@@ -134,8 +175,7 @@ class WriteWall: public AbstractWrite<IngredientsType>
         
         WriteWall(const IngredientsType& src):AbstractWrite<IngredientsType>(src){this->setHeaderOnly(true);}
   
-        void writeStream(std::ostream& strm)
-        {
+        void writeStream(std::ostream& strm){
             const IngredientsType& ingredients=(this->getSource());
             
             for (size_t i=0; i<ingredients.getWalls().size(); i++) {
@@ -146,7 +186,13 @@ class WriteWall: public AbstractWrite<IngredientsType>
 };
 
 
-
+/*****************************************************************/
+/**
+ * @class ReadWall
+ *
+ * @brief Handles BFM-File-Read \b #!wall
+ * @tparam [in] IngredientsType Ingredients class storing all system information.
+ **/
 template < class IngredientsType >
 class ReadWall : public ReadToDestination < IngredientsType >
 {
@@ -158,13 +204,12 @@ class ReadWall : public ReadToDestination < IngredientsType >
 };
 
 
-
-
-
-
-
-/* checkMove */
-
+/**
+ * @details checking if move is going to touch one of the walls
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move local sc move
+ */
 template<class IngredientsType>
 bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) 
 {	
@@ -191,12 +236,14 @@ bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveLocalSc& mov
 	return false;
 }
 
-
-
-/* checkMove for addmove */
-
+/**
+ * @details checking if added monomer is going to touch one of the walls
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] addmove move to add sc monomer
+ */
 template<class IngredientsType>
-bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddScMonomer& addmove)
+bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddMonomerSc& addmove)
 {	
     uint32_t counter(0);
     
@@ -221,12 +268,14 @@ bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddScMonomer
 	return false;
 }
 
-
-
-
-
-/* synchronize */
-
+/**
+ * @brief Synchronize this feature with the system given as argument
+ *
+ * @details checking all monomer positions to be not in conflict with one of the walls
+ * 
+ * @throw <std::runtime_error> monomer occupies a position on the walls
+ * @param [in] ingredients a reference to the IngredientsType - mainly the system
+ **/
 template<class IngredientsType>
 void FeatureWall::synchronize(const IngredientsType& ingredients)
 {
@@ -252,14 +301,12 @@ void FeatureWall::synchronize(const IngredientsType& ingredients)
     }
 }
 
-
-
-
-
-
-
-/* ReadWall execute() */
-
+/**
+ * @brief Executes the reading routine to extract \b #!wall.
+ *
+ * @throw <std::runtime_error> walls could not be read.
+ * @tparam IngredientsType Features used in the system. See Ingredients.
+ **/
 template < class IngredientsType >
 void ReadWall<IngredientsType>::execute()
 {
@@ -284,9 +331,16 @@ void ReadWall<IngredientsType>::execute()
 }
 
 
-
-/* exportRead wall */
-
+/**
+ * @details The function is called by the Ingredients class when an object of type Ingredients
+ * is associated with an object of type FileImport. The export of the Reads is thus
+ * taken care automatically when it becomes necessary.\n
+ * Registered Read-In Commands:
+ * * #!wall: bx by bz	nx ny nz
+ *
+ * @param fileReader File importer for the bfm-file
+ * @tparam IngredientsType Features used in the system. See Ingredients.
+ **/
 template < class IngredientsType >
 void FeatureWall::exportRead(FileImport<IngredientsType>& fileReader)
 {
@@ -294,17 +348,21 @@ void FeatureWall::exportRead(FileImport<IngredientsType>& fileReader)
     fileReader.registerRead("#!wall:", new  ReadWall< IngredientsType > (destination));
 }
 
-
-
-/* exportWrite wall */
-
+/**
+ * The function is called by the Ingredients class when an object of type Ingredients
+ * is associated with an object of type AnalyzerWriteBfmFile. The export of the Writes is thus
+ * taken care automatically when it becomes necessary.\n
+ * Registered Write-Out Commands:
+ * * #!wall: bx by bz	nx ny nz
+ *
+ * @param fileWriter File writer for the bfm-file.
+ * @tparam IngredientsType Features used in the system. See Ingredients.
+ */
 template < class IngredientsType >
 void FeatureWall::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const
 {
     const IngredientsType& source=fileWriter.getIngredients_();
     fileWriter.registerWrite("#!wall:", new WriteWall <IngredientsType> (source));
 }
-
-
 
 #endif //LEMONADE_FEATURE_WALL_H

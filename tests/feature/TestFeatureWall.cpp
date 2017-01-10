@@ -39,10 +39,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
-#include <LeMonADE/updater/moves/MoveAddScMonomer.h>
-//#include <LeMonADE/updater/moves/MoveLocalBcc.h>
-//#include <LeMonADE/updater/moves/MoveAddBccMonomer.h>
-
+#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 
 class TestFeatureWall: public ::testing::Test{
@@ -85,7 +82,7 @@ TEST(TestFeatureWall,Moves)
     
     //one move of every type
     MoveLocalSc scmove;
-    MoveAddScMonomer addmove;
+    MoveAddMonomerSc addmove;
     
     ingredients.modifyMolecules().resize(3);
     ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
@@ -95,11 +92,17 @@ TEST(TestFeatureWall,Moves)
     EXPECT_NO_THROW(ingredients.synchronize(ingredients));
     
     
+    
     //************  scmove  ***************
     
     //build wall in y-z-plane at x=2 -> x=1 should be forbidden
     Wall wall1;
     wall1.setBase(2,0,0);
+    // check forbidden nomal vector: must be a unit vector! P(1,0,0)
+    EXPECT_ANY_THROW(wall1.setNormal(2,0,0));
+    EXPECT_ANY_THROW(wall1.setNormal(0,1,1));
+    
+    //add correct normal vector
     wall1.setNormal(1,0,0);
     ingredients.addWall(wall1);
 /*    
@@ -129,8 +132,6 @@ TEST(TestFeatureWall,Moves)
     //check possible monomer 2 movements
     while((scmove.getDir().getX()==-1) || (scmove.getIndex()!=2)) scmove.init(ingredients);
     EXPECT_TRUE(ingredients.checkMove(ingredients,scmove));
-    
-    
     
     //build additional wall in x-z-plane at y=2 -> x=1 and y=1 should be forbidden now
     Wall wall2;
