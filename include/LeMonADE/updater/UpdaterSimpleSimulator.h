@@ -31,10 +31,6 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/AbstractUpdater.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
 
-//simple simulation updater. takes the type of move as template 
-//argument and the number of mcs to be executed as argument for the 
-//constructor
-
 /**
  * @file
  *
@@ -45,10 +41,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @details It takes the type of move as template argument MoveType
  * and the number of mcs to be executed as argument for the constructor
  *
- * @todo remove IngredientsUpdater and use AbstractUpdater
- *
  * @tparam IngredientsType Ingredients class storing all system information( e.g. monomers, bonds, etc).
- * @tparam <MoveType> name of the specialized move.
+ * @tparam MoveType name of the specialized move.
  */
 template<class IngredientsType,class MoveType>
 class UpdaterSimpleSimulator:public AbstractUpdater

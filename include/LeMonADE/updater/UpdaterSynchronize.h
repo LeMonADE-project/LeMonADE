@@ -41,7 +41,12 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 template <class IngredientsType> class UpdaterSynchronize: public AbstractUpdater
 {
 public:
+	/** 
+	 * @brief constructor passing the ingredients reference to the updater
+	 **/
 	UpdaterSynchronize( IngredientsType& ing):ingredients(ing){};
+	
+	//! execute function performing the synchronize
 	bool execute();
 
 	  /**
@@ -68,6 +73,11 @@ private:
 
 };
 
+/** 
+ * @details the synchronize function is applied to ingredients
+ * 
+ * @return always returns \b true
+ **/
 template <class IngredientsType>
 bool UpdaterSynchronize<IngredientsType>::execute()
 {
