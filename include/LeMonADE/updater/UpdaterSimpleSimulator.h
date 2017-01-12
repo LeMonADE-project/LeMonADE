@@ -51,7 +51,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @tparam <MoveType> name of the specialized move.
  */
 template<class IngredientsType,class MoveType>
-class UpdaterSimpleSimulator:public IngredientsUpdater<IngredientsType>
+class UpdaterSimpleSimulator:public AbstractUpdater
 {
 
 public:
@@ -62,7 +62,7 @@ public:
    * @param steps MCS per cycle to performed by execute()
    */
   UpdaterSimpleSimulator(IngredientsType& ing,uint32_t steps)
-  :IngredientsUpdater<IngredientsType>(ing),nsteps(steps)
+  :ingredients(ing),nsteps(steps)
   {}
   
   /**
@@ -77,26 +77,26 @@ public:
   bool execute()
   {
 	time_t startTimer = time(NULL); //in seconds
-	std::cout<<"mcs "<<this->getIngredients().getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) <<std::endl;
+	std::cout<<"mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) <<std::endl;
 
     for(int n=0;n<nsteps;n++){
       
-	for(int m=0;m<this->getIngredients().getMolecules().size();m++)
+	for(int m=0;m<ingredients.getMolecules().size();m++)
 	{
-		move.init(this->getIngredients());
+		move.init(ingredients);
 		
-		if(move.check(this->getIngredients())==true)
+		if(move.check(ingredients)==true)
 		{
-			move.apply(this->getIngredients());
+			move.apply(ingredients);
 		}
 	}
       
     }
     
-    this->getIngredients().modifyMolecules().setAge(this->getIngredients().modifyMolecules().getAge()+nsteps);
+    ingredients.modifyMolecules().setAge(ingredients.modifyMolecules().getAge()+nsteps);
     
-    std::cout<<"mcs "<<this->getIngredients().getMolecules().getAge() << " with " << (((1.0*nsteps)*this->getIngredients().getMolecules().size())/(difftime(time(NULL), startTimer)) ) << " [attempted moves/s]" <<std::endl;
-    std::cout<<"mcs "<<this->getIngredients().getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) << " with " << nsteps << " MCS "<<std::endl;
+    std::cout<<"mcs "<<ingredients.getMolecules().getAge() << " with " << (((1.0*nsteps)*ingredients.getMolecules().size())/(difftime(time(NULL), startTimer)) ) << " [attempted moves/s]" <<std::endl;
+    std::cout<<"mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) << " with " << nsteps << " MCS "<<std::endl;
 
     return true;
   }
@@ -120,6 +120,9 @@ public:
   virtual void cleanup(){};
 
 private:
+  //! A reference to the IngredientsType - mainly the system
+  IngredientsType& ingredients;
+  
   //! Specialized move to be used
   MoveType move;
 
