@@ -35,7 +35,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @brief abstract updater to create systems
  * 
- * @details This abstract class provides the three basic functions to create systems: add a single monomer, add a connected monomer and move the system to find some free space
+ * @details This abstract class provides the three basic functions to create systems: add a single monomer, add a connected monomer and move the system to find some free space. 
+ * This Updater requires FeatureAttributes.
  *
  * @tparam IngredientsType
  *
@@ -45,6 +46,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/MonomerGroup.h>
 #include <LeMonADE/utility/DepthIterator.h>
 #include <LeMonADE/utility/Vector3D.h>
+#include <LeMonADE/updater/MoveAddMonomerSc.h>
 
 template<class IngredientsType>
 class UpdaterAbstractCreate:public AbstractUpdater
