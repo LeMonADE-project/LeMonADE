@@ -154,7 +154,12 @@ bool UpdaterAddLinearChains<IngredientsType>::execute(){
   }else{
     std::cout << "real lattice occupation density =" << (8*ingredients.getMolecules().size()) / lattice_volume<<std::endl;
     wasExecuted=true;
-    linearizeSystem();
+    // if we added single monomers (solvent) compress solvent
+    if(NMonoPerChain==1){
+      ingredients.setCompressedOutputIndices(ingredients.getMolecules().size()-1-(NMonoPerChain*NChain),ingredients.getMolecules().size()-1);
+    }else{
+      linearizeSystem();
+    }
     return true;
   }
 }
