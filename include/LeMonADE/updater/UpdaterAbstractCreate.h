@@ -46,7 +46,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/MonomerGroup.h>
 #include <LeMonADE/utility/DepthIterator.h>
 #include <LeMonADE/utility/Vector3D.h>
-#include <LeMonADE/updater/MoveAddMonomerSc.h>
+#include <LeMonADE/updater/moves/MoveLocalSc.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 template<class IngredientsType>
 class UpdaterAbstractCreate:public AbstractUpdater
