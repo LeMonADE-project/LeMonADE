@@ -34,7 +34,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * */
 /*****************************************************************************/
 /**
- * @class Move
+ * @class MoveBase
  *
  * @brief Base class for any types of moves inside the simulation.
  *
