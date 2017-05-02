@@ -53,9 +53,27 @@ using namespace std;
  * */
 /*****************************************************************************/
 class FeatureBoltzmannTest: public ::testing::Test{
-  
-  /* suppress cout output for better readability -->un/comment here:*/    
+      
 public:
+
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+	 
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+	 
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
+  
+  /* suppress cout output for better readability -->un/comment here:*/
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
@@ -79,7 +97,7 @@ private:
 /*****************************************************************************/
 TEST_F(FeatureBoltzmannTest, CheckMove)
 {
-  MoveBase testmove;
+  UnknownMove testmove;
   FeatureBoltzmann feature;
   //setting move probability to one and try several times if checkMove returns true as expected
   testmove.resetProbability();

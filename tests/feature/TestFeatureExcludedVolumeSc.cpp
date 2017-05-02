@@ -37,6 +37,22 @@ using namespace std;
 
 class TestFeatureExcludedVolumeSc: public ::testing::Test{
 public:
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+	 
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+	 
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
   
   //redirect cout output
   virtual void SetUp(){
@@ -72,7 +88,7 @@ TEST_F(TestFeatureExcludedVolumeSc,Moves)
     ingredients.setPeriodicZ(1);
     
     //one move of every type
-    MoveBase basemove;
+    UnknownMove basemove;
     MoveLocalSc scmove;
     MoveAddMonomerSc addmove;
     

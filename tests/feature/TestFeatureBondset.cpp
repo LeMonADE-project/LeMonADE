@@ -61,6 +61,23 @@ public:
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> Ing;
   
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+	 
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+	 
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
+  
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
@@ -137,7 +154,7 @@ TEST_F(FeatureBondsetTest, ExportRead){
 /***********************************************************************/
 TEST_F(FeatureBondsetTest,checkUnknownMove)
 {
-	MoveBase someMove;
+	UnknownMove someMove;
 	FeatureBondset<> feature;
 	EXPECT_TRUE(someMove.check(feature));
 }
