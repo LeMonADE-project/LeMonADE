@@ -78,27 +78,5 @@ public:
   virtual void cleanup() = 0;
 };
 
-/**
- * @class IngredientsUpdater
- *
- * @brief Generic base class for all Updater that dealing with Ingredients.
- *
- * @deprecated
- *
- * @todo remove IngredientsUpdater from the LeMonADe-project
- **/
-template < class IngredientsType > class IngredientsUpdater: public AbstractUpdater
-{
-protected:
-  IngredientsType& ingredients;
-  IngredientsType& getIngredients() {return ingredients;}
-public:
-  
-  IngredientsUpdater(IngredientsType& val):ingredients(val){}
-  virtual ~IngredientsUpdater(){}
-  
-};
-
-
 
 #endif /* LEMONADE_UPDATER_ABSTRACTUPDATER_H */
