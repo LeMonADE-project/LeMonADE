@@ -85,7 +85,14 @@ This can be found in the documentation.
     cmake ..
     make docs
 ```
-    
+## References
+
+This library has been used in the following publications (without guarantee for completeness)
+* C. Jentzsch, J.U. Sommer, J. Chem. Phys. 10, 104908 (2014)    
+* H. Rabbel, M. Werner, J.-U. Sommer, Macromolecules 48, 4724-4732 (2015)
+* M. Lang, M. Werner, R. Dockhorn, T. Kreer, Macromolecules 49, 5190-5201 (2016)
+* M. Wengenmayr, R. Dockhorn, J.-U. Sommer, Macromolecules 49, 9215-9227 (2016)
+
 ## License
 
 See the LICENSE in the root directory.
