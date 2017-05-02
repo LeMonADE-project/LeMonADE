@@ -84,7 +84,12 @@ TEST_F(TestUpdaterAddLinearChains, Constructor)
   IngredientsType ingredients;
   
   //Constructor call
-  EXPECT_NO_THROW(UpdaterAddLinearChains<IngredientsType> Timmy(ingredients,1,2));
+  UpdaterAddLinearChains<IngredientsType> Timmy(ingredients,1,2);
+  //check initialisation list
+  EXPECT_FALSE(Timmy.getIsSolvent());
+  EXPECT_EQ(2,Timmy.getNMonomerPerChain());
+  EXPECT_EQ(1,Timmy.getNChain());
+  EXPECT_DOUBLE_EQ(0.0,Timmy.getDensity());
 }
 
 TEST_F(TestUpdaterAddLinearChains, TestUpdater)
@@ -105,8 +110,11 @@ TEST_F(TestUpdaterAddLinearChains, TestUpdater)
   
   UpdaterAddLinearChains<IngredientsType> Tommy(ingredients, 4, 16);
   
-  // first execution
+   // first execution
+  EXPECT_NO_THROW(Tommy.initialize());
+  //repeat execution, should not do anything
   EXPECT_TRUE(Tommy.execute());
+  
   EXPECT_NO_THROW(ingredients.synchronize());
   EXPECT_EQ((4*16),ingredients.getMolecules().size());
   // check (default) monomer taggs
@@ -144,9 +152,12 @@ TEST_F(TestUpdaterAddLinearChains, TestCompressedSolvent)
   ingredients.modifyBondset().addBFMclassicBondset();
   EXPECT_NO_THROW(ingredients.synchronize());
   
+  // add some chains longer than 1 but allow solvent compression
   UpdaterAddLinearChains<IngredientsType> Tommy_1(ingredients, 4, 16, 3, 4, true);
   
   // first execution
+  EXPECT_NO_THROW(Tommy_1.initialize());
+  //repeat execution, should not do anything
   EXPECT_TRUE(Tommy_1.execute());
   EXPECT_NO_THROW(ingredients.synchronize());
   EXPECT_EQ((4*16),ingredients.getMolecules().size());
@@ -164,10 +175,12 @@ TEST_F(TestUpdaterAddLinearChains, TestCompressedSolvent)
   EXPECT_NO_THROW(Tommy_2.initialize());
   EXPECT_TRUE(Tommy_2.execute());
   
+  // use tags to check the new monomers
   EXPECT_EQ((5*16),ingredients.getMolecules().size());
   EXPECT_EQ(5,ingredients.getMolecules()[64].getAttributeTag());
   EXPECT_EQ(5,ingredients.getMolecules()[79].getAttributeTag());
   
+  // get map of indizees size and index range
   EXPECT_EQ(1,ingredients.getCompressedOutputIndices().size());
   EXPECT_EQ(64,ingredients.getCompressedOutputIndices().begin()->first);
   EXPECT_EQ(79,ingredients.getCompressedOutputIndices().begin()->second);
@@ -177,11 +190,12 @@ TEST_F(TestUpdaterAddLinearChains, TestCompressedSolvent)
   EXPECT_NO_THROW(Tommy_3.initialize());
   EXPECT_TRUE(Tommy_3.execute());
   
+  // use tags to check the new monomers
   EXPECT_EQ((6*16),ingredients.getMolecules().size());
   EXPECT_EQ(6,ingredients.getMolecules()[80].getAttributeTag());
   EXPECT_EQ(6,ingredients.getMolecules()[95].getAttributeTag());
   
-  // same number of compressed monomers
+  // same number of compressed monomers as before
   EXPECT_EQ(1,ingredients.getCompressedOutputIndices().size());
   EXPECT_EQ(64,ingredients.getCompressedOutputIndices().begin()->first);
   EXPECT_EQ(79,ingredients.getCompressedOutputIndices().begin()->second);
