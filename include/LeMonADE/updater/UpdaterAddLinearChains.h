@@ -57,11 +57,20 @@ class UpdaterAddLinearChains: public UpdaterAbstractCreate<IngredientsType>
   typedef UpdaterAbstractCreate<IngredientsType> BaseClass;
   
 public:
-  UpdaterAddLinearChains(IngredientsType& ingredients_, uint32_t NChain_, uint32_t NMonoPerChain_, int32_t type1_=1, int32_t type2_=2);
+  UpdaterAddLinearChains(IngredientsType& ingredients_, uint32_t NChain_, uint32_t NMonoPerChain_, int32_t type1_=1, int32_t type2_=2, bool IsSolvent=false);
   
   virtual void initialize();
   virtual bool execute();
   virtual void cleanup();
+  
+  //! getter function for write compressed solvent bool 
+  const bool getIsSolvent() const {return IsSolvent;}
+  
+  //! getter function for number of monomers in chains
+  const int32_t getNMonomerPerChain() const {return NMonoPerChain;}
+  
+  //! getter function for number of chains
+  const int32_t getNChain() const {return NChain;}
   
 private:
   // provide access to functions of UpdaterAbstractCreate used in this updater
@@ -73,7 +82,7 @@ private:
   //! number of monomers in a chain
   uint32_t NMonoPerChain;
   
-  //!number of linear chains in the box
+  //! number of linear chains in the box
   uint32_t NChain;
   
   //! lattice occupation density
@@ -85,9 +94,11 @@ private:
   //! attribute tag of even monomers
   int32_t type1;
   
-  //!getAttributeTag of odd monomers
+  //! getAttributeTag of odd monomers
   int32_t type2;
   
+  //! bool to check if chains of size 1 should be compressed to solvent
+  bool IsSolvent;
 };
 
 /** 
@@ -98,9 +109,9 @@ private:
 * @param NMonoPerChain_ number of monomers in one chain
 */
 template < class IngredientsType >
-UpdaterAddLinearChains<IngredientsType>::UpdaterAddLinearChains(IngredientsType& ingredients_, uint32_t NChain_, uint32_t NMonoPerChain_, int32_t type1_, int32_t type2_):
+UpdaterAddLinearChains<IngredientsType>::UpdaterAddLinearChains(IngredientsType& ingredients_, uint32_t NChain_, uint32_t NMonoPerChain_, int32_t type1_, int32_t type2_, bool IsSolvent_):
 BaseClass(ingredients_), NChain(NChain_), NMonoPerChain(NMonoPerChain_), density(0), wasExecuted(false),
-type1(type1_), type2(type2_)
+type1(type1_), type2(type2_), IsSolvent(IsSolvent_)
 {}
 
 /**
@@ -155,8 +166,8 @@ bool UpdaterAddLinearChains<IngredientsType>::execute(){
     std::cout << "real lattice occupation density =" << (8*ingredients.getMolecules().size()) / lattice_volume<<std::endl;
     wasExecuted=true;
     // if we added single monomers (solvent) compress solvent
-    if(NMonoPerChain==1){
-      ingredients.setCompressedOutputIndices(ingredients.getMolecules().size()-1-(NMonoPerChain*NChain),ingredients.getMolecules().size()-1);
+    if(IsSolvent && NMonoPerChain==1){
+      ingredients.setCompressedOutputIndices(ingredients.getMolecules().size()-(NMonoPerChain*NChain),ingredients.getMolecules().size()-1);
     }else{
       linearizeSystem();
     }

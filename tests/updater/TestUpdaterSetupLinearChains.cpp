@@ -128,3 +128,62 @@ TEST_F(TestUpdaterAddLinearChains, TestUpdater)
   
 }
 
+TEST_F(TestUpdaterAddLinearChains, TestCompressedSolvent)
+{
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes) Features;
+  typedef ConfigureSystem<VectorInt3,Features> Config;
+  typedef Ingredients<Config> IngredientsType;
+  
+  IngredientsType ingredients;
+  ingredients.setBoxX(16);
+  ingredients.setBoxY(16);
+  ingredients.setBoxZ(16);
+  ingredients.setPeriodicX(true);
+  ingredients.setPeriodicY(true);
+  ingredients.setPeriodicZ(true);
+  ingredients.modifyBondset().addBFMclassicBondset();
+  EXPECT_NO_THROW(ingredients.synchronize());
+  
+  UpdaterAddLinearChains<IngredientsType> Tommy_1(ingredients, 4, 16, 3, 4, true);
+  
+  // first execution
+  EXPECT_TRUE(Tommy_1.execute());
+  EXPECT_NO_THROW(ingredients.synchronize());
+  EXPECT_EQ((4*16),ingredients.getMolecules().size());
+  // check explicitly set  monomer taggs
+  EXPECT_EQ(3,ingredients.getMolecules()[0].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[1].getAttributeTag());
+  EXPECT_EQ(3,ingredients.getMolecules()[2].getAttributeTag());
+  EXPECT_EQ(4,ingredients.getMolecules()[15].getAttributeTag());
+  
+  // expect no compressed solvent monomers (no chains of length 1)
+  EXPECT_EQ(0,ingredients.getCompressedOutputIndices().size());
+  
+  // add some single monomers to same ingredients and try to compress
+  UpdaterAddLinearChains<IngredientsType> Tommy_2(ingredients, 16, 1, 5, 5, true);
+  EXPECT_NO_THROW(Tommy_2.initialize());
+  EXPECT_TRUE(Tommy_2.execute());
+  
+  EXPECT_EQ((5*16),ingredients.getMolecules().size());
+  EXPECT_EQ(5,ingredients.getMolecules()[64].getAttributeTag());
+  EXPECT_EQ(5,ingredients.getMolecules()[79].getAttributeTag());
+  
+  EXPECT_EQ(1,ingredients.getCompressedOutputIndices().size());
+  EXPECT_EQ(64,ingredients.getCompressedOutputIndices().begin()->first);
+  EXPECT_EQ(79,ingredients.getCompressedOutputIndices().begin()->second);
+  
+  // add some more single monomers to same ingredients but do not compress
+  UpdaterAddLinearChains<IngredientsType> Tommy_3(ingredients, 16, 1, 6, 6, false);
+  EXPECT_NO_THROW(Tommy_3.initialize());
+  EXPECT_TRUE(Tommy_3.execute());
+  
+  EXPECT_EQ((6*16),ingredients.getMolecules().size());
+  EXPECT_EQ(6,ingredients.getMolecules()[80].getAttributeTag());
+  EXPECT_EQ(6,ingredients.getMolecules()[95].getAttributeTag());
+  
+  // same number of compressed monomers
+  EXPECT_EQ(1,ingredients.getCompressedOutputIndices().size());
+  EXPECT_EQ(64,ingredients.getCompressedOutputIndices().begin()->first);
+  EXPECT_EQ(79,ingredients.getCompressedOutputIndices().begin()->second);
+}
+
