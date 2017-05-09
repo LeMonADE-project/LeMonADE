@@ -108,7 +108,7 @@ template <class IngredientsType, class DepthIteratorPredicate>
 AnalyzerWriteBfmFileSubGroup<IngredientsType, DepthIteratorPredicate>::
 AnalyzerWriteBfmFileSubGroup(const std::string& filename, const IngredientsType& ing, int writeType,DepthIteratorPredicate pred)
 :AnalyzerWriteBfmFile<IngredientsType>(filename,ingredients,writeType)
-,ingredientsAllData(ing),predicate(pred),subgroup(&ing.getMolecules())
+,ingredientsAllData(ing),predicate(pred),subgroup(ing.getMolecules())
 ,alwaysReindexGroups(false)
 {
 	
