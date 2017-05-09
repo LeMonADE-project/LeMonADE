@@ -387,7 +387,7 @@ bool AnalyzerWriteBfmFile<IngredientsType>::execute(){
   }
   //if an !mcs was part of the write objects, write it now
   //the !mcs must always be written last in each step
-  mcsCommand->writeStream(file);
+  if(mcsCommand!=0) mcsCommand->writeStream(file);
   mcsCommand=0;
   return true;	
 	
