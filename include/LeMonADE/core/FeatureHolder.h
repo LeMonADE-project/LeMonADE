@@ -105,6 +105,8 @@ public:
 	Feature::printMetaData(stream);
 	//print meta data of the rest of the features
 	Base   ::printMetaData(stream);
+	//free memory
+	free(demangled);
   }
 
   /**
