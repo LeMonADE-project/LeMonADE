@@ -204,7 +204,7 @@ class FeatureBondset : public Feature
        
 	 uint n = molecules.getNeighborIdx(i,j);
        // if (!bondset.isValid(molecules[n]-molecules[i]))
-	 if (!bondset.isValidStrongCheck(molecules[n]-molecules[i]))
+	 if (!bondset.isValid(molecules[n]-molecules[i]))
 	{
 	  std::ostringstream errorMessage;
 	  errorMessage << "FeatureBondset::synchronize(): Invalid bond vector between monomer " << i << " at " << molecules[i] << " and " << n << " at " <<  molecules[n] <<  ".\n";throw std::runtime_error(errorMessage.str());
