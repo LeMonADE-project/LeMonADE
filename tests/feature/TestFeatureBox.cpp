@@ -66,6 +66,24 @@ protected:
   Ing ingredients;
 
 public:  
+
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+	 
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+	 
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
+  
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
@@ -239,7 +257,7 @@ TEST_F(FeatureBoxTest, Synchronize)
 //unknown moves that derive from the class Move should be accepted
 TEST_F(FeatureBoxTest,checkUnknownMove)
 {
-	MoveBase someMove;
+	UnknownMove someMove;
 	FeatureBox feature;
 	//check pure feature
 	EXPECT_TRUE(someMove.check(feature));

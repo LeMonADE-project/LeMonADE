@@ -67,8 +67,26 @@ protected:
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> MyIngredients;
   
-  /* suppress cout output for better readability -->un-/comment here:*/    
 public:
+
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+	 
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+	 
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
+  
+  /* suppress cout output for better readability -->un-/comment here:*/    
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
@@ -177,7 +195,7 @@ TEST_F(TestFeatureFixedMonomers, CheckMove)
   MyIngredients ingredients;
   ingredients.modifyMolecules().addMonomer(1,1,1);
   
-  MoveBase move;
+  UnknownMove move;
   EXPECT_TRUE(move.check(ingredients));
   
   MoveLocalSc localmove;

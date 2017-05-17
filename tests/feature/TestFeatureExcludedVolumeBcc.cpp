@@ -36,7 +36,22 @@ using namespace std;
 
 class TestFeatureExcludedVolumeBcc: public ::testing::Test{
 public:
-  
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+	 
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+	 
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=std::cout.rdbuf();
@@ -71,7 +86,7 @@ TEST_F(TestFeatureExcludedVolumeBcc,Moves)
     ingredients.setPeriodicZ(1);
     
     //one move of every type
-    MoveBase basemove;
+    UnknownMove basemove;
     MoveLocalBcc bccmove;
     MoveAddMonomerBcc addmove;
     
