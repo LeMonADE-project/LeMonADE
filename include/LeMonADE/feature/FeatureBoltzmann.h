@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -59,18 +59,18 @@ class FeatureBoltzmann:public Feature
 public:
 	//! Default constructor (empty)
 	FeatureBoltzmann(){}
-	
+
 	//! Default destructor (empty)
 	virtual ~FeatureBoltzmann(){}
 
 	//! Checks if move is allowed by the Metropolis-criterion.
-	template<class IngredientsType> 
+	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients,const MoveBase& move);
-	
+
 private:
 	//! RNG (Random Number Generator) for random numbers. Needs to be seeded in main() or somewhere appropriate.
 	RandomNumberGenerators randomNumbers;
-	
+
 };
 
 
@@ -83,8 +83,8 @@ private:
  * @return if move is allowed (true) or rejected (false).
  */
 template<class IngredientsType>
-bool FeatureBoltzmann::checkMove(const IngredientsType& ingredients, const MoveBase& move) 
-{	
+bool FeatureBoltzmann::checkMove(const IngredientsType& ingredients, const MoveBase& move)
+{
 	return( (randomNumbers.r250_drand() < move.getProbability() ) ? true : false);
 }
 

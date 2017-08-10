@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -50,14 +50,14 @@ RandomNumberGenerators::RandomNumberGenerators()
 		r250Engine=new R250;
 		r250Engine->loadDefaultState();
 		}
-#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11	
+#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 	if(mt19937Engine==0)
 	{
 		mt19937Engine=new std::mt19937;
 		seedMT(1);
 	}
 #endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
-	
+
 }
 
 
@@ -72,11 +72,11 @@ void RandomNumberGenerators::seedAll()
 	seedSTDRAND();
 	//randomly initialize all provided RNGs
 	seedR250();
-	
+
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 	seedMT();
 #endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
-	
+
 }
 
 //randomly seed R250Engine
@@ -101,7 +101,7 @@ void RandomNumberGenerators::seedSTDRAND()
 	{
 		uint32_t* seed=new uint32_t;
 		std::ifstream in("/dev/urandom");
-		in.read((char*)seed,sizeof(seed));	
+		in.read((char*)seed,sizeof(seed));
 		std::srand(*seed);
 		std::cout<<"RandomNumberGenerators: random seed for std::rand() picked from /dev/urandom:"<<seed<<std::endl;
 		urandom.close();
@@ -111,9 +111,9 @@ void RandomNumberGenerators::seedSTDRAND()
 		std::stringstream errormessage;
 		errormessage<<"could not generate random seed for std::rand() from urandom..exiting\n";
 		throw std::runtime_error(errormessage.str());
-		
+
 	}
-	
+
 }
 
 
@@ -127,7 +127,7 @@ void RandomNumberGenerators::seedMT()
 	{
 		uint32_t* seed=new uint32_t;
 		std::ifstream in("/dev/urandom");
-		in.read((char*)seed,sizeof(seed));	
+		in.read((char*)seed,sizeof(seed));
 		std::srand(*seed);
 		std::cout<<"RandomNumberGenerators: random seed for Mersenne Twister picked from /dev/urandom:"<<seed<<std::endl;
 		urandom.close();
@@ -137,7 +137,7 @@ void RandomNumberGenerators::seedMT()
 		std::stringstream errormessage;
 		errormessage<<"could not generate random seed for Mersenne Twister from urandom..exiting\n";
 		throw std::runtime_error(errormessage.str());
-		
+
 	}
 }
 

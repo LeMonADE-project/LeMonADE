@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -50,13 +50,13 @@ TEST(MonomerGroups, DifferentGroupTypes)
   typedef Loki::NullType Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients < Config> MyIngredients;
-  
+
 //   typedef Loki::NullType Features;
 //   typedef Molecules<VectorInt3> MyMolecules;
 //   typedef Ingredients<MyMolecules,Features> MyIngredients;
-  
+
   MyIngredients ingredients;
-  
+
   //create a few connected objects
   ingredients.modifyMolecules().addMonomer(VectorInt3(1,1,1));
   ingredients.modifyMolecules().addMonomer(VectorInt3(2,1,1));
@@ -67,38 +67,38 @@ TEST(MonomerGroups, DifferentGroupTypes)
   ingredients.modifyMolecules().addMonomer(VectorInt3(7,1,1));
   ingredients.modifyMolecules().addMonomer(VectorInt3(8,1,1));
   ingredients.modifyMolecules().addMonomer(VectorInt3(9,1,1));
-  
+
   ingredients.modifyMolecules().connect(0,1);
   ingredients.modifyMolecules().connect(2,3);
   ingredients.modifyMolecules().connect(3,4);
   ingredients.modifyMolecules().connect(5,6);
   ingredients.modifyMolecules().connect(6,7);
   ingredients.modifyMolecules().connect(7,8);
-  
-  //find the groups of connected objects and demonstrate the use of different 
+
+  //find the groups of connected objects and demonstrate the use of different
   //group containers
-  
+
   // list - based groups:
   typedef list < int   > Group;
   typedef list < Group > GroupList;
-  
+
   GroupList connectedObjectsList;
   GroupList linearStrandsList;
   // fills list of groups with connected objects, which belong to a linear strand (including ends)
-  fill_connected_groups( ingredients.getMolecules(), linearStrandsList, Group(), belongsToLinearStrand() ); 
-  
+  fill_connected_groups( ingredients.getMolecules(), linearStrandsList, Group(), belongsToLinearStrand() );
+
   // vector-based groups:
   typedef vector < MonomerGroup<MyIngredients::molecules_type> > MonomerGroupVector;
   MonomerGroupVector linearStrandsVector;
 
-  fill_connected_groups( ingredients.getMolecules(), 
-			linearStrandsVector,  
-			MonomerGroup<MyIngredients::molecules_type>(ingredients.getMolecules()), 
+  fill_connected_groups( ingredients.getMolecules(),
+			linearStrandsVector,
+			MonomerGroup<MyIngredients::molecules_type>(ingredients.getMolecules()),
 			belongsToLinearStrand() );
 
   //now check that the two groups are the same (subgroups have same size)
   GroupList::iterator li(linearStrandsList.begin());
-  MonomerGroupVector::iterator gi(linearStrandsVector.begin()); 
+  MonomerGroupVector::iterator gi(linearStrandsVector.begin());
   while(li!=linearStrandsList.end()){
     EXPECT_EQ(linearStrandsList.size(),linearStrandsVector.size());
     ++li;
@@ -120,7 +120,7 @@ TEST(MonomerGroups, CopyGroup)
 	//introduce some monomers
 	int nMonos=11;
 	myIngredients.modifyMolecules().resize(nMonos);
-	
+
 	//set coordinates and connect monomers into chain. also put information
 	//on the bonds
 	for(int i=0;i<nMonos;i++)
@@ -128,10 +128,10 @@ TEST(MonomerGroups, CopyGroup)
 		myIngredients.modifyMolecules()[i].setAllCoordinates(2*i,i,i);
 		if(i>0) myIngredients.modifyMolecules().connect(i,i-1,i);
 	}
-	
+
 	//also connect monomers 0 and 2
 	myIngredients.modifyMolecules().connect(0,2,100);
-	
+
 	//now open a group
 	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
@@ -146,7 +146,7 @@ TEST(MonomerGroups, CopyGroup)
 	//this should then contain the correct monomers as well as bonds between
 	//them
 	Ing::molecules_type mol2=myGroup.copyGroup();
-	
+
 	//now run the tests
 	EXPECT_EQ(7,mol2.size());
 	EXPECT_EQ(2,mol2.getNumLinks(0));
@@ -156,16 +156,16 @@ TEST(MonomerGroups, CopyGroup)
 	EXPECT_EQ(1,mol2.getNumLinks(4)); //previous particle 8
 	EXPECT_EQ(2,mol2.getNumLinks(5));
 	EXPECT_EQ(1,mol2.getNumLinks(6));
-	
-	//see if the bond information were also copied 
+
+	//see if the bond information were also copied
 	EXPECT_EQ(1,mol2.getLinkInfo(0,1));
 	EXPECT_EQ(2,mol2.getLinkInfo(1,2));
 	EXPECT_EQ(100,mol2.getLinkInfo(0,2));
 	EXPECT_EQ(9,mol2.getLinkInfo(4,5));
 	EXPECT_EQ(10,mol2.getLinkInfo(6,5));
-	
-	
-	
+
+
+
 }
 
 
@@ -183,7 +183,7 @@ TEST(MonomerGroups, ClearGroup)
 	//introduce some monomers
 	int nMonos=11;
 	myIngredients.modifyMolecules().resize(nMonos);
-	
+
 	//set coordinates and connect monomers into chain. also put information
 	//on the bonds
 	for(int i=0;i<nMonos;i++)
@@ -191,10 +191,10 @@ TEST(MonomerGroups, ClearGroup)
 		myIngredients.modifyMolecules()[i].setAllCoordinates(2*i,i,i);
 		if(i>0) myIngredients.modifyMolecules().connect(i,i-1,i);
 	}
-	
+
 	//also connect monomers 0 and 2
 	myIngredients.modifyMolecules().connect(0,2,100);
-	
+
 	//now open a group
 	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
@@ -205,20 +205,20 @@ TEST(MonomerGroups, ClearGroup)
 	myGroup.push_back(8);
 	myGroup.push_back(9);
 	myGroup.push_back(10);
-	
+
 	EXPECT_EQ(myGroup.size(),7);
-	
+
 	//clear the group
 	myGroup.clear();
 	EXPECT_EQ(myGroup.size(),0);
-	
+
 	//put some stuff back
 	myGroup.push_back(2);
 	myGroup.push_back(6);
 	myGroup.push_back(8);
 	myGroup.push_back(9);
 	myGroup.push_back(10);
-	
+
 	EXPECT_EQ(myGroup.size(),5);
 	EXPECT_EQ(myGroup.trueIndex(0),2);
 	EXPECT_EQ(myGroup.trueIndex(2),8);
@@ -239,7 +239,7 @@ TEST(MonomerGroups, Erase)
 	//introduce some monomers
 	int nMonos=11;
 	myIngredients.modifyMolecules().resize(nMonos);
-	
+
 	//set coordinates and connect monomers into chain. also put information
 	//on the bonds
 	for(int i=0;i<nMonos;i++)
@@ -247,10 +247,10 @@ TEST(MonomerGroups, Erase)
 		myIngredients.modifyMolecules()[i].setAllCoordinates(2*i,i,i);
 		if(i>0) myIngredients.modifyMolecules().connect(i,i-1,i);
 	}
-	
+
 	//also connect monomers 0 and 2
 	myIngredients.modifyMolecules().connect(0,2,100);
-	
+
 	//now open a group
 	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
@@ -261,27 +261,27 @@ TEST(MonomerGroups, Erase)
 	myGroup.push_back(8);
 	myGroup.push_back(9);
 	myGroup.push_back(10);
-	
+
 	EXPECT_EQ(myGroup.size(),7);
-	
+
 	//delete stuff from the group
 	EXPECT_NO_THROW(myGroup.erase(6));
 	EXPECT_THROW(myGroup.erase(7),std::runtime_error);
-	
+
 	EXPECT_EQ(myGroup.size(),6);
-	
+
 	myGroup.erase(2);
 	myGroup.erase(2);
-	
+
 	EXPECT_EQ(myGroup.size(),4);
-	
+
 	EXPECT_EQ(myGroup.trueIndex(0),0);
 	EXPECT_EQ(myGroup.trueIndex(1),1);
 	EXPECT_EQ(myGroup.trueIndex(2),8);
 	EXPECT_EQ(myGroup.trueIndex(3),9);
-	
-	
-	
+
+
+
 }
 
 
@@ -299,7 +299,7 @@ TEST(MonomerGroups, RemoveFromGroup)
 	//introduce some monomers
 	int nMonos=11;
 	myIngredients.modifyMolecules().resize(nMonos);
-	
+
 	//set coordinates and connect monomers into chain. also put information
 	//on the bonds
 	for(int i=0;i<nMonos;i++)
@@ -307,10 +307,10 @@ TEST(MonomerGroups, RemoveFromGroup)
 		myIngredients.modifyMolecules()[i].setAllCoordinates(2*i,i,i);
 		if(i>0) myIngredients.modifyMolecules().connect(i,i-1,i);
 	}
-	
+
 	//also connect monomers 0 and 2
 	myIngredients.modifyMolecules().connect(0,2,100);
-	
+
 	//now open a group
 	MonomerGroup<Ing::molecules_type> myGroup((myIngredients.getMolecules()));
 	//and put some of the monomers into the group
@@ -321,23 +321,23 @@ TEST(MonomerGroups, RemoveFromGroup)
 	myGroup.push_back(8);
 	myGroup.push_back(9);
 	myGroup.push_back(10);
-	
+
 	EXPECT_EQ(myGroup.size(),7);
-	
+
 	//delete stuff from the group
 	EXPECT_NO_THROW(myGroup.removeFromGroup(6));
 	EXPECT_NO_THROW(myGroup.removeFromGroup(10));
 	EXPECT_THROW(myGroup.removeFromGroup(7),std::runtime_error);
 	EXPECT_THROW(myGroup.removeFromGroup(3),std::runtime_error);
-	
+
 	EXPECT_EQ(myGroup.size(),5);
-	
+
 	EXPECT_EQ(myGroup.trueIndex(0),0);
 	EXPECT_EQ(myGroup.trueIndex(1),1);
 	EXPECT_EQ(myGroup.trueIndex(2),2);
 	EXPECT_EQ(myGroup.trueIndex(3),8);
 	EXPECT_EQ(myGroup.trueIndex(4),9);
-	
-	
-	
+
+
+
 }

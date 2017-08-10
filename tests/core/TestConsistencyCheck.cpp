@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -45,20 +45,20 @@ using namespace std;
     class Feature4;
     class Feature5;
 
-    
-    
+
+
     class Feature0:public Feature{
     public:
       typedef LOKI_TYPELIST_1(Feature5) required_features_back;
       template < class IngredientsType > void synchronize(IngredientsType& val){cout<<"0";}
     };
-    
+
     class Feature1:public Feature{
     public:
       template < class IngredientsType > void synchronize(IngredientsType& val){cout<<"1";}
     };
-      
-    
+
+
 
     class Feature2:public Feature{
     public:
@@ -74,13 +74,13 @@ using namespace std;
       typedef LOKI_TYPELIST_1(Feature5) required_features_back;
       template < class IngredientsType > void synchronize(IngredientsType& val){cout<<"3";}
     };
-    
+
     class Feature4:public Feature{
     public:
       typedef LOKI_TYPELIST_1(Feature3) required_features_front;
       template < class IngredientsType > void synchronize(IngredientsType& val){cout<<"4";}
     };
-    
+
     class Feature5:public Feature{
     public:
       template < class IngredientsType > void synchronize(IngredientsType& val){cout<<"5";}
@@ -90,7 +90,7 @@ TEST(ConsistencyCheckTest,Errorcode){
   typedef LOKI_TYPELIST_5(Feature1,Feature2,Feature3,Feature4,Feature5) FeaturesA;
   typedef LOKI_TYPELIST_5(Feature2,Feature3,Feature4,Feature5,Feature1) FeaturesB;
   typedef LOKI_TYPELIST_5(Feature2,Feature4,Feature5,Feature1,Feature3) FeaturesC;
-  
+
   EXPECT_EQ(1,(ConsistencyCheck<FeaturesA, ::Loki::NullType>::MY_ERRORSTATE) );
   EXPECT_EQ(2,(ConsistencyCheck<FeaturesB, ::Loki::NullType>::MY_ERRORSTATE) );
   EXPECT_EQ(3,(ConsistencyCheck<FeaturesC, ::Loki::NullType>::MY_ERRORSTATE) );

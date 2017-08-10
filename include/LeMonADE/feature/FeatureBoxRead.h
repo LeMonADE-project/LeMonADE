@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -33,7 +33,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/io/AbstractRead.h>
 
 /**
- * @file 
+ * @file
  * @brief Reading routines for bfm Reads !box_x,!box_y,!box_z,!periodic_x,!periodic_y,!periodic_z
  *
  */
@@ -45,9 +45,9 @@ template <class IngredientsType> class ReadBoxZ;
 template <class IngredientsType> class ReadPeriodicX;
 template <class IngredientsType> class ReadPeriodicY;
 template <class IngredientsType> class ReadPeriodicZ;
- 
 
- 
+
+
 /*******************************************************************
  * Definitions of Read classes for the different bfm Reads
  *******************************************************************/

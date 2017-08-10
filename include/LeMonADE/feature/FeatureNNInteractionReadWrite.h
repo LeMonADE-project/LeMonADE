@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -91,7 +91,7 @@ void ReadNNInteraction<IngredientsType>::execute()
 
     //set stream to throw exception on fail
     file.exceptions(file.exceptions() | std::ifstream::failbit);
-    
+
     try
       {
 	file>>typeA;
@@ -106,7 +106,7 @@ void ReadNNInteraction<IngredientsType>::execute()
 	errormessage<<"Previous error: "<<e.what()<<std::endl;
 	throw std::runtime_error(errormessage.str());
       }
-    
+
     //now save the interaction tuple just read from the file
     ingredients.setNNInteraction(typeA,typeB,interactionConstant);
 

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -59,15 +59,15 @@ class ReadJumpsMcs: public ReadToDestination < IngredientsType >
    * @return \a True if first call/occurance of !mcs - \a False otherwise.
    */
   bool isFirstCall() const {return first_call;}
-  
-  
+
+
   ///@todo better solution for solvent???
   //! Ignores if monomer position is missing in the !mcs (maybe due to solvent)
   bool ignore_missing_monos;
-  
+
   //! The number of frames/conformations/!mcs-command in file.
   uint32_t nFrames;
- 
+
  public:
    //constructor: sets ignore_missing_monos=true here!!
   ///@todo Why we ignore here monomers as default?
@@ -77,10 +77,10 @@ class ReadJumpsMcs: public ReadToDestination < IngredientsType >
   ,ignore_missing_monos(true)
   ,first_call(true)
   ,nFrames(0){}
-  
+
   //! Empty Destructor
   virtual ~ReadJumpsMcs(){}
-  
+
   //enable ignoring of incomplete monomer initialzation
   /**
    * @brief Set this if missing monomers should ignore by read-in (maybe due to solvent).
@@ -90,10 +90,10 @@ class ReadJumpsMcs: public ReadToDestination < IngredientsType >
    * @param val True if missing monomers should ignored - False otherwise.
    */
   void setIgnoreMissingMonomers(bool val){ignore_missing_monos = val;}
-  
+
   //get information from file
   void execute();
-  
+
 };
 
 /***********************************************************************/
@@ -511,7 +511,7 @@ public:
   {
     fileReader.replaceRead("!mcs",new ReadJumpsMcs <IngredientsType> (fileReader.getDestination()));
   }
-  
+
   /**
    * @brief Export the relevant functionality for writing bfm-files to the responsible writer object
    *

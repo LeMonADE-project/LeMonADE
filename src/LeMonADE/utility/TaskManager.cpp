@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 /*****************************************************************************/
 /**
- * @file 
+ * @file
  * @brief Implementation TaskManager members
  * */
 /*****************************************************************************/
@@ -41,7 +41,7 @@ TaskManager::~TaskManager()
 {
     vector <UpdaterObject*>::iterator uIterator(updater.begin());
     vector <AnalyzerObject*>::iterator aIterator(analyzer.begin());
-    
+
     //free memory allocated for UpdaterObjects
     while(uIterator!=updater.end()){
       delete *uIterator;
@@ -88,7 +88,7 @@ void TaskManager::run()
 {
   vector <UpdaterObject*>::iterator uIterator;
   vector <AnalyzerObject*>::iterator aIterator;
-  
+
   //if there are no updaters, execute all analyzers and return
   if(updater.size()==0){
     aIterator=analyzer.begin();
@@ -103,31 +103,31 @@ void TaskManager::run()
     while(true){
       ++nCircles;
       running=false;
-      
+
       //call all updaters
       uIterator=updater.begin();
       while(uIterator!=updater.end() ){
-	if((*uIterator)->shouldExecute(nCircles)){ 
+	if((*uIterator)->shouldExecute(nCircles)){
 		bool currentUpdaterRunning=(*uIterator)->run();
 		running=(running ||currentUpdaterRunning);
-		
+
 	}
 	++uIterator;
       }
       //if all updaters return false, exit the loop
       if(!running) break;
-      
+
       //call all analyzers
       aIterator=analyzer.begin();
       while(aIterator!=analyzer.end() ){
 	if((*aIterator)->shouldExecute(nCircles)) (*aIterator)->run();
 	++aIterator;
       }
-    
+
     }
   }
-    
-  
+
+
 
 }
 
@@ -140,13 +140,13 @@ void TaskManager::run()
  **/
 void TaskManager::run(int nPeriods)
 {
-  
+
   vector <UpdaterObject*>::iterator uIterator;
   vector <AnalyzerObject*>::iterator aIterator;
   int actualCircles=nCircles;
   while(nCircles<nPeriods+actualCircles){
-    ++nCircles;   
-    
+    ++nCircles;
+
     //call all updaters
     uIterator=updater.begin();
     ///@todo exception, if all updaters return false and loop keeps running??
@@ -154,16 +154,16 @@ void TaskManager::run(int nPeriods)
       if((*uIterator)->shouldExecute(nCircles)) (*uIterator)->run();
       ++uIterator;
     }
-    
+
     //call all analyzers
     aIterator=analyzer.begin();
     while(aIterator!=analyzer.end() ){
       if((*aIterator)->shouldExecute(nCircles)) (*aIterator)->run();
       ++aIterator;
     }
-   
+
   }
- 
+
 }
 
 /*****************************************************************************/
@@ -180,10 +180,10 @@ void TaskManager::initialize()
       (*uIterator)->initialize();
       ++uIterator;
     }
-    
+
     aIterator=analyzer.begin();
-    while(aIterator!=analyzer.end() ){ 
-      (*aIterator)->initialize(); 
+    while(aIterator!=analyzer.end() ){
+      (*aIterator)->initialize();
       ++aIterator;
     }
 }
@@ -202,10 +202,10 @@ void TaskManager::cleanup()
       (*uIterator)->cleanup();
       ++uIterator;
     }
-    
+
     aIterator=analyzer.begin();
-    while(aIterator!=analyzer.end() ){ 
-      (*aIterator)->cleanup(); 
+    while(aIterator!=analyzer.end() ){
+      (*aIterator)->cleanup();
       ++aIterator;
     }
 }

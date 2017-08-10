@@ -7,12 +7,12 @@
 //     for You" by Alexandrescu, Andrei.
 //     Published in the February 2001 issue of the C/C++ Users Journal.
 //     http://www.cuj.com/documents/s=7998/cujcexp1902alexandr/
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author makes no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author makes no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 // Prepared for Loki library by Richard Sposato
 ////////////////////////////////////////////////////////////////////////////////
@@ -36,7 +36,7 @@ namespace Loki
      the mutex type as a LockingPolicy class.  The only requirements for a
      LockingPolicy class are to provide Lock and Unlock methods.
      */
-    template < typename SharedObject, typename LockingPolicy = LOKI_DEFAULT_MUTEX, 
+    template < typename SharedObject, typename LockingPolicy = LOKI_DEFAULT_MUTEX,
                template<class> class ConstPolicy = LOKI_DEFAULT_CONSTNESS >
     class LockingPtr
     {
