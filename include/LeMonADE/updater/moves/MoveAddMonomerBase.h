@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2016 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2016 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -48,7 +48,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * way: "class MySpecialMove:public MoveAddMonomerBase<MySpecialMove>".
  * It must implement the functions init,check and apply. Calls to the corresponding
  * functions in this base class are then redirected to the specialized implementation.
- * See for an example the class MoveAddMonomerSc. 
+ * See for an example the class MoveAddMonomerSc.
  * Since this class simply serves as a common base, the functions apply(), check(), and init() don't do
  * anything particular.
  *
@@ -56,7 +56,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 /*****************************************************************************/
-template <class SpecializedMove> 
+template <class SpecializedMove>
 class MoveAddMonomerBase:public MoveBase
 {
 public:
@@ -67,7 +67,7 @@ public:
   template <class IngredientsType> void check(const IngredientsType& ingredients);
   //! Apply the move to the system given as argument
   template <class IngredientsType> void apply(IngredientsType& ingredients);
-  
+
   //! setter function for monomerTag of new monomer
   void setTag(int32_t tag){monomerTag=tag;}
   //! setter function for position of new monomer taking a VectorInt3
@@ -80,16 +80,16 @@ public:
   const VectorInt3 getPosition() const {return position;}
   //! getter function for index of the new monomer. This is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
   size_t getMonomerIndex() const {return monomerIndex;}
-  
+
 protected:
   void setMonomerIndex(size_t index){monomerIndex=index;}
-  
+
 private:
   //! position where the new monomer is placed in the simulation box
   VectorInt3 position;
   //! monomerTag that is applied to the new monomer, requires Feature FeatureAttributes with int-Type
   int32_t monomerTag;
-  /** 
+  /**
    * @brief Index of new PartileThis is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
    * @details It is set when apply is called. useful if Features want to alter the particle when applying the move
    */
@@ -110,7 +110,7 @@ private:
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveAddMonomerBase<SpecializedMove>::init(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients);
@@ -127,7 +127,7 @@ void MoveAddMonomerBase<SpecializedMove>::init(const IngredientsType& ingredient
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveAddMonomerBase<SpecializedMove>::check(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->check(ingredients);
@@ -144,7 +144,7 @@ void MoveAddMonomerBase<SpecializedMove>::check(const IngredientsType& ingredien
  * */
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveAddMonomerBase<SpecializedMove>::apply(IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->apply(ingredients);

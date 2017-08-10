@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -54,7 +54,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  **/
 /*****************************************************************************/
 
-class MoveLocalBcc : public MoveLocalBase<MoveLocalBcc> 
+class MoveLocalBcc : public MoveLocalBase<MoveLocalBcc>
 {
 public:
 	MoveLocalBcc(){};
@@ -88,10 +88,10 @@ template <class IngredientsType>
 void MoveLocalBcc::init(const IngredientsType& ing)
 {
   this->resetProbability();
-  
+
   //draw index
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-  
+
   //draw direction
   uint32_t randNumber=this->randomNumbers.r250_rand32();
   this->setDir(VectorInt3(
@@ -115,13 +115,13 @@ template <class IngredientsType>
 void MoveLocalBcc::init(const IngredientsType& ing, uint32_t index)
 {
   this->resetProbability();
-  
+
   //set index
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
     throw std::runtime_error("MoveLocalBcc::init(ing, index): index out of range!");
-  
+
   //draw direction
   uint32_t randNumber=this->randomNumbers.r250_rand32();
   this->setDir(VectorInt3(
@@ -135,7 +135,7 @@ void MoveLocalBcc::init(const IngredientsType& ing, uint32_t index)
 /**
  * @brief Initialize the move with a given move direction.
  *
- * @details Resets the move probability to unity. Dice a Vertex (monomer) index 
+ * @details Resets the move probability to unity. Dice a Vertex (monomer) index
  * inside the graph and set the move direction to the argument passed.
  *
  * @param ing A reference to the IngredientsType - mainly the system
@@ -145,10 +145,10 @@ template <class IngredientsType>
 void MoveLocalBcc::init(const IngredientsType& ing, VectorInt3 dir)
 {
   this->resetProbability();
-  
+
   //draw index
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-  
+
   //set direction
   if( (dir.getX()==1 || dir.getX()==-1 ) &&
     (dir.getY()==1 || dir.getY()==-1 ) &&
@@ -172,13 +172,13 @@ template <class IngredientsType>
 void MoveLocalBcc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir)
 {
   this->resetProbability();
-  
+
   //draw index
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
     throw std::runtime_error("MoveLocalBcc::init(ing, index, dir): index out of range!");
-  
+
   //set direction
   if( (dir.getX()==1 || dir.getX()==-1 ) &&
     (dir.getY()==1 || dir.getY()==-1 ) &&
@@ -205,7 +205,7 @@ bool MoveLocalBcc::check(IngredientsType& ing)
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
 }
-  
+
 
 /*****************************************************************************/
 /**
@@ -219,14 +219,14 @@ bool MoveLocalBcc::check(IngredientsType& ing)
 template< class IngredientsType>
 void MoveLocalBcc::apply(IngredientsType& ing)
 {
-	///@todo make this independent of the order to avoid confusion!! 
-	
+	///@todo make this independent of the order to avoid confusion!!
+
 	//move must FIRST be applied to the features
-	ing.applyMove(ing,*this);	
+	ing.applyMove(ing,*this);
 
 	//THEN the position can be modified
 	ing.modifyMolecules()[this->getIndex()]+=this->getDir();
-  
+
 }
 
 

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -114,7 +114,7 @@ public:
 	hasType(int type){types.insert(type);}
 	hasType(int type1,int type2){types.insert(type1); types.insert(type2);}
 	hasType(std::vector<int> typeVector){for(size_t n=0;n<typeVector.size();n++) types.insert(typeVector[n]);}
-	
+
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{
@@ -139,7 +139,7 @@ template<int AttributeType>
 class notOfType
 {
 public:
-	
+
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{

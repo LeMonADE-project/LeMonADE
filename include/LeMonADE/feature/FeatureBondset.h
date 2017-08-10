@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -89,7 +89,7 @@ class FeatureBondset : public Feature
  public:
 	//! Standard constructor (empty)
   FeatureBondset(){}
-    
+
   //! Standard destructor (empty)
   virtual ~FeatureBondset(){}
 
@@ -103,12 +103,12 @@ class FeatureBondset : public Feature
    * the two lines below.*/
 // 	SlowBondset& modifyBondset()     {return bondset;};
 //  const SlowBondset&    getBondset()const{return bondset;};
-  
-  
+
+
 
  /**
   * @brief Export the relevant functionality for reading bfm-files to the responsible reader object
-  * 
+  *
   * @details The function is called by the Ingredients class when an object of type Ingredients
   * is associated with an object of type FileImport. The export of the Reads is thus
   * taken care automatically when it becomes necessary.\n
@@ -183,7 +183,7 @@ class FeatureBondset : public Feature
 
           return true;
   }
-  
+
   /**
    * @brief Updates the bond-set lookup table if necessary
    *
@@ -195,13 +195,13 @@ class FeatureBondset : public Feature
   {
     //this function only does something if the bondset has change since the last update
     bondset.updateLookupTable();
-    
+
     const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
-    
+
     for (size_t i=0; i< molecules.size(); ++i)
     {
      for (size_t j=0; j< molecules.getNumLinks(i); ++j){
-       
+
 	 uint n = molecules.getNeighborIdx(i,j);
        // if (!bondset.isValid(molecules[n]-molecules[i]))
 	 if (!bondset.isValidStrongCheck(molecules[n]-molecules[i]))
@@ -214,10 +214,10 @@ class FeatureBondset : public Feature
   }
 
  private:
- 
+
   //! Stores the set of allowed bond-vectors.
   BondSetType bondset;
-  
+
 
   /* if you want to use the SlowBondset, comment the line above and uncomment
    * the line below.*/
@@ -237,16 +237,16 @@ void ReadBondset <LemonadeSystem>::execute()
   int x,y,z,identifier;
   std::string line;
   std::streampos previous;
-  
+
   //go to next line and save the position of the get pointer into streampos previous
   getline(*source,line);
   previous=(*source).tellg();
 
   //read and process the lines containing the bond vector definition
   getline(*source,line);
-  
+
   while(!line.empty() && !((*source).fail())){
-    
+
     //stop at next Read and set the get-pointer to the position before the Read
     if(detectRead(line)){
       (*source).seekg(previous);
@@ -266,15 +266,15 @@ void ReadBondset <LemonadeSystem>::execute()
 		   <<"Could not read vector components in vector no "<<nBondVectors+1;
       throw std::runtime_error(messagestream.str());
     }
-    
+
     //throw exception, if next character isnt ":"
     if(!findSeparator(stream,':')){
-      
+
     	std::stringstream messagestream;
       messagestream<<"ReadBondset<LemonadeSystem>::execute()\n"
 		   <<"Wrong definition of bondvector\nCould not find separator \":\" ";
       throw std::runtime_error(messagestream.str());
-      
+
     }
 
     //read bond identifier, throw exception if extraction fails
@@ -289,7 +289,7 @@ void ReadBondset <LemonadeSystem>::execute()
 
     }
     else{
-      
+
     	std::stringstream messagestream;
       messagestream<<"ReadBondset<LemonadeSystem>::execute()\n"
 		   <<"could not read identifier in vector no "<<nBondVectors+1;
@@ -297,7 +297,7 @@ void ReadBondset <LemonadeSystem>::execute()
 
     }
   }
-  
+
 }
 
 
@@ -312,7 +312,7 @@ void WriteBondset<LemonadeSystem>::writeStream(std::ostream& strm){
     strm<<(bondVec->second)<<":"<<(bondVec->first)<<"\n";
   }
   strm<<"\n";
-  
+
 }
 
 #endif

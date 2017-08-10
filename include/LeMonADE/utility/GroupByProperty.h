@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -28,7 +28,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LEMONADE_UTILITY_GROUPBYPROPERTY_H
 #define LEMONADE_UTILITY_GROUPBYPROPERTY_H
 /**
- * @file 
+ * @file
  * @brief definition of global function group_by_property
  * */
 
@@ -36,7 +36,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 
 /**
- * 
+ *
  * @brief Global function that groups vertices/monomers by a property
  *
  * @details The function combines indexes of monomers into groups defined by a certain property. Each group is of type GroupType, and the
@@ -48,7 +48,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @param molecules reference to the container/graph, in which the monomers are stored
  * @param groups reference to the container that stores the groups to be found here
  * @param groupInit reference to an object that serves as base type for a group (argument group stores objects of this type)
- * @param findGroup functor that separates the monomers into groups using its ()-operator. It needs to provide a typedef property_type to specify the return type. 
+ * @param findGroup functor that separates the monomers into groups using its ()-operator. It needs to provide a typedef property_type to specify the return type.
  *
  * @deprecated
  *
@@ -57,16 +57,16 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 template < class Graph, class GroupContainer, class GroupType, class GroupFinder >
 void group_by_property(Graph& molecules, GroupContainer& groups, const GroupType& groupInit, const GroupFinder& findGroup)
 {
-  
-  typedef typename GroupFinder::property_type Property; 
+
+  typedef typename GroupFinder::property_type Property;
   //all values of the property in question are mapped to an index (size_t)
   //this is the index of the group as used in the GroupContainer groups.
   std::map<Property,size_t> detectedGroups;
-  
+
   //loop over all monomers to find get the property and put them into the correct group
   for(size_t i=0;i<molecules.size();++i)
   {
-    //if the group key, returned by findGroup(i), already exists in the map, 
+    //if the group key, returned by findGroup(i), already exists in the map,
     //append the index of the current monomer to the respective group
     if(detectedGroups.find(findGroup(molecules,i))!=detectedGroups.end()){
       groups[detectedGroups.find(findGroup(molecules,i))->second].push_back(i);
@@ -78,7 +78,7 @@ void group_by_property(Graph& molecules, GroupContainer& groups, const GroupType
       groups.push_back(groupInit);
       groups.back().push_back(i);
     }
-      
+
   }
 }
 

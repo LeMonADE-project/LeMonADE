@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #define LEMONADE_CORE_GENERATECONTEXTTYPE_H
 
 /**
- * @file 
+ * @file
  *
  * @brief Classes used to generate Ingredients base class from features.
  **/
@@ -46,7 +46,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Used as dead end of the feature hierarchy by GenerateContextType (defined below).
  **/
 struct EmptyModelFeature : public Feature {
- 
+
 };
 
 
@@ -63,7 +63,7 @@ template <> struct FullExpand< ::Loki::NullType >{typedef ::Loki::NullType Resul
 /**
  * @brief Implementation for the normal case with a typelist of features
  */
-template < class Head, class Tail > 
+template < class Head, class Tail >
 struct FullExpand< ::Loki::Typelist< Head, Tail > >
 {
   //put the fully expanded forwards required features of the acutal feature (Head)
@@ -82,19 +82,19 @@ struct FullExpand< ::Loki::Typelist< Head, Tail > >
     //insert the actual feature's backwards required features and append thei
     //fully expanded rest of the typelist
     typename ::Loki::TL::Append
-    < 
-      //typelist consisting of the actual feature (Head) followed by the fully expanded list 
+    <
+      //typelist consisting of the actual feature (Head) followed by the fully expanded list
       //of the backwards required features of Head
       ::Loki::Typelist<Head,typename FullExpand<typename Head::required_features_back>::Result >
       //fully expanded rest of the typelist
       ,typename FullExpand<Tail>::Result
-      
+
     >::Result
     //fully expanded forwards required features of Head
     ,typename FullExpand<typename Head::required_features_front>::Result
   >::Result Result;
 };
- 
+
 
 
 /**
@@ -109,7 +109,7 @@ template< class TList> struct InsertBackRequests;
 template <> struct InsertBackRequests< ::Loki::NullType>{typedef ::Loki::NullType Result;};
 
 //! Implementation for the normal case with a typelist of features
-template< class Head, class Tail> 
+template< class Head, class Tail>
 struct InsertBackRequests< ::Loki::Typelist <Head,Tail> >
 {
 	/**
@@ -150,11 +150,11 @@ template<class TList> struct InsertFeatureRequests
   * @details inserts all requested features in the required order (in most cases...)
   * procedure: OrigList->FullExpand->NoDuplicates->InsertBackRequests->NoDuplicatesReverse
   **/
-    typename InsertBackRequests 
+    typename InsertBackRequests
     <
       //remove duplicates back to front from fully expanded list of features
       typename ::Loki::TL::NoDuplicates< typename FullExpand < TList >::Result >::Result
-    >::Result 
+    >::Result
   >::Result Result;
 };
 

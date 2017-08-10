@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -30,7 +30,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 /*****************************************************************************/
 /**
- * @file 
+ * @file
  * @brief Definitions of class templates SafeCastBackend and safe_cast
  * */
 /*****************************************************************************/
@@ -47,8 +47,8 @@ namespace LemonadeHelper
 {
 
 //! Generic template class providing a static_cast to \a From to \a To
-template < class From, class To > struct SafeCastBackend 
-{ 
+template < class From, class To > struct SafeCastBackend
+{
   static To Cast( From& src) { return static_cast<To>(src); };
 };
 
@@ -95,9 +95,9 @@ namespace Lemonade
   template < class To > struct safe_cast
   {
     To tmp;
-    
+
     template < class From > safe_cast(From  src):tmp( LemonadeHelper::SafeCastBackend< From, To >::Cast( src ) ){}
-    
+
     operator To () const {return tmp;}
   };
 };

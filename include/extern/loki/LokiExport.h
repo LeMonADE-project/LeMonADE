@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // The Loki Library
 // Copyright (c) 2006 by Peter Kümmel
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author makes no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author makes no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef LOKI_LOKIEXPORT_INC_
@@ -19,10 +19,10 @@
 
 #ifdef _HAVE_GCC_VISIBILITY
 #define LOKI_EXPORT_SPEC __attribute__ ((visibility("default")))
-#define LOKI_IMPORT_SPEC 
+#define LOKI_IMPORT_SPEC
 #else
 #define LOKI_EXPORT_SPEC
-#define LOKI_IMPORT_SPEC 
+#define LOKI_IMPORT_SPEC
 #endif
 
 #else
@@ -31,8 +31,8 @@
 #define LOKI_EXPORT_SPEC __declspec(dllexport)
 #define LOKI_IMPORT_SPEC __declspec(dllimport)
 #else
-#define LOKI_EXPORT_SPEC 
-#define LOKI_IMPORT_SPEC 
+#define LOKI_EXPORT_SPEC
+#define LOKI_IMPORT_SPEC
 #endif
 
 #endif

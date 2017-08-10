@@ -14,16 +14,16 @@
 #include <stdexcept>
 #include "../TypeManip.h"
 
-namespace yasli 
+namespace yasli
 {
     template <class T, class Allocator = allocator<T> >
     class vector;
 }
 
 namespace yasli {
-     
+
    template <class T, class Allocator>
-   class vector 
+   class vector
    {
        struct ebo : public Allocator
        {
@@ -32,7 +32,7 @@ namespace yasli {
            ebo(const Allocator& a) : Allocator(a) {}
        } ebo_;
        T *end_;
-       T *eos_; 
+       T *eos_;
    public:
        // types:
        typedef          vector<T, Allocator>             this_type;//not standard
@@ -49,21 +49,21 @@ namespace yasli {
        typedef std::reverse_iterator<iterator>           reverse_iterator;
        typedef std::reverse_iterator<const_iterator>     const_reverse_iterator;
    private:
-       void init_empty() 
+       void init_empty()
        {
-            
+
    #if YASLI_UNDEFINED_POINTERS_COPYABLE == 1
            end_ = ebo_.beg_;
            eos_ = ebo_.beg_;
-   #else   
+   #else
            ebo_.beg_ = 0;
            end_ = 0;
-           eos_ = 0;    
+           eos_ = 0;
    #endif
            assert(empty());
-           
+
        }
-       
+
        void init_move(vector& temp)
        {
            ebo_ = temp.ebo_;
@@ -71,7 +71,7 @@ namespace yasli {
            eos_ = temp.eos_;
            temp.init_empty();
        }
-   
+
        void init_fill(size_type n, const T& value, const Allocator& a)
        {
            // Will avoid catch (...)
@@ -80,7 +80,7 @@ namespace yasli {
            init_move(temp);
            assert(size() == n);
        }
-       
+
        // 23.2.4.1 construct/copy/destroy:
        template <class InputIterator, class looks_like_itr>
        void init(InputIterator first, InputIterator last, looks_like_itr, const Allocator& a)
@@ -89,91 +89,91 @@ namespace yasli {
            temp.insert(temp.end(), first, last);
            init_move(temp);
        }
-       
+
        template <class non_iterator>
-       void init(non_iterator n, non_iterator datum, Loki::Int2Type<false>, 
+       void init(non_iterator n, non_iterator datum, Loki::Int2Type<false>,
                                                      const Allocator& a)
        {
             init_fill((size_type)n, (const T&)datum, a);
        }
-       
+
    public:
        vector()
        {
            init_empty();
        }
-       
-       explicit vector(const Allocator& a) 
+
+       explicit vector(const Allocator& a)
            : ebo_(a)
        {
            init_empty();
        }
-   
+
        explicit vector(size_type n, const T& value = T(),
                const Allocator& a = Allocator())
        {
            init_fill(n, value, a);
        }
-       
+
        //!! avoid enable_if
        template <class InputIterator>
        vector(InputIterator first, InputIterator last, const Allocator& a = Allocator())
-       {                
+       {
             init(first, last, Loki::Int2Type<
-                       yasli_nstd::is_class<InputIterator>::value || 
+                       yasli_nstd::is_class<InputIterator>::value ||
                        yasli_nstd::is_pointer<InputIterator>::value >(), a);
        }
-       
+
    public:
        vector(const vector<T,Allocator>& x)
        {
            vector temp(x.begin(), x.end(), x.ebo_);
            init_move(temp);
        }
-   
+
        ~vector()
        {
            yasli_nstd::destroy(ebo_, ebo_.beg_, size());
            const size_type c = capacity();
            if (c != 0) ebo_.deallocate(ebo_.beg_, c);
        }
-   
+
        // Note pass by value
        vector<T,Allocator>& operator=(vector<T,Allocator> temp)
        {
            temp.swap(*this);
            return *this;
        }
-   
-       template <class InputIterator>   
+
+       template <class InputIterator>
        void assign(InputIterator first, InputIterator last)
        {
-                     
+
            assign_pre_impl(first, last, Loki::Int2Type<yasli_nstd::
                                   is_class<InputIterator>::value||yasli_nstd::
                                   is_pointer<InputIterator>::value>());
        }
-       
+
    private://-------ASSIGN IMPLEMENTATION
        template <class InputIterator, class looks_like_itr>
        void assign_pre_impl(InputIterator first, InputIterator last, looks_like_itr)
-       {    
+       {
             assign_impl(first, last,
                std::iterator_traits<InputIterator>::iterator_category());
        }
-       
+
        template <class InputIterator>
        void assign_pre_impl(InputIterator n, InputIterator datum, Loki::Int2Type<false>)
-       {    
+       {
             assign((size_type) n, (const T&) datum);
        }
-   
+
        template <class InputIterator>
        void assign_impl(InputIterator first, InputIterator last, std::input_iterator_tag)
        {
            for (iterator i = begin(); i != end(); ++i, ++first)
            {
-               if (first == last) 
+               if (first == last)
                {
                    resize(i - begin());
                    return;
@@ -183,11 +183,11 @@ namespace yasli {
            // we filled up the vector, now insert the rest
            insert(end(), first, last);
        }
-   
+
        template <class RanIt>
        void assign_impl(RanIt first, RanIt last, std::random_access_iterator_tag)
        {
-           const typename std::iterator_traits<RanIt>::difference_type d = 
+           const typename std::iterator_traits<RanIt>::difference_type d =
                last - first;
            assert(d >= 0);
            size_type newSize = size_type(d);
@@ -229,7 +229,7 @@ namespace yasli {
            assert(size() == n);
            assert(empty() || front() == back());
        }
-   
+
        allocator_type get_allocator() const
        {
            return ebo_;
@@ -243,13 +243,13 @@ namespace yasli {
        const_reverse_iterator rbegin() const { return const_reverse_iterator(end()); }
        reverse_iterator rend() { return reverse_iterator(begin()); }
        const_reverse_iterator rend() const { return const_reverse_iterator(begin()); }
-   
+
        // 23.2.4.2 capacity:
-   
+
        size_type size() const { return end_ - ebo_.beg_; }
        size_type max_size() const { return ebo_.max_size(); }
-   
-       void resize(size_type sz, T c = T()) 
+
+       void resize(size_type sz, T c = T())
        {
            const size_type oldSz = size();
            if (oldSz >= sz)
@@ -272,15 +272,15 @@ namespace yasli {
    public:
        size_type capacity() const
        {
-           return eos_ - ebo_.beg_; 
+           return eos_ - ebo_.beg_;
        }
        bool empty() const
        {
-           return ebo_.beg_ == end_; 
+           return ebo_.beg_ == end_;
        }
        void reserve(size_type n)
        {
-           const size_type 
+           const size_type
                s = size(),
                c = capacity();
            if (c >= n) return;
@@ -302,7 +302,7 @@ namespace yasli {
        {
            if (capacity() >= n) return true;
            if (!yasli_nstd::allocator_traits<Allocator>::reallocate_inplace(
-               ebo_, ebo_.beg_, n)) 
+               ebo_, ebo_.beg_, n))
            {
                return false;
            }
@@ -352,9 +352,9 @@ namespace yasli {
            assert(!empty());
            return end_[-1];
        }
-   
+
    private:
-           
+
        void prepare_growth(size_type delta)
        {
            const size_type s = size();
@@ -372,12 +372,12 @@ namespace yasli {
                reserve(std::max(s + delta, suggestedSize));
            }
        }
-   
+
    public:
        // 23.2.4.3 modifiers:
        void push_back(const T& x)
        {
-           if (size() == capacity()) 
+           if (size() == capacity())
            {
                prepare_growth(1);
            }
@@ -391,17 +391,17 @@ namespace yasli {
        }
        void move_back_nstd(T& x)
        {
-           if (size() == capacity()) 
+           if (size() == capacity())
            {
                prepare_growth(1);
            }
            yasli_protocols::move_traits<T>::nondestructive_move(&x, &x + 1, end_);
        }
-   
+
        // 23.2.4.3 modifiers:
        iterator insert(iterator position, const T& x)
        {
-           // @@@ be smarter about this reservation 
+           // @@@ be smarter about this reservation
            reserve(size() + 1);
            const size_type pos = position - begin();
            insert(position, (size_type)1, x);
@@ -409,37 +409,37 @@ namespace yasli {
        }
        void insert(iterator position, size_type n, const T& x)
        {
-           insert(position, 
+           insert(position,
                yasli_nstd::fill_iterator<const T&>(x),
                yasli_nstd::fill_iterator<const T&>(x, n)
                );
        }
-       
+
        template <class InputIterator>
        void insert(iterator position, InputIterator first, InputIterator last)
        {
            insert_pre_impl(position, first, last,
               Loki::Int2Type<yasli_nstd::is_class<InputIterator>::value||
-                             yasli_nstd::is_pointer<InputIterator>::value>()); 
+                             yasli_nstd::is_pointer<InputIterator>::value>());
        }
    private:
        template<class InputIterator, class looks_like_iterator>
-       void 
+       void
        insert_pre_impl(iterator position, InputIterator first, InputIterator last,
                        looks_like_iterator)
-       {      
-           insert_impl(position, first, last, 
+       {
+           insert_impl(position, first, last,
            typename std::iterator_traits<InputIterator>::iterator_category());
        }
-       
+
        template <class non_iterator>
-       void insert_pre_impl(iterator position, non_iterator n, non_iterator x, 
+       void insert_pre_impl(iterator position, non_iterator n, non_iterator x,
                                                          Loki::Int2Type<false>)
        {   //used if e.g. T is int and insert(itr, 10, 6) is called
-           insert(position, static_cast<size_type>(n), 
+           insert(position, static_cast<size_type>(n),
                             static_cast<value_type>(x));
        }
-       
+
        template <class InputIterator>
        void insert_impl(iterator position,
            InputIterator first, InputIterator last, std::input_iterator_tag)
@@ -454,16 +454,16 @@ namespace yasli {
            FwdIterator first, FwdIterator last, std::forward_iterator_tag)
        {
            typedef yasli_protocols::move_traits<T> mt;
-           
-           const typename std::iterator_traits<FwdIterator>::difference_type 
+
+           const typename std::iterator_traits<FwdIterator>::difference_type
                           count = std::distance(first, last);
-               
+
            if (eos_ - end_ > count || reserve_inplace_nstd(size() + count)) // there's enough room
            {
                if (count > end_ - &*position)
                {
                    // Step 1: fill the hole between end_ and position+count
-                   FwdIterator i1 = first; 
+                   FwdIterator i1 = first;
                    std::advance(i1, end_ - &*position);
                    FwdIterator i2 = i1;
                    std::advance(i2, &*position + count - end_);//why not i2 = first; advance(i2,count);
@@ -508,7 +508,7 @@ namespace yasli {
            }
        }
    public:
-   
+
        iterator erase(iterator position)
        {
            erase(position, position + 1);
@@ -538,9 +538,9 @@ namespace yasli {
            end_ = ebo_.beg_;
        }
    };//vector
-   
-   
-   
+
+
+
    template <class T, class Allocator>
    bool operator==(const vector<T,Allocator>& x,
                    const vector<T,Allocator>& y);
@@ -562,20 +562,20 @@ namespace yasli {
    // specialized algorithms:
    template <class T, class Allocator>
    void swap(vector<T,Allocator>& x, vector<T,Allocator>& y);
-   
+
 }//yasli
 
 
 
 namespace yasli_protocols
-{         
+{
     template <class T, class A>
-    struct move_traits< yasli::vector<T, A> >:public 
+    struct move_traits< yasli::vector<T, A> >:public
     yasli_nstd::type_selector<
                     sizeof(yasli::vector<T, A>) != (3 * sizeof(T*)),
                     memmove_traits< std::complex<T> >,
                     safe_move_traits< std::complex<T> >
-             >::result 
+             >::result
     {
     };
 }
