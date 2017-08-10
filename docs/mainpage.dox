@@ -1,6 +1,6 @@
 /**
-@mainpage 
- 
+@mainpage
+
 @section intro Introduction
 
 This document provides code documentation for the software LeMonADe. Further
@@ -8,7 +8,7 @@ down this page you can find a short introduction on the purpose and structure
 of the software, as well as a getting started manual including a few
 instructive examples. These are meant to both give you an idea of how the
 software is working and also give you an idea of how you can customize it to
-your needs. 
+your needs.
 
 @subpage getting_started
 \n
@@ -16,9 +16,9 @@ your needs.
 \n
 @subpage basic_examples
 \n
-@subpage advanced_examples 
+@subpage advanced_examples
 \n
- 
+
 
 @page getting_started Getting Started
 
@@ -29,7 +29,7 @@ git-repository on github
 
 git@github.com:LeMonADE-project/LeMonADE.git
 
-Information on how to build and install the software can be found there, 
+Information on how to build and install the software can be found there,
 or equivalently in the file Readme.md in the repository.
 
 
@@ -44,16 +44,16 @@ this into the existing code in a very simple fashion. This modularity of the
 software makes the code very well reuseable. More information about how
 features work can be found in the section "Advanced useage" below, and in the
 documentation of the code.\n\n
-Let's go into the structure in a little more datail. The essential parts of
+Let's go into the structure in a little more detail. The essential parts of
 the framework are sketched in the figure below.
 
 @image html ProgramStructure.jpg "Program elements" width=\textwidth
 
 The basic unit of the system is, as may be expected, monomers. These hold
-information such as a position in space, a charge, or whatever other qunatity
+information such as a position in space, a charge, or whatever other quantity
 that is characteristic for a particle. \n
 The monomers are organized in a structure we call "Molecules". This class
-holds additional information about connectivity (or bonds) and privides the
+holds additional information about connectivity (or bonds) and provides the
 interfaces to particle and bond information. In other words, "Molecules"
 organizes the particles in a graph structure, with the particles being
 vertices and the bonds being the edges.\n\n
@@ -72,10 +72,10 @@ automatically (if several features require the same additional feature, it is
 only added once). The concept of extensions by the use of features will be
 shown in the provided examples to make the point more clear.\n\n
 Usually one would like to not only store a single conformation in the
-strucure, but rather constantly update the conformation and possibly analyze
+structure, but rather constantly update the conformation and possibly analyze
 it. In LeMonADe, everything that has write-access to the Ingredients is called
 an "updater", whereas all structures that somehow only process the system
-information, and thus only need read-access, are called anlyzers. Updaters and
+information, and thus only need read-access, are called analyzers. Updaters and
 analyzers are conveniently managed by a class TaskManager. This class
 periodically executes all defined updaters and analyzers, thus generating the
 program flow.\n\n
@@ -85,20 +85,20 @@ show how the just described software design works in practice.
 
 @page basic_examples Basic Usage
 This section shows how a very simple LeMonADe program can be put together and
-used. First examples are discussed. More advanced examples, expecially for
+used. First examples are discussed. More advanced examples, especially for
 customization, are discussed in the next section.\n\n
 A typical LeMonADe main() function can be used almost as a script. It consists
 usually of three parts:\n
 1. Define the additional features you want to use (if any) along with what you want to use as a
 monomer base unit (e.g. integer position for lattice simulations, or double
 positions for analysis of MD data, 3D or 2D,...).\n
-2. Tell the taskmanager, which updaters and analyzers you want to use
+2. Tell the task manager, which updaters and analyzers you want to use
 (e.g. ReadFile and a BFMSimulation updater could be a choice of two
 updaters).\n
-3. Tell the taskmanager to run the defined tasks.\n\n
+3. Tell the task manager to run the defined tasks.\n\n
 
 The possible ways how to do this are illustrated in the examples.\n
-Before that, the basic data structures, and the use of the random number 
+Before that, the basic data structures, and the use of the random number
 generators are explained.\n
 
 @section example0 Example 0: Using Ingredients and Molecules
@@ -108,7 +108,7 @@ as the basic data type for storing coordinates.
 
 @include example0/ex0main.cpp
 
-@section example1 Example 1: Random numbers 
+@section example1 Example 1: Random numbers
 
 This example demonstrates the basic usage the random number generator.
 @include example1/ex1main.cpp
@@ -188,16 +188,16 @@ is to write our own feature (FeatureColor), which provides the color map and
 knows that it requires the monomers to be extended by the interfaces provided
 by the class ColorTag. It furthermore exports the needed routines for reading
 the custom commands #!color_tag and #!color_map to the file-reader, if
-necessary. Let's go through this step by step. Below is the sourcecode of the
+necessary. Let's go through this step by step. Below is the source code of the
 feature:
 
 @include example6/FeatureExample6.h
 
 And here are the reading commands that are exported when a file is to be
-read. They are classes that must be derived from AbstractCommand, and that 
-implement the function void execute(). If the prgram is supposed to
+read. They are classes that must be derived from AbstractCommand, and that
+implement the function void execute(). If the program is supposed to
 also be able to write bfm-files containing these commands, this can be done
-just analoguously by writing a class derived from AbstractWrite. See the
+just analogously by writing a class derived from AbstractWrite. See the
 documentation and code of other features, as well as the tests, for more
 examples.
 
@@ -210,7 +210,7 @@ examples shown before:
 @include example6/ex6main.cpp
 
 In the folder example6 there is a bfm file provided (testfile.bfm), that has
-the commands #color_map and #color_tag in it. Simple call 
+the commands #color_map and #color_tag in it. Simple call
 @code
 Example6 example6/testfile.bfm
 @endcode
