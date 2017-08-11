@@ -26,7 +26,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------*/
 
 /* *********************************************************************
- * This example program demonstates the use of the class template
+ * This example program demonstrates the use of the class template
  * Vector3D, providing a simple 3 dimensional vector class.
  *
  * Vector3D is defined in src/utility/Vector3D.h

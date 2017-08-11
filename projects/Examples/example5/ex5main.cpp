@@ -114,7 +114,7 @@ int main(int argc, char* argv[]){
 
     //add the simulator
     //here we set the frequency to one, because we want to execute it in every
-    //circle
+    //cycle
     taskmanager.addUpdater(new
     UpdaterSimpleSimulator<MyIngredients,MoveLocalSc>(mySystem,1000),1);
 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]){
     taskmanager.addAnalyzer(new
     AnalyzerRadiusOfGyration<MyIngredients>(mySystem,"Rg2.dat"),10);
 
-    //now add the ex5analyzer. execute it every second circle
+    //now add the ex5analyzer. execute it every second cycle
     std::string outputFilename("ex5output.dat");
     taskmanager.addAnalyzer(new Ex5Analyzer<MyIngredients>(mySystem,outputFilename),2);
 

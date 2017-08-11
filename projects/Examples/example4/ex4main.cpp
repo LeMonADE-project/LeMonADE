@@ -51,7 +51,7 @@ int main(int argc, char* argv[]){
     /* ****************************************************************
       * as described in the previous examples, we quickly seed the
       * random number generator, and set up a system in a box with the
-      * standard BFM bondset. We add 10 monomers and connect them to a
+      * standard BFM bond set. We add 10 monomers and connect them to a
       * linear polymer.
       * ***************************************************************/
 
@@ -122,9 +122,9 @@ int main(int argc, char* argv[]){
       * arguments:
       * 1) a pointer to the updater/analyzer
       * 2) a number indicating how often the particular task should be
-      * executed. For example, 1 means every circle, 2 every second
-      * circle, etc. Setting the second argument to 0 means the task
-      * will be executed only once in the first circle. This is useful
+      * executed. For example, 1 means every cycle, 2 every second
+      * cycle, etc. Setting the second argument to 0 means the task
+      * will be executed only once in the first cycle. This is useful
       * if for example a polymer is added in the beginning by an updater.
       * Here, we have created the polymer by hand, so this is not
       * necessary.
@@ -135,9 +135,9 @@ int main(int argc, char* argv[]){
 
     //add the simulator
     //the syntax says: the simulator should simulate mySystem
-    //every time it is exeted, it simulates for 10000 steps
+    //every time it is executed, it simulates for 10000 steps
     //The 1 as second argument to addUpdater says that the
-    //simulation is to be called in every circle.
+    //simulation is to be called in every cycle.
     taskmanager.addUpdater(new
     UpdaterSimpleSimulator<MyIngredients,MoveLocalSc>(mySystem,10000),1);
 
@@ -153,7 +153,7 @@ int main(int argc, char* argv[]){
     AnalyzerRadiusOfGyration<MyIngredients>(mySystem,"Rg2.dat"),10);
 
     /* ****************************************************************
-      * For running the desired tasks, the taskmanager provides four
+      * For running the desired tasks, the task manager provides four
       * functions:
       * - initialize() : should always be called at the beginning. It
       * initializes the updaters and analyzers. More on this topic in
@@ -168,10 +168,10 @@ int main(int argc, char* argv[]){
 
     //this will prepare and run the simulation. look in the directory
     //where you called the program for output files.
-    //we run the taskmanager 1000 times, because in every run, the
+    //we run the task manager 1000 times, because in every run, the
     //simulator makes 10000 steps->total of 1E7 steps.
     //when you run this example program, you will see some output
-    //indicating the progress of the simulation on the sceen.
+    //indicating the progress of the simulation on the screen.
 
     taskmanager.initialize();
     taskmanager.run(1000);

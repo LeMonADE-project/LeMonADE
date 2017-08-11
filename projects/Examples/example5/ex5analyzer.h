@@ -45,7 +45,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * Furthermore, they normally hold a const reference to either ingredients
  * or molecules, because they need to access the particle data. The reference
  * should always be const, because the Analyzer is not supposed to change the
- * sytem, only analyze the contents.
+ * system, only analyze the contents.
  * Below the class declaration we implement the functions
  * ***************************************************************************/
 
@@ -69,7 +69,7 @@ private:
   std::string outputFilename;
   //this will count the number of samples, so we can calculate the average
   uint32_t nValues;
-  //this holds the number of particles in the sytem. set by initialize()
+  //this holds the number of particles in the system. set by initialize()
   double nParticles;
   //this will be the result at the end
   VectorDouble3 centerOfMass;
@@ -107,7 +107,7 @@ void Ex5Analyzer<IngredientsType>::initialize()
 /* ****************************************************************************
  * execute...this is where the analysis happens
  * we calculate the center of mass of the system and add the value to the
- * vector centerOfMass. In cleanup, we will devide the collected value
+ * vector centerOfMass. In cleanup, we will divide the collected value
  * by the number of samples.
  * ***************************************************************************/
 template<class IngredientsType>

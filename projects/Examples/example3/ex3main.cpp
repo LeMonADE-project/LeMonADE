@@ -28,7 +28,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /* ***************************************************************************
  * As a first example of how the classes Ingredients and Molecules can be used
  * together, we define a group of particles that have three integer coordinates.
- * This is just the same as in example 2. Here, we additinally place the
+ * This is just the same as in example 2. Here, we additionally place the
  * particles into an Ingredients environment defined by features. This example
  * program shows how to access the Molecules object contained within Ingredients,
  * and how to use features to change the environment.
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
   /* ***************************************************************************
    * The first three lines of the code above are only typedefs, that is they only
    * define alias shortcut names to make the code more readable. In fact, all four
-   * lines of code above could also be writtenn as
+   * lines of code above could also be written as
    * Ingredients<ConfigureSystem<VectorInt3,LOKI_TYPELIST_1(FeatureBox)> > system;
    * Here, we use the separate typedefs to make the different parts easier to
    * explain.
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
    * of this follows at the bottom of this example program.
    * For detailed explanations of what a typelist does internally, you can have
    * a look at the documentation of the loki library at
-   * http://loki-lib.sourcforge.net,
+   * http://loki-lib.sourceforge.net,
    * or other sources explaining the loki library. For using LeMonADe, this is not
    * necessary to know in detail.
    *
@@ -85,7 +85,7 @@ int main(int argc, char* argv[])
    * Ingredients uses a Configuration type as template parameter (third line)
    * from which it gets all information about the used features.
    * This type is defined in the second line and specifies internally the Molecules
-   * object to be used, and a datatype containing all information from the features.
+   * object to be used, and a data type containing all information from the features.
    * Again, the details are not too important for the beginning. It is mostly
    * important to know that the type ConfigureSystem uses two template arguments,
    * the first one being the vector type for Molecules as in example 2, and the
@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
    * z direction. If we now set the coordinate of some particle to be larger
    * than 128 (the size of the box in z-direction), or negative, the system
    * becomes inconsistent. Calling synchronize would in that case give an
-   * appropriate errormessage. Below it is shown how to use synchronize.
+   * appropriate error message. Below it is shown how to use synchronize.
    * To see the effect, you can change the coordinate of some particle to
    * an invalid value, and then compile and run the example program.
    * ************************************************************************/
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
    * environment, which is defined by a box, but additionally a set of allowed
    * bond vectors (for the BFM model). The handling of this set of bond vectors
    * is taken care of by FeatureBondset. Setting up such an environment works
-   * exactly the same way as before .Note that we now use LOKI_TYPELIST_2,
+   * exactly the same way as before. Note that we now use LOKI_TYPELIST_2,
    * because we use two features to define the system.
    * in addition the the settings for the box, system2 also offers functions for
    * defining the set of allowed bond vectors:

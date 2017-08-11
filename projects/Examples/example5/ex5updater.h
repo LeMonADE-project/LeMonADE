@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * This example shows how to write a simple updater. In this case, the updater
  * will add a number of single monomers to the system.
  * Basically, this is similar to what has been done in the previous
- * example, only that it is encapsuled in an updater - and thus it is reusable
+ * example, only that it is encapsulated in an updater - and thus it is reusable
  * in other programs.
  * ***************************************************************************/
 
