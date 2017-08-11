@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
   Molecules<VectorInt3> molecules2;
 
   //just to demonstrate the idea, the next line defines a molecules object with
-  //only 4 allowed bonds, three coodinates with double values, and an integer stored
+  //only 4 allowed bonds, three coordinates with double values, and an integer stored
   //with every bond
   Molecules<VectorDouble3,4,int> molecules3;
 
@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 
   //to set the number of particles in the system, Molecules offers the function
   //resize(n).
-  //similarily, to obtain the number of particles, use the functon size()
+  //similarly, to obtain the number of particles, use the functon size()
   //here we change the number of particles and print the current size to the
   //standard output
 
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 
   //by now, molecules1 contains 5 particles. the number of particles in a Molecules
   //object can be found using the function size().
-  //we print the sizes of all the molecules objects to the standart output:
+  //we print the sizes of all the molecules objects to the standard output:
   std::cout<<"**************************************************\n";
   std::cout<<"size of molecules1:"<<molecules1.size()<<std::endl;
   std::cout<<"size of molecules2:"<<molecules2.size()<<std::endl;
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
   molecules1.connect(1,2);
   molecules1.connect(3,4);
 
-  //for demonstrating the priciple, we also connect particles 4 and 0 and store some
+  //for demonstrating the principle, we also connect particles 4 and 0 and store some
   //value on the bond. In the definition we chose to allow for integer values to be
   //stored on the bonds, so we store a value of 5 here:
   molecules1.connect(4,0,5);
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
   std::cout<<"monomer 0 - z coordinate:"<<molecules1[0].getZ()<<std::endl;
   std::cout<<"**************************************************\n";
 
-  //similarily, one can alter the positions using VectorInt3's functions
+  //similarly, one can alter the positions using VectorInt3's functions
   //setX(),setY(),setZ():
   //now we change the position of the 0th monomer and print the new position
   //to the screen
