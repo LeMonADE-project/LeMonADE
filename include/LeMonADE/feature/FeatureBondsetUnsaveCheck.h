@@ -63,7 +63,7 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
   /**
    * @brief Updates the bond-set lookup table if necessary
    *
-   * @details Synchronizes the bond-set look-up table with the rest of the system, and checks for invalid bonds.
+   * @details Synchronizes the bond-set look-up table with the rest of the system, and checks for invalid bonds. Connection between periodic images is allowed.
    *
    * @param ingredients A reference to the IngredientsType - mainly the system.
    */
