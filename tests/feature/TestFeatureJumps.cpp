@@ -98,8 +98,10 @@ TEST_F(TestFeatureJumps, CheckWrite)
   ingredients.setPeriodicZ(true);
   
   //add bond to the bondset
-  uint i = 0;
+  //add mirrored bond vector for consistency
   ingredients.modifyBondset().addBond(1,1,2,48);
+  ingredients.modifyBondset().addBond(-1,-1,-2,49); 
+  uint i = 0;
   for(i=0;i<16;i++){
     ingredients.modifyMolecules().addMonomer(VectorInt3(i,i,2*i+32));
   }
