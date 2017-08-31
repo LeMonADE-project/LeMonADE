@@ -73,6 +73,12 @@ protected:
   
   //! function to add a new monomer inbetween two others
   bool addMonomerInsideConnectedPair(uint32_t indexA, uint32_t indexB, int32_t type=1);
+
+  //! function to add a new monomer at two others
+  bool addMonomerAtConnectedPair(uint32_t indexA, uint32_t indexB, int32_t type=1);
+  
+  //! function to add a ring around a chain monomer
+  bool addRing(uint32_t parent_id, int32_t type=1, uint32_t NRingMonomers=5);
   
   //! function to move the whole system
   void moveSystem(int32_t nsteps);
@@ -83,8 +89,10 @@ protected:
   //! function to get a random bondvector of length 2
   VectorInt3 randomBondvector();
   
+  
 private:
   RandomNumberGenerators rng;
+ 
   
 };
 
@@ -252,7 +260,175 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerInsideConnectedPair(uint3
   }
   return false;
 }
-
+/******************************************************************************/
+/**
+ * @brief function to add a new monomer two already existing ones.
+ * @param indexA
+ * @param indexB
+ * @param type attribute tag of the new monomer
+ * @return <b false> if position is not free, <b true> if move was applied
+ */
+template<class IngredientsType>
+bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtConnectedPair(uint32_t indexA, uint32_t indexB, int32_t type){
+  //first check if monomers are connected
+  if( ! ingredients.getMolecules().areConnected(indexA,indexB))
+    return false;
+  
+  MoveAddMonomerSc addmove;
+  addmove.init(ingredients);
+  addmove.setTag(type);
+  
+  int32_t counter(0);
+  
+  while(counter<10000){
+    //try at most 30 random bondvectors to find a new monomer position
+    for(uint i=0;i<30;i++){
+      // get a random bondvector
+      VectorInt3 bondvector(randomBondvector());
+      // set position of new monomer
+      addmove.setPosition(ingredients.getMolecules()[indexA]+bondvector);
+    
+      // check new position (excluded volume, other features)
+      if(addmove.check(ingredients)==true){
+	//check the new bondvector bewten the new monomer and indexB
+	VectorInt3 checkBV(addmove.getPosition()-ingredients.getMolecules()[indexB]);
+	if( (checkBV.getLength() < 3) && (ingredients.getBondset().isValidStrongCheck(checkBV)) ){
+	  addmove.apply(ingredients);
+	  ingredients.modifyMolecules().connect( indexA, (ingredients.getMolecules().size()-1) );
+	  ingredients.modifyMolecules().connect( indexB, (ingredients.getMolecules().size()-1) );
+	  return true;
+	}
+      }
+    }
+    // if no position matches, we need to move the system a bit
+    moveSystem(2);
+    counter++;
+  }
+  return false;
+}
+/**
+ * @brief add a ring threaded on a chain at position of parent monomer
+ * @details the ring is made of 5 monomers
+ * @param parent
+ * @param type
+ */
+template < class IngredientsType >
+bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t type, uint32_t NRingMonomers)
+  {
+    bool addRingSuccess(true);
+    uint32_t attempts(0);
+    while (attempts<10000)
+    {
+      uint32_t neighborDirection(0);
+      uint32_t currentParent(parent);
+      while (true)
+      {
+	  uint32_t neighborID(ingredients.getMolecules().getNeighborIdx(currentParent,neighborDirection));
+	  if(ingredients.getMolecules().getNumLinks(neighborID) > 2 )
+	  {
+	    if(neighborDirection==1) break;
+	    else {neighborDirection++; currentParent=parent;}
+	  }
+	  else
+	  {
+	    VectorInt3 neighborPosition(ingredients.getMolecules()[neighborID]);
+	    VectorInt3 parentPosition(ingredients.getMolecules()[currentParent]);
+	    VectorInt3 bond(neighborPosition-parentPosition);
+	    if(bond.getLength() == 2)
+	    {
+	      int32_t dx1, dx2;
+	      int32_t dy1, dz1;
+	      int32_t dy2, dz2;
+	      VectorInt3 vec1,vec2;
+	      if(bond.getX() == 2 || bond.getX() == -2)
+	      {
+		parentPosition+=VectorInt3(bond.getX()/2,0,0);
+		dx1=0;dx2=0;//dy1=2;dy2=0;dz1=0;dz2=2; 
+		if(rng.r250_drand()>0.5){dy1=2;dy2=0;dz1=0;dz2=2;}
+		else {dy1=0;dy2=2;dz1=2;dz2=0;}
+		int32_t dx3,dx4;
+		rng.r250_drand()>0.5 ? dx3=1 : dx3=-1;
+		rng.r250_drand()>0.5 ? dx4=1 : dx4=-1;
+		vec1=VectorInt3( dx2+dx3,  dy2,  dz2);
+		vec2=VectorInt3(-dx2+dx4, -dy2, -dz2);
+	      }
+	      else if(bond.getY() == 2 || bond.getY() == -2)
+	      {
+		parentPosition+=VectorInt3(0,bond.getY()/2,0);
+		dy1=0;dy2=0; 
+		if(rng.r250_drand()>0.5){dx1=2;dx2=0;dz1=0;dz2=2;}
+		else {dx1=0;dx2=2;dz1=2;dz2=0;}
+		int32_t dy3,dy4;
+		rng.r250_drand()>0.5 ? dy3=1 : dy3=-1;
+		rng.r250_drand()>0.5 ? dy4=1 : dy4=-1;
+		vec1=VectorInt3( dx2,  dy2+dy3,  dz2);
+		vec2=VectorInt3(-dx2, -dy2+dy4, -dz2);
+	      }
+	      else if(bond.getZ() == 2 || bond.getZ() == -2)
+	      {
+		parentPosition+=VectorInt3(0,0,bond.getZ()/2);
+		dz1=0;dz2=0; 
+		if(rng.r250_drand()>0.5){dx1=2;dx2=0;dy1=0;dy2=2;}
+		else {dx1=0;dx2=2;dy1=2;dy2=0;}
+		int32_t dz3,dz4;
+		rng.r250_drand()>0.5 ? dz3=1 : dz3=-1;
+		rng.r250_drand()>0.5 ? dz4=1 : dz4=-1;
+		vec1=VectorInt3( dx2,  dy2,  dz2+dz3);
+		vec2=VectorInt3(-dx2, -dy2, -dz2+dz4);
+	      }
+	      else {throw std::runtime_error("UpdaterAbstractCreate::addRing - something wrong with the bond along the chain");}
+	      // check two positions in addition to 
+	      std::vector<VectorInt3> PotentialPositions(6,parentPosition);
+	      PotentialPositions[0]+=VectorInt3( dx1, dy1, dz1);
+	      PotentialPositions[2]+=VectorInt3(-dx1,-dy1,-dz1);
+	      PotentialPositions[4]+=VectorInt3( dx2, dy2, dz2);
+	      PotentialPositions[5]+=VectorInt3(-dx2,-dy2,-dz2);
+	      PotentialPositions[1]+=vec1;
+	      PotentialPositions[3]+=vec2;
+	      
+	      // check of positions are free
+	      bool PositionsFit(true);
+	      for(uint32_t i=0; i <PotentialPositions.size();i++)
+	      {
+		  MoveAddMonomerSc addmove;
+		  addmove.init(ingredients);
+		  addmove.setPosition(PotentialPositions[i]);
+		  if(addmove.check(ingredients)==false){PositionsFit=false;}
+	      }
+	      
+	      if (PositionsFit)
+	      {
+		for(uint32_t i=0; i < 4 ;i++) 
+		{
+		  std::cout <<addMonomerAtPosition(PotentialPositions[i], type)<<" at "<<PotentialPositions[i]<<std::endl;
+		} 
+		uint32_t LastMonomerID(ingredients.getMolecules().size()-1);
+		for(uint32_t i=0; i < 4 ;i++) 
+		{
+		  ingredients.modifyMolecules().connect((LastMonomerID-i%4),(LastMonomerID-(1+i)%4));
+		}
+		
+		if (NRingMonomers>4) 
+		{
+		  for(uint32_t i=0; i<(NRingMonomers-4);i++)
+		  {
+		    addMonomerInsideConnectedPair(ingredients.getMolecules().size()-1,ingredients.getMolecules().size()-2,type);
+		  }
+		}
+		return true;
+		
+	      }
+	      //if still here: try again at next position		
+	      currentParent=neighborID;
+	    }
+	    else {currentParent=neighborID;}
+	  }
+      }
+      attempts++;
+      moveSystem(2);
+    }
+    return false; 
+  };
 /******************************************************************************/
 /**
  * @brief function to move the whole system
@@ -338,5 +514,4 @@ VectorInt3 UpdaterAbstractCreate<IngredientsType>::randomBondvector(){
   }else
     throw std::runtime_error("UpdaterAbstractCreate::randomBondvector: bondvectors not part of the bondvectorset.");
 }
-
 #endif /* LEMONADE_UPDATER_ABSTRACT_CREATE_H */
