@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -34,7 +34,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 /// constructor
 //pointers pos,other147 and other250 are set to positions in the array
-//according to random number generation algorithm. 
+//according to random number generation algorithm.
 //loads predefined state.
 R250::R250():
 	   arrayEnd(&array[R250_RANDOM_PREFETCH]),
@@ -47,28 +47,28 @@ R250::R250():
 
 
 //applies the random number algorithm to the internal state array
-//the algorithm applies bitwise ^ operations to the numbers in the array, such 
+//the algorithm applies bitwise ^ operations to the numbers in the array, such
 //that new pseudo random numbers are generated. the poiner dice is then set to
 //the beginning of the array, from where the new numbers are drawn.
 void R250::refresh()
 {
 	do
 	{
-	  *(pos++)		= *(other147++)^(*(other250++)); 
+	  *(pos++)		= *(other147++)^(*(other250++));
 	}
 	while(pos != arrayEnd);
 	pos			= array;
 
 	do
 	{
-	  *(pos++)		= *(other147++)^(*(other250++)); 
+	  *(pos++)		= *(other147++)^(*(other250++));
 	}
 	while(other147!=arrayEnd);
 
 	other147			= array;
 	do
 	{
-	  *(pos++)		= *(other147++)^(*(other250++)); 
+	  *(pos++)		= *(other147++)^(*(other250++));
 	}
 	while(other250!=arrayEnd);
 
@@ -82,12 +82,12 @@ void R250::loadRandomState()
 {
 		std::cout << "size of rng = " << sizeof(array) << std::endl;
 		std::cout << "loading r250 state from /dev/urandom...";
-		
+
 		std::ifstream in("/dev/urandom");
 		in.read((char*)array,sizeof(array));
-		
+
 		std::cout << "ready.\n";
-		
+
 		//shuffle array and initialize pointers
 		pos=&array[250];
 		other147=(pos-147);
@@ -110,7 +110,7 @@ void R250::setState(uint32_t* stateArray)
 }
 
 //this resets the state array to a predefined value, so that a defined state
-//can always be obtained if needed. the numbers were generated from /dev/urandom 
+//can always be obtained if needed. the numbers were generated from /dev/urandom
 //once and then simply copied here.
 void R250::loadDefaultState()
 {
@@ -162,7 +162,7 @@ void R250::loadDefaultState()
 	{
 		array[i]=tmp[i];
 	}
-	
+
 	//shuffle
 	pos=&array[250];
 	other147=(pos-147);

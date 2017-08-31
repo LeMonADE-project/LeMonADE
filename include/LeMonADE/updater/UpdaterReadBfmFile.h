@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -57,7 +57,7 @@ public:
 	 */
   UpdaterReadBfmFile(std::string filename,IngredientsType& ing,int readType)
     :ingredients(ing),file(filename,ing),myReadType(readType){};
-  
+
 
   /**
    * @enum BFM_READ_TYPE
@@ -102,7 +102,7 @@ public:
 		}
 		else
 			throw std::runtime_error("ReadBFMFile::init()...read type must have value READ_LAST_CONFIG_SAVE(0), READ_LAST_CONFIG_FAST(1), or READ_STEPWISE(2)\n");
-		
+
 		ingredients.synchronize();
   };
 
@@ -123,7 +123,7 @@ public:
   virtual bool execute()
   {
 	bool retVal = false;
-	
+
 	if(myReadType==READ_STEPWISE)
 		retVal=file.read();
 
@@ -142,10 +142,10 @@ public:
 	*/
 	if( ((myReadType != READ_STEPWISE) && (myReadType != READ_LAST_CONFIG_SAVE) && (myReadType!=READ_LAST_CONFIG_FAST)))
 		throw std::runtime_error("ReadBFMFile::execute()...read type must have value READ_LAST_CONFIG_SAVE(0), READ_LAST_CONFIG_FAST(1), or READ_STEPWISE(2)\n");
-		
-		  
-	ingredients.synchronize(); 
-	return retVal;	  
+
+
+	ingredients.synchronize();
+	return retVal;
   }
 
 
@@ -206,7 +206,7 @@ public:
 
   //! Close the file stream.
   void closeFile(){file.close();}
-  
+
 private:
 	//! A reference to the IngredientsType - mainly the system
 	IngredientsType& ingredients;

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -30,7 +30,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 /*****************************************************************************/
 /**
- * @file 
+ * @file
  * @brief class template NumericResultTypes, NumericTypeFlags, IfThenElse
  **/
 
@@ -58,7 +58,7 @@ template < class T > struct NumericTypeFlags {};/*
     is_signed  = true
   };
 };*/
-  
+
 
 //! Template for numeric type 'float'
 template < >  struct NumericTypeFlags< float > { enum{ is_float   = true, is_signed  = true };};
@@ -121,7 +121,7 @@ template < class T > struct ResultTypes < T , T >
   typedef T stronger_type;
   typedef T product_type;
   typedef double double_type;
-  
+
 };
 
 //! Generic template class providing the information of numeric type it's sign and number of bytes.
@@ -159,49 +159,49 @@ namespace Lemonade
  * @class NumericResultTypes
  * @brief Used by Vector3D to ensure well defined result types for operations involving different types
  **/
-template < class T1, class T2 = T1  > struct NumericResultTypes 
+template < class T1, class T2 = T1  > struct NumericResultTypes
 {
-    typedef typename LemonadeHelper::IfThenElse 
-    < 
+    typedef typename LemonadeHelper::IfThenElse
+    <
 	// if T1 is float
 	LemonadeHelper::NumericTypeFlags <T1> ::is_float,
-	
+
 	// then
-	  typename LemonadeHelper::IfThenElse 
-	  < 
+	  typename LemonadeHelper::IfThenElse
+	  <
 	    // if type 2 is float
 	    LemonadeHelper::NumericTypeFlags <T2> ::is_float,
 	      // then take the longer one
 	      typename LemonadeHelper::LargerType<T1,T2>::result,
 	      // else take the float T1
-	      T1 
+	      T1
 	    // endif T2 is float
 	    >::result,
 	// else ( if T1 is not float )
-	typename LemonadeHelper::IfThenElse  
-	<  
+	typename LemonadeHelper::IfThenElse
+	<
 	// if type T2 is float
 	    LemonadeHelper::NumericTypeFlags <T2> ::is_float,
-	    
+
 	    // then take T2
 	    T2,
-	    
-	    // else 
+
+	    // else
 	    // return a signed integer, if one of them is signed
 	    // and at the same time the longest one
-	    typename 
-	      LemonadeHelper::SpecifyInt 
-	      < 
+	    typename
+	      LemonadeHelper::SpecifyInt
+	      <
 		LemonadeHelper::MaxValue < LemonadeHelper::NumericTypeFlags <T1> ::is_signed, LemonadeHelper::NumericTypeFlags <T2> ::is_signed > ::result,
 		LemonadeHelper::MaxValue < sizeof(T1),sizeof(T2) > ::result
 	      > ::result
-	      
+
 	// endif T2 is float
-	> :: result 
-	
+	> :: result
+
     // endif T1 is float
     > :: result stronger_type;
-    
+
     typedef stronger_type product_type;
     typedef double double_type;
 

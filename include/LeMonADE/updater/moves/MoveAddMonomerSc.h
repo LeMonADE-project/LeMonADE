@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2016 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2016 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -33,7 +33,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @file
- * 
+ *
  * @author Martin
  * @class MoveAddMonomerSc
  *
@@ -45,7 +45,7 @@ class MoveAddMonomerSc : public MoveAddMonomerBase<MoveAddMonomerSc>
 public:
   MoveAddMonomerSc(){};
   virtual ~MoveAddMonomerSc(){};
-  
+
   //! Reset the probability
   template <class IngredientsType> void init(const IngredientsType& ing);
 
@@ -54,7 +54,7 @@ public:
 
   //! Apply the move to the system given as argument
   template< class IngredientsType> void apply(IngredientsType& ing);
-  
+
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ bool MoveAddMonomerSc::check(IngredientsType& ing)
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
 }
-  
+
 /*****************************************************************************/
 /**
  * @brief apply the move to the system given as argument
@@ -93,7 +93,7 @@ void MoveAddMonomerSc::apply(IngredientsType& ing)
   //some features may want to do things with it
   ing.modifyMolecules().addMonomer(this->getPosition().getX(),this->getPosition().getY(),this->getPosition().getZ());
   this->setMonomerIndex(ing.getMolecules().size()-1);
-  
+
   //now apply it to the features so that the features can make alterations,
   //for example set the attribute tag, if the FeatureAttributes is used
   ing.applyMove(ing,*this);

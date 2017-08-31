@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -50,18 +50,18 @@ public:
 	steps[2]=VectorInt3(0,1,0);
 	steps[3]=VectorInt3(0,-1,0);
 	steps[4]=VectorInt3(0,0,1);
-	steps[5]=VectorInt3(0,0,-1);	
+	steps[5]=VectorInt3(0,0,-1);
   }
-  
+
   // overload initialise function to be able to set the moves index and direction if neccessary
   template <class IngredientsType> void init(const IngredientsType& ing);
   template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
   template <class IngredientsType> void init(const IngredientsType& ing, VectorInt3 dir);
   template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
-  
+
   template <class IngredientsType> bool check(IngredientsType& ing);
   template< class IngredientsType> void apply(IngredientsType& ing);
-    
+
 private:
   // holds the possible move directions
   /**
@@ -97,10 +97,10 @@ template <class IngredientsType>
 void MoveLocalSc::init(const IngredientsType& ing)
 {
   this->resetProbability();
-  
+
   //draw index
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-  
+
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
   this->setDir(steps[randomDir]);
@@ -120,13 +120,13 @@ template <class IngredientsType>
 void MoveLocalSc::init(const IngredientsType& ing, uint32_t index)
 {
   this->resetProbability();
-  
+
   //set index
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
     throw std::runtime_error("MoveLocalSc::init(ing, index): index out of range!");
-  
+
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
   this->setDir(steps[randomDir]);
@@ -146,10 +146,10 @@ template <class IngredientsType>
 void MoveLocalSc::init(const IngredientsType& ing, VectorInt3 dir)
 {
   this->resetProbability();
-  
+
   //draw index
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-  
+
   //set direction
   if(dir==steps[0] ||
     dir==steps[1] ||
@@ -177,13 +177,13 @@ template <class IngredientsType>
 void MoveLocalSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir)
 {
   this->resetProbability();
-  
+
   //set index
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
     throw std::runtime_error("MoveLocalSc::init(ing, index, dir): index out of range!");
-  
+
   //set direction
   if(dir==steps[0] ||
     dir==steps[1] ||
@@ -211,7 +211,7 @@ bool MoveLocalSc::check(IngredientsType& ing)
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
 }
-  
+
 /*****************************************************************************/
 /**
  * @brief Apply the move to the system , e.g. add the displacement to Vertex (monomer) position.
@@ -225,13 +225,13 @@ template< class IngredientsType>
 void MoveLocalSc::apply(IngredientsType& ing)
 {
 	///@todo Think about the applying of move. Esp. make this independent of the order to avoid confusion!!
-	
+
 	//move must FIRST be applied to the features
-	ing.applyMove(ing,*this);	
+	ing.applyMove(ing,*this);
 
 	//THEN the position can be modified
 	ing.modifyMolecules()[this->getIndex()]+=this->getDir();
-  
+
 }
 
 #endif
