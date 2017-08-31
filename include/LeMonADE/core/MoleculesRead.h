@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #define LEMONADE_CORE_MOLECULESREAD_H
 
 /**
- *@file 
+ *@file
  *@brief Reading routines for bfm-Reads !number_of_monomers, !bonds and !mcs
  **/
 
@@ -69,9 +69,9 @@ template < class IngredientsType >
 void ReadNrOfMonomers<IngredientsType>::execute()
 {
   std::cout<<"reading number of monomers...";
-  int x; 
+  int x;
   if( this->getInputStream()>> x)
-  { 
+  {
      this->getDestination().modifyMolecules().resize(x);
      std::cout<<x<<std::endl;
   }
@@ -108,7 +108,7 @@ void ReadBonds<IngredientsType>::execute()
   std::cout << "ReadBonds:execute() : updating " <<std::endl;
   int a,b;
   int nBonds=0;
-  
+
   std::string line;
   std::streampos previous;
   //go to next line and save position of get pointer to streampos previous
@@ -117,16 +117,16 @@ void ReadBonds<IngredientsType>::execute()
 
   //get line from file for processing
   getline(this->getInputStream(),line);
-  
+
   //start processing the line
   while(!line.empty() && this->getInputStream().good()){
-    
+
     //if the line contains a bfm Read, stop the procedure and set the get pointer back
     if(this->detectRead(line)){
       this->getInputStream().seekg(previous);
       break;
     }
-    
+
     //initialize a stringstream with the line for easier processing
     std::stringstream stream(line);
 
@@ -134,21 +134,21 @@ void ReadBonds<IngredientsType>::execute()
     stream>>a>>b;
     //throw exception if something went wrong
     if(stream.fail()){
-      
+
     	std::stringstream errormessage;
       errormessage<<"ReadBonds<IngredientsType>::execute()\n"
 		  <<"Could not read bond partners in "<<nBonds+1<<" th bond definition\n";
       throw std::runtime_error(errormessage.str());
-      
+
     }
-      
+
     //if still here, add bond to bondset
     this->getDestination().modifyMolecules().connect(a-1,b-1);
     nBonds++;
     //read next line from file
     getline(this->getInputStream(),line);
   }
-  
+
   std::cout << "ReadBonds:execute() : done " <<std::endl;
 }
 
@@ -172,24 +172,24 @@ class ReadMcs: public ReadToDestination < IngredientsType >
 
 	//! The number of frames/conformations/!mcs-command in file.
 	uint32_t nFrames;
-	
+
 	/**
 	 * @brief Return if first !mcs is read-in, already.
 	 *
 	 * @return \a True if first call/occurance of !mcs - \a False otherwise.
 	 */
 	bool isFirstCall() const {return first_call;}
-	
+
 	//! processes a regular mcs line from a stream
 	void processRegularLine(const std::string& line);
-  
+
 	//! processes a line beginning with keyword solvent
 	void processSolventLine(const std::string& line,uint32_t& offset);
-	
+
 	//! processes a line beginning with keyword solvent
 	void processSolventContinueLine(const std::string& line,uint32_t& offset);
-  
-  
+
+
  public:
   //! Empty Constructor, but delegates call to the Feature. Default: no ignoring of missing monomers.
   ReadMcs(IngredientsType& destination):ReadToDestination< IngredientsType > (destination)
@@ -198,7 +198,7 @@ class ReadMcs: public ReadToDestination < IngredientsType >
   ,ignore_missing_monos(false)
   ,nFrames(0)
   {}
-  
+
   /**
    * @brief Set this if missing monomers should ignore by read-in (maybe due to solvent).
    *
@@ -207,9 +207,9 @@ class ReadMcs: public ReadToDestination < IngredientsType >
    * @param val True if missing monomers should ignored - False otherwise.
    */
   void setIgnoreMissingMonomers(bool val){ignore_missing_monos = val;}
-  
+
   void execute();
-  
+
 };
 
 /***********************************************************************/
@@ -222,15 +222,15 @@ template < class IngredientsType > void ReadMcs< IngredientsType >::execute()
 {
   //get writeable reference to the molecules container
   typename IngredientsType::molecules_type& molecules = this->getDestination().modifyMolecules();
-  
-  
+
+
   if ( this->isFirstCall() ) {
 	std::cout << "ReadMcs:execute() : updating ";
 	std::cout << "connectivity and ";
 	std::cout << "positions.";
   }
-  
-  
+
+
   //some variables needed for reading
   unsigned long mcs;
   std::string line;
@@ -238,24 +238,24 @@ template < class IngredientsType > void ReadMcs< IngredientsType >::execute()
 
   //read mcs number from file and update data
   this->getInputStream()>>mcs;
-  
+
   molecules.setAge(mcs);
-  
+
   //throw exception if there is a reading error or update data otherwise
   if(this->getInputStream().fail()){
-    
+
     std::stringstream errormessage;
     errormessage<<"ReadMcs<IngredientsType>::execute()\n"
 		<<"Could not read mcs number. Previous mcs number was "<<molecules.getAge();
     throw std::runtime_error(errormessage.str());
-    
+
   }
-  
+
   molecules.setAge(mcs);
 
   nFrames++;
   if(nFrames%1000 == 0) std::cout<<"Setting age: "<<mcs<<std::endl;
- 
+
   // the following lines will check if 'jumps' of the '!mcs'-Read are present
   // if so you should use the FeatureJumps for backward-compability
   // for the new LeMonADe-file there´re no jumps anymore!
@@ -285,13 +285,13 @@ template < class IngredientsType > void ReadMcs< IngredientsType >::execute()
 
   //process input lines in this loop
   while(!line.empty() && !this->getInputStream().fail()){
-    
+
 	  //if the line contains a bfm Read, stop the procedure and set the get pointer back
 	  if(this->detectRead(line)){
 		  this->getInputStream().seekg(previous);
 		  return;
 	  }
-	  
+
 	  //if the line starts with the solvent keyword, process the compressed solvent format
 	  if(line.rfind("solvent ",0)==0)
 	  {
@@ -300,15 +300,15 @@ template < class IngredientsType > void ReadMcs< IngredientsType >::execute()
 		  uint32_t offset=0;
 		  processSolventLine(line,offset);
 		  getline(this->getInputStream(),line);
-		  
+
 		  //if solvent extends over more than one line, process "sc" lines as well
 		  while(line.rfind("sc ",0)==0)
 		  {
 			  processSolventContinueLine(line,offset);
-			  getline(this->getInputStream(),line);  
+			  getline(this->getInputStream(),line);
 		  }
 		  size_t stopMonomerIndex=monomerCount;
-		  
+
 		  //remember which monomers are to be compressed when writing an output file
 		  this->getDestination().setCompressedOutputIndices(startMonomerIndex,stopMonomerIndex-1);
 	  }
@@ -327,7 +327,7 @@ template < class IngredientsType > void ReadMcs< IngredientsType >::execute()
     errormessage<<"ReadMcs<IngredientsType>::execute()\n"
 		<<"Inconsistent number of monomers in bfm file in mcs number "
 		<<molecules.getAge()<<std::endl;
-		
+
     if ( (this->ignore_missing_monos==true)  || this->isFirstCall() )
     {
 		if(nFrames%1000==0)
@@ -342,11 +342,11 @@ template < class IngredientsType > void ReadMcs< IngredientsType >::execute()
     }
 
   }
-  
+
   monomerCount=0;
   first_call = false;
-  
-  
+
+
 }
 
 //! reads coordinates from a line containing a connected chain
@@ -359,23 +359,23 @@ template<class IngredientsType>void ReadMcs<IngredientsType>::processRegularLine
 	//read first three coordinates
 	stream>>x>>y>>z;
 
-	
+
 	if(!stream.fail())
 	{
 		molecules[monomerCount].setAllCoordinates(x,y,z);
 			++monomerCount;
 	}
-	
+
 	//throw exception if first coordinates of chain cannot be extracted from file
 	if(stream.fail())
 	{
-	
+
 		std::stringstream errormessage;
 		errormessage<<"ParsingError::ReadMcs<IngredientsType>::execute()\n"
 				<<"Could not read chain initial coordinates in mcs "<<molecules.getAge();
-				
+
 		throw std::runtime_error(errormessage.str());
-	
+
 	}
 
 	//ignore spaces
@@ -389,7 +389,7 @@ template<class IngredientsType>void ReadMcs<IngredientsType>::processRegularLine
 		x+=this->getDestination().getBondset().getBondVector(bondId).getX();
 		y+=this->getDestination().getBondset().getBondVector(bondId).getY();
 		z+=this->getDestination().getBondset().getBondVector(bondId).getZ();
-		
+
 		//update molecules
 		molecules[monomerCount].setAllCoordinates(x,y,z);
 
@@ -399,11 +399,11 @@ template<class IngredientsType>void ReadMcs<IngredientsType>::processRegularLine
 		{
 			molecules.connect(monomerCount-1,monomerCount);
 		}
-		
+
 		//count number of monomers in this mcs
 		++monomerCount;
 	}
-	
+
 }
 
 //! reads folded coordinates of compressed solvent from a line starting with keyword "solvent"
@@ -416,9 +416,9 @@ template<class IngredientsType> void ReadMcs<IngredientsType>::processSolventLin
 	int32_t x,y,z;
 	//put line into stream for ease of processing
 	std::stringstream stream(line);
-	
+
 	stream.ignore(8); //ignore "solvent "
-	
+
 	//now start processing the rest of the stream
 	int32_t distance;
 	while(stream.peek()>0 && stream.good())
@@ -433,18 +433,18 @@ template<class IngredientsType> void ReadMcs<IngredientsType>::processSolventLin
 		{
 			distance=int32_t(stream.get())-33;
 		}
-		
+
 		offset+=distance;
-		
+
 		//transform linear offset index back into 3d coordinates
 		x=offset%boxX;
 		y=int32_t(offset/boxX)%boxY;
-		z=int32_t(offset/(boxX*boxY));		
+		z=int32_t(offset/(boxX*boxY));
 		molecules[monomerCount].setAllCoordinates(x,y,z);
 		//count number of monomers in this mcs
 		++monomerCount;
 	}
-	
+
 }
 
 //! reads folded coordinates of compressed solvent from a line starting with keyword "sc"
@@ -457,7 +457,7 @@ template<class IngredientsType> void ReadMcs<IngredientsType>::processSolventCon
 	int32_t x,y,z;
 	//put line into stream for ease of processing
 	std::stringstream stream(line);
-	
+
 	stream.ignore(3); //ignore "sc "
 	//in this line there is no extra offset to be read from the line
 	//now start processing the rest of the stream
@@ -474,18 +474,18 @@ template<class IngredientsType> void ReadMcs<IngredientsType>::processSolventCon
 		{
 			distance=int32_t(stream.get())-33;
 		}
-		
+
 		offset+=distance;
-		
+
 		//transform linear offset back into 3d coordinate
 		x=offset%boxX;
 		y=int32_t(offset/boxX)%boxY;
-		z=int32_t(offset/(boxX*boxY));		
+		z=int32_t(offset/(boxX*boxY));
 		molecules[monomerCount].setAllCoordinates(x,y,z);
 		//count number of monomers in this mcs
 		++monomerCount;
 	}
-	
+
 }
 
 

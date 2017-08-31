@@ -31,7 +31,7 @@ class StoragePolicy
     typedef @ const_iterator;
     typedef A allocator_type;
     typedef @ size_type;
-    
+
     StoragePolicy(const StoragePolicy& s);
     StoragePolicy(const A&);
     StoragePolicy(const E* s, size_type len, const A&);
@@ -42,7 +42,7 @@ class StoragePolicy
     const_iterator begin() const;
     iterator end();
     const_iterator end() const;
-    
+
     size_type size() const;
     size_type max_size() const;
     size_type capacity() const;
@@ -50,17 +50,17 @@ class StoragePolicy
     void reserve(size_type res_arg);
 
     void append(const E* s, size_type sz);
-    
+
     template <class InputIterator>
     void append(InputIterator b, InputIterator e);
 
     void resize(size_type newSize, E fill);
 
     void swap(StoragePolicy& rhs);
-    
+
     const E* c_str() const;
     const E* data() const;
-    
+
     A get_allocator() const;
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ class StoragePolicy
 // Builds the small string optimization over any other storage
 ////////////////////////////////////////////////////////////////////////////////
 
-template <class Storage, unsigned int threshold, 
+template <class Storage, unsigned int threshold,
     typename Align = typename Storage::value_type*>
 class SmallStringOpt
 {
@@ -90,54 +90,54 @@ public:
     typedef typename Storage::allocator_type allocator_type;
     typedef typename allocator_type::size_type size_type;
     typedef typename Storage::reference reference;
-    
+
 private:
-    enum { temp1 = threshold * sizeof(value_type) > sizeof(Storage) 
-        ? threshold  * sizeof(value_type) 
+    enum { temp1 = threshold * sizeof(value_type) > sizeof(Storage)
+        ? threshold  * sizeof(value_type)
         : sizeof(Storage) };
-    
+
     enum { temp2 = temp1 > sizeof(Align) ? temp1 : sizeof(Align) };
 
 public:
-    enum { maxSmallString = 
+    enum { maxSmallString =
         (temp2 + sizeof(value_type) - 1) / sizeof(value_type) };
-    
+
 private:
     enum { magic = maxSmallString + 1 };
-    
+
     union
     {
         mutable value_type buf_[maxSmallString + 1];
         Align align_;
     };
-    
+
     Storage& GetStorage()
     {
         assert(buf_[maxSmallString] == magic);
         Storage* p = reinterpret_cast<Storage*>(&buf_[0]);
         return *p;
     }
-    
+
     const Storage& GetStorage() const
     {
         assert(buf_[maxSmallString] == magic);
         const Storage *p = reinterpret_cast<const Storage*>(&buf_[0]);
         return *p;
     }
-    
+
     bool Small() const
     {
         return buf_[maxSmallString] != magic;
     }
-        
+
 public:
     SmallStringOpt(const SmallStringOpt& s)
     {
         if (s.Small())
         {
             flex_string_details::pod_copy(
-                s.buf_, 
-                s.buf_ + s.size(), 
+                s.buf_,
+                s.buf_ + s.size(),
                 buf_);
         }
         else
@@ -146,12 +146,12 @@ public:
         }
         buf_[maxSmallString] = s.buf_[maxSmallString];
     }
-    
+
     SmallStringOpt(const allocator_type&)
     {
         buf_[maxSmallString] = maxSmallString;
     }
-    
+
     SmallStringOpt(const value_type* s, size_type len, const allocator_type& a)
     {
         if (len <= maxSmallString)
@@ -179,7 +179,7 @@ public:
             buf_[maxSmallString] = magic;
         }
     }
-    
+
     // Fix suggested by Andrew Barnert on 07/03/2007
     SmallStringOpt& operator=(const SmallStringOpt& rhs)
     {
@@ -228,32 +228,32 @@ public:
     iterator begin()
     {
         if (Small()) return buf_;
-        return &*GetStorage().begin(); 
+        return &*GetStorage().begin();
     }
-    
+
     const_iterator begin() const
     {
         if (Small()) return buf_;
-        return &*GetStorage().begin(); 
+        return &*GetStorage().begin();
     }
-    
+
     iterator end()
     {
         if (Small()) return buf_ + maxSmallString - buf_[maxSmallString];
-        return &*GetStorage().end(); 
+        return &*GetStorage().end();
     }
-    
+
     const_iterator end() const
     {
         if (Small()) return buf_ + maxSmallString - buf_[maxSmallString];
-        return &*GetStorage().end(); 
+        return &*GetStorage().end();
     }
-    
+
     size_type size() const
     {
         assert(!Small() || maxSmallString >= buf_[maxSmallString]);
-        return Small() 
-            ? maxSmallString - buf_[maxSmallString] 
+        return Small()
+            ? maxSmallString - buf_[maxSmallString]
             : GetStorage().size();
     }
 
@@ -270,7 +270,7 @@ public:
             if (res_arg <= maxSmallString) return;
             SmallStringOpt temp(*this);
             this->~SmallStringOpt();
-            new(buf_) Storage(temp.data(), temp.size(), 
+            new(buf_) Storage(temp.data(), temp.size(),
                 temp.get_allocator());
             buf_[maxSmallString] = magic;
             GetStorage().reserve(res_arg);
@@ -281,7 +281,7 @@ public:
         }
         assert(capacity() >= res_arg);
     }
-    
+
     template <class FwdIterator>
     void append(FwdIterator b, FwdIterator e)
     {
@@ -292,7 +292,7 @@ public:
         else
         {
             // append to a small string
-            const size_type 
+            const size_type
                 sz = std::distance(b, e),
                 neededCapacity = maxSmallString - buf_[maxSmallString] + sz;
 
@@ -325,7 +325,7 @@ public:
                 // Small string resized to big string
                 SmallStringOpt temp(*this); // can't throw
                 // 11-17-2001: correct exception safety bug
-                Storage newString(temp.data(), temp.size(), 
+                Storage newString(temp.data(), temp.size(),
                     temp.get_allocator());
                 newString.resize(n, c);
                 // We make the reasonable assumption that an empty Storage
@@ -379,7 +379,7 @@ public:
             if (rhs.Small())
             {
                 // Small swapped with small
-                std::swap_ranges(buf_, buf_ + maxSmallString + 1, 
+                std::swap_ranges(buf_, buf_ + maxSmallString + 1,
                     rhs.buf_);
             }
             else
@@ -415,17 +415,17 @@ public:
             }
         }
     }
-    
+
     const value_type* c_str() const
-    { 
-        if (!Small()) return GetStorage().c_str(); 
+    {
+        if (!Small()) return GetStorage().c_str();
         buf_[maxSmallString - buf_[maxSmallString]] = value_type();
         return buf_;
     }
 
     const value_type* data() const
     { return Small() ? buf_ : GetStorage().data(); }
-    
+
     allocator_type get_allocator() const
     { return allocator_type(); }
 };

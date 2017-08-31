@@ -20,9 +20,9 @@ int main(int argc, char* argv[])
 	std::string outfile;
 	uint32_t max_mcs=0;
 	uint32_t save_interval=0;
-	
+
 	outfile="outfile.bfm";
-	
+
 	if(!(argc==4 || argc==5 )|| (argc==2 && strcmp(argv[1],"--help")==0 ))
 	{
 		std::string errormessage;
@@ -35,7 +35,7 @@ int main(int argc, char* argv[])
 		errormessage+="Updaters used: ReadFullBFMFile, SimpleSimulator\n";
 		errormessage+="Analyzers used: WriteBfmFile\n";
 		throw std::runtime_error(errormessage);
-		
+
 	}
 	else
 	{
@@ -46,14 +46,14 @@ int main(int argc, char* argv[])
 		if(argc==5) outfile=argv[4];
 		else outfile=argv[1];
 	}
-	
+
 	//seed the globally available random number generators
 	RandomNumberGenerators rng;
 	rng.seedAll();
-	
+
 	// FeatureExcludedVolume<> is equivalent to FeatureExcludedVolume<FeatureLattice<bool> >
 	typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes,FeatureExcludedVolumeSc<>) Features;
-	
+
 	typedef ConfigureSystem<VectorInt3,Features, 6> Config;
 	typedef Ingredients<Config> Ing;
 	Ing myIngredients;
@@ -65,14 +65,14 @@ int main(int argc, char* argv[])
 	taskmanager.addUpdater(new UpdaterSimpleSimulator<Ing,MoveLocalSc>(myIngredients,save_interval));
 
 	taskmanager.addAnalyzer(new AnalyzerWriteBfmFile<Ing>(outfile,myIngredients));
-	
+
 	taskmanager.initialize();
 	taskmanager.run(max_mcs/save_interval);
 	taskmanager.cleanup();
-	
+
 	}
 	catch(std::exception& err){std::cerr<<err.what();}
 	return 0;
-  
+
 }
 

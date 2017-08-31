@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -87,19 +87,19 @@ public:
 template < class IngredientsType > class IngredientsAnalyzer: public AbstractAnalyzer
 {
 protected:
-  
+
   const IngredientsType& ingredients;
   const typename IngredientsType::molecules_type& molecules;
-  
-  
+
+
   const IngredientsType& getIngredients() const {return ingredients;}
   const typename IngredientsType::molecules_type& getMolecules() const {return ingredients.getMolecules();}
-  
-  
+
+
 public:
   virtual ~IngredientsAnalyzer(){};
   IngredientsAnalyzer(const IngredientsType& val):ingredients(val),molecules(val.getMolecules()){}
-  
+
 };
 
 

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -54,7 +54,7 @@ namespace Lemonade
 template < class T1, class T2 > void reduceDistanceInPeriodicSpace( T1& distance, const T2& period)
 {
 	if (  distance > period/2 ) {while(-(distance-period)<period/2) distance -= Lemonade::safe_cast<T1>(period);  return; }
-	else 
+	else
 	if ( -distance > period/2 ) { while((distance+period)<period/2) distance += Lemonade::safe_cast<T1>(period); return; }
 }
 
@@ -73,7 +73,7 @@ template < class T1, class T2 > void reduceDistanceInPeriodicSpace( T1& distance
  *
  * @todo Different namespace?
  **/
-template < class T, class BoxType > 
+template < class T, class BoxType >
 Vector3D<T> calcDistanceVector3D (const Vector3D< T >& a, const Vector3D< T >& b, const BoxType& box )
 {
 	Vector3D < T > result (b-a);
@@ -98,7 +98,7 @@ Vector3D<T> calcDistanceVector3D (const Vector3D< T >& a, const Vector3D< T >& b
  *
  * @todo Different namespace?
  **/
-template < class T > 
+template < class T >
 Vector3D<T> calcDistanceVector3D (const Vector3D< T >& a, const Vector3D< T >& b, const Loki::NullType& box )
 {
 	Vector3D < T > result (b-a);

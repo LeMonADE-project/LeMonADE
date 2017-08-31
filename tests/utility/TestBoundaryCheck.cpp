@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -40,7 +40,7 @@ TEST(BoundaryCheckPolicies, Dynamic )
 {
   	uint length = 4;
 	std::vector<int> array(length,0);
-	
+
 	if ( length > 2 )
 	{
 		EXPECT_NO_THROW ( CheckDynamicBounds :: isValidIdx (array,length-2) );
@@ -48,12 +48,12 @@ TEST(BoundaryCheckPolicies, Dynamic )
 	}
 	EXPECT_THROW ( CheckDynamicBounds :: isValidIdx (array,length   ), IndexOutOfBoundsException );
 	EXPECT_THROW ( CheckDynamicBounds :: isValidIdx (array,length+1 ), IndexOutOfBoundsException );
-	
+
 	array.resize(2*length,0);
-	
+
 	if ( length > 0 )
 	{
-		EXPECT_NO_THROW ( CheckDynamicBounds :: isValidIdx (array,0) );	
+		EXPECT_NO_THROW ( CheckDynamicBounds :: isValidIdx (array,0) );
 	}
 	EXPECT_THROW ( CheckDynamicBounds :: isValidIdx (array,2*length ), IndexOutOfBoundsException );
 	EXPECT_THROW ( CheckDynamicBounds :: isValidIdx (array,-1 ), IndexOutOfBoundsException );
@@ -63,21 +63,21 @@ TEST(BoundaryCheckPolicies, Static )
 {
   	const uint length = 4;
 	int array[length] = {0,0,0,0};
-	
+
 	typedef CheckStaticBounds <length,false> BundaryCheckPolicy ;
 	typedef CheckStaticBounds <length,true>  VerboseBundaryCheckPolicy ;
-	
+
 	if ( length > 2 )
 	{
 		EXPECT_NO_THROW ( BundaryCheckPolicy :: isValidIdx (array,length-2) );
 		EXPECT_NO_THROW ( BundaryCheckPolicy :: isValidIdx (array,length-1) );
 	}
-	
+
 	EXPECT_THROW ( BundaryCheckPolicy :: isValidIdx (array,length   ), std::out_of_range );
 	EXPECT_THROW ( BundaryCheckPolicy :: isValidIdx (array,length+1 ), std::out_of_range );
 	EXPECT_THROW ( BundaryCheckPolicy :: isValidIdx (array,-1       ), std::out_of_range );
 	EXPECT_THROW ( VerboseBundaryCheckPolicy:: isValidIdx (array, -1 ), std::out_of_range );
-	
+
 }
 
 TEST(BoundaryCheckPolicies, NoCheck )

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -56,7 +56,7 @@ public:
   //! Executes the routine to write \b !box_x.
   void writeStream(std::ostream& strm){strm<<"!box_x="<<(this->getSource()).getBoxX()<<"\n\n";}
 private:
-  
+
 };
 
 /***********************************************************************/
@@ -77,7 +77,7 @@ public:
   //! Executes the routine to write \b !box_y.
   void writeStream(std::ostream& strm){strm<<"!box_y="<<(this->getSource()).getBoxY()<<"\n\n";}
 private:
-  
+
 };
 
 /***********************************************************************/
@@ -98,7 +98,7 @@ public:
   //! Executes the routine to write \b !box_z.
   void writeStream(std::ostream& strm){strm<<"!box_z="<<(this->getSource()).getBoxZ()<<"\n\n";}
 private:
-  
+
 };
 
 /***********************************************************************/
@@ -119,7 +119,7 @@ public:
   //! Executes the routine to write \b !periodic_x.
   void writeStream(std::ostream& strm){strm<<"!periodic_x="<<(this->getSource()).isPeriodicX()<<"\n\n";}
 private:
-  
+
 };
 
 /***********************************************************************/
@@ -140,7 +140,7 @@ public:
   //! Executes the routine to write \b !periodic_y.
   void writeStream(std::ostream& strm){strm<<"!periodic_y="<<(this->getSource()).isPeriodicY()<<"\n\n";}
 private:
-  
+
 };
 
 /***********************************************************************/
@@ -161,7 +161,7 @@ public:
   //! Executes the routine to write \b !periodic_z.
   void writeStream(std::ostream& strm){strm<<"!periodic_z="<<(this->getSource()).isPeriodicZ()<<"\n\n";}
 private:
-  
+
 };
 
 #endif

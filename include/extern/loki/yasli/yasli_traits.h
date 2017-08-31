@@ -6,36 +6,36 @@
 
 
 
-namespace yasli_nstd 
+namespace yasli_nstd
 {
     /*
-    template <bool b, class T = void> 
+    template <bool b, class T = void>
     struct enable_if {};
 
-    template <class T> 
+    template <class T>
     struct enable_if<true, T> { typedef T type; };
     */
-    
+
     //!! TYPE SELECTORS
     //Used in place of enable_if:
     //not so neat or so versitile but they do compile
     template<bool condition, class if_true, class if_false>
     struct type_selector
     {
-        typedef if_true result; 
+        typedef if_true result;
     };
-    
+
     template<class if_true, class if_false>
     struct type_selector<false, if_true, if_false>
     {
-        typedef if_false result; 
-    };  
+        typedef if_false result;
+    };
 
     // Types for differentiating compile-time choices
     typedef char (&yes_t)[1];
     typedef char (&no_t)[2];
 
-    // Credit goes to Boost; 
+    // Credit goes to Boost;
     // also found in the C++ Templates book by Vandevoorde and Josuttis
 
     //!! Wouldn't compile with these inside is_class
@@ -64,12 +64,12 @@ namespace yasli_nstd
         enum { value = int(!is_class<T>::value) };
     };
 
-    
+
    template <typename T> struct is_memmoveable
     {
         enum { value = int(!is_class<T>::value) };
     };
-   
+
 
     // For moving
     enum move_t { move };
