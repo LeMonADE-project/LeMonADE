@@ -78,7 +78,8 @@ private:
 
 
 //test the if the read commands !number_of_monomers, !bonds and !mcs
-//are exported correctly and work. 
+//are exported correctly and work. ng CXX object tests/CMakeFiles/LeMonADE-tests.dir/feature/TestFeatureMoleculesIO.cpp.o
+
 TEST_F(FeatureMoleculesIOTest, ExportRead){
   MyIngredients ingredients;
   
@@ -124,7 +125,8 @@ TEST_F(FeatureMoleculesIOTest, ExportRead){
   //check age (next mcs)
   file.read();
   EXPECT_EQ(30, ingredients.getMolecules().getAge());
-  position2.setAllCoordinates(5+234,5,5-2*67);
+  position2.setAllCoordinates(5+234,5,5-2*67);ng CXX object tests/CMakeFiles/LeMonADE-tests.dir/feature/TestFeatureMoleculesIO.cpp.o
+
   EXPECT_EQ(position2,ingredients.getMolecules()[2]);
   position3.setAllCoordinates(3+234,5,4-2*67);
   EXPECT_EQ(position3,ingredients.getMolecules()[3]);
@@ -182,11 +184,16 @@ TEST_F(FeatureMoleculesIOTest, ExportWrite){
   ingredients.modifyMolecules().connect(8,9);
   ingredients.modifyMolecules().connect(1,4);
 
-
+  //add bonds
+  //add reflected bonds for consistency 
   ingredients.modifyBondset().addBond(1,1,1,')');
   ingredients.modifyBondset().addBond(0,3,0,'o');
   ingredients.modifyBondset().addBond(-1,2,1,':');
-
+  ingredients.modifyBondset().addBond(-1,-1,-1,'/');
+  ingredients.modifyBondset().addBond(0,-3,0,';');
+  ingredients.modifyBondset().addBond(1,-2,-1,'-');
+  
+  
   //now create file with the information entered above
   string filename("tmpMoleculesRW.bfm");
   AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
@@ -194,7 +201,6 @@ TEST_F(FeatureMoleculesIOTest, ExportWrite){
   outputFile.execute();
   outputFile.closeFile();
 
-  cout<<"start reading"<<endl;
   //now read the file back in and compare
   MyIngredients checkIngredients;
   FileImport<MyIngredients> inputFile(filename,checkIngredients);
@@ -218,6 +224,476 @@ TEST_F(FeatureMoleculesIOTest, ExportWrite){
 }
 
 
+//test the if the read commands !add_bonds and !_remove_bonds
+//are exported correctly and work.
+TEST_F(FeatureMoleculesIOTest,WriteReadAdditionalBondsAPPNOFILE)
+{
+  MyIngredients ingredients;
+  //Load start config
+  UpdaterReadBfmFile<MyIngredients> inputFileStart("tests/WriteReadAdditionalBondsTest.bfm",ingredients,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  inputFileStart.initialize();
+  inputFileStart.execute();
+  inputFileStart.cleanup();
+  
+  //now create file with the information of the start config
+  //File does not exist!
+  string filename("tests/tmpMoleculesAddRemoveAPPNOFILE.bfm");
+  AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::APPEND);
+  outputFile.initialize();
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(2221);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().disconnect(4,5);
+  ingredients.modifyMolecules().disconnect(6,7);
+  ingredients.modifyMolecules().disconnect(7,8);
+  ingredients.modifyMolecules().disconnect(8,9);
+  ingredients.modifyMolecules().disconnect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(2345);
+  ingredients.modifyMolecules().connect(0,1);
+  ingredients.modifyMolecules().connect(1,2);
+  ingredients.modifyMolecules().connect(3,4);
+  ingredients.modifyMolecules().connect(4,5);
+  ingredients.modifyMolecules().connect(6,7);
+  ingredients.modifyMolecules().connect(7,8);
+  ingredients.modifyMolecules().connect(8,9);
+  ingredients.modifyMolecules().connect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(3825);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(8099);
+  ingredients.modifyMolecules().disconnect(1,3);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  outputFile.closeFile();
+  
+  MyIngredients testIngredients;
+  UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
+  inputFile.initialize();
+  EXPECT_EQ(1000,testIngredients.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(2221,testIngredients.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(2345,testIngredients.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(3825,testIngredients.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,3));
+  inputFile.execute();
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,3));
+  inputFile.closeFile();
+  
+   EXPECT_EQ(0,remove(filename.c_str()));
+  
+  
+}
+
+//test the if the read commands !add_bonds and !_remove_bonds
+//are exported correctly and work.
+TEST_F(FeatureMoleculesIOTest,WriteReadAdditionalBondsAPPEND)
+{
+  MyIngredients ingredientsStart;
+  //Load start config
+  UpdaterReadBfmFile<MyIngredients> inputFileStart("tests/WriteReadAdditionalBondsTest.bfm",ingredientsStart,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  inputFileStart.initialize();
+  inputFileStart.execute();
+  inputFileStart.cleanup();
+  //Create temporary file for modifying
+  string filename("tests/tmpMoleculesAddRemoveAPPEND.bfm");
+  AnalyzerWriteBfmFile<MyIngredients> outputFileStart(filename,ingredientsStart,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
+  outputFileStart.initialize();
+  outputFileStart.execute();
+  outputFileStart.cleanup();
+  
+  //read in the file into a new ingredients which can be modified
+  MyIngredients ingredients;
+  UpdaterReadBfmFile<MyIngredients> input("tests/tmpMoleculesAddRemoveAPPEND.bfm",ingredients,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  input.initialize();
+  input.execute();
+  input.cleanup();
+  
+  AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::APPEND);
+  outputFile.initialize();
+  ingredients.modifyMolecules().setAge(2221);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().disconnect(4,5);
+  ingredients.modifyMolecules().disconnect(6,7);
+  ingredients.modifyMolecules().disconnect(7,8);
+  ingredients.modifyMolecules().disconnect(8,9);
+  ingredients.modifyMolecules().disconnect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(2345);
+  ingredients.modifyMolecules().connect(0,1);
+  ingredients.modifyMolecules().connect(1,2);
+  ingredients.modifyMolecules().connect(3,4);
+  ingredients.modifyMolecules().connect(4,5);
+  ingredients.modifyMolecules().connect(6,7);
+  ingredients.modifyMolecules().connect(7,8);
+  ingredients.modifyMolecules().connect(8,9);
+  ingredients.modifyMolecules().connect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(3825);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(8099);
+  ingredients.modifyMolecules().disconnect(1,3);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  outputFile.closeFile();
+  
+  MyIngredients testIngredients;
+  UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
+  inputFile.initialize();
+  EXPECT_EQ(1000,testIngredients.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(2221,testIngredients.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(2345,testIngredients.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(3825,testIngredients.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,3));
+  inputFile.execute();
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,3));
+  inputFile.closeFile();
+  
+   EXPECT_EQ(0,remove(filename.c_str()));
+  
+  
+}
+
+//test the if the read commands !add_bonds and !_remove_bonds
+//are exported correctly and work.
+TEST_F(FeatureMoleculesIOTest,WriteReadAdditionalBondsNEWFILE)
+{
+  MyIngredients ingredients;
+  //set some values on ingredients
+  //ingredients.modifyMolecules().resize(9);
+  ingredients.modifyMolecules().setAge(1000);
+  ingredients.setPeriodicX(true);
+  ingredients.setPeriodicY(true);
+  ingredients.setPeriodicZ(true);
+  ingredients.setBoxX(128);
+  ingredients.setBoxY(128);
+  ingredients.setBoxZ(128);
+
+  VectorInt3 monomer1; monomer1.setAllCoordinates(1,1,1);
+  VectorInt3 monomer2; monomer2.setAllCoordinates(2,2,2);
+  VectorInt3 monomer3; monomer3.setAllCoordinates(3,3,3);
+  VectorInt3 monomer4; monomer4.setAllCoordinates(1,4,1);
+  VectorInt3 monomer5; monomer5.setAllCoordinates(2,5,2);
+  VectorInt3 monomer6; monomer6.setAllCoordinates(3,6,3);
+  VectorInt3 monomer7; monomer7.setAllCoordinates(7,7,7);
+  VectorInt3 monomer8; monomer8.setAllCoordinates(6,9,8);
+  VectorInt3 monomer9; monomer9.setAllCoordinates(6,12,8);
+  VectorInt3 monomer10; monomer10.setAllCoordinates(7,13,9);
+
+  ingredients.modifyMolecules().addMonomer(monomer1);
+  ingredients.modifyMolecules().addMonomer(monomer2);
+  ingredients.modifyMolecules().addMonomer(monomer3);
+  ingredients.modifyMolecules().addMonomer(monomer4);
+  ingredients.modifyMolecules().addMonomer(monomer5);
+  ingredients.modifyMolecules().addMonomer(monomer6);
+  ingredients.modifyMolecules().addMonomer(monomer7);
+  ingredients.modifyMolecules().addMonomer(monomer8);
+  ingredients.modifyMolecules().addMonomer(monomer9);
+  ingredients.modifyMolecules().addMonomer(monomer10);
+
+  ingredients.modifyMolecules().connect(0,1);
+  ingredients.modifyMolecules().connect(1,2);
+  ingredients.modifyMolecules().connect(3,4);
+  ingredients.modifyMolecules().connect(4,5);
+  ingredients.modifyMolecules().connect(6,7);
+  ingredients.modifyMolecules().connect(7,8);
+  ingredients.modifyMolecules().connect(8,9);
+  ingredients.modifyMolecules().connect(1,4);
+  
+  ingredients.modifyMolecules().connect(1,3);
+  ingredients.modifyMolecules().disconnect(1,3);
+  
+  //add bonds
+  //add reflected bonds for consistency 
+  ingredients.modifyBondset().addBond(1,1,1,')');
+  ingredients.modifyBondset().addBond(0,3,0,'o');
+  ingredients.modifyBondset().addBond(-1,2,1,':');
+  ingredients.modifyBondset().addBond(-1,2,-1,'a');
+  ingredients.modifyBondset().addBond(-1,-1,-1,'/');
+  ingredients.modifyBondset().addBond(0,-3,0,';');
+  ingredients.modifyBondset().addBond(1,-2,-1,'-');
+  ingredients.modifyBondset().addBond(1,-2,1,'b');
+  
+    //now create file with the information entered above
+  string filename("tests/tmpMoleculesAddRemoveNEWFILE.bfm");
+  AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
+  outputFile.initialize();
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(2221);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().disconnect(4,5);
+  ingredients.modifyMolecules().disconnect(6,7);
+  ingredients.modifyMolecules().disconnect(7,8);
+  ingredients.modifyMolecules().disconnect(8,9);
+  ingredients.modifyMolecules().disconnect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(2345);
+  ingredients.modifyMolecules().connect(0,1);
+  ingredients.modifyMolecules().connect(1,2);
+  ingredients.modifyMolecules().connect(3,4);
+  ingredients.modifyMolecules().connect(4,5);
+  ingredients.modifyMolecules().connect(6,7);
+  ingredients.modifyMolecules().connect(7,8);
+  ingredients.modifyMolecules().connect(8,9);
+  ingredients.modifyMolecules().connect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(3825);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  ingredients.modifyMolecules().setAge(8099);
+  ingredients.modifyMolecules().disconnect(1,3);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  outputFile.closeFile();
+  
+  MyIngredients testIngredients;
+  UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
+  inputFile.initialize();
+  EXPECT_EQ(1000,testIngredients.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(2221,testIngredients.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(2345,testIngredients.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,4));
+  inputFile.execute();
+  EXPECT_EQ(3825,testIngredients.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,3));
+  inputFile.execute();
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,3));
+  inputFile.closeFile();
+  
+  EXPECT_EQ(0,remove(filename.c_str()));
+  
+  
+}
+
+//test the if the read commands !add_bonds and !_remove_bonds
+//are exported correctly and work.
+TEST_F(FeatureMoleculesIOTest,WriteReadAdditionalBondsOVERWRITE)
+{
+  MyIngredients ingredients;
+  //Load start config
+  UpdaterReadBfmFile<MyIngredients> inputFileStart("tests/WriteReadAdditionalBondsTest.bfm",ingredients,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  inputFileStart.initialize();
+  inputFileStart.execute();
+  inputFileStart.cleanup();
+  
+  //now create file with the information of the start config
+  string filename("tests/tmpMoleculesAddRemoveOVERWRITE.bfm");
+  AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::OVERWRITE);
+  outputFile.initialize();
+  outputFile.execute();
+  
+  MyIngredients testIngredients;
+  UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  
+  inputFile.initialize();
+  EXPECT_EQ(1000,testIngredients.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients.getMolecules().areConnected(1,4));
+  
+  ingredients.modifyMolecules().setAge(2221);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().disconnect(4,5);
+  ingredients.modifyMolecules().disconnect(6,7);
+  ingredients.modifyMolecules().disconnect(7,8);
+  ingredients.modifyMolecules().disconnect(8,9);
+  ingredients.modifyMolecules().disconnect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  
+  MyIngredients testIngredients1;  
+  UpdaterReadBfmFile<MyIngredients> inputFile1(filename,testIngredients1,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  inputFile1.initialize();  
+  inputFile1.execute();
+  EXPECT_EQ(2221,testIngredients1.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(3,4));
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(4,5));
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(6,7));
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(7,8));
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(8,9));
+  EXPECT_FALSE(testIngredients1.getMolecules().areConnected(1,4));
+  
+  ingredients.modifyMolecules().setAge(2345);
+  ingredients.modifyMolecules().connect(0,1);
+  ingredients.modifyMolecules().connect(1,2);
+  ingredients.modifyMolecules().connect(3,4);
+  ingredients.modifyMolecules().connect(4,5);
+  ingredients.modifyMolecules().connect(6,7);
+  ingredients.modifyMolecules().connect(7,8);
+  ingredients.modifyMolecules().connect(8,9);
+  ingredients.modifyMolecules().connect(1,4);
+  ingredients.synchronize(ingredients);
+  outputFile.execute();
+  
+    MyIngredients testIngredients2;
+UpdaterReadBfmFile<MyIngredients> inputFile2(filename,testIngredients2,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  inputFile2.initialize();  
+  inputFile2.execute();
+  
+  EXPECT_EQ(2345,testIngredients2.getMolecules().getAge());
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(4,5));
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(6,7));
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(7,8));
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(8,9));
+  EXPECT_TRUE(testIngredients2.getMolecules().areConnected(1,4));
+  
+  ingredients.modifyMolecules().setAge(3825);
+  ingredients.modifyMolecules().disconnect(0,1);
+  ingredients.modifyMolecules().disconnect(1,2);
+  ingredients.modifyMolecules().disconnect(3,4);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  
+    MyIngredients testIngredients3;
+UpdaterReadBfmFile<MyIngredients> inputFile3(filename,testIngredients3,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  inputFile3.initialize();  
+  inputFile3.execute();
+  
+  EXPECT_EQ(3825,testIngredients3.getMolecules().getAge());
+  EXPECT_FALSE(testIngredients3.getMolecules().areConnected(0,1));
+  EXPECT_FALSE(testIngredients3.getMolecules().areConnected(1,2));
+  EXPECT_FALSE(testIngredients3.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(testIngredients3.getMolecules().areConnected(1,3));
+  
+  ingredients.modifyMolecules().setAge(8099);
+  ingredients.modifyMolecules().disconnect(1,3);
+  ingredients.modifyMolecules().connect(1,3);
+  outputFile.execute();
+  
+    MyIngredients testIngredients4;
+UpdaterReadBfmFile<MyIngredients> inputFile4(filename,testIngredients4,UpdaterReadBfmFile<MyIngredients>::READ_LAST_CONFIG_SAVE);
+  inputFile4.initialize();  
+  inputFile4.execute();
+  
+  EXPECT_TRUE(testIngredients4.getMolecules().areConnected(1,3));
+
+  
+   EXPECT_EQ(0,remove(filename.c_str()));
+  
+  
+}
 
 TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)
 {

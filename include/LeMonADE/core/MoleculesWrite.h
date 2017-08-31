@@ -40,7 +40,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /***********************************************************************/
 /**
  * @file
- * @brief Writing routines for bfm-Reads !number_of_monomers, !bonds and !mcs
+ * @brief Writing routines for bfm-Reads !number_of_monomers !bonds, !mcs,
+ * !add_bonds and !remove_bonds
  **/
 /***********************************************************************/
 
@@ -362,5 +363,169 @@ void WriteBonds<IngredientsType>::writeStream(std::ostream& strm){
  strm<<"\n";
 }
 
+/******** write command handling !add_bonds *********************************/
+/**
+ * @class WriteAddBonds
+ * @brief Handles BFM-File-Write \b !add_bonds.
+ * 
+ * @tparam IngredientsType Ingredients class storing all system information.
+ * */
+template <class IngredientsType>
+class WriteAddBonds: public AbstractWrite<IngredientsType>
+{
+  	enum BFM_WRITE_TYPE_EXPANDED{
+	  C_APPEND=3,	//!< The configuration (excl. header) is append to the file  
+	  C_OVERWRITE=4,  //!< The configuration (incl. header) overwrites the existing file
+	  C_NEWFILE=5,	//!< The configuration (incl. header) is written to a new file
+	  C_APPNOFILE=6,	//!< The file doenst exist
+	};
+	
+public:
+	//! constructor
+	WriteAddBonds(const IngredientsType& ingredients, int writeType=C_APPEND):
+	AbstractWrite<IngredientsType>(ingredients),
+	myWriteType(writeType),
+	old_ingredients(ingredients)
+	{this->setHeaderOnly(false);}
+	
+	//! writes to the file stream
+	void writeStream(std::ostream& strm);
+	
+	
+private:
+  	  
+	typedef typename IngredientsType::molecules_type::edge_type edge_type;
+	//! Storage for added bonds
+// 	std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds;
+	
+	//!Storage for a copy of ingredients of the last time step
+	IngredientsType old_ingredients;
+	
+	//! ENUM-type BFM_WRITE_TYPE specify the write-out
+	int myWriteType;
+	
+};
+/**********************implementation of members    *******************/
+//! Executes the routine to write \b !add_bonds.
+template <class IngredientsType>
+void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
+	switch(myWriteType)
+	{ case C_APPNOFILE:
+	  case C_NEWFILE: 
+	  case C_APPEND: {
 
+		//get a map containing the added bond	
+		std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=this->getSource().getMolecules().getEdges();
+		//get a map containing the removed bonds
+		std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=old_ingredients.getMolecules().getEdges();
+		
+		//erases all bond parnters from the map which are unchanged
+		//the rest of RemovedBonds contains only bonds which are removed during
+		//the last simulation step, in contrast the rest of the map AddBonds 
+		//contains only bonds which are newly formed during the last simulation
+		//step
+		typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
+		for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
+			if(AddBonds.find(it->first)!=AddBonds.end()){
+			  AddBonds.erase(AddBonds.find(it->first));
+			}
+		}
+		
+		//write only the bonds that were added since the last update	
+		strm<<"!add_bonds\n";
+		for(it=AddBonds.begin();it!=AddBonds.end();++it){
+			  strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+		}
+		strm<<"\n";
+		
+		old_ingredients=this->getSource();
+		break;}
+	  case C_OVERWRITE: {break;} 
+	}
+	
+}
+/******** write command handling !remove_bonds *********************************/
+/**
+ * @class WriteRemoveBonds
+ * @brief Handles BFM-File-Write \b !remove_bonds.
+ * 
+ * @tparam IngredientsType Ingredients class storing all system information.
+ * */
+template <class IngredientsType>
+class WriteRemoveBonds: public AbstractWrite<IngredientsType>
+{
+  enum BFM_WRITE_TYPE{
+	  C_APPEND=3,	//!< The configuration (excl. header) is append to the file  
+	  C_OVERWRITE=4,  //!< The configuration (incl. header) overwrites the existing file
+	  C_NEWFILE=5,	//!< The configuration (incl. header) is written to a new file
+	  C_APPNOFILE=6,	//!< The file doenst exist
+	};
+	
+public:
+	//! constructor
+	WriteRemoveBonds(const IngredientsType& ingredients, int writeType=C_APPEND):
+	AbstractWrite<IngredientsType>(ingredients),
+	myWriteType(writeType),
+	old_ingredients(ingredients)
+	{this->setHeaderOnly(false);}
+	
+
+	//! writes to the file stream
+	void writeStream(std::ostream& strm);
+	
+private:
+	  
+	typedef typename IngredientsType::molecules_type::edge_type edge_type;
+	  
+	//! Storage for removed bonds
+// 	std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds;
+	
+	//!Storage for a copy of ingredients of the last time step
+	IngredientsType old_ingredients;
+	
+	//! ENUM-type BFM_WRITE_TYPE specify the write-out
+	int myWriteType;
+
+};
+/**********************implementation of members    *******************/
+//! Executes the routine to write \b !remove_bonds.
+template <class IngredientsType>
+void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
+	switch(myWriteType)
+	{ case C_APPNOFILE:
+	  case C_NEWFILE: 
+	  case C_APPEND: {
+	  
+	      //get a map containing the removed bonds
+	      std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=old_ingredients.getMolecules().getEdges();
+	      //get a map containing the added bond	
+	      std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=this->getSource().getMolecules().getEdges();
+	      
+	      //erases all bond parnters from the map which are unchanged
+	      //the rest of RemovedBonds contains only bonds which are removed during
+	      //the last simulation step, in contrast the rest of the map AddBonds 
+	      //contains only bonds which are newly formed during the last simulation
+	      //step
+	      typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
+	      for(it=AddBonds.begin();it!=AddBonds.end();++it){
+		      if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
+			RemovedBonds.erase(RemovedBonds.find(it->first));
+		      }
+	      }
+	      
+	      //write only the breaks that were removed since the last update
+	      strm<<"!remove_bonds\n";
+	      for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
+		      strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+	      }
+	      strm<<"\n";
+	      
+	      old_ingredients=this->getSource();
+	      break;}
+	  case C_OVERWRITE: {break;} 
+	}
+
+
+	
+}
 #endif /* LEMONADE_CORE_MOLECULESWRITE_H */

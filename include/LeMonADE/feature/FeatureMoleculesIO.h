@@ -116,6 +116,7 @@ private:
 * * !number_of_monomers
 * * !bonds
 * * !add_bonds
+* * !remove_bonds
 * * !mcs
 *
 * @param fileReader File importer for the bfm-file
@@ -129,6 +130,7 @@ void FeatureMoleculesIO::exportRead(FileImport<IngredientsType>& fileReader)
 	fileReader.registerRead("!number_of_monomers", new  ReadNrOfMonomers< IngredientsType > (destination) );
 	fileReader.registerRead("!bonds", new  ReadBonds< IngredientsType > (destination) );
 	fileReader.registerRead("!add_bonds", new  ReadBonds< IngredientsType > (destination) );
+	fileReader.registerRead("!remove_bonds", new  ReadBreaks< IngredientsType > (destination) );
 	fileReader.registerRead("!mcs", new  ReadMcs< IngredientsType > (destination) );
 }
 
@@ -140,6 +142,8 @@ void FeatureMoleculesIO::exportRead(FileImport<IngredientsType>& fileReader)
 * Registered Write-Out Commands:
 * * !number_of_monomers
 * * !bonds
+* * !add_bonds
+* * !remove_bonds
 * * !mcs
 *
 * @param fileWriter File writer for the bfm-file.
@@ -151,6 +155,8 @@ void FeatureMoleculesIO::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& file
 	const IngredientsType& source=fileWriter.getIngredients_();
 	fileWriter.registerWrite("!number_of_monomers", new WriteNrOfMonomers <IngredientsType> (source));
 	fileWriter.registerWrite("!bonds", new WriteBonds <IngredientsType> (source));
+	fileWriter.registerWrite("!add_bonds", new WriteAddBonds<IngredientsType> (source,fileWriter.getCommandType()));
+	fileWriter.registerWrite("!remove_bonds", new WriteRemoveBonds<IngredientsType> (source,fileWriter.getCommandType()));
 	fileWriter.registerWrite("!mcs", new WriteMcs <IngredientsType> (source));
 }
 

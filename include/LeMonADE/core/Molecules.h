@@ -265,6 +265,9 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    */
   void clearBonds();
   
+    //! returns the edges of the graph 
+  std::map < std::pair < uint32_t, uint32_t > , Edge > getEdges() const {return edges;}
+  
 
 private:
   
