@@ -109,6 +109,15 @@ public:
       checker=addMonomerInsideConnectedPair(1,ingredients.getMolecules().size()-1,4);
     }else if(numExec==5){
       linearizeSystem();
+    }else if(numExec==6){
+      ingredients.modifyMolecules().resize(0);
+      ingredients.synchronize();
+      
+      checker=addMonomerAtPosition(VectorInt3( ingredients.getBoxX()/2,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),1);
+      checker=addMonomerToParent(0,3);
+      checker=addMonomerToParent(1,3);
+      checker=addMonomerToParent(2,3);
+      checker=addMonomerToParent(3,3);      
     }
     
     numExec++;
