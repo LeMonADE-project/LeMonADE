@@ -129,11 +129,10 @@ public:
     }else if(numExec==8){
       //add ring
       checker=addRing(2);
-    }
-    else if(numExec==9){
+    }else if(numExec==9){
       //add ring
-      checker=addRing(3,4,8);
-    }
+      checker=addRing(3,4,8)
+    };
     
     numExec++;
     return checker;
