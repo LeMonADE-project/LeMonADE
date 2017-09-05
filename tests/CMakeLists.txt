@@ -29,7 +29,7 @@ set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION
                 ${GTEST_LIBRARY_PATH} )
 add_dependencies(${GTEST_LIBRARY} googletest)
 
-# copy all .test to build directory 
+# copy all .test to build directory
 configure_file(attributesTest.test tests/attributesTest.test COPYONLY)
 configure_file(featureBondsetTest.test tests/featureBondsetTest.test COPYONLY)
 configure_file(featureBoxTest.test tests/featureBoxTest.test COPYONLY)

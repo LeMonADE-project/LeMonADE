@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -38,7 +38,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/core/TypelistExtensions.h>
 /**
- * @file 
+ * @file
  *
  * @class FeatureHolder
  *
@@ -52,7 +52,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @tparam Feature
  * @brief Feature held by this FeatureHolder
- * 
+ *
  * @tparam Base
  * @brief Linear hierarchy of the rest of the used features
  *
@@ -121,11 +121,11 @@ public:
    */
   template < class IngredientsType, class MoveType > bool checkMove( const IngredientsType& ingedients, MoveType& move )
   {
-    //check move compatibility with current feature and 
+    //check move compatibility with current feature and
     // the rest of the features.
     return Feature::checkMove(ingedients,move) && Base::checkMove(ingedients,move);
   }
-  
+
 
   /**
    * @brief This function applies the given Move to the Ingredients
@@ -137,12 +137,12 @@ public:
    */
   template < class IngredientsType, class MoveType > void applyMove( IngredientsType& ingedients, const MoveType& move )
   {
-    //check move compatibility with current feature and 
+    //check move compatibility with current feature and
     // the rest of the features.
     Feature::applyMove(ingedients,move);
     Base::applyMove(ingedients,move);
   }
-  
+
 
   /**
    * @brief Synchronizes all Features and establishing consistency in the system.

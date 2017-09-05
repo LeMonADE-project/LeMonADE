@@ -15,7 +15,7 @@
 using namespace std;
 
 class NNInteractionBccTest: public ::testing::Test{
-  /* suppress cout output for better readability -->un-/comment here:*/    
+  /* suppress cout output for better readability -->un-/comment here:*/
 public:
   //redirect cout output
   virtual void SetUp(){
@@ -72,36 +72,36 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
 
     molecules1[1].setAllCoordinates(13,7,7);
     myIngredients1.synchronize(myIngredients1);
-    
+
     //define moves in all possible directions for later use
     MoveLocalBcc DXDYDZ,DXDYmDZ,DXmDYDZ,DXmDYmDZ,mDXDYDZ,mDXDYmDZ,mDXmDYDZ,mDXmDYmDZ;
-    
+
     DXDYDZ.init(myIngredients1);
     while((DXDYDZ.getDir()[0]!=1 ) ||(DXDYDZ.getDir()[1]!=1 ) ||(DXDYDZ.getDir()[2]!=1 ) || (DXDYDZ.getIndex()!=1)){ DXDYDZ.init(myIngredients1);}
-    
+
     DXDYmDZ.init(myIngredients1);
     while((DXDYmDZ.getDir()[0]!=1 ) ||(DXDYmDZ.getDir()[1]!=1 ) ||(DXDYmDZ.getDir()[2]!=-1 ) || (DXDYmDZ.getIndex()!=1)){ DXDYmDZ.init(myIngredients1);}
-    
+
     DXmDYDZ.init(myIngredients1);
     while((DXmDYDZ.getDir()[0]!=1 ) ||(DXmDYDZ.getDir()[1]!=-1 ) ||(DXmDYDZ.getDir()[2]!=1 ) || (DXmDYDZ.getIndex()!=1)){ DXmDYDZ.init(myIngredients1);}
-    
+
     DXmDYmDZ.init(myIngredients1);
     while((DXmDYmDZ.getDir()[0]!=1 ) ||(DXmDYmDZ.getDir()[1]!=-1 ) ||(DXmDYmDZ.getDir()[2]!=-1 ) || (DXmDYmDZ.getIndex()!=1)){ DXmDYmDZ.init(myIngredients1);}
-    
+
     mDXDYDZ.init(myIngredients1);
     while((mDXDYDZ.getDir()[0]!=-1 ) ||(mDXDYDZ.getDir()[1]!=1 ) ||(mDXDYDZ.getDir()[2]!=1 ) || (mDXDYDZ.getIndex()!=1)){ mDXDYDZ.init(myIngredients1);}
-    
+
     mDXDYmDZ.init(myIngredients1);
     while((mDXDYmDZ.getDir()[0]!=-1 ) ||(mDXDYmDZ.getDir()[1]!=1 ) ||(mDXDYmDZ.getDir()[2]!=-1 ) || (mDXDYmDZ.getIndex()!=1)){ mDXDYmDZ.init(myIngredients1);}
-    
+
     mDXmDYDZ.init(myIngredients1);
     while((mDXmDYDZ.getDir()[0]!=-1 ) ||(mDXmDYDZ.getDir()[1]!=-1 ) ||(mDXmDYDZ.getDir()[2]!=1 ) || (mDXmDYDZ.getIndex()!=1)){ mDXmDYDZ.init(myIngredients1);}
-    
+
     mDXmDYmDZ.init(myIngredients1);
     while((mDXmDYmDZ.getDir()[0]!=-1 ) ||(mDXmDYmDZ.getDir()[1]!=-1 ) ||(mDXmDYmDZ.getDir()[2]!=-1 ) || (mDXmDYmDZ.getIndex()!=1)){ mDXmDYmDZ.init(myIngredients1);}
-    
+
     //now start checking moves of monomer 1 around the position of monomer 0
-    
+
     ///--- first move upwards in a zig-zag line from (3,-3,-3) to (3,-1,3) relative to monomer 0
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
@@ -110,7 +110,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -118,7 +118,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -126,7 +126,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -134,7 +134,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -142,7 +142,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     //last step to the next row
     DXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYDZ.getProbability(),exp(epsilon0));
@@ -151,7 +151,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     //----- now move downwards in zig-zag from (3,-1,3) to (3,1,-3)
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(-epsilon0));
@@ -160,7 +160,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -168,7 +168,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(-epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -176,7 +176,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -184,7 +184,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(-epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -192,7 +192,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -200,9 +200,9 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     //------ now move upwards in zig-zag to (1,1,3)
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -210,7 +210,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -218,7 +218,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -226,7 +226,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -234,7 +234,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -242,7 +242,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     //last step to the next row
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
@@ -251,7 +251,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),11);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     //--- now again zig-za downwards to (-1,3,-3)
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(-epsilon0));
@@ -260,7 +260,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(epsilon0));
     mDXDYmDZ.apply(myIngredients1);
@@ -268,7 +268,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),13);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(-epsilon0));
     DXmDYmDZ.apply(myIngredients1);
@@ -276,7 +276,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(epsilon0));
     mDXDYmDZ.apply(myIngredients1);
@@ -284,7 +284,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),13);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(-epsilon0));
     DXmDYmDZ.apply(myIngredients1);
@@ -292,7 +292,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(epsilon0));
     mDXDYmDZ.apply(myIngredients1);
@@ -300,7 +300,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),13);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     //---move up again to (-3,1,3) relative to monomer 0
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(-epsilon0));
@@ -309,7 +309,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -317,7 +317,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYDZ.getProbability(),exp(-epsilon0));
     DXDYDZ.apply(myIngredients1);
@@ -325,7 +325,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -333,7 +333,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYDZ.getProbability(),exp(-epsilon0));
     DXDYDZ.apply(myIngredients1);
@@ -341,7 +341,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -349,7 +349,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     //---move down to (-2,0,-2), which has a contact, then move to (-1,1,-3), which doesn't
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(-epsilon0));
@@ -358,7 +358,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -366,7 +366,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -374,7 +374,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -382,7 +382,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -390,8 +390,8 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
-    
+
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -399,7 +399,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     //--  now check the position below monomer 0, i.e. (0,0,-2)
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(-epsilon0));
@@ -408,7 +408,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     //--now check the position (0,-2,-2), go there in a first step
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(epsilon0));
@@ -417,7 +417,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),11);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(-epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -425,7 +425,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     //--now check (-2,-2,-2), go there in a first step
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(epsilon0));
@@ -434,7 +434,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -442,7 +442,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     //--check -2,-2,0, go there in a first step
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(epsilon0));
@@ -451,7 +451,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(-epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -459,7 +459,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     //-- check (0,-2,0), go there first
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
@@ -468,7 +468,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -476,7 +476,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     //--now check (0,-2,2), go there in one step first
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
@@ -485,7 +485,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),11);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -493,7 +493,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     //-- now the last unchecked position with a contact is (0,0,2)
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(epsilon0));
@@ -502,7 +502,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMovePowerOfTwoLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -553,36 +553,36 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
 
     molecules1[1].setAllCoordinates(13,7,7);
     myIngredients1.synchronize(myIngredients1);
-    
+
     //define moves in all possible directions for later use
     MoveLocalBcc DXDYDZ,DXDYmDZ,DXmDYDZ,DXmDYmDZ,mDXDYDZ,mDXDYmDZ,mDXmDYDZ,mDXmDYmDZ;
-    
+
     DXDYDZ.init(myIngredients1);
     while((DXDYDZ.getDir()[0]!=1 ) ||(DXDYDZ.getDir()[1]!=1 ) ||(DXDYDZ.getDir()[2]!=1 ) || (DXDYDZ.getIndex()!=1)){ DXDYDZ.init(myIngredients1);}
-    
+
     DXDYmDZ.init(myIngredients1);
     while((DXDYmDZ.getDir()[0]!=1 ) ||(DXDYmDZ.getDir()[1]!=1 ) ||(DXDYmDZ.getDir()[2]!=-1 ) || (DXDYmDZ.getIndex()!=1)){ DXDYmDZ.init(myIngredients1);}
-    
+
     DXmDYDZ.init(myIngredients1);
     while((DXmDYDZ.getDir()[0]!=1 ) ||(DXmDYDZ.getDir()[1]!=-1 ) ||(DXmDYDZ.getDir()[2]!=1 ) || (DXmDYDZ.getIndex()!=1)){ DXmDYDZ.init(myIngredients1);}
-    
+
     DXmDYmDZ.init(myIngredients1);
     while((DXmDYmDZ.getDir()[0]!=1 ) ||(DXmDYmDZ.getDir()[1]!=-1 ) ||(DXmDYmDZ.getDir()[2]!=-1 ) || (DXmDYmDZ.getIndex()!=1)){ DXmDYmDZ.init(myIngredients1);}
-    
+
     mDXDYDZ.init(myIngredients1);
     while((mDXDYDZ.getDir()[0]!=-1 ) ||(mDXDYDZ.getDir()[1]!=1 ) ||(mDXDYDZ.getDir()[2]!=1 ) || (mDXDYDZ.getIndex()!=1)){ mDXDYDZ.init(myIngredients1);}
-    
+
     mDXDYmDZ.init(myIngredients1);
     while((mDXDYmDZ.getDir()[0]!=-1 ) ||(mDXDYmDZ.getDir()[1]!=1 ) ||(mDXDYmDZ.getDir()[2]!=-1 ) || (mDXDYmDZ.getIndex()!=1)){ mDXDYmDZ.init(myIngredients1);}
-    
+
     mDXmDYDZ.init(myIngredients1);
     while((mDXmDYDZ.getDir()[0]!=-1 ) ||(mDXmDYDZ.getDir()[1]!=-1 ) ||(mDXmDYDZ.getDir()[2]!=1 ) || (mDXmDYDZ.getIndex()!=1)){ mDXmDYDZ.init(myIngredients1);}
-    
+
     mDXmDYmDZ.init(myIngredients1);
     while((mDXmDYmDZ.getDir()[0]!=-1 ) ||(mDXmDYmDZ.getDir()[1]!=-1 ) ||(mDXmDYmDZ.getDir()[2]!=-1 ) || (mDXmDYmDZ.getIndex()!=1)){ mDXmDYmDZ.init(myIngredients1);}
-    
+
     //now start checking moves of monomer 1 around the position of monomer 0
-    
+
     ///--- first move upwards in a zig-zag line from (3,-3,-3) to (3,-1,3) relative to monomer 0
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
@@ -591,7 +591,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -599,7 +599,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -607,7 +607,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -615,7 +615,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -623,7 +623,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     //last step to the next row
     DXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYDZ.getProbability(),exp(epsilon0));
@@ -632,7 +632,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     //----- now move downwards in zig-zag from (3,-1,3) to (3,1,-3)
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(-epsilon0));
@@ -641,7 +641,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -649,7 +649,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(-epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -657,7 +657,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -665,7 +665,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(-epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -673,7 +673,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -681,9 +681,9 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     //------ now move upwards in zig-zag to (1,1,3)
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -691,7 +691,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -699,7 +699,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -707,7 +707,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -715,7 +715,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),13);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -723,7 +723,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),12);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     //last step to the next row
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
@@ -732,7 +732,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),11);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     //--- now again zig-za downwards to (-1,3,-3)
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(-epsilon0));
@@ -741,7 +741,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(epsilon0));
     mDXDYmDZ.apply(myIngredients1);
@@ -749,7 +749,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),13);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(-epsilon0));
     DXmDYmDZ.apply(myIngredients1);
@@ -757,7 +757,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(epsilon0));
     mDXDYmDZ.apply(myIngredients1);
@@ -765,7 +765,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),13);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(-epsilon0));
     DXmDYmDZ.apply(myIngredients1);
@@ -773,7 +773,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     mDXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYmDZ.getProbability(),exp(epsilon0));
     mDXDYmDZ.apply(myIngredients1);
@@ -781,7 +781,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),13);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     //---move up again to (-3,1,3) relative to monomer 0
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(-epsilon0));
@@ -790,7 +790,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -798,7 +798,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYDZ.getProbability(),exp(-epsilon0));
     DXDYDZ.apply(myIngredients1);
@@ -806,7 +806,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -814,7 +814,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYDZ.getProbability(),exp(-epsilon0));
     DXDYDZ.apply(myIngredients1);
@@ -822,7 +822,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),12);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -830,7 +830,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     //---move down to (-2,0,-2), which has a contact, then move to (-1,1,-3), which doesn't
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(-epsilon0));
@@ -839,7 +839,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -847,7 +847,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -855,7 +855,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(epsilon0));
     mDXmDYmDZ.apply(myIngredients1);
@@ -863,7 +863,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -871,8 +871,8 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
-    
+
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -880,7 +880,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),11);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     //--  now check the position below monomer 0, i.e. (0,0,-2)
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(-epsilon0));
@@ -889,7 +889,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),10);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     //--now check the position (0,-2,-2), go there in a first step
     DXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYmDZ.getProbability(),exp(epsilon0));
@@ -898,7 +898,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),11);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     mDXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYDZ.getProbability(),exp(-epsilon0));
     mDXmDYDZ.apply(myIngredients1);
@@ -906,7 +906,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     //--now check (-2,-2,-2), go there in a first step
     mDXmDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXmDYmDZ.getProbability(),exp(epsilon0));
@@ -915,7 +915,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),7);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -923,7 +923,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),8);
-    
+
     //--check -2,-2,0, go there in a first step
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(epsilon0));
@@ -932,7 +932,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),7);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),9);
-    
+
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(-epsilon0));
     DXmDYDZ.apply(myIngredients1);
@@ -940,7 +940,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),8);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     //-- check (0,-2,0), go there first
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
@@ -949,7 +949,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -957,7 +957,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),10);
-    
+
     //--now check (0,-2,2), go there in one step first
     DXmDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXmDYDZ.getProbability(),exp(epsilon0));
@@ -966,7 +966,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),11);
     EXPECT_EQ(molecules1[1].getY(),7);
     EXPECT_EQ(molecules1[1].getZ(),11);
-    
+
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(-epsilon0));
     mDXDYDZ.apply(myIngredients1);
@@ -974,7 +974,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),10);
     EXPECT_EQ(molecules1[1].getY(),8);
     EXPECT_EQ(molecules1[1].getZ(),12);
-    
+
     //-- now the last unchecked position with a contact is (0,0,2)
     mDXDYDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(mDXDYDZ.getProbability(),exp(epsilon0));
@@ -983,7 +983,7 @@ TEST_F(NNInteractionBccTest,CheckApplyBccMoveAnyLattice)
     EXPECT_EQ(molecules1[1].getX(),9);
     EXPECT_EQ(molecules1[1].getY(),9);
     EXPECT_EQ(molecules1[1].getZ(),13);
-    
+
     DXDYmDZ.check(myIngredients1);
     EXPECT_DOUBLE_EQ(DXDYmDZ.getProbability(),exp(-epsilon0));
     DXDYmDZ.apply(myIngredients1);
@@ -1017,7 +1017,7 @@ TEST_F(NNInteractionBccTest,getSetInteraction)
     EXPECT_THROW(myIngredients.getNNInteraction(1,0),std::runtime_error);
     EXPECT_THROW(myIngredients.getNNInteraction(0,256),std::runtime_error);
     EXPECT_THROW(myIngredients.getNNInteraction(256,0),std::runtime_error);
-    
+
     //set interaction between types 1,2
     myIngredients.setNNInteraction(1,2,0.8);
     EXPECT_DOUBLE_EQ(myIngredients.getNNInteraction(1,2),0.8);
@@ -1155,38 +1155,38 @@ TEST_F(NNInteractionBccTest,ApplyMoveAddMonomerBcc)
     myIngredients1.setPeriodicZ(1);
 
     myIngredients1.synchronize();
-    
+
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
-    
+
     MoveAddMonomerBcc addMonomer;
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(256);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(0);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(-1);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(2);
     addMonomer.apply(myIngredients1);
-    
+
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,6,7));
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(255);
     addMonomer.apply(myIngredients1);
-    
+
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,6,7)));
-    
+
 }

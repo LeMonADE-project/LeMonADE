@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -90,7 +90,7 @@ private:
  *
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
-template < class IngredientsType> 
+template < class IngredientsType>
 class ReadFixedMonomers: public ReadToDestination<IngredientsType>
 {
 public:
@@ -106,7 +106,7 @@ public:
  *
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
-template <class IngredientsType> 
+template <class IngredientsType>
 class WriteFixedMonomers:public AbstractWrite<IngredientsType>
 {
 public:
@@ -126,13 +126,13 @@ class FeatureFixedMonomers:public Feature
 {
 public:
   typedef LOKI_TYPELIST_1(MonomerMovableTag) monomer_extensions;
-  
+
   //! Export the relevant functionality for reading bfm-files to the responsible reader object
-  template<class IngredientsType> 
+  template<class IngredientsType>
   void exportRead(FileImport<IngredientsType>& fileReader);
-  
+
   //! Export the relevant functionality for writing bfm-files to the responsible writer object
-  template<class IngredientsType> 
+  template<class IngredientsType>
   void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
 
   /**
@@ -187,7 +187,7 @@ public:
  * @param fileReader File importer for the bfm-file
  * @tparam IngredientsType Features used in the system. See Ingredients.
  **/
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureFixedMonomers::exportRead(FileImport< IngredientsType >& fileReader)
 {
   fileReader.registerRead("#!fixed_monomers",new ReadFixedMonomers<IngredientsType>(fileReader.getDestination()));
@@ -204,7 +204,7 @@ void FeatureFixedMonomers::exportRead(FileImport< IngredientsType >& fileReader)
  *
  * @param fileWriter File writer for the bfm-file.
  */
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureFixedMonomers::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
   fileWriter.registerWrite("#!fixed_monomers",new WriteFixedMonomers<IngredientsType>(fileWriter.getIngredients_()));
@@ -216,7 +216,7 @@ void FeatureFixedMonomers::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& 
  *
  * @throw <std::runtime_error> attributes and identifier could not be read.
  **/
-template < class IngredientsType> 
+template < class IngredientsType>
 void ReadFixedMonomers<IngredientsType>::execute()
 {
 	std::cout << " executeReadFixedMonomers"<< std::endl;
@@ -233,16 +233,16 @@ void ReadFixedMonomers<IngredientsType>::execute()
   std::istream& source=this->getInputStream();
   //for convenience: get the set of monomers
   typename IngredientsType::molecules_type& molecules=this->getDestination().modifyMolecules();
-  
+
   //go to next line and save the position of the get pointer into streampos previous
   getline(source,line);
   previous=(source).tellg();
 
   //read and process the lines containing the bond vector definition
   getline(source,line);
-  
+
   while(!line.empty() && !((source).fail())){
-    
+
     //stop at next Read and set the get-pointer to the position before the Read
     if(this->detectRead(line)){
       (source).seekg(previous);
@@ -262,16 +262,16 @@ void ReadFixedMonomers<IngredientsType>::execute()
 		   <<"Could not read first index in fixed_monomers line "<<nfixedMonomers+1;
       throw std::runtime_error(messagestream.str());
     }
-    
+
     //throw exception, if next character isnt "-"
     if(!this->findSeparator(stream,'-')){
-      
+
       std::stringstream messagestream;
       messagestream<<"ReadFixedMonomers<IngredientsType>::execute()\n"
 		   <<"Wrong definition of fixed_monomers\nCould not find separator \"-\" "
 		   <<"in fixed_monomers definition no "<<nfixedMonomers+1;
       throw std::runtime_error(messagestream.str());
-      
+
     }
 
     //read bond identifier, throw exception if extraction fails
@@ -284,16 +284,16 @@ void ReadFixedMonomers<IngredientsType>::execute()
 		   <<"Could not read second index in fixed_monomers line "<<nfixedMonomers+1;
       throw std::runtime_error(messagestream.str());
     }
-    
+
     //throw exception, if next character isnt ":"
     if(!this->findSeparator(stream,':')){
-      
+
       std::stringstream messagestream;
       messagestream<<"ReadFixedMonomers<IngredientsType>::execute()\n"
 		   <<"Wrong definition of fixed_monomers\nCould not find separator \":\" "
 		   <<"in fixed_monomers definition no "<<nfixedMonomers+1;
       throw std::runtime_error(messagestream.str());
-      
+
     }
     //read the isfixedMonomers tag
     stream>>isfixedMonomers;
@@ -314,14 +314,14 @@ void ReadFixedMonomers<IngredientsType>::execute()
     }
     //otherwise throw an exception
     else{
-      
+
       std::stringstream messagestream;
       messagestream<<"ReadFixedMonomers<IngredientsType>::execute()\n"
 		   <<"could not read fixed_monomers in fixed_monomers definition no "<<nfixedMonomers+1;
       throw std::runtime_error(messagestream.str());
 
     }
-  } 
+  }
 }
 
 /******************************************************************************/
@@ -331,12 +331,12 @@ void WriteFixedMonomers<IngredientsType>::writeStream(std::ostream& strm)
 {
   //for all output the indices are increased by one, because the file-format
   //starts counting indices at 1 (not 0)
-  
+
   //write bfm command
   strm<<"#!fixed_monomers\n";
   //get reference to monomers
   const typename IngredientsType::molecules_type& molecules=this->getSource().getMolecules();
-  
+
   size_t nMonomers=molecules.size();
   //attribute blocks begin with startIndex
   size_t startIndex=0;
@@ -344,7 +344,7 @@ void WriteFixedMonomers<IngredientsType>::writeStream(std::ostream& strm)
   size_t n=0;
   //attribute to be written (updated in loop below)
   int isfixedMonomers=molecules[0].getMovableTag() ? 0 : 1; //0->movable, 1-> fixed
-  
+
   //write attibutes (blockwise)
   while(n<nMonomers){
     if((molecules[n].getMovableTag() ? 0 : 1)!=isfixedMonomers)
@@ -357,7 +357,7 @@ void WriteFixedMonomers<IngredientsType>::writeStream(std::ostream& strm)
   }
   //write final fixed_monomers: 0->movable, 1-> fixed
   strm<<startIndex+1<<"-"<<nMonomers<<":"<<isfixedMonomers<<std::endl<<std::endl;
-  
+
 }
 
 

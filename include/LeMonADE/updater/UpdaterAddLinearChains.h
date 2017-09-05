@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -33,9 +33,9 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @class UpdaterAddLinearChains
  *
  * @brief Updater to create a solution of monomdisperse linear chains.
- * 
- * @details This is a simple implementation of a system setup starting from an empty ingredients 
- * or a system with some monomers inside. This updater requires FeatureAttributes. 
+ *
+ * @details This is a simple implementation of a system setup starting from an empty ingredients
+ * or a system with some monomers inside. This updater requires FeatureAttributes.
  * Two tags are added to the monomers in alternating manner, usually needed for GPU computing.
  *
  * @tparam IngredientsType
@@ -56,56 +56,56 @@ template<class IngredientsType>
 class UpdaterAddLinearChains: public UpdaterAbstractCreate<IngredientsType>
 {
   typedef UpdaterAbstractCreate<IngredientsType> BaseClass;
-  
+
 public:
   UpdaterAddLinearChains(IngredientsType& ingredients_, uint32_t NChain_, uint32_t NMonoPerChain_, int32_t type1_=1, int32_t type2_=2, bool IsSolvent=false);
-  
+
   virtual void initialize();
   virtual bool execute();
   virtual void cleanup();
-  
-  //! getter function for write compressed solvent bool 
+
+  //! getter function for write compressed solvent bool
   const bool getIsSolvent() const {return IsSolvent;}
-  
+
   //! getter function for number of monomers in chains
   const int32_t getNMonomerPerChain() const {return NMonoPerChain;}
-  
+
   //! getter function for number of chains
   const int32_t getNChain() const {return NChain;}
-  
+
   //! getter function for calculated density
   const double getDensity() const {return density;}
-  
+
 private:
   // provide access to functions of UpdaterAbstractCreate used in this updater
   using BaseClass::ingredients;
   using BaseClass::addMonomerToParent;
   using BaseClass::addSingleMonomer;
   using BaseClass::linearizeSystem;
-  
+
   //! number of monomers in a chain
   uint32_t NMonoPerChain;
-  
+
   //! number of linear chains in the box
   uint32_t NChain;
-  
+
   //! lattice occupation density
   double density;
-  
+
   //! bool for execution
   bool wasExecuted;
-  
+
   //! attribute tag of even monomers
   int32_t type1;
-  
+
   //! getAttributeTag of odd monomers
   int32_t type2;
-  
+
   //! bool to check if chains of size 1 should be compressed to solvent
   bool IsSolvent;
 };
 
-/** 
+/**
 * @brief Constructor handling the new systems paramters
 *
 * @param ingredients_ a reference to the IngredientsType - mainly the system
@@ -126,12 +126,12 @@ type1(type1_), type2(type2_), IsSolvent(IsSolvent_)
 template < class IngredientsType >
 void UpdaterAddLinearChains<IngredientsType>::initialize(){
   std::cout << "initialize UpdaterAddLinearChains" << std::endl;
-  
+
   // get the target density from the sum of existing monomers and the new added chains
   density=(double)( ingredients.getMolecules().size() + NMonoPerChain*NChain ) * 8  /(double)( ingredients.getBoxX()*ingredients.getBoxY()*ingredients.getBoxZ() );
-  
+
   std::cout << "add "<<NChain*NMonoPerChain<<" monomers to the box"<<std::endl;
-  
+
   execute();
 }
 
@@ -144,9 +144,9 @@ template < class IngredientsType >
 bool UpdaterAddLinearChains<IngredientsType>::execute(){
   if(wasExecuted)
     return true;
-  
+
   std::cout << "execute UpdaterAddLinearChains" << std::endl;
-  
+
   //loop over chains and chain monomers and build it up
   for(uint32_t i=0;i<(NChain);i++){
     for(uint32_t j=0;j<(NMonoPerChain);j++){
@@ -160,7 +160,7 @@ bool UpdaterAddLinearChains<IngredientsType>::execute(){
       }
     }
   }
-  
+
   ingredients.synchronize();
   double lattice_volume(ingredients.getBoxX()*ingredients.getBoxY()*ingredients.getBoxZ());
   if(std::abs(density - ( (double)(ingredients.getMolecules().size()*8) / lattice_volume )) > 0.0000000001 ){
@@ -186,7 +186,7 @@ bool UpdaterAddLinearChains<IngredientsType>::execute(){
 */
 template < class IngredientsType >
 void UpdaterAddLinearChains<IngredientsType>::cleanup(){
-  
+
 }
 
 

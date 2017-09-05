@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -37,17 +37,17 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @class ConsistencyCheck
  *
- * @brief Check a list of features for consistency regarding the required features (dependencies) 
+ * @brief Check a list of features for consistency regarding the required features (dependencies)
  *
  * @details Checks (from front to back) whether a feature in the list was required
  * to be further in front by some previous feature. For every feature in the list it
  * is checked whether this particular feature is contained in the list ForbiddenFeatures, i.e.
- * was required to be further in front. 
+ * was required to be further in front.
  * The number of such inconsistencies are collected and the value of MY_ERRORSTATE is set accordingly.
  *
  * @tparam FeatureList
  * @brief List of features to be checked
- * 
+ *
  * @tparam ForbiddenFeatures
  * @brief List of features that are required to be further in front in the list (this should be resolved automatically).
  * */
@@ -70,7 +70,7 @@ private:
   enum {MY_VALUE= 0};
 public:
   enum {MY_ERRORSTATE= MY_VALUE};
-  
+
 };
 
 
@@ -106,17 +106,17 @@ template <class Head, class Tail, class ForbiddenFeatures>
 class ConsistencyCheck< ::Loki::Typelist<Head,Tail> , ForbiddenFeatures >
 {
 private:
-  
+
   typedef typename ::Loki::TL::NoDuplicates
-  < 
-    typename ::Loki::TL::AppendIfNotNull <ForbiddenFeatures,typename Head::required_features_front>::Result 
+  <
+    typename ::Loki::TL::AppendIfNotNull <ForbiddenFeatures,typename Head::required_features_front>::Result
   >::Result UpdatedForbiddenFeatures;
-  
+
   enum {MY_VALUE=::Loki::TL::IndexOf<ForbiddenFeatures,Head>::value==-1 ? 0 : 1};
 public:
-  
+
   enum {MY_ERRORSTATE= MY_VALUE + ConsistencyCheck<Tail,UpdatedForbiddenFeatures>::MY_ERRORSTATE};
-  
+
 };
 
 #endif

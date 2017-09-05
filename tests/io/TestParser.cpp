@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -31,14 +31,14 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/io/Parser.h>
 
-//this test simply checks if the parser finds the 
+//this test simply checks if the parser finds the
 //commands from a file,returns them in the correct format
 TEST(ParserTest,FindRead)
 {
   std::ifstream file;
   file.open("tests/parserTest.test");
   Parser parser(file);
-  
+
   EXPECT_EQ("!firstCommand",parser.findRead());
   EXPECT_EQ("!secondCommand",parser.findRead());
   EXPECT_EQ("#!thirdCommand",parser.findRead());

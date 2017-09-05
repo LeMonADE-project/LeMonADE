@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -46,18 +46,18 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  *
  * @class AnalyzerWriteBfmFile
- * 
+ *
  * @brief Analyzer writing the configurations into a given bfm-file.
- * 
+ *
  * @details The output is appended to the file, if the file already exists.
  * If it does not exist, a new file is created and the header information is written
  * at the beginning
- * 
+ *
  * @tparam IngredientsType Ingredients class storing all system information( e.g. monomers, bonds, etc).
  *
  * @todo rename to WriteBFMFile or similar.
  **/
-template <class IngredientsType> 
+template <class IngredientsType>
 class AnalyzerWriteBfmFile: public AbstractAnalyzer
 {
 public:
@@ -66,7 +66,7 @@ public:
 
   //!Standard destructor closing the file stream.
   virtual ~AnalyzerWriteBfmFile();
-  
+
   /**
    * @enum BFM_WRITE_TYPE
    *
@@ -98,13 +98,13 @@ public:
 
   //! Initializes the writing. Opens the file and check for IO.
   virtual void initialize();
-  
+
   //! Interface for adding new write Writes provided by Feature (e.g. !box_x)
   void registerWrite(std::string WriteString,SuperAbstractWrite* WriteObject);
 
   //! Interface for replacing old (standard) Writes with new write Writes. Example: FeatureJumps (!mcs)
   void replaceWrite(std::string WriteString,SuperAbstractWrite* NewWriteObject);
-  
+
   //! Creates a new file (maybe overrides existing file)
   void startNewFile();
 
@@ -122,10 +122,9 @@ public:
 
   //! Returns the filename used in this class
   std::string getFilename(){return _filename;}
-  
+
   //! Returns the enum type for command handling
   int getCommandType(){return myCommandWriteType;}
-  
 
   /**
    * @brief This function is called \a once in the end of the TaskManager.
@@ -141,10 +140,10 @@ private:
 
   //! Checks if the file with given name already exists
   bool fileExists(std::string fname);
-  
+
   //! The filename to be used.
   std::string _filename;
-  
+
     //! Storage for data that are processed to file (mostly Ingredients).
   const IngredientsType& ingredients;
 
@@ -203,9 +202,9 @@ AnalyzerWriteBfmFile<IngredientsType>::~AnalyzerWriteBfmFile()
 		it->second=0;
 	}
 	WriteObjects.clear();
-	
+
 	closeFile();
-	
+
 }
 
 /***********************************************************************/
@@ -218,16 +217,16 @@ AnalyzerWriteBfmFile<IngredientsType>::~AnalyzerWriteBfmFile()
  */
 template <class IngredientsType>
 void AnalyzerWriteBfmFile<IngredientsType>::registerWrite(std::string WriteString,SuperAbstractWrite* WriteObject){
-    
-	
+
+
 	std::vector< std::pair <std::string,SuperAbstractWrite*> >::iterator it;
-	//first check if the command string (WriteString) is already used for 
+	//first check if the command string (WriteString) is already used for
 	//a different write
 	for(it=WriteObjects.begin();it!=WriteObjects.end();++it)
 	{
 		if(it->first==WriteString)
 		{
-						
+
 			std::stringstream errormessage;
 			errormessage<<"WriteBfmFile::registerWrite "
 					<<"Write string "<<WriteString<<" already used";
@@ -252,9 +251,9 @@ template <class IngredientsType>
 void AnalyzerWriteBfmFile<IngredientsType>::replaceWrite(std::string WriteString,SuperAbstractWrite* NewWriteObject)
 {
 	bool stringReplaced=false;
-	
+
 	std::vector< std::pair <std::string,SuperAbstractWrite*> >::iterator it;
-	//first check if the command string (WriteString) is already used for 
+	//first check if the command string (WriteString) is already used for
 	//a different write
 	for(it=WriteObjects.begin();it!=WriteObjects.end();++it)
 	{
@@ -278,7 +277,7 @@ void AnalyzerWriteBfmFile<IngredientsType>::replaceWrite(std::string WriteString
 			<<"Write string "<<WriteString<<" cannot be replaced, because it is not used yet!";
 		throw std::runtime_error(errormessage.str());
 	}
-	
+
 }
 
 /***********************************************************************/
@@ -387,15 +386,16 @@ bool AnalyzerWriteBfmFile<IngredientsType>::fileExists(std::string fname){
  */
 template <class IngredientsType>
 bool AnalyzerWriteBfmFile<IngredientsType>::execute(){
- 
+
   if(myWriteType==OVERWRITE) startOverwriteNewFile(_filename);
+
 
   std::vector< std::pair<std::string,SuperAbstractWrite*> >::iterator it;
   SuperAbstractWrite* mcsCommand=0;
   //write all Writes that do not have the writeHeaderOnly flag set
   for(it=WriteObjects.begin(); it!=WriteObjects.end(); ++it)
   {
-	if(it->first=="!mcs") mcsCommand=it->second;  
+	if(it->first=="!mcs") mcsCommand=it->second;
 	else if( (it->second)->writeHeaderOnly()==false)
 	{
 		(it->second)->writeStream(file);
@@ -405,8 +405,8 @@ bool AnalyzerWriteBfmFile<IngredientsType>::execute(){
   //the !mcs must always be written last in each step
   if(mcsCommand!=0) mcsCommand->writeStream(file);
   mcsCommand=0;
-  return true;	
-	
+  return true;
+
 }
 
 
@@ -494,7 +494,7 @@ void AnalyzerWriteBfmFile<IngredientsType>::writeHeader()
 	file<<"#"<<ctime(&localTime);
 	file<<"#monomer numbering starts at 1\n\n";
 	file<<"########################################################\n\n";
-	
+
 	file<<"# meta-data:"<<std::endl;
 	std::stringstream metadata;
 	ingredients.printMetaData(metadata);
@@ -510,7 +510,7 @@ void AnalyzerWriteBfmFile<IngredientsType>::writeHeader()
 		if( (it->second)->writeHeaderOnly())
 		{
 			(it->second)->writeStream(file);
-			
+
 		}
 	}
 }

@@ -11,12 +11,12 @@
 #include <misc/mojo.h>//NOT A SAFE WAY TO INCLUDE IT
 
 namespace yasli {
-          
-         
+
+
     // 20.4.1, the default allocator:
     template <class T> class allocator;
     template <> class allocator<void>;
-    
+
     // 20.4.1.2, allocator globals
     template <class T, class U>
     bool operator==(const allocator<T>&, const allocator<U>&) throw()
@@ -25,11 +25,11 @@ namespace yasli {
     template <class T, class U>
     bool operator!=(const allocator<T>&, const allocator<U>&) throw()
     { return false; }
-    
+
     // 20.4.2, raw storage iterator:
     // @@@ not defined, use the std one @@@
     //template <class OutputIterator, class T> class raw_storage_iterator;
-    
+
     // 20.4.3, temporary buffers:
     // @@@ not defined, use the std one @@@
     //template <class T>
@@ -54,7 +54,7 @@ namespace yasli {
 namespace yasli {
     template <class T> class allocator;
     // specialize for void:
-    template <> class allocator<void> 
+    template <> class allocator<void>
     {
     public:
         typedef void* pointer;
@@ -64,7 +64,7 @@ namespace yasli {
         template <class U> struct rebind { typedef allocator<U> other; };
     };
 
-    template <class T> class allocator 
+    template <class T> class allocator
     {
     public:
         typedef size_t                 size_type;
@@ -74,7 +74,7 @@ namespace yasli {
         typedef T&                     reference;
         typedef const T&               const_reference;
         typedef T                      value_type;
-        
+
         template <class U> struct rebind { typedef allocator<U> other; };
         allocator() throw() {}
         allocator(const allocator&) throw() {}
@@ -86,19 +86,19 @@ namespace yasli {
         {
             return static_cast<pointer>(::operator new(n * sizeof(T)));
         }
-        void deallocate(pointer p, size_type) 
+        void deallocate(pointer p, size_type)
         {
             ::operator delete(p);
         }
-        size_type max_size() const throw() 
+        size_type max_size() const throw()
         {
             return size_type(-1);
         }
-        void construct(pointer p, const T& val) 
+        void construct(pointer p, const T& val)
         {
             new((void *) p) T(val);
         }
-        void destroy(pointer p) 
+        void destroy(pointer p)
         {
             ((T*) p)->~T();
         }
@@ -107,7 +107,7 @@ namespace yasli {
 
 namespace yasli_nstd
 {
-    template <class T> class mallocator 
+    template <class T> class mallocator
     {
     public:
         typedef size_t       size_type;
@@ -117,7 +117,7 @@ namespace yasli_nstd
         typedef T&           reference;
         typedef const T&     const_reference;
         typedef T            value_type;
-        
+
         template <class U> struct rebind { typedef mallocator<U> other; };
         mallocator() throw() {}
         mallocator(const mallocator&) throw() {}
@@ -129,37 +129,37 @@ namespace yasli_nstd
         {
             return static_cast<pointer>(malloc(n * sizeof(T)));
         }
-        void deallocate(pointer p, size_type) 
+        void deallocate(pointer p, size_type)
         {
             free(p);
         }
-        size_type max_size() const throw() 
+        size_type max_size() const throw()
         {
             return size_type(-1);
         }
-        void construct(pointer p, const T& val) 
+        void construct(pointer p, const T& val)
         {
             new((void *) p) T(val);
         }
-        void destroy(pointer p) 
+        void destroy(pointer p)
         {
             ((T*) p)->~T();
         }
     };
-    
+
     //--------------destroy--------
-    
+
     namespace _impl
-    {                  
+    {
        struct non_destroyer
        {
-           template <class A, class T>   
+           template <class A, class T>
            static void destroy(A& a, T* p, typename A::size_type n) {}
-              
+
            template <class ForwardIterator>
-           static void destroy_range(ForwardIterator b, ForwardIterator e) {} 
+           static void destroy_range(ForwardIterator b, ForwardIterator e) {}
        };
-       
+
        struct destroyer
        {
            template <class A, class T>
@@ -168,28 +168,28 @@ namespace yasli_nstd
                const typename A::pointer p1 = p + n;
                for (; p < p1; ++p) a.destroy(p);
            }
-              
+
            template <class ForwardIterator>
-           static void destroy_range(ForwardIterator b, ForwardIterator e) 
+           static void destroy_range(ForwardIterator b, ForwardIterator e)
            {
                typedef typename std::iterator_traits<ForwardIterator>::value_type
                   value_type;
                for (; b != e; ++b) (*b).~value_type();
            }
-       };    
+       };
     }
 
     template <class A, class T>
-    void destroy(A& a, T* p, typename A::size_type n) 
+    void destroy(A& a, T* p, typename A::size_type n)
     {
         yasli_nstd::type_selector<yasli_nstd::is_class<T>::value != 0,
                                   _impl::destroyer,
                                   _impl::non_destroyer
                                  >::result::destroy(a, p, n);
     }
-    
+
     template <class ForwardIterator>
-    void destroy_range(ForwardIterator b, ForwardIterator e) 
+    void destroy_range(ForwardIterator b, ForwardIterator e)
     {
         yasli_nstd::type_selector<
             yasli_nstd::is_class<typename std::iterator_traits<ForwardIterator>
@@ -198,7 +198,7 @@ namespace yasli_nstd
             _impl::non_destroyer
             >::result::destroy_range(b, e);
     }
-    
+
     //---------------
 
 
@@ -207,16 +207,16 @@ namespace yasli_nstd
     {
         return mojo::uninitialized_move(b, e, d);
     }
-    
+
     template <class A>
     struct generic_allocator_traits
     {
-        static typename A::pointer 
+        static typename A::pointer
         reallocate(
-            A& a, 
-            typename A::pointer b, 
-            typename A::pointer e, 
-            typename A::size_type newSize) 
+            A& a,
+            typename A::pointer b,
+            typename A::pointer e,
+            typename A::size_type newSize)
         {
             typename A::pointer p1 = a.allocate(newSize, b);
             const typename A::size_type oldSize = e - b;
@@ -238,7 +238,7 @@ namespace yasli_nstd
         static bool reallocate_inplace(
         A& a,
         typename A::pointer b,
-        typename A::size_type newSize) 
+        typename A::size_type newSize)
         {
             return false;
         }
@@ -248,55 +248,55 @@ namespace yasli_nstd
     };
 
     template <class A>
-    struct allocator_traits : public generic_allocator_traits<A> 
+    struct allocator_traits : public generic_allocator_traits<A>
     {
     };
 
     template <class T>
-    struct allocator_traits< yasli::allocator<T> >  
-        : public generic_allocator_traits< yasli::allocator<T> > 
+    struct allocator_traits< yasli::allocator<T> >
+        : public generic_allocator_traits< yasli::allocator<T> >
     {
 #if YASLI_NEW_IS_MALLOC != 0
-        
+
         static bool reallocate_inplace(
                         A& a,
                         typename A::pointer b,
-                        typename A::size_type newSize) 
+                        typename A::size_type newSize)
         {
             allocator_traits< yasli_nstd::mallocator<T> >
                               ::reallocate_inplace(a, b, newSize);
         }
-               
-        static typename yasli::allocator<T>::pointer 
+
+        static typename yasli::allocator<T>::pointer
         reallocate(
-            yasli::allocator<T>& a, 
-            typename yasli::allocator<T>::pointer b, 
-            typename yasli::allocator<T>::pointer e, 
-            typename yasli::allocator<T>::size_type newSize) 
-        {    
+            yasli::allocator<T>& a,
+            typename yasli::allocator<T>::pointer b,
+            typename yasli::allocator<T>::pointer e,
+            typename yasli::allocator<T>::size_type newSize)
+        {
             allocator_traits< yasli_nstd::mallocator<T> >
-                              ::reallocate(a, b, e, newSize);      
+                              ::reallocate(a, b, e, newSize);
         }
 #endif//yasli_new_is_malloc
     };
 
     template <class T>
-    struct allocator_traits< yasli_nstd::mallocator<T> >  
-        : public generic_allocator_traits< yasli_nstd::mallocator<T> > 
+    struct allocator_traits< yasli_nstd::mallocator<T> >
+        : public generic_allocator_traits< yasli_nstd::mallocator<T> >
     {
 #if YASLI_HAS_EXPAND && YASLI_HAS_EFFICIENT_MSIZE
         static bool reallocate_inplace(
                         yasli_nstd::mallocator<T>& a,
                         typename yasli_nstd::mallocator<T>::pointer b,
-                        typename yasli_nstd::mallocator<T>::size_type newSize) 
+                        typename yasli_nstd::mallocator<T>::size_type newSize)
         {
             if (b == 0) return malloc(newSize);
             if (newSize == 0) {free(b); return false;}
-            return b == yasli_platform::expand(b, newSize) 
+            return b == yasli_platform::expand(b, newSize)
                    && yasli_platform::msize(b) >= newSize;
-        } 
+        }
 #endif
-        static typename yasli_nstd::mallocator<T>::pointer 
+        static typename yasli_nstd::mallocator<T>::pointer
         reallocate(
             yasli_nstd::mallocator<T>& a,
             typename yasli_nstd::mallocator<T>::pointer b,
@@ -307,21 +307,21 @@ namespace yasli_nstd
             {
                 return static_cast<T*>(realloc(b, newSize));
             }
-            if(reallocate_inplace(a, b, newSize)) return b;           
+            if(reallocate_inplace(a, b, newSize)) return b;
             return generic_allocator_traits< yasli_nstd::mallocator<T> >::
-                          reallocate(a, b, e, newSize);            
+                          reallocate(a, b, e, newSize);
         }
     };
 }
 
 namespace yasli
 {
-     //Here is where type_selector is really much more ugly than 
+     //Here is where type_selector is really much more ugly than
      //enable_if.
-          
+
     //----------------UNINIT COPY--------
     namespace _impl
-    {                   
+    {
           //safe
           template <class InputItr, class FwdItr>
           struct uninitialized_safe_copier
@@ -341,13 +341,13 @@ namespace yasli
                          for (; begin != end; ++begin) (&*begin)->~T();
                      }
                  } guard = { result, &result };
-                 for (; first != last; ++first, ++result) 
+                 for (; first != last; ++first, ++result)
                      new(&*result) typename std::iterator_traits<FwdItr>::value_type(*first);
                  // commit
                  return result;
              }
-          };                    
-          
+          };
+
           template <class T>
           struct uninitialized_memcopier
           {
@@ -356,21 +356,21 @@ namespace yasli
                  yasli_nstd::is_memcopyable<T>::value;
                  const size_t s = last - first;
                  memmove(result, first, s * sizeof(T));
-                 return result + s;                 
+                 return result + s;
              }
           };
-            
+
     }// _impl
-    
-    // @@@ TODO: specialize for yasli_nstd::fill_iterator 
-   
+
+    // @@@ TODO: specialize for yasli_nstd::fill_iterator
+
     template <class InputItr, class FwdItr>
     FwdItr uninitialized_copy(InputItr first, InputItr last, FwdItr result)
     {
            std::cout<<"neither\n";
         return _impl::uninitialized_safe_copier<InputItr, FwdItr>::execute(first, last, result);
     }
-    
+
     template <class T>
     T* uninitialized_copy(const T* first, const T* last, T* result)
     {
@@ -380,17 +380,17 @@ namespace yasli
                                          _impl::uninitialized_safe_copier<const T*, T*>
                                         >::result::execute(first, last, result);
     }
-    
+
     template <class T>
     T* uninitialized_copy(T* first, T* last, T* result)
     {
        std::cout<<"non-const\n";
-       return uninitialized_copy(static_cast<const T*>(first), 
+       return uninitialized_copy(static_cast<const T*>(first),
                                  static_cast<const T*>(last), result);
-    }  
-   
+    }
+
     //-------------------------UNINIT FILL------
-    
+
     template <class ForwardIterator, class T>
     void
     uninitialized_fill(ForwardIterator first, ForwardIterator last,
@@ -406,7 +406,7 @@ namespace yasli
             }
         } guard = { first, &first };
         for (; first != last; ++first)
-            new(&*first) T(x); 
+            new(&*first) T(x);
         // Commit
         guard.pCrt = 0;
     }
@@ -444,7 +444,7 @@ namespace yasli
         // Commit
         guard.pCrt = 0;
     }
-    
+
 }// yasli
 
 #endif // YASLI_MEMORY_H_

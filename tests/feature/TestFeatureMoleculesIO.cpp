@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -49,7 +49,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 /************************************************************************/
-//define test fixtures for the different tests their purpose is to set up 
+//define test fixtures for the different tests their purpose is to set up
 //the tests to suppress cout's output such that is does not display on the
 //standard output during the tests. this makes google test's output more readeable
 /************************************************************************/
@@ -59,18 +59,18 @@ public:
   typedef LOKI_TYPELIST_1(FeatureMoleculesIO) Features;
   typedef ConfigureSystem<VectorInt3,Features,4> Config;
   typedef Ingredients < Config> MyIngredients;
-  
+
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
     cout.rdbuf(tempStream.rdbuf());
   };
-  
+
   //restore original output
   virtual void TearDown(){
     cout.rdbuf(originalBuffer);
   };
-  
+
 private:
   std::streambuf* originalBuffer;
   std::ostringstream tempStream;
@@ -78,19 +78,19 @@ private:
 
 
 //test the if the read commands !number_of_monomers, !bonds and !mcs
-//are exported correctly and work. ng CXX object tests/CMakeFiles/LeMonADE-tests.dir/feature/TestFeatureMoleculesIO.cpp.o
+//are exported correctly and work.
 
 TEST_F(FeatureMoleculesIOTest, ExportRead){
   MyIngredients ingredients;
-  
+
   //read a testfile
   FileImport<MyIngredients> file("tests/molecules.test",ingredients);
-  
+
   //check if number of monomers was read correctly
   file.read();
   EXPECT_EQ(10,ingredients.getMolecules().size());
-//   
-  //check some positions 
+//
+  //check some positions
   VectorInt3 position2; position2.setAllCoordinates(5,5,5);
   VectorInt3 position3; position3.setAllCoordinates(3,5,4);
   VectorInt3 position4; position4.setAllCoordinates(5,7,5);
@@ -99,7 +99,7 @@ TEST_F(FeatureMoleculesIOTest, ExportRead){
   EXPECT_EQ(position4,ingredients.getMolecules()[4]);
 
   //check some bond information:
-  
+
   //number of bonds
   EXPECT_EQ(2, ingredients.getMolecules().getNumLinks(0));
   EXPECT_EQ(2, ingredients.getMolecules().getNumLinks(3));
@@ -108,10 +108,10 @@ TEST_F(FeatureMoleculesIOTest, ExportRead){
   EXPECT_EQ(0, ingredients.getMolecules().getNeighborIdx(5,0));
   EXPECT_EQ(5, ingredients.getMolecules().getNeighborIdx(0,0));
   EXPECT_EQ(1, ingredients.getMolecules().getNeighborIdx(0,1));
-  
+
   //check age (first mcs)
   EXPECT_EQ(10, ingredients.getMolecules().getAge());
-  
+
   //check age (next mcs)
   file.read();
   EXPECT_EQ(20, ingredients.getMolecules().getAge());
@@ -698,7 +698,7 @@ UpdaterReadBfmFile<MyIngredients> inputFile4(filename,testIngredients4,UpdaterRe
 TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)
 {
 	MyIngredients ingredients;
-	
+
 	//set some values on ingredients
 	ingredients.modifyMolecules().setAge(10000);
 	ingredients.setPeriodicX(true);
@@ -707,7 +707,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)
 	ingredients.setBoxX(32);
 	ingredients.setBoxY(32);
 	ingredients.setBoxZ(64);
-	
+
 	//set 500 solvents in the box
 	int offset=32;
 	std::map<int32_t,int32_t> coordinates;
@@ -725,27 +725,27 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)
 		int32_t foldedZ=z%64;
 		int32_t linIndex=foldedZ*32*32+foldedY*32+foldedX;
 		coordinates[linIndex]+=1;
-		
+
 	}
-	
+
 	ingredients.setCompressedOutputIndices(0,499);
 	ingredients.synchronize(ingredients);
-	
+
 	//now create file with the information entered above
 	string filename("tmpMoleculesSoventRW.bfm");
 	AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
 	outputFile.initialize();
 	outputFile.execute();
 	outputFile.closeFile();
-	
-	
+
+
 	MyIngredients testIngredients;
 	UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
 	inputFile.initialize();
 	inputFile.execute();
 	inputFile.closeFile();
-	
-	//construct a map with folded coordinates again 
+
+	//construct a map with folded coordinates again
 	std::map<int32_t,int32_t> testCoordinates;
 	for(size_t i=0;i<testIngredients.getMolecules().size();i++)
 	{
@@ -760,7 +760,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)
 	EXPECT_EQ(ingredients.getCompressedOutputIndices(),testIngredients.getCompressedOutputIndices());
 	//maps with folded indices should also be equal
 	EXPECT_EQ(coordinates,testCoordinates);
-	
+
 	//remove temporary file  (and let test fail if not removed)
 	EXPECT_EQ(0,remove(filename.c_str()));
 
@@ -769,7 +769,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)
 TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensitySplit)
 {
 	MyIngredients ingredients;
-	
+
 	//set some values on ingredients
 	ingredients.modifyMolecules().setAge(10000);
 	ingredients.setPeriodicX(true);
@@ -778,7 +778,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensitySplit)
 	ingredients.setBoxX(32);
 	ingredients.setBoxY(64);
 	ingredients.setBoxZ(64);
-	
+
 	//set 500 solvents in the box
 	int offset=32;
 	std::map<int32_t,int32_t> coordinates;
@@ -796,28 +796,28 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensitySplit)
 		int32_t foldedZ=z%64;
 		int32_t linIndex=foldedZ*32*64+foldedY*32+foldedX;
 		coordinates[linIndex]+=1;
-		
+
 	}
-	
+
 	ingredients.setCompressedOutputIndices(10,20);
 	ingredients.setCompressedOutputIndices(30,480);
 	ingredients.synchronize(ingredients);
-	
+
 	//now create file with the information entered above
 	string filename("tmpMoleculesSoventRW.bfm");
 	AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
 	outputFile.initialize();
 	outputFile.execute();
 	outputFile.closeFile();
-	
-	
+
+
 	MyIngredients testIngredients;
 	UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
 	inputFile.initialize();
 	inputFile.execute();
 	inputFile.closeFile();
-	
-	//construct a map with folded coordinates again 
+
+	//construct a map with folded coordinates again
 	std::map<int32_t,int32_t> testCoordinates;
 	for(size_t i=0;i<testIngredients.getMolecules().size();i++)
 	{
@@ -832,7 +832,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensitySplit)
 	EXPECT_EQ(ingredients.getCompressedOutputIndices(),testIngredients.getCompressedOutputIndices());
 	//maps with folded indices should also be equal
 	EXPECT_EQ(coordinates,testCoordinates);
-	
+
 	//remove temporary file  (and let test fail if not removed)
 	EXPECT_EQ(0,remove(filename.c_str()));
 
@@ -843,7 +843,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensitySplit)
 TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensity)
 {
 	MyIngredients ingredients;
-	
+
 	//set some values on ingredients
 	ingredients.modifyMolecules().setAge(10000);
 	ingredients.setPeriodicX(true);
@@ -852,7 +852,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensity)
 	ingredients.setBoxX(32);
 	ingredients.setBoxY(32);
 	ingredients.setBoxZ(64);
-	
+
 	//set 500 solvents in the box
 	int offset=32;
 	std::map<int32_t,int32_t> coordinates;
@@ -870,27 +870,27 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensity)
 		int32_t foldedZ=z%64;
 		int32_t linIndex=foldedZ*32*32+foldedY*32+foldedX;
 		coordinates[linIndex]+=1;
-		
+
 	}
-	
+
 	ingredients.setCompressedOutputIndices(0,1999);
 	ingredients.synchronize(ingredients);
-	
+
 	//now create file with the information entered above
 	string filename("tmpMoleculesSoventRW.bfm");
 	AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
 	outputFile.initialize();
 	outputFile.execute();
 	outputFile.closeFile();
-	
-	
+
+
 	MyIngredients testIngredients;
 	UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
 	inputFile.initialize();
 	inputFile.execute();
 	inputFile.closeFile();
-	
-	//construct a map with folded coordinates again 
+
+	//construct a map with folded coordinates again
 	std::map<int32_t,int32_t> testCoordinates;
 	for(size_t i=0;i<testIngredients.getMolecules().size();i++)
 	{
@@ -905,7 +905,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensity)
 	EXPECT_EQ(ingredients.getCompressedOutputIndices(),testIngredients.getCompressedOutputIndices());
 	//maps with folded indices should also be equal
 	EXPECT_EQ(coordinates,testCoordinates);
-	
+
 	//remove temporary file  (and let test fail if not removed)
 	EXPECT_EQ(0,remove(filename.c_str()));
 
@@ -914,7 +914,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensity)
 TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensitySplit)
 {
 	MyIngredients ingredients;
-	
+
 	//set some values on ingredients
 	ingredients.modifyMolecules().setAge(10000);
 	ingredients.setPeriodicX(true);
@@ -923,7 +923,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensitySplit)
 	ingredients.setBoxX(32);
 	ingredients.setBoxY(64);
 	ingredients.setBoxZ(64);
-	
+
 	//set 500 solvents in the box
 	int offset=32;
 	std::map<int32_t,int32_t> coordinates;
@@ -941,29 +941,29 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensitySplit)
 		int32_t foldedZ=z%64;
 		int32_t linIndex=foldedZ*32*64+foldedY*32+foldedX;
 		coordinates[linIndex]+=1;
-		
+
 	}
-	
+
 	ingredients.setCompressedOutputIndices(0,20);
 	ingredients.setCompressedOutputIndices(30,280);
 	ingredients.setCompressedOutputIndices(300,1999);
 	ingredients.synchronize(ingredients);
-	
+
 	//now create file with the information entered above
 	string filename("tmpMoleculesSoventRW.bfm");
 	AnalyzerWriteBfmFile<MyIngredients> outputFile(filename,ingredients,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
 	outputFile.initialize();
 	outputFile.execute();
 	outputFile.closeFile();
-	
-	
+
+
 	MyIngredients testIngredients;
 	UpdaterReadBfmFile<MyIngredients> inputFile(filename,testIngredients,UpdaterReadBfmFile<MyIngredients>::READ_STEPWISE);
 	inputFile.initialize();
 	inputFile.execute();
 	inputFile.closeFile();
-	
-	//construct a map with folded coordinates again 
+
+	//construct a map with folded coordinates again
 	std::map<int32_t,int32_t> testCoordinates;
 	for(size_t i=0;i<testIngredients.getMolecules().size();i++)
 	{
@@ -978,7 +978,7 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensitySplit)
 	EXPECT_EQ(ingredients.getCompressedOutputIndices(),testIngredients.getCompressedOutputIndices());
 	//maps with folded indices should also be equal
 	EXPECT_EQ(coordinates,testCoordinates);
-	
+
 	//remove temporary file  (and let test fail if not removed)
 	EXPECT_EQ(0,remove(filename.c_str()));
 
@@ -988,13 +988,13 @@ TEST_F(FeatureMoleculesIOTest,CompressedSolventHighDensitySplit)
 TEST_F(FeatureMoleculesIOTest,getSetCompressedOutputIndices)
 {
 	MyIngredients ingredients;
-	
+
 	EXPECT_EQ(ingredients.getCompressedOutputIndices().size(),0);
-	
+
 	ingredients.setCompressedOutputIndices(10,112);
 	ingredients.setCompressedOutputIndices(200,400);
 	EXPECT_EQ(ingredients.getCompressedOutputIndices().size(),2);
-	
+
 	ingredients.setCompressedOutputIndices(10,114);
 	EXPECT_EQ(ingredients.getCompressedOutputIndices().at(10),114);
 }

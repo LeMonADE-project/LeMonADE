@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -76,7 +76,7 @@ private:
  * @brief Handles BFM-File-Reads \b !attributes
  * @tparam IngredientsType Ingredients class storing all system information.
  */
-template < class IngredientsType> 
+template < class IngredientsType>
 class ReadAttributes: public ReadToDestination<IngredientsType>
 {
 public:
@@ -93,7 +93,7 @@ public:
  * @brief Handles BFM-File-Write \b !attributes
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
-template <class IngredientsType> 
+template <class IngredientsType>
 class WriteAttributes:public AbstractWrite<IngredientsType>
 {
 public:
@@ -114,21 +114,21 @@ class FeatureAttributes:public Feature
 public:
   //! This Feature requires a monomer_extensions.
   typedef LOKI_TYPELIST_1(MonomerAttributeTag) monomer_extensions;
-  
+
   //! Export the relevant functionality for reading bfm-files to the responsible reader object
-  template<class IngredientsType> 
+  template<class IngredientsType>
   void exportRead(FileImport<IngredientsType>& fileReader);
-  
+
   //! Export the relevant functionality for writing bfm-files to the responsible writer object
-  template<class IngredientsType> 
+  template<class IngredientsType>
   void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
 
   //! For all unknown moves: this does nothing
-  template<class IngredientsType> 
+  template<class IngredientsType>
     void applyMove(IngredientsType& ing, const MoveBase& move){};
 
   //! Overloaded for moves of type MoveAddMonomerBase to set the attribute tag by inserting a monomer
-  template<class IngredientsType,class AddMoveType> 
+  template<class IngredientsType,class AddMoveType>
     void applyMove(IngredientsType& ing, const MoveAddMonomerBase<AddMoveType>& move);
 
 };
@@ -151,7 +151,7 @@ public:
  * @param destination List of Feature to write-in from the read values.
  * @tparam IngredientsType Features used in the system. See Ingredients.
  **/
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureAttributes::exportRead(FileImport< IngredientsType >& fileReader)
 {
   fileReader.registerRead("!attributes",new ReadAttributes<IngredientsType>(fileReader.getDestination()));
@@ -167,7 +167,7 @@ void FeatureAttributes::exportRead(FileImport< IngredientsType >& fileReader)
  *
  * @param fileWriter File writer for the bfm-file.
  */
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureAttributes::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
   fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType>(fileWriter.getIngredients_()));
@@ -180,7 +180,7 @@ void FeatureAttributes::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fil
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
  * @param [in] move general addmove (MoveAddScMonomer/MoveAddBccMonomer)
  */
-template<class IngredientsType,class AddMoveType> 
+template<class IngredientsType,class AddMoveType>
 void FeatureAttributes::applyMove(IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType>& move)
 {
 	ingredients.modifyMolecules()[move.getMonomerIndex()].setAttributeTag(move.getTag());
@@ -192,7 +192,7 @@ void FeatureAttributes::applyMove(IngredientsType& ingredients, const MoveAddMon
  *
  * @throw <std::runtime_error> attributes and identifier could not be read.
  **/
-template < class IngredientsType> 
+template < class IngredientsType>
 void ReadAttributes<IngredientsType>::execute()
 {
   //some variables used during reading
@@ -207,16 +207,16 @@ void ReadAttributes<IngredientsType>::execute()
   std::istream& source=this->getInputStream();
   //for convenience: get the set of monomers
   typename IngredientsType::molecules_type& molecules=this->getDestination().modifyMolecules();
-  
+
   //go to next line and save the position of the get pointer into streampos previous
   getline(source,line);
   previous=(source).tellg();
 
   //read and process the lines containing the bond vector definition
   getline(source,line);
-  
+
   while(!line.empty() && !((source).fail())){
-    
+
     //stop at next Read and set the get-pointer to the position before the Read
     if(this->detectRead(line)){
       (source).seekg(previous);
@@ -236,16 +236,16 @@ void ReadAttributes<IngredientsType>::execute()
 		   <<"Could not read first index in attributes line "<<nAttributes+1;
       throw std::runtime_error(messagestream.str());
     }
-    
+
     //throw exception, if next character isnt "-"
     if(!this->findSeparator(stream,'-')){
-      
+
     	std::stringstream messagestream;
       messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
 		   <<"Wrong definition of attributes\nCould not find separator \"-\" "
 		   <<"in attribute definition no "<<nAttributes+1;
       throw std::runtime_error(messagestream.str());
-      
+
     }
 
     //read bond identifier, throw exception if extraction fails
@@ -258,16 +258,16 @@ void ReadAttributes<IngredientsType>::execute()
 		   <<"Could not read second index in attributes line "<<nAttributes+1;
       throw std::runtime_error(messagestream.str());
     }
-    
+
     //throw exception, if next character isnt ":"
     if(!this->findSeparator(stream,':')){
-      
+
     	std::stringstream messagestream;
       messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
 		   <<"Wrong definition of attributes\nCould not find separator \":\" "
 		   <<"in attribute definition no "<<nAttributes+1;
       throw std::runtime_error(messagestream.str());
-      
+
     }
     //read the attribute tag
     stream>>attribute;
@@ -286,14 +286,14 @@ void ReadAttributes<IngredientsType>::execute()
     }
     //otherwise throw an exception
     else{
-      
+
     	std::stringstream messagestream;
       messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
 		   <<"could not read attribute in attribute definition no "<<nAttributes+1;
       throw std::runtime_error(messagestream.str());
 
     }
-  } 
+  }
 }
 
 
@@ -303,12 +303,12 @@ void WriteAttributes<IngredientsType>::writeStream(std::ostream& strm)
 {
   //for all output the indices are increased by one, because the file-format
   //starts counting indices at 1 (not 0)
-  
+
   //write bfm command
   strm<<"!attributes\n";
   //get reference to monomers
   const typename IngredientsType::molecules_type& molecules=this->getSource().getMolecules();
-  
+
   size_t nMonomers=molecules.size();
   //attribute blocks begin with startIndex
   size_t startIndex=0;
@@ -316,7 +316,7 @@ void WriteAttributes<IngredientsType>::writeStream(std::ostream& strm)
   size_t n=0;
   //attribute to be written (updated in loop below)
   int attribute=molecules[0].getAttributeTag();
-  
+
   //write attibutes (blockwise)
   while(n<nMonomers){
     if(molecules[n].getAttributeTag()!=attribute)
@@ -329,7 +329,7 @@ void WriteAttributes<IngredientsType>::writeStream(std::ostream& strm)
   }
   //write final attributes
   strm<<startIndex+1<<"-"<<nMonomers<<":"<<attribute<<std::endl<<std::endl;
-  
+
 }
 
 

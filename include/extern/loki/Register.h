@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // The Loki Library
 // Copyright (c) 2006 Peter Kümmel
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author makes no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author makes no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef LOKI_REGISTER_INC_
@@ -18,7 +18,7 @@
 #include "TypeManip.h"
 #include "HierarchyGenerators.h"
 
-///  \defgroup RegisterGroup Register 
+///  \defgroup RegisterGroup Register
 
 namespace Loki
 {
@@ -43,17 +43,17 @@ namespace Loki
 
     namespace Private
     {
-        template<class T> 
+        template<class T>
         struct RegisterOnCreate
         {
             RegisterOnCreate()  { RegisterFunction<T>(); }
         };
 
-        template<class T> 
+        template<class T>
         struct UnRegisterOnDelete
         {
             ~UnRegisterOnDelete() { UnRegisterFunction<T>(); }
-        };    
+        };
 
         template<class T>
         struct RegisterOnCreateElement
@@ -79,7 +79,7 @@ namespace Loki
     ////////////////////////////////////////////////////////////////////////////////
 
     template<typename ElementList>
-    struct RegisterOnCreateSet 
+    struct RegisterOnCreateSet
         : GenScatterHierarchy<ElementList, Private::RegisterOnCreateElement>
     {};
 
@@ -93,7 +93,7 @@ namespace Loki
     ///  see test/Register
     ////////////////////////////////////////////////////////////////////////////////
     template<typename ElementList>
-    struct UnRegisterOnDeleteSet 
+    struct UnRegisterOnDeleteSet
         : GenScatterHierarchy<ElementList, Private::UnRegisterOnDeleteElement>
     {};
 
@@ -108,8 +108,8 @@ namespace Loki
     ///  see test/Register
     ////////////////////////////////////////////////////////////////////////////////
 
-    
-#define LOKI_CONCATE(a,b,c,d) a ## b ## c ## d 
+
+#define LOKI_CONCATE(a,b,c,d) a ## b ## c ## d
 #define LOKI_CONCAT(a,b,c,d) LOKI_CONCATE(a,b,c,d)
 
 #define LOKI_CHECK_CLASS_IN_LIST( CLASS , LIST )                                \

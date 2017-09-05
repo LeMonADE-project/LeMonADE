@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -56,7 +56,7 @@ public:
 		if(counter<5) return true;
 		else return false;
 	}
-	
+
 	void initialize(){isInitialized=true;}
 	void cleanup(){isCleanedUp=true;}
 
@@ -65,7 +65,7 @@ public:
 private:
 	int counter;
 	string* destination;
-	
+
 
 };
 
@@ -77,16 +77,16 @@ public:
 		result.append(*source);
 		return true;
 	}
-	
+
 	void initialize(){isInitialized=true;}
 	void cleanup(){isCleanedUp=true;}
-	
+
 	string result;
 	bool isInitialized;
 	bool isCleanedUp;
 private:
 	string* source;
-	
+
 };
 
 
@@ -136,15 +136,15 @@ TEST(TaskManagerTest, Run)
   DummyUpdater* updater2=new DummyUpdater(textstring2);
   DummyAnalyzer* analyzer1=new DummyAnalyzer(textstring1);
   DummyAnalyzer* analyzer2=new DummyAnalyzer(textstring2);
-  
+
   taskmanager1.addUpdater(updater1);
   taskmanager1.addAnalyzer(analyzer1);
   taskmanager2.addUpdater(updater2);
   taskmanager2.addAnalyzer(analyzer2);
-  
+
   taskmanager1.run();
   taskmanager2.run(2);
-  
+
   EXPECT_EQ(taskmanager1.getNCircles(),5);
   EXPECT_EQ(taskmanager2.getNCircles(),2);
   taskmanager2.run(1);
@@ -157,40 +157,40 @@ TEST(TaskManagerTest, InitAndCleanup)
 {
   string textstring;
   TaskManager taskmanager;
-  
+
   DummyUpdater* updater1=new DummyUpdater(textstring);
   DummyUpdater* updater2=new DummyUpdater(textstring);
   DummyAnalyzer* analyzer1=new DummyAnalyzer(textstring);
   DummyAnalyzer* analyzer2=new DummyAnalyzer(textstring);
-  
+
   taskmanager.addUpdater(updater1);
   taskmanager.addAnalyzer(analyzer1);
   taskmanager.addUpdater(updater2);
   taskmanager.addAnalyzer(analyzer2);
-  
+
   EXPECT_FALSE(updater1->isInitialized);
   EXPECT_FALSE(updater1->isCleanedUp);
   EXPECT_FALSE(analyzer1->isInitialized);
   EXPECT_FALSE(analyzer1->isCleanedUp);
-  
+
   taskmanager.initialize();
   EXPECT_TRUE(updater1->isInitialized);
   EXPECT_FALSE(updater1->isCleanedUp);
   EXPECT_TRUE(analyzer1->isInitialized);
   EXPECT_FALSE(analyzer1->isCleanedUp);
-  
+
   EXPECT_TRUE(updater2->isInitialized);
   EXPECT_FALSE(updater2->isCleanedUp);
   EXPECT_TRUE(analyzer2->isInitialized);
   EXPECT_FALSE(analyzer2->isCleanedUp);
-  
+
   taskmanager.cleanup();
-  
+
   EXPECT_TRUE(updater1->isInitialized);
   EXPECT_TRUE(updater1->isCleanedUp);
   EXPECT_TRUE(analyzer1->isInitialized);
   EXPECT_TRUE(analyzer1->isCleanedUp);
-  
+
   EXPECT_TRUE(updater2->isInitialized);
   EXPECT_TRUE(updater2->isCleanedUp);
   EXPECT_TRUE(analyzer2->isInitialized);

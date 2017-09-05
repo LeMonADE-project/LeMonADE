@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -34,7 +34,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 
 /******************************************************************************
-testing the automated monomer decoration 
+testing the automated monomer decoration
 ******************************************************************************/
     //define some example monomer extensions
     class MonoFeature1{
@@ -65,66 +65,66 @@ testing the automated monomer decoration
     class Feature1:public Feature{
     public:
       int feature1(){return 1;}
-      typedef LOKI_TYPELIST_1(MonoFeature1) monomer_extensions; 
+      typedef LOKI_TYPELIST_1(MonoFeature1) monomer_extensions;
     };
-      
-    
+
+
 
     class Feature2:public Feature{
     public:
-      int feature2(){return 2;} 
+      int feature2(){return 2;}
     };
 
 
 
     class Feature3:public Feature{
     public:
-      int feature3(){return 3;} 
+      int feature3(){return 3;}
       typedef LOKI_TYPELIST_2(MonoFeature3a,MonoFeature3b) monomer_extensions;
     };
 TEST(GenerateMonomerTypeTest, AutomatedDecoration)
 {
-  
-  
+
+
 
 
     //now test GenerateMonomerType for some feature lists
-    
+
     //fist: all above defined dummy-features
     typedef LOKI_TYPELIST_3(Feature1,Feature2,Feature3)	FeaturesAll;
     typedef GenerateMonomerType<VectorInt3,FeaturesAll>::Result myMonomerAll;
     myMonomerAll monomerAllFeatures;
-    
+
     EXPECT_EQ(1,monomerAllFeatures.mono1());
     EXPECT_EQ(31,monomerAllFeatures.mono3a());
     EXPECT_EQ(32,monomerAllFeatures.mono3b());
-    
+
     //now only single sets of features
     typedef LOKI_TYPELIST_2(Feature1,Feature2)	Features12;
     typedef GenerateMonomerType<VectorInt3,Features12>::Result myMonomer12;
-    myMonomer12 monomerFeatures12;    
+    myMonomer12 monomerFeatures12;
     EXPECT_EQ(1,monomerFeatures12.mono1());
-    
+
     typedef LOKI_TYPELIST_2(Feature2,Feature1)	Features21;
     typedef GenerateMonomerType<VectorInt3,Features21>::Result myMonomer21;
-    myMonomer12 monomerFeatures21;    
+    myMonomer12 monomerFeatures21;
     EXPECT_EQ(1,monomerFeatures21.mono1());
-    
+
     //the order of the features should not make a difference for the type,
     //also, since Feature2 has no monomer extensions, it should make no difference
     //to the type at all. Since the monomer extensions all have some member
     //variables of different size, this can be tested using sizeof
-    
+
     EXPECT_EQ(sizeof(myMonomer12),sizeof(myMonomer21));
-    
+
     typedef LOKI_TYPELIST_1(Feature1)	Features1;
     typedef GenerateMonomerType<VectorInt3,Features1>::Result myMonomer1;
     EXPECT_EQ(sizeof(myMonomer12),sizeof(myMonomer1));
-        
+
     typedef LOKI_TYPELIST_1(Feature2)	Features2;
     typedef GenerateMonomerType<VectorInt3,Features2>::Result myMonomer2;
     EXPECT_EQ(sizeof(VectorInt3),sizeof(myMonomer2));
-    
+
     EXPECT_EQ(sizeof(VectorInt3)+6*sizeof(int),sizeof(myMonomerAll));
-    
+
 }
