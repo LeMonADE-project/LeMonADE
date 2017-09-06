@@ -318,116 +318,129 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
         uint32_t attempts(0);
         while (attempts<10000)
         {
-        uint32_t neighborDirection(0);
-        uint32_t currentParent(parent);
-        while (true)
-        {
-        uint32_t neighborID(ingredients.getMolecules().getNeighborIdx(currentParent,neighborDirection));
-        if(ingredients.getMolecules().getNumLinks(neighborID) != 2 )
-        {
-            if(neighborDirection==1) break;
-            else {neighborDirection++; currentParent=parent;}
-        }
-        else
-        {
-            VectorInt3 neighborPosition(ingredients.getMolecules()[neighborID]);
-            VectorInt3 parentPosition(ingredients.getMolecules()[currentParent]);
-            VectorInt3 bond(neighborPosition-parentPosition);
-            if(bond.getLength() == 2)
-            {
-            int32_t dx1, dx2;
-            int32_t dy1, dz1;
-            int32_t dy2, dz2;
-            VectorInt3 vec1,vec2;
-            if(bond.getX() == 2 || bond.getX() == -2)
-            {
-            parentPosition+=VectorInt3(bond.getX()/2,0,0);
-            dx1=0;dx2=0;//dy1=2;dy2=0;dz1=0;dz2=2; 
-            if(rng.r250_drand()>0.5){dy1=2;dy2=0;dz1=0;dz2=2;}
-            else {dy1=0;dy2=2;dz1=2;dz2=0;}
-            int32_t dx3,dx4;
-            rng.r250_drand()>0.5 ? dx3=1 : dx3=-1;
-            rng.r250_drand()>0.5 ? dx4=1 : dx4=-1;
-            vec1=VectorInt3( dx2+dx3,  dy2,  dz2);
-            vec2=VectorInt3(-dx2+dx4, -dy2, -dz2);
-            }
-            else if(bond.getY() == 2 || bond.getY() == -2)
-            {
-            parentPosition+=VectorInt3(0,bond.getY()/2,0);
-            dy1=0;dy2=0; 
-            if(rng.r250_drand()>0.5){dx1=2;dx2=0;dz1=0;dz2=2;}
-            else {dx1=0;dx2=2;dz1=2;dz2=0;}
-            int32_t dy3,dy4;
-            rng.r250_drand()>0.5 ? dy3=1 : dy3=-1;
-            rng.r250_drand()>0.5 ? dy4=1 : dy4=-1;
-            vec1=VectorInt3( dx2,  dy2+dy3,  dz2);
-            vec2=VectorInt3(-dx2, -dy2+dy4, -dz2);
-            }
-            else if(bond.getZ() == 2 || bond.getZ() == -2)
-            {
-            parentPosition+=VectorInt3(0,0,bond.getZ()/2);
-            dz1=0;dz2=0; 
-            if(rng.r250_drand()>0.5){dx1=2;dx2=0;dy1=0;dy2=2;}
-            else {dx1=0;dx2=2;dy1=2;dy2=0;}
-            int32_t dz3,dz4;
-            rng.r250_drand()>0.5 ? dz3=1 : dz3=-1;
-            rng.r250_drand()>0.5 ? dz4=1 : dz4=-1;
-            vec1=VectorInt3( dx2,  dy2,  dz2+dz3);
-            vec2=VectorInt3(-dx2, -dy2, -dz2+dz4);
-            }
-            else {throw std::runtime_error("UpdaterAbstractCreate::addRing - something wrong with the bond along the chain");}
-            // check two positions in addition to 
-            std::vector<VectorInt3> PotentialPositions(6,parentPosition);
-            PotentialPositions[0]+=VectorInt3( dx1, dy1, dz1);
-            PotentialPositions[2]+=VectorInt3(-dx1,-dy1,-dz1);
-            PotentialPositions[4]+=VectorInt3( dx2, dy2, dz2);
-            PotentialPositions[5]+=VectorInt3(-dx2,-dy2,-dz2);
-            PotentialPositions[1]+=vec1;
-            PotentialPositions[3]+=vec2;
-            
-            // check of positions are free
-            bool PositionsFit(true);
-            for(uint32_t i=0; i <PotentialPositions.size();i++)
-            {
-            MoveAddMonomerSc addmove;
-            addmove.init(ingredients);
-            addmove.setPosition(PotentialPositions[i]);
-            if(addmove.check(ingredients)==false){PositionsFit=false;}
-            }
-            
-            if (PositionsFit)
-            {
-            for(uint32_t i=0; i < 4 ;i++) 
-            {
-            std::cout <<addMonomerAtPosition(PotentialPositions[i], type)<<" at "<<PotentialPositions[i]<<std::endl;
-            } 
-            uint32_t LastMonomerID(ingredients.getMolecules().size()-1);
-            for(uint32_t i=0; i < 4 ;i++) 
-            {
-            ingredients.modifyMolecules().connect((LastMonomerID-i%4),(LastMonomerID-(1+i)%4));
-            }
-            
-            if (NRingMonomers>4) 
-            {
-            for(uint32_t i=0; i<(NRingMonomers-4);i++)
-            {
-                addMonomerInsideConnectedPair(ingredients.getMolecules().size()-1,ingredients.getMolecules().size()-2,type);
-            }
-            }
-            return true;
-            
-            }
-            //if still here: try again at next position		
-            currentParent=neighborID;
-            }
-            else {currentParent=neighborID;}
-        }
-        }
-        attempts++;
-        moveSystem(2);
+	  uint32_t neighborDirection(0);
+	  uint32_t currentParent(parent);
+	  while (true)
+	  {
+	    uint32_t neighborID(ingredients.getMolecules().getNeighborIdx(currentParent,neighborDirection));
+	    if(ingredients.getMolecules().getNumLinks(neighborID) != 2 )
+	    {
+		if(neighborDirection==1) break;
+		else {neighborDirection++; currentParent=parent;}
+	    }
+	    else
+	    {
+		VectorInt3 neighborPosition(ingredients.getMolecules()[neighborID]);
+		VectorInt3 parentPosition(ingredients.getMolecules()[currentParent]);
+		VectorInt3 bond(neighborPosition-parentPosition);
+		if(bond.getLength() == 2)
+		{
+		    for(uint32_t i=0; i<8; i++)
+		    {
+			
+			VectorInt3 StartPosition=parentPosition;
+			//set the possible conformations 
+			int32_t dx1, dx2;
+			int32_t dy1, dz1;
+			int32_t dy2, dz2;
+			VectorInt3 vec1,vec2;
+			if(bond.getX() == 2 || bond.getX() == -2)
+			{
+			  StartPosition+=VectorInt3(bond.getX()/2,0,0);
+			  dx1=0;dx2=0;//dy1=2;dy2=0;dz1=0;dz2=2; 
+			  if(rng.r250_drand()>0.5){dy1=2;dy2=0;dz1=0;dz2=2;}
+			  else {dy1=0;dy2=2;dz1=2;dz2=0;}
+			  int32_t dx3,dx4;
+			  rng.r250_drand()>0.5 ? dx3=1 : dx3=-1;
+			  rng.r250_drand()>0.5 ? dx4=1 : dx4=-1;
+			  vec1=VectorInt3( dx2+dx3,  dy2,  dz2);
+			  vec2=VectorInt3(-dx2+dx4, -dy2, -dz2);
+			}
+			else if(bond.getY() == 2 || bond.getY() == -2)
+			{
+			  StartPosition+=VectorInt3(0,bond.getY()/2,0);
+			  dy1=0;dy2=0; 
+			  if(rng.r250_drand()>0.5){dx1=2;dx2=0;dz1=0;dz2=2;}
+			  else {dx1=0;dx2=2;dz1=2;dz2=0;}
+			  int32_t dy3,dy4;
+			  rng.r250_drand()>0.5 ? dy3=1 : dy3=-1;
+			  rng.r250_drand()>0.5 ? dy4=1 : dy4=-1;
+			  vec1=VectorInt3( dx2,  dy2+dy3,  dz2);
+			  vec2=VectorInt3(-dx2, -dy2+dy4, -dz2);
+			}
+			else if(bond.getZ() == 2 || bond.getZ() == -2)
+			{
+			  StartPosition+=VectorInt3(0,0,bond.getZ()/2);
+			  dz1=0;dz2=0; 
+			  if(rng.r250_drand()>0.5){dx1=2;dx2=0;dy1=0;dy2=2;}
+			  else {dx1=0;dx2=2;dy1=2;dy2=0;}
+			  int32_t dz3,dz4;
+			  rng.r250_drand()>0.5 ? dz3=1 : dz3=-1;
+			  rng.r250_drand()>0.5 ? dz4=1 : dz4=-1;
+			  vec1=VectorInt3( dx2,  dy2,  dz2+dz3);
+			  vec2=VectorInt3(-dx2, -dy2, -dz2+dz4);
+			}
+			// set positions of monomers and two which guarantee that ring is threaded 
+			std::vector<VectorInt3> PotentialPositions(6,StartPosition);
+			PotentialPositions[0]+=VectorInt3( dx1, dy1, dz1);
+			PotentialPositions[2]+=VectorInt3(-dx1,-dy1,-dz1);
+			PotentialPositions[4]+=VectorInt3( dx2, dy2, dz2);
+			PotentialPositions[5]+=VectorInt3(-dx2,-dy2,-dz2);
+			PotentialPositions[1]+=vec1;
+			PotentialPositions[3]+=vec2;
+			
+			// check if positions are occupied
+			bool PositionsFit(true);
+			for(uint32_t i=0; i <PotentialPositions.size();i++)
+			{
+			  MoveAddMonomerSc addmove;
+			  addmove.init(ingredients);
+			  addmove.setPosition(PotentialPositions[i]);
+			  if(addmove.check(ingredients)==false){PositionsFit=false;}
+			}
+			
+			// add ring to system
+			if (PositionsFit)
+			{
+			  bool AddRing(true);
+			  for(uint32_t i=0; i<NRingMonomers;i++) 
+			  {
+			    if ( i<4  && AddRing ) if(!addMonomerAtPosition(PotentialPositions[i], type) ) {AddRing=false;throw std::runtime_error("Could not add 4-monomer ring!");}
+			    if ( i==3 && AddRing ) for(uint32_t i=0; i < 4 ;i++) ingredients.modifyMolecules().connect(((ingredients.getMolecules().size()-1) -i%4),((ingredients.getMolecules().size()-1)-(1+i)%4));
+			    if ( i>3  && AddRing ) 
+			    {
+			      for (uint32_t j=0;j<i;j++)
+			      {
+				if (addMonomerInsideConnectedPair(ingredients.getMolecules().size()-(1+j%i),ingredients.getMolecules().size()-(1+(1+j)%i),type)) 
+				{
+				  AddRing=true;
+				  break;
+				}else { AddRing=false;}
+			      }
+			    }
+			  }
+
+			  if (AddRing) return true;
+			  else throw std::runtime_error("Could not add a ring!");
+			  
+			}
+		    }
+		    
+		    //if still here: try again at next position		
+		    currentParent=neighborID;
+			
+		}
+		else {currentParent=neighborID;}
+	    }
+	  }
+	  attempts++;
+	  moveSystem(2);
         }
         return false; 
-    }else{throw std::runtime_error("Given parent ID does not exist!");}
+    }else{
+      std::stringstream error;
+      error<<"Given parent ID "<<parent<<" does not exist!";
+      throw std::runtime_error(error.str());}
   };
 
 /******************************************************************************/
