@@ -145,7 +145,7 @@ public:
 	template<class IngredientsType>
 	void synchronize(IngredientsType& ingredients);
 
-private:
+protected:
 
 	//! Populates the lattice using the coordinates of molecules.
 	template<class IngredientsType> void fillLattice(

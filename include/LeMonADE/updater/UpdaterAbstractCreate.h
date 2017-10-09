@@ -306,9 +306,12 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtConnectedPair(uint32_t 
 }
 /**
  * @brief add a ring threaded on a chain at position of parent monomer
- * @details the ring is made of 5 monomers
- * @param parent
- * @param type
+ * 
+ * @todo are there conformations where bonds of the ring cross the bonds of the chain?
+ * 
+ * @param parent 
+ * @param type monomer tag 
+ * @param NRingMonomers number of monomers per ring 
  */
 template < class IngredientsType >
 bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t type, uint32_t NRingMonomers)
