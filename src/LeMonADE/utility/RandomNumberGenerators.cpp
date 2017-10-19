@@ -88,7 +88,7 @@ void RandomNumberGenerators::seedR250()
 
 //seed R250Engine with array of 256 values
 //state array has to contain 256 ideally random values
-void RandomNumberGenerators::seedR250(uint32_t* stateArray)
+void RandomNumberGenerators::seedR250( uint32_t const * stateArray )
 {
 	r250Engine->setState(stateArray);
 }
@@ -142,7 +142,7 @@ void RandomNumberGenerators::seedMT()
 }
 
 //seed Mersenne Twister
-void RandomNumberGenerators::seedMT(uint32_t seed)
+void RandomNumberGenerators::seedMT( uint32_t seed )
 {
 	mt19937Engine->seed(seed);
 }

@@ -96,7 +96,7 @@ void R250::loadRandomState()
 }
 
 //this allows to set the internal state array to given values.
-void R250::setState(uint32_t* stateArray)
+void R250::setState( uint32_t const * stateArray )
 {
 		for(size_t i=0;i<R250_RANDOM_PREFETCH;i++)
 		{

@@ -101,7 +101,7 @@ class RandomNumberGenerators
 		//! randomly seed only R250Engine from /dev/urandom
 		void seedR250();
 		//! seed R250Engine with array given as argument
-		void seedR250(uint32_t* seedArray);
+		void seedR250( uint32_t const * seedArray );
 
 		//! randomly seed std:rand()
 		void seedSTDRAND();
