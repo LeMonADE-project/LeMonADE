@@ -148,4 +148,28 @@ public:
 
 };
 
+/**
+ * @class notOfBothTypes
+ *
+ * @brief Functor providing the information the Vertex does not have an attribute tag.
+ *
+ * @deprecated
+ *
+ * @todo we should reconsider this approach for usability
+ *
+ * @todo Rename FunctorNotOfType
+ **/
+template<int AttributeType1, int AttributeType2>
+class notOfBothTypes
+{
+public:
+
+	template<class MoleculesType>
+	bool operator()(const MoleculesType& m, int i)
+	{
+		return ((m[i].getAttributeTag()==AttributeType1  || m[i].getAttributeTag()==AttributeType2)?false:true);
+	}
+
+};
+
 #endif
