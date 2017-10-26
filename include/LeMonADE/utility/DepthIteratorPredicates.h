@@ -41,10 +41,6 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Functor providing the information if Vertex is no cross-linking point
  *  (functionality 0 < f <= 2)
  *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
- *
  * @todo Rename FunctorBelongToLinearStrand
  **/
 struct belongsToLinearStrand {
@@ -59,10 +55,6 @@ struct belongsToLinearStrand {
  * @struct alwaysTrue
  *
  * @brief Functor returning always \a True.
- *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
  *
  * @todo Rename FunctorAlwaysTrue
  **/
@@ -80,10 +72,6 @@ struct alwaysTrue
  *
  * @brief Functor returning \a True if monomer has at least one bond.
  *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
- *
  * @todo Rename FunctorAlwaysTrue
  **/
 struct hasBonds
@@ -99,10 +87,6 @@ struct hasBonds
  * @class hasThisType
  *
  * @brief Functor providing the information the Vertex has an attribute tag.
- *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
  *
  * @todo Rename FunctorHasThisType
  **/
@@ -122,10 +106,6 @@ public:
  * @class hasOneOfTheseTwoTypes
  *
  * @brief Functor providing the information the Vertex has an attribute tag.
- *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
  *
  * @todo Rename FunctorHasOneOfTheseTypes
  **/
@@ -147,10 +127,6 @@ public:
  *
  * @brief Functor providing the information the Vertex does not have an attribute tag.
  *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
- *
  * @todo Rename FunctorNotOfType
  **/
 template<int AttributeType>
@@ -170,10 +146,6 @@ public:
  * @class notOfBothTypes
  *
  * @brief Functor providing the information the Vertex does not have an attribute tag.
- *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
  *
  * @todo Rename FunctorNotOfType
  **/
