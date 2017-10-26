@@ -50,7 +50,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 struct belongsToLinearStrand {
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
-			{
+	{
 		return ((m.getNumLinks(i) > 0) && (m.getNumLinks(i) < 3));
 	}
 };
@@ -70,7 +70,7 @@ struct alwaysTrue
 {
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
-			{
+	{
 		return true;
 	}
 };
@@ -90,7 +90,7 @@ struct hasBonds
 {
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
-			{
+	{
 		return m.getNumLinks(i) >0;
 	}
 };
@@ -107,19 +107,19 @@ struct hasBonds
  * @todo Rename FunctorHasThisType
  **/
 template<int AttributeType>
-class hasType
+class hasThisType
 {
 public:
   
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{
-		return (m[i].getAttributeTag()==AttributeType?true:false);
+		return ( (m[i].getAttributeTag()==AttributeType)?true:false );
 	}
 };
 
 /**
- * @class hasOneOfTheseTypes
+ * @class hasOneOfTheseTwoTypes
  *
  * @brief Functor providing the information the Vertex has an attribute tag.
  *
@@ -130,14 +130,14 @@ public:
  * @todo Rename FunctorHasOneOfTheseTypes
  **/
 template<int AttributeType1,int AttributeType2>
-class hasType
+class hasOneOfTheseTwoTypes
 {
 public:
   
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{
-		return ((m[i].getAttributeTag()==AttributeType1  || m[i].getAttributeTag()==AttributeType2)?true:false);
+		return (( (m[i].getAttributeTag()==AttributeType1)  || (m[i].getAttributeTag()==AttributeType2) )?true:false);
 	}
 };
 
@@ -161,7 +161,7 @@ public:
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{
-		return (m[i].getAttributeTag()==AttributeType?false:true);
+		return ( (m[i].getAttributeTag()==AttributeType)?false:true );
 	}
 
 };
@@ -185,7 +185,7 @@ public:
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{
-		return ((m[i].getAttributeTag()==AttributeType1  || m[i].getAttributeTag()==AttributeType2)?false:true);
+		return (( (m[i].getAttributeTag()==AttributeType1)  || (m[i].getAttributeTag()==AttributeType2) )?false:true);
 	}
 
 };
