@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -75,9 +75,9 @@ public:
 
   //! Interface for replacing old (standard) Read with new read Reads. Example: FeatureJumps (!mcs)
   void replaceRead(std::string, AbstractRead*);
-  
+
   AbstractRead* modifyRead(std::string);
-  
+
   void initialize()
   {
 	  //read the header of the bfm file
@@ -152,10 +152,10 @@ public:
 
   //! Close the file stream.
   void close(){file.close();};
-  
+
   //! Get pointer to data container
   IngredientsType& getDestination(){return bfmData;}
-  
+
 private:
 
   //! Storage for data that are read-in from file (mostly Ingredients).
@@ -174,7 +174,7 @@ private:
   //Read handling
   //! Map of Read-strings (e.g. !box_x) associated Read objects
   std::map <std::string, AbstractRead*> Reads;
-  //save the unknown commands found in the file in 
+  //save the unknown commands found in the file in
   //this set. This is used to make sure information about unknown reads is
   //not written out multiple times when printMetaData is used.
   //! Set of Read-strings of unknown commands found in the file.
@@ -182,7 +182,7 @@ private:
 
   //! Execute read of Read associated with string
   void executeRead(const std::string&);
-  
+
   // these are used for jumping to mcs-positions in the file
   //! The time (in mcs) of the first conformation.
   uint64_t firstMcs;
@@ -193,14 +193,14 @@ private:
   //! Maps frame number to mcs.
   std::map<uint32_t,uint64_t> framePositionInFile;
 
-  //saves the complete first conformation. this is useful for 
-  //jumping back to the first conformation 
+  //saves the complete first conformation. this is useful for
+  //jumping back to the first conformation
   //! Holing the first conformation in the file. Useful for rewinding.
   typename IngredientsType::molecules_type firstConformation;
 
   //! Scans the complete file for the positions of the !mcs commands
   void scanFile();
-	
+
 };
 
 /***********************************************************************
@@ -234,12 +234,12 @@ FileImport<IngredientsType>::FileImport(const std::string& sourcefile,Ingredient
 
   //the features' read-Reads are registered here!!
   bfmData.exportRead(*this);
-  
+
   //make the input file stream known to Read objects
   for(typename std::map <std::string,AbstractRead*>::iterator ib=Reads.begin();ib!=Reads.end();++ib){
     ib->second->setInputStream(&file);
   }
-  
+
   dataStorage.setName(sourcefile);
 
   //read the header of the bfm file
@@ -266,7 +266,7 @@ FileImport<IngredientsType>::~FileImport()
 
 /******************************************************************************
  *void FileImport::registerRead(string ReadString, AbstractRead* ReadObject)
- ******************************************************************************/ 
+ ******************************************************************************/
 /**
  *
  * @param ReadString bfm-keyword/command/user-command (e.g. !box_x, #!fixed_monomers)
@@ -288,7 +288,7 @@ void FileImport<IngredientsType>::registerRead(std::string ReadString, AbstractR
 
 /******************************************************************************
  *void FileImport::replaceRead(string key, AbstractRead* newRead)
- ******************************************************************************/ 
+ ******************************************************************************/
 /**
  *
  * @param key bfm-keyword/command/user-command (e.g. !box_x, #!fixed_monomers)
@@ -342,38 +342,38 @@ void FileImport<IngredientsType>::readHeader()
 
 	std::string Read;
 	std::streampos beforeFirstMcs=file.tellg();
-	
+
 	bool first_mcs_found=false;
 
 	//read file up to the first mcs command (including the first mcs)
 	while(!file.fail() && (Read != "endoffile") && (first_mcs_found == false))
 	{
 		Read=parser.findRead();
-		
-		
+
+
 		if (Read=="!mcs")
 		{
 			if (!first_mcs_found) first_mcs_found = true;
-			
+
 		}
 		else if(Read=="#!version")
 		{
 			file>>version;
 			versionInformationPresent=true;
-			
+
 		}
 		else
 			beforeFirstMcs=file.tellg();
-		
+
 		executeRead(Read);
-		
-	}  
-	
+
+	}
+
 	firstMcs=bfmData.getMolecules().getAge();
 	//now reset the file to the position befor the first mcs command
 	file.seekg(beforeFirstMcs);
 	firstConformation=bfmData.getMolecules();
-	
+
 	if(!versionInformationPresent || version!=::LEMONADE_VERSION)
 	{
 		std::cerr<<"\nWARNING: NO VERSION INFORMATION PRESENT IN FILE, OR VERSION NUMBER DIFFERS FROM THE PROGRAM USED!\n";
@@ -383,7 +383,7 @@ void FileImport<IngredientsType>::readHeader()
 
 /******************************************************************************
  *void FileImport::read()
- ******************************************************************************/ 
+ ******************************************************************************/
 // read and process file until eof or next !mcs is reached (or file stream fails otherwise)
 /**
  * @details If the header is not read-in before it also parses the header and the first !mcs.
@@ -395,7 +395,7 @@ bool FileImport<IngredientsType>::read()
 {
 
 	std::string Read;
-	
+
 	//read and process file until eof or !mcs is reached (or file stream fails otherwise)
 	bool MCSFound = false;
 
@@ -408,15 +408,15 @@ bool FileImport<IngredientsType>::read()
 		executeRead(Read);
 
 		if ( MCSFound ) break;
-	}	
-	
-	
+	}
+
+
 	return MCSFound;
 }
 
 /******************************************************************************
  *void FileImport::executeRead(const string& ReadString)
- ******************************************************************************/ 
+ ******************************************************************************/
 // Execute read of Read associated with string
 /**
  * @param ReadString Keyword/command/user-command which should be executed.
@@ -470,21 +470,21 @@ void FileImport<IngredientsType>::scanFile()
 
 	//first go to the beginning of the file and find the position of
 	//the first mcs command. this position is not saved, because it
-	//is not necessarily clear, which commands preceeding the first 
+	//is not necessarily clear, which commands preceeding the first
 	// !mcs area part of this !mcs (e.g. solvent). Therefore, the
-	//complete first conformation is saved in readHeader(). 
+	//complete first conformation is saved in readHeader().
 	file.clear();
 	mcsPositionInFile.clear();
 	framePositionInFile.clear();
 	file.seekg(0,std::ios::beg);
-	
+
 	//the information of the first frame/conformation is read-in by readHeader()
 	while(!file.fail() && (read != "endoffile"))
 	{
 		mcsPosition=file.tellg();
 
 		read=parser.findRead();
-		
+
 		if (read=="!mcs")
 		{
 			file>>mcs;
@@ -492,24 +492,24 @@ void FileImport<IngredientsType>::scanFile()
 			framePositionInFile.insert(std::make_pair(mcsPositionInFile.size(),mcs));
 			break;
 		}
-	}  
+	}
 
 	//now save all the following positions of the !mcs commands
-  
+
 	while(!file.fail() && read != "endoffile" )
 	{
 
 		mcsPosition=file.tellg();
-		
+
 		read=parser.findRead();
 		while(read!="!mcs" && !file.fail() && read!="endoffile" )
 			{
 			read=parser.findRead();
-			
+
 			}
-		
+
 		if(!(read=="endoffile")) file>>mcs;
-		
+
 		if(file.fail() && !(read=="endoffile"))
 		{
 			std::stringstream errormessage;
@@ -525,9 +525,9 @@ void FileImport<IngredientsType>::scanFile()
 	//go back to the position the file was at before this function was called
 	file.clear();
 	file.seekg(startingPosition);
-	
+
 	std::cout<<"done\n";
-  
+
 }
 
 //jumps to the mcs given as argument and reads the conformation
@@ -549,7 +549,7 @@ bool FileImport<IngredientsType>::gotoMcs(uint64_t mcs)
   std::streampos position;
   std::map<uint64_t,std::streampos>::iterator it;
   //check if smaller than min or larger than max
-  
+
   //if the required mcs is smaller than the first in the map, just
   //update the system with the first conformation
   if(mcs< mcsPositionInFile.begin()->first)
@@ -577,7 +577,7 @@ bool FileImport<IngredientsType>::gotoMcs(uint64_t mcs)
     file.seekg(position);
     retVal=read();
   }
-  
+
   return retVal;
 }
 
@@ -607,7 +607,7 @@ bool FileImport<IngredientsType>::gotoFrame(uint32_t frame)
 template <class IngredientsType>
 bool FileImport<IngredientsType>::gotoEnd()
 {
-  
+
 	std::streampos position;
 
   position=mcsPositionInFile.rbegin()->second;
@@ -616,12 +616,12 @@ bool FileImport<IngredientsType>::gotoEnd()
   file.seekg(position);
   //now read until next mcs is processed
   bool retVal=read();
-  
+
   return retVal;
 }
 
 //goes through the file step by step until last conformation is reached
-//this can be much slower than gotoEnd(), but it garantees that the 
+//this can be much slower than gotoEnd(), but it garantees that the
 //topology is correct, in case it changes somewhere in the middle of the file
 /**
  * @details IMPORTANT: IN CONTRAST TO gotoEnd() THE TOPOLOGY SHOULD BE CORRECT,
@@ -633,18 +633,18 @@ template<class IngredientsType>
 bool FileImport<IngredientsType>::gotoEndSave()
 {
 	gotoStart();
-	
+
 	bool reachedEnd;
 	do
 	{
 		reachedEnd=!(read());
-		
+
 	}while(reachedEnd==false);
-	
+
 	return reachedEnd;
 }
 
-//goes back to the first conformation. the file pointer is set accordingly in 
+//goes back to the first conformation. the file pointer is set accordingly in
 //gotoMcs(0)
 /**
  * @details IMPORTANT: TOPOLOGY MIGHT NOT BE CORRECT IF IT IS CHANGING SOMEWHERE IN THE

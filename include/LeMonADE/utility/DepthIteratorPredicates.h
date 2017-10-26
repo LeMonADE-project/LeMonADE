@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -98,7 +98,7 @@ struct hasBonds
 };
 
 /**
- * @class hasType
+ * @class hasThisType
  *
  * @brief Functor providing the information the Vertex has an attribute tag.
  *
@@ -106,23 +106,43 @@ struct hasBonds
  *
  * @todo we should reconsider this approach for usability
  *
- * @todo Rename FunctorHasType
+ * @todo Rename FunctorHasThisType
  **/
+template<int AttributeType>
 class hasType
 {
 public:
-	hasType(int type){types.insert(type);}
-	hasType(int type1,int type2){types.insert(type1); types.insert(type2);}
-	hasType(std::vector<int> typeVector){for(size_t n=0;n<typeVector.size();n++) types.insert(typeVector[n]);}
-	
+  
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{
-		return types.count(m[i].getAttributeTag());
+		return (m[i].getAttributeTag()==AttributeType?true:false);
 	}
-private:
-	std::set<int> types;
 };
+
+/**
+ * @class hasOneOfTheseTypes
+ *
+ * @brief Functor providing the information the Vertex has an attribute tag.
+ *
+ * @deprecated
+ *
+ * @todo we should reconsider this approach for usability
+ *
+ * @todo Rename FunctorHasOneOfTheseTypes
+ **/
+template<int AttributeType1,int AttributeType2>
+class hasType
+{
+public:
+  
+	template<class MoleculesType>
+	bool operator()(const MoleculesType& m, int i)
+	{
+		return ((m[i].getAttributeTag()==AttributeType1  || m[i].getAttributeTag()==AttributeType2)?true:false);
+	}
+};
+
 
 /**
  * @class notOfType
@@ -139,11 +159,35 @@ template<int AttributeType>
 class notOfType
 {
 public:
-	
+
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{
 		return (m[i].getAttributeTag()==AttributeType?false:true);
+	}
+
+};
+
+/**
+ * @class notOfBothTypes
+ *
+ * @brief Functor providing the information the Vertex does not have an attribute tag.
+ *
+ * @deprecated
+ *
+ * @todo we should reconsider this approach for usability
+ *
+ * @todo Rename FunctorNotOfType
+ **/
+template<int AttributeType1, int AttributeType2>
+class notOfBothTypes
+{
+public:
+
+	template<class MoleculesType>
+	bool operator()(const MoleculesType& m, int i)
+	{
+		return ((m[i].getAttributeTag()==AttributeType1  || m[i].getAttributeTag()==AttributeType2)?false:true);
 	}
 
 };

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -39,33 +39,33 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  *
  * @class ConfigureSystem
- * 
+ *
  * @brief Collection of typedefs for configuring Ingredients from a list of features.
  *
  * @tparam max_connectivity Maximum connectivity of the monomers. Default is 7.
  *
  * @tparam Edge Type of information that can be stored on a bond. Default is \a int.
- * 
- * @typedef ConfigureSystem::feature_list 
+ *
+ * @typedef ConfigureSystem::feature_list
  * @brief Final list of features used to construct Ingredients (Loki typelist).
- * @details Here the list of features given as a template parameter is automatically 
- * extended by all features that may be required by other features in the list. 
- * 
+ * @details Here the list of features given as a template parameter is automatically
+ * extended by all features that may be required by other features in the list.
+ *
  * @typedef ConfigureSystem::context_type
  * @brief Base type for Ingredients
- * @details The type consists of a linear inheritance hierarchy of all features in 
+ * @details The type consists of a linear inheritance hierarchy of all features in
  * the typelist feature_list, connected by FeatureHolder.
- * 
+ *
  * @typedef ConfigureSystem::monomer_type
  * @brief Basic type for monomers used in Molecules.
  * @details The MonomerBaseType given as the first template argument is extended by
  * all monomer extensions required by features in feature_list.
- * 
+ *
  * @typedef ConfigureSystem::molecules_type
  * @brief Defines the graph used to store the monomers.
  * @details Monomers of the previously defined monomer_type are here stored in Molecules,
  * which provides interfaces and functionalities for handling the monomers.
- * 
+ *
  * @enum MY_ERRORSTATE
  * @brief 0 if everything good, > 0 else
  * @details Counts the number of inconsistencies in feature_list. More precisely

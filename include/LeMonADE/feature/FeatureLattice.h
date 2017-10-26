@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -49,7 +49,7 @@ public:
 
 	FeatureLattice(){};
 	virtual ~FeatureLattice(){};
-	
+
 	//! Move the value on the lattice to a new position. Delete the Value on the old position
 	void moveOnLattice(const VectorInt3& oldPos, const VectorInt3& newPos);
 
@@ -227,7 +227,7 @@ inline uint32_t FeatureLattice<ValueType>::foldBackZ(int value) const{
  * @param ing a reference to the IngredientsType - mainly the system
  **/
 template<class ValueType>
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureLattice<ValueType>::synchronize(IngredientsType& ing) {
 
 	//if the lattice is already initialized, free the memory first

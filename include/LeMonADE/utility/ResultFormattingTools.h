@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -136,7 +136,7 @@ void ResultFormattingTools::writeResultFile(std::string filename,const Ingredien
 
 	std::ofstream file;
 	file.open(filename.c_str());
-	
+
 	if(!file.is_open())
 		throw std::runtime_error("ResultFormattingTools::writeResultFile(): error opening output file"+filename+"\n");
 	std::stringstream contents;
@@ -159,10 +159,10 @@ void ResultFormattingTools::appendToResultFile(std::string filename,ResultType& 
 
 	std::ofstream file;
 	file.open(filename.c_str(),std::ios_base::app);
-	
+
 	if(!file.is_open())
 		throw std::runtime_error("ResultFormattingTools::appendToResultFile(): error opening output file"+filename+"\n");
-	
+
 	//check if all column have the same size
 	int columnSize = results[0].size();
 	for (int i = 0; i < results.size(); ++i) {

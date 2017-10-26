@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -46,13 +46,13 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  *
  * @class AnalyzerWriteBfmFileSubGroup
- * 
+ *
  * @brief Analyzer writing the configurations into a given bfm-file.
- * 
+ *
  * @details The output is appended to the file, if the file already exists.
  * If it does not exist, a new file is created and the header information is written
  * at the beginning
- * 
+ *
  * @tparam IngredientsType Ingredients class storing all system information( e.g. monomers, bonds, etc).
  *
  * @todo rename to WriteBFMFile or similar.
@@ -63,29 +63,29 @@ class AnalyzerWriteBfmFileSubGroup: public AnalyzerWriteBfmFile<IngredientsType>
 public:
 	//! Standard Constructor. Default: all data will be appended to the file
 	AnalyzerWriteBfmFileSubGroup(const std::string& filename, const IngredientsType& ing,int writeType=AnalyzerWriteBfmFile<IngredientsType>::APPEND, DepthIteratorPredicate pred=hasBonds());
-	
+
 	//!Standard destructor closing the file stream.
 	virtual ~AnalyzerWriteBfmFileSubGroup(){}
-	
-	
+
+
 	//! Triggers writing of the Writes that need to be written for every step (i.e. excluding header)
 	virtual bool execute();
-	
+
 	//! Initializes the writing. Opens the file and check for IO.
 	virtual void initialize();
-	
+
 
 	void setAlwaysReindex(bool value){alwaysReindexGroups=value;}
 private:
-	
+
 	//! Storage for data that are processed to file (mostly Ingredients).
 	IngredientsType ingredients;
-		
+
 	const IngredientsType& ingredientsAllData;
 	MonomerGroup<typename IngredientsType::molecules_type> subgroup;
 	//! Internal copy of a Predicate (conditional exclusion of vertices), used in allowed_to_visit() method.
 	DepthIteratorPredicate predicate;
-	
+
 	//!flag used in execute()
 	bool alwaysReindexGroups;
 };
@@ -111,7 +111,7 @@ AnalyzerWriteBfmFileSubGroup(const std::string& filename, const IngredientsType&
 ,ingredientsAllData(ing),predicate(pred),subgroup(ing.getMolecules())
 ,alwaysReindexGroups(false)
 {
-	
+
 }
 
 
@@ -129,11 +129,11 @@ bool AnalyzerWriteBfmFileSubGroup<IngredientsType, DepthIteratorPredicate>::exec
 	//copies all ingredients information again
 	if(alwaysReindexGroups==true)
 		initialize();
-	
+
 	//copies only the monomers
 	else
 		ingredients.modifyMolecules()=subgroup.copyGroup();
-	
+
 	AnalyzerWriteBfmFile<IngredientsType>::execute();
 
 }
@@ -158,7 +158,7 @@ void AnalyzerWriteBfmFileSubGroup<IngredientsType, DepthIteratorPredicate>::init
 	ingredients=ingredientsAllData;  // implicit calls synchronize
 
 	ingredients.setName(this->getFilename());
-	
+
 	//find the desired subgroup of monomers
 	subgroup.clear();
 	for(size_t n=0;n<ingredientsAllData.getMolecules().size();n++)
@@ -171,7 +171,7 @@ void AnalyzerWriteBfmFileSubGroup<IngredientsType, DepthIteratorPredicate>::init
 
 	ingredients.modifyMolecules()=subgroup.copyGroup();
 	ingredients.clearCompressedOutputIndices(); //necessary because the indices are now different
-	
+
 	std::cout << "sizeMolecules:" << this->ingredients.getMolecules().size() << std::endl;
 	AnalyzerWriteBfmFile<IngredientsType>::initialize();
 

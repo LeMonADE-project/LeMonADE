@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 // The Loki Library
 // Copyright (c) 2006 Peter Kümmel
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author makes no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author makes no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef LOKI_PIMPL_INC_
@@ -15,7 +15,7 @@
 // $Id: Pimpl.h 751 2006-10-17 19:50:37Z syntheticpp $
 
 
-///  \defgroup PimplGroup Pimpl 
+///  \defgroup PimplGroup Pimpl
 
 #ifndef LOKI_INHERITED_PIMPL_NAME
 #define LOKI_INHERITED_PIMPL_NAME d
@@ -45,7 +45,7 @@ namespace Loki
         T& operator*()    { return *ptr_; }
         const T* operator->() const    { return  ptr_; }
         const T& operator*()  const    { return *ptr_; }
-    
+
     private:
         ConstPropPtr();
         ConstPropPtr(const ConstPropPtr&);
@@ -62,17 +62,17 @@ namespace Loki
     ///  Implements the Pimpl idiom. It's a wrapper for a smart pointer which
     ///  automatically creates and deletes the implementation object and adds
     ///  const propagation to the smart pointer.
-    ///  
+    ///
     ///  \par Usage
     ///  see test/Pimpl
     ////////////////////////////////////////////////////////////////////////////////
 
     template
-    <    
-        class T, 
+    <
+        class T,
         typename Pointer = ConstPropPtr<T>
     >
-    class Pimpl 
+    class Pimpl
     {
     public:
 
@@ -86,9 +86,9 @@ namespace Loki
             // Don't compile with incomplete type
             //
             // If compilation breaks here make sure
-            // the compiler does not auto-generate the 
+            // the compiler does not auto-generate the
             // destructor of the class hosting the pimpl:
-            // - implement the destructor of the class 
+            // - implement the destructor of the class
             // - don't inline the destructor
             typedef char T_must_be_defined[sizeof(T) ? 1 : -1 ];
         }
@@ -134,8 +134,8 @@ namespace Loki
 
 
     template<class T, typename Pointer = ConstPropPtr<T> >
-    struct PimplOwner 
-    {    
+    struct PimplOwner
+    {
         Pimpl<T,Pointer> LOKI_INHERITED_PIMPL_NAME;
     };
 
@@ -144,7 +144,7 @@ namespace Loki
     /// \class  ImplOf
     ///
     /// \ingroup PimplGroup
-    /// Convenience template for the 
+    /// Convenience template for the
     /// implementations which Pimpl points to.
     //////////////////////////////////////////
 
@@ -191,7 +191,7 @@ namespace Loki
         };
 
     };
-  
+
 }
 
 #endif // end file guardian

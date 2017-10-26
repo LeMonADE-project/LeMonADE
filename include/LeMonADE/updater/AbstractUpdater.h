@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -77,28 +77,6 @@ public:
    **/
   virtual void cleanup() = 0;
 };
-
-/**
- * @class IngredientsUpdater
- *
- * @brief Generic base class for all Updater that dealing with Ingredients.
- *
- * @deprecated
- *
- * @todo remove IngredientsUpdater from the LeMonADe-project
- **/
-template < class IngredientsType > class IngredientsUpdater: public AbstractUpdater
-{
-protected:
-  IngredientsType& ingredients;
-  IngredientsType& getIngredients() {return ingredients;}
-public:
-  
-  IngredientsUpdater(IngredientsType& val):ingredients(val){}
-  virtual ~IngredientsUpdater(){}
-  
-};
-
 
 
 #endif /* LEMONADE_UPDATER_ABSTRACTUPDATER_H */

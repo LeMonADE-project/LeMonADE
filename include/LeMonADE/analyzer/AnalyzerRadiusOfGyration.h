@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -47,23 +47,23 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Analyzer for evaluating the squared radius of gyration Rg^2
  *
  * @tparam IngredientsType Ingredients class storing all system information( e.g. monomers, bonds, etc).
- * 
- * @details This analyzer calculates the squared radius of gyration of either the 
+ *
+ * @details This analyzer calculates the squared radius of gyration of either the
  * complete system (if no subgroup of monomers was specified), or the average of
- * the Rg^2 of a set of subgroups (if subgroups were specified using the provided 
+ * the Rg^2 of a set of subgroups (if subgroups were specified using the provided
  * function void setMonomerGroups(std::vector<MonomerGroup<molecules_type> >) )
  * The analyzer calculates Rg^2 in every timestep and saves the time series
- * of this data to disk in the format 
+ * of this data to disk in the format
  * mcs <Rg2_x> <Rg2_y> <Rg2_z>  <Rg2_tot>
  * The default output filename is Rg2TimeSeries.dat and it can be changed by argument
  * to the constructor or by using the setter function provided.
- * If a more sophisticated grouping of monomers into groups is required, one can 
- * also write a new analyzer, inheriting from AnalyzerRadiusOfGyration, and 
- * overwriting the initialize function. 
+ * If a more sophisticated grouping of monomers into groups is required, one can
+ * also write a new analyzer, inheriting from AnalyzerRadiusOfGyration, and
+ * overwriting the initialize function.
  */
 template < class IngredientsType > class AnalyzerRadiusOfGyration : public AbstractAnalyzer
 {
-	
+
 private:
 	//! typedef for the underlying container holding the monomers
 	typedef typename IngredientsType::molecules_type molecules_type;
@@ -89,11 +89,11 @@ protected:
 	//! Set the groups to be analyzed. This function is meant to be used in initialize() of derived classes.
 	void setMonomerGroups(std::vector<MonomerGroup<molecules_type> > groupVector){groups=groupVector;}
 public:
-  
+
 	//! constructor
 	AnalyzerRadiusOfGyration(const IngredientsType& ing,
 			  std::string filename="Rg2TimeSeries.dat");
-	
+
 	//! destructor. does nothing
 	virtual ~AnalyzerRadiusOfGyration(){}
 	//! Initializes data structures. Called by TaskManager::initialize()
@@ -106,7 +106,7 @@ public:
 	void setBufferSize(uint32_t size){bufferSize=size;}
 	//! Change the output file name
 	void setOutputFile(std::string filename){outputFile=filename;isFirstFileDump=true;}
-	
+
 };
 
 /*************************************************************************
@@ -119,7 +119,7 @@ public:
  * */
 template<class IngredientsType>
 AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(
-	const IngredientsType& ing, 
+	const IngredientsType& ing,
 	std::string filename)
 :ingredients(ing)
 ,bufferSize(100)
@@ -146,33 +146,33 @@ void AnalyzerRadiusOfGyration<IngredientsType>::initialize()
 		for(size_t n=0;n<ingredients.getMolecules().size();n++)
 			groups[0].push_back(n);
 	}
-	
+
 }
 
 /**
- * @details Calculates the current Rg2, saves it in the 
- * time series, and saves the time series to disk in regular intervals. 
+ * @details Calculates the current Rg2, saves it in the
+ * time series, and saves the time series to disk in regular intervals.
  * */
 template< class IngredientsType >
 bool AnalyzerRadiusOfGyration<IngredientsType>::execute()
 {
 	VectorDouble3 Rg2Components(0.0,0.0,0.0);
-	
+
 	for(size_t n=0;n<groups.size();n++)
 	{
 		//this vector will contain (Rg^2_x, Rg^2_y, Rg^2_z), i.e. the squared components!
-		Rg2Components+=calculateRg2Components(groups[n])/double(groups.size());	
+		Rg2Components+=calculateRg2Components(groups[n])/double(groups.size());
 	}
-	
+
 	Rg2TimeSeries[0].push_back(Rg2Components.getX());
 	Rg2TimeSeries[1].push_back(Rg2Components.getY());
 	Rg2TimeSeries[2].push_back(Rg2Components.getZ());
-	Rg2TimeSeries[3].push_back(Rg2Components.getX()+Rg2Components.getY()+Rg2Components.getZ());	
+	Rg2TimeSeries[3].push_back(Rg2Components.getX()+Rg2Components.getY()+Rg2Components.getZ());
 	MCSTimes.push_back(ingredients.getMolecules().getAge());
 	//save to disk in regular intervals
 	if(MCSTimes.size()>=bufferSize)
 		dumpTimeSeries();
-	
+
 	return true;
 }
 
@@ -187,8 +187,8 @@ void AnalyzerRadiusOfGyration<IngredientsType>::cleanup()
 }
 
 /**
- * @details Saves the current content of Rg2TimeSeries to the file 
- * Rg2TimeSeries.dat. The output format is: 
+ * @details Saves the current content of Rg2TimeSeries to the file
+ * Rg2TimeSeries.dat. The output format is:
  * mcs Rg2_x Rg2_y Rg2_z Rg2_tot
  * */
 template<class IngredientsType>
@@ -197,21 +197,21 @@ void AnalyzerRadiusOfGyration<IngredientsType>::dumpTimeSeries()
 	//fist make a single vector<vector<double> > for writing the results
 	std::vector<std::vector<double> > resultsTimeseries=Rg2TimeSeries;
 	resultsTimeseries.insert(resultsTimeseries.begin(),MCSTimes);
-	
+
 	//if it is written for the first time, include comment in the output file
 	if(isFirstFileDump){
 		std::stringstream commentTimeSeries;
 		commentTimeSeries<<"Created by AnalyzerRadiusOfGyration\n";
 		commentTimeSeries<<"file contains time series of average Rg_squared (Rg2) over all analyzed groups\n";
 		commentTimeSeries<<"format: mcs\t Rg2X\t Rg2Y\t Rg2Z\t Rg2Total\n";
-	
+
 		ResultFormattingTools::writeResultFile(
 			outputFile,
 			ingredients,
 			resultsTimeseries,
 			commentTimeSeries.str()
 		);
-		
+
 		isFirstFileDump=false;
 	}
 	//otherwise just append the new data
@@ -226,7 +226,7 @@ void AnalyzerRadiusOfGyration<IngredientsType>::dumpTimeSeries()
 }
 
 /**
- * @details calculates the three components Rg^2_x, Rg^2_y,Rg^2_z and returns 
+ * @details calculates the three components Rg^2_x, Rg^2_y,Rg^2_z and returns
  * them in a vector.
  * @return VectorDouble3 containing the components Rg^2_x, Rg^2_y,Rg^2_z, or (0.0,0.0,0.0) if group is empty)
  * @param group the monomer group of which the Rg2 is calculated
@@ -239,8 +239,8 @@ VectorDouble3 AnalyzerRadiusOfGyration<IngredientsType>::calculateRg2Components(
 	if(group.size()==0){
 		return VectorDouble3(0.0,0.0,0.0);
 	}
-	
-	
+
+
 	VectorDouble3 sum_sqr; VectorDouble3 CoM_sum;
 	//first calculate the center of mass
 	for ( size_t n = 0; n < group.size(); ++n)
@@ -250,22 +250,22 @@ VectorDouble3 AnalyzerRadiusOfGyration<IngredientsType>::calculateRg2Components(
 		CoM_sum.setZ( CoM_sum.getZ() + group[n].getZ() );
 	}
 	double inv_N = 1.0 / double ( group.size() );
-	
-	VectorDouble3 CoM (double ( CoM_sum.getX() ) * inv_N, 
+
+	VectorDouble3 CoM (double ( CoM_sum.getX() ) * inv_N,
 			   double ( CoM_sum.getY() ) * inv_N,
 			   double ( CoM_sum.getZ() ) * inv_N);
-	
+
 	//now calculate the Rg2 using the center of mass
 	for ( uint32_t n = 0; n < group.size(); ++n)
 	{
 		double diffX,diffY,diffZ;
-		diffX = double(group[n].getX()) - CoM.getX();	
+		diffX = double(group[n].getX()) - CoM.getX();
 		diffY = double(group[n].getY()) - CoM.getY();
 		diffZ = double(group[n].getZ()) - CoM.getZ();
 		sum_sqr +=VectorDouble3(diffX*diffX,diffY*diffY,diffZ*diffZ);
 	}
 	return sum_sqr / double ( group.size() );
-		
+
 }
 #endif
 

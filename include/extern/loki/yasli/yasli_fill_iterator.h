@@ -36,7 +36,7 @@ namespace yasli_nstd
     {
         T value_;
         /*difference_type*/ ptrdiff_t count_;//////////////////////////////////
-    
+
     public:
         typedef std::ptrdiff_t difference_type;
         typedef typename fill_iterator_base<T>::pointer pointer;
@@ -44,12 +44,12 @@ namespace yasli_nstd
         //typedef iterator_type;
 
         fill_iterator()
-        {    
+        {
         }
 
         explicit fill_iterator(reference value, difference_type count = 0)
         : value_(value), count_(count)
-        {    
+        {
         }
 
         template<class U>
@@ -69,7 +69,7 @@ namespace yasli_nstd
         }
 
         fill_iterator& operator++()
-        {    
+        {
             ++count_;
             return *this;
         }
@@ -82,7 +82,7 @@ namespace yasli_nstd
         }
 
         fill_iterator& operator--()
-        {    
+        {
             --count_;
             return *this;
         }
@@ -126,7 +126,7 @@ namespace yasli_nstd
             return **this;
         }
 
-        template <class T2> 
+        template <class T2>
         bool operator==(const fill_iterator<T2>& rhs) const
         {
             return count_ == rhs.count_;
@@ -134,13 +134,13 @@ namespace yasli_nstd
 
     };
 
-    template <class T, class D> 
+    template <class T, class D>
     inline fill_iterator<T> operator+(D lhs, const fill_iterator<T>& rhs)
     {
         return rhs + lhs;
     }
 
-    template <class T> 
+    template <class T>
     inline bool operator!=(
         const fill_iterator<T>& lhs,
         const fill_iterator<T>& rhs)
@@ -148,7 +148,7 @@ namespace yasli_nstd
         return !(lhs == rhs);
     }
 
-    template <class T> 
+    template <class T>
     inline bool operator<(
         const fill_iterator<T>& lhs,
         const fill_iterator<T>& rhs)
@@ -156,7 +156,7 @@ namespace yasli_nstd
         return lhs.count_ < rhs.count_;
     }
 
-    template <class T> 
+    template <class T>
     inline bool operator>(
         const fill_iterator<T>& lhs,
         const fill_iterator<T>& rhs)
@@ -164,7 +164,7 @@ namespace yasli_nstd
         return rhs < lhs;
     }
 
-    template <class T> 
+    template <class T>
     inline bool operator<=(
         const fill_iterator<T>& lhs,
         const fill_iterator<T>& rhs)
@@ -172,7 +172,7 @@ namespace yasli_nstd
         return !(rhs < lhs);
     }
 
-    template <class T> 
+    template <class T>
     inline bool operator>=(
         const fill_iterator<T>& lhs,
         const fill_iterator<T>& rhs)

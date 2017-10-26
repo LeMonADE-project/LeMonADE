@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -28,7 +28,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * @brief Tests for the classes Molecules
- * 
+ *
  * @author Christoph
  * @date 23.04.2013
  * */
@@ -49,7 +49,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 /************************************************************************/
-//define test fixtures for the different tests their purpose is to set up 
+//define test fixtures for the different tests their purpose is to set up
 //the tests to suppress cout's output such that is does not display on the
 //standard output during the tests. this makes google test's output more readeable
 /************************************************************************/
@@ -59,18 +59,18 @@ public:
   typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features;
   typedef ConfigureSystem<VectorInt3,Features,4> Config;
   typedef Ingredients < Config> MyIngredients;
-  
+
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
     cout.rdbuf(tempStream.rdbuf());
   };
-  
+
   //restore original output
   virtual void TearDown(){
     cout.rdbuf(originalBuffer);
   };
-  
+
 private:
   std::streambuf* originalBuffer;
   std::ostringstream tempStream;
@@ -95,7 +95,7 @@ TEST_F(MoleculesTest, GetterAndSetter){
 
 	molecules2.connect(0,1);
 	molecules2.connect(1,2,1);
-	
+
 
 	EXPECT_EQ(1, molecules2.getLinkInfo(1,2));
 	EXPECT_EQ(1, molecules2.getLinkInfo(2,1));
@@ -189,15 +189,15 @@ TEST_F(MoleculesTest, AddMonomers){
 }
 
 TEST_F(MoleculesTest, Connectivity){
-  
+
   //create test object
   Molecules <VectorInt3,3> molecules;
   molecules.resize(10);
-  
+
   //connect to non-existent monomer
   EXPECT_THROW(molecules.connect(1,11),std::range_error);
   EXPECT_EQ(0,molecules.getNumLinks(1));
-  
+
   //try to exceed maximum connectivity
   molecules.connect(1,2);
   molecules.connect(1,3);
@@ -214,25 +214,25 @@ TEST_F(MoleculesTest, Connectivity){
   EXPECT_TRUE(molecules.areConnected(1,2));
   EXPECT_FALSE(molecules.areConnected(2,4));
   EXPECT_FALSE(molecules.areConnected(1,20));
-  
+
   //disconnect monomers
   molecules.disconnect(1,2);
   EXPECT_EQ(2,molecules.getNumLinks(1));
   EXPECT_EQ(1,molecules.getNumLinks(2));
   EXPECT_ANY_THROW(molecules.getLinkInfo(1,2));
-  
+
   //try to disconnect monomers which are not connected
   EXPECT_ANY_THROW(molecules.disconnect(1,2));
 }
 
 TEST_F(MoleculesTest, Constructors){
-  
-  //standard constructor 
+
+  //standard constructor
   Molecules <VectorInt3> molecules1;
   //check default values
   EXPECT_EQ(0,molecules1.getAge());
   EXPECT_EQ(0,molecules1.size());
-  
+
   //conversion constructor
   //add some information to molecules 1 and see if the conversion constructor
   //does a good copying job
@@ -242,14 +242,14 @@ TEST_F(MoleculesTest, Constructors){
   molecules1.connect(0,3);
   molecules1.connect(0,4,2);
   molecules1[1].setAllCoordinates(2,3,4);
-  //this should throw an exception, because the max connectivity of molecules1 
+  //this should throw an exception, because the max connectivity of molecules1
   //is too high
   EXPECT_ANY_THROW( (Molecules<VectorInt3, 2> (molecules1)) );
 
   //create new objects from molecules1
   Molecules<VectorInt3> molecules2(molecules1);
   Molecules<VectorInt3, 8> molecules3(molecules2);
-  
+
   //check if everything was copied correctly
   EXPECT_EQ(7,molecules2.getMaxConnectivity());
   EXPECT_EQ(8,molecules3.getMaxConnectivity());
@@ -262,24 +262,24 @@ TEST_F(MoleculesTest, Constructors){
 }
 
 TEST_F(MoleculesTest, AssignmentOperator){
-  
+
   //setup of a molecules object first
   Molecules <VectorInt3> molecules1;
-  
+
   molecules1.resize(10);
   molecules1.connect(0,1);
   molecules1.connect(0,2);
   molecules1.connect(0,3);
   molecules1.connect(0,4,2);
   molecules1[1].setAllCoordinates(2,3,4);
-  
+
   //copy to molecules object of same type, and with higher max
   //connectivity...should both work
   Molecules<VectorInt3> molecules2;
   molecules2=molecules1;
   Molecules<VectorInt3, 8> molecules3;
   molecules3=molecules2;
-  
+
   //check if everything was copied correctly
   EXPECT_EQ(7,molecules2.getMaxConnectivity());
   EXPECT_EQ(8,molecules3.getMaxConnectivity());
@@ -289,13 +289,13 @@ TEST_F(MoleculesTest, AssignmentOperator){
   EXPECT_EQ(molecules2[1],molecules3[1]);
   EXPECT_EQ(molecules1.getLinkInfo(0,4),molecules2.getLinkInfo(0,4));
   EXPECT_EQ(molecules2.getLinkInfo(0,4),molecules3.getLinkInfo(0,4));
-  
-  
+
+
   //now try to assign to molecules object with too low max connectivity
   //this should throw an exception
   Molecules<VectorInt3, 2> molecules4;
   EXPECT_ANY_THROW( molecules4=molecules1) ;
-  
+
 }
 
 TEST_F(MoleculesTest,Clear){
@@ -341,7 +341,7 @@ TEST_F(MoleculesTest,Clear){
   ingredients.modifyMolecules().connect(7,8);
   ingredients.modifyMolecules().connect(8,9);
   ingredients.modifyMolecules().connect(1,4);
-  
+
   EXPECT_EQ(8,ingredients.getMolecules().getTotalNumLinks());
   ingredients.modifyMolecules().clearBonds();
   EXPECT_EQ(0,ingredients.getMolecules().getTotalNumLinks());
@@ -349,7 +349,7 @@ TEST_F(MoleculesTest,Clear){
   {
 	  EXPECT_EQ(0,ingredients.getMolecules().getNumLinks(n));
   }
-  
+
   ingredients.modifyMolecules().connect(0,1);
   ingredients.modifyMolecules().connect(1,2);
   ingredients.modifyMolecules().connect(3,4);
@@ -358,10 +358,10 @@ TEST_F(MoleculesTest,Clear){
   ingredients.modifyMolecules().connect(7,8);
   ingredients.modifyMolecules().connect(8,9);
   ingredients.modifyMolecules().connect(1,4);
-  
+
   EXPECT_EQ(8,ingredients.getMolecules().getTotalNumLinks());
   ingredients.modifyMolecules().clear();
   EXPECT_EQ(0,ingredients.getMolecules().getTotalNumLinks());
   EXPECT_EQ(0,ingredients.getMolecules().size());
-  
+
 }

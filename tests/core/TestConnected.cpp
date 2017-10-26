@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -132,28 +132,28 @@ TEST(ConnectedTest, ConnectAndDisconnect) {
 TEST(ConnectedTest, ConnectivityZero){
   //test standard constructor
   Connected<VectorInt3,0> connected0;
-  
+
   EXPECT_EQ(0,connected0.getMaxConnectivity());
   EXPECT_EQ(0,connected0.getNumLinks());
   EXPECT_THROW(connected0.getNeighborIdx(0),std::runtime_error);
-  
+
   //est connect and disconnect
   EXPECT_THROW(connected0.connect(1),std::runtime_error);
   //check if everything is still the same
   EXPECT_EQ(0,connected0.getNumLinks());
   EXPECT_THROW(connected0.getNeighborIdx(0),std::runtime_error);
   EXPECT_THROW(connected0.disconnect(1), std::runtime_error);
-  
+
   //test constructor from vertex
   VectorInt3 pos;
   pos.setAllCoordinates(1,2,3);
   Connected<VectorInt3,0> connected1(pos);
-  
+
   EXPECT_EQ(1,connected1.getX());
   EXPECT_EQ(2,connected1.getY());
   EXPECT_EQ(3,connected1.getZ());
   EXPECT_EQ(0,connected1.getMaxConnectivity());
-  
+
   //test conversion constructor
   Connected<VectorInt3,2> connected2;
   connected2.setAllCoordinates(4,5,6);
@@ -163,43 +163,43 @@ TEST(ConnectedTest, ConnectivityZero){
   EXPECT_EQ(6,connected3.getZ());
   connected2.connect(1);
   EXPECT_THROW( (Connected<VectorInt3,0>(connected2)) ,std::runtime_error);
-  
+
   //test if zero memory is consumed by decorator
   EXPECT_EQ(sizeof(pos),sizeof(connected1));
 }
 
 //Test for the template specialization for max_connectivity=1
 TEST(ConnectedTest, ConnectivityOne){
-  
+
   //test standard constructor
   Connected<VectorInt3,1> connected0;
   EXPECT_EQ(1,connected0.getMaxConnectivity());
   EXPECT_EQ(0,connected0.getNumLinks());
-  
+
   //test connect and disconnect
   connected0.connect(10);
   EXPECT_EQ(1,connected0.getNumLinks());
   EXPECT_EQ(10,connected0.getNeighborIdx(0));
-  
+
   EXPECT_THROW(connected0.connect(11),std::runtime_error);
   EXPECT_EQ(1,connected0.getNumLinks());
-  
+
   EXPECT_THROW(connected0.disconnect(11),std::runtime_error);
   EXPECT_EQ(1,connected0.getNumLinks());
-  
+
   connected0.disconnect(10);
   EXPECT_EQ(0,connected0.getNumLinks());
-  
+
   //test construction from vertex
   VectorInt3 pos;
   pos.setAllCoordinates(1,2,3);
   Connected<VectorInt3,1> connected1(pos);
-  
+
   EXPECT_EQ(1,connected1.getX());
   EXPECT_EQ(2,connected1.getY());
   EXPECT_EQ(3,connected1.getZ());
   EXPECT_EQ(1,connected1.getMaxConnectivity());
-  
+
   //test conversion constructor
   //prepare some objects
   Connected<VectorInt3,3> connected2;
@@ -207,7 +207,7 @@ TEST(ConnectedTest, ConnectivityOne){
   connected2.connect(10);
   connected3.connect(20);
   connected3.connect(21);
-  
+
   connected2.setAllCoordinates(1,2,3);
   //now copy these objects into a new one
   //this one should work
@@ -219,7 +219,7 @@ TEST(ConnectedTest, ConnectivityOne){
   EXPECT_EQ(connected2.getZ(),connected4.getZ());
   //this one should not work
   EXPECT_THROW( (Connected<VectorInt3,1>(connected3)),std::runtime_error);
-  
-  
+
+
 }
 

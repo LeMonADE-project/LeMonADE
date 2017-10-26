@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (Hauke Rabbel)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -45,7 +45,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * Furthermore, they normally hold a const reference to either ingredients
  * or molecules, because they need to access the particle data. The reference
  * should always be const, because the Analyzer is not supposed to change the
- * sytem, only analyze the contents.
+ * system, only analyze the contents.
  * Below the class declaration we implement the functions
  * ***************************************************************************/
 
@@ -56,12 +56,12 @@ public:
 
   //constructor, get a reference to the ingredients for accessing the data later
   Ex5Analyzer(const IngredientsType& ing, std::string filename);
-  
+
   //we have to implement these three methods
   void initialize();
   bool execute();
   void cleanup();
-  
+
 private:
 
   const IngredientsType& ingredients;
@@ -69,7 +69,7 @@ private:
   std::string outputFilename;
   //this will count the number of samples, so we can calculate the average
   uint32_t nValues;
-  //this holds the number of particles in the sytem. set by initialize() 
+  //this holds the number of particles in the system. set by initialize()
   double nParticles;
   //this will be the result at the end
   VectorDouble3 centerOfMass;
@@ -83,8 +83,8 @@ private:
 
 //constructor
 //we initialize the reference to ingredients and set nValues to zero
-template<class IngredientsType> 
- Ex5Analyzer<IngredientsType>::Ex5Analyzer(const IngredientsType& ing, 
+template<class IngredientsType>
+ Ex5Analyzer<IngredientsType>::Ex5Analyzer(const IngredientsType& ing,
 			 std::string filename)
  :ingredients(ing)
 {
@@ -106,8 +106,8 @@ void Ex5Analyzer<IngredientsType>::initialize()
 
 /* ****************************************************************************
  * execute...this is where the analysis happens
- * we calculate the center of mass of the system and add the value to the 
- * vector centerOfMass. In cleanup, we will devide the collected value
+ * we calculate the center of mass of the system and add the value to the
+ * vector centerOfMass. In cleanup, we will divide the collected value
  * by the number of samples.
  * ***************************************************************************/
 template<class IngredientsType>
@@ -119,12 +119,12 @@ bool Ex5Analyzer<IngredientsType>::execute()
     VectorDouble3 particleCoordinate=ingredients.getMolecules()[n];
     currentCenterOfMass+= (particleCoordinate/nParticles);
   }
- 
+
   //add the current center of mass to the accumulated value
   centerOfMass+=currentCenterOfMass;
   //increase the counter for the number of samples
   nValues++;
-  
+
   return true;
 }
 
@@ -144,7 +144,7 @@ void Ex5Analyzer<IngredientsType>::cleanup()
   outputFile<<centerOfMass.getX()<<"\t"
             <<centerOfMass.getY()<<"\t"
             <<centerOfMass.getZ()<<std::endl;
-            
+
   outputFile.close();
-  
+
 }

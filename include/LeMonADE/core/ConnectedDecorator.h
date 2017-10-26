@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -38,16 +38,16 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  * @class Connected
  * @brief Adds a neighbor list to an arbitrary class Vertex.
- * 
+ *
  * @tparam Vertex
  * @brief The class to be decorated
- * 
+ *
  * @tparam max_connectivity
  * @brief Maximum number of connected objects. Default is \a 7.
  * @todo implement copy operator (or using the copy operator from the base class. But this
  * means one only copies the positions and not the connections.
  **/
-template <class Vertex, uint max_connectivity = 7> 
+template <class Vertex, uint max_connectivity = 7>
 class Connected: public Vertex
 {
 
@@ -60,7 +60,7 @@ public:
 	 * @brief Construct an empty neighbor list
 	 */
 	Connected() :	Vertex(), counter(0) {}
-	
+
 	/**
 	 * @brief Construct an empty neighbor list, but copies the Vertex internally.
 	 *
@@ -72,7 +72,7 @@ public:
 	//! Conversion constructor (from different Connected type)
 	template<class V, uint MC>
 	Connected(const Connected<V, MC>& src);
-	
+
 	/**********************************************************************/
 	//connectivity
 	/**********************************************************************/
@@ -93,13 +93,13 @@ public:
 	static uint getMaxConnectivity() {
 		return max_connectivity;
 	}
-	
+
 	//! Returns the index of the i-th connection (bond partner) of the vertex.
 	uint32_t getNeighborIdx(uint32_t i) const;
 
 	//! Connect this Vertex (monomer) to another Vertex with index \a b.
 	void connect(int32_t b);
-	
+
 	//! Disconnect this Vertex (monomer) from another Vertex with index \a b.
 	void disconnect(uint32_t b);
 
@@ -132,14 +132,14 @@ private:
  * @details Conversion and copy of the specified neighbor list \a src to this implementation
  *
  * @throw <std::runtime_error> if copying not possible due to limited max_connectivity
- * 
+ *
  * @param[in] src Neighbor list to convert.
  */
 template<class Vertex,uint max_connectivity>
 template<class V, uint MC>
-Connected<Vertex,max_connectivity>::Connected(const Connected<V, MC>& src) 
+Connected<Vertex,max_connectivity>::Connected(const Connected<V, MC>& src)
 	:Vertex(src) {
-	
+
 	//if max_connectivity not high enough, throw exception
 	if (this->getMaxConnectivity() < src.getNumLinks()) {
 		throw std::runtime_error("class Connected - constructor: Tried to import from connected Vertex with larger connectivity.");
@@ -154,7 +154,7 @@ Connected<Vertex,max_connectivity>::Connected(const Connected<V, MC>& src)
 }
 
 /** *************************************************************************
- * 
+ *
  * @throws <std::runtime_error> if copying not possible due to limited max_connectivity
  * */
 template<class Vertex,uint max_connectivity>
@@ -163,11 +163,11 @@ void Connected<Vertex,max_connectivity>::operator=(const Connected<V, MC> &val){
 	// copy position
 	//static_cast<V>(&this) = static_cast<V>(val);
 	this->setAllCoordinates(val.getX(), val.getY(), val.getZ());///@todo call base = operator instead
-	
+
 	//copy connectivity. throw exception if not possible due to limited max_connectivity
 	if (this->getMaxConnectivity() < val.getNumLinks()) {
 		throw std::runtime_error("class Connected - constructor: Tried to import from connected Vertex with larger connectivity.");
-	} 		
+	}
 	else {
 		for (uint i = 0; i < val.getNumLinks(); ++i) {
 			links[i] = val.getNeighborIdx(i);
@@ -202,7 +202,7 @@ uint32_t Connected<Vertex,max_connectivity>::getNeighborIdx(uint32_t i) const {
  *
  * @throw <std::runtime_error> if index is invalid esp. negative.
  * @param b Index of Vertex (monomer) to connect with.
- * 
+ *
  */
 template<class Vertex,uint max_connectivity>
 void Connected<Vertex,max_connectivity>::connect(int32_t b) {
@@ -236,7 +236,7 @@ void Connected<Vertex,max_connectivity>::connect(int32_t b) {
  * If you using \sa getNeighborIdx , make sure you take the reordering into account.
  *
  * @throw <std::runtime_error> if Vertex with index \a b is not linked to this one.
- * 
+ *
  * @param b Index of Vertex (monomer) to disconnect from.
  */
 template<class Vertex,uint max_connectivity>

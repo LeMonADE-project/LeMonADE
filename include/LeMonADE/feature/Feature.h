@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -43,7 +43,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @file
  *
  * @class Feature
- * 
+ *
  * @brief Base Feature class, which every special Feature is derived from
  *
  **/
@@ -113,7 +113,7 @@ public:
    * @param [in] move General move (maybe MoveLocalSc or MoveLocalBcc).
    */
   template < class IngredientsType> void applyMove( IngredientsType& ingredients, const MoveBase& move ) { }
-  
+
   /**
    * @brief Synchronizes the Features and establishing consistency in the system.
    *
@@ -126,7 +126,7 @@ public:
    * @param ingredients A reference to the IngredientsType - mainly the system.
    */
   template < class IngredientsType > void synchronize(IngredientsType& ingredients) {};
-  
+
   /**
    * @brief Overloaded function to stream all metadata to an output stream.
    *
@@ -136,7 +136,7 @@ public:
    * @param stream output stream
    */
   virtual void printMetaData(std::ostream& stream) const{}
-  
+
 
 };
 

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2016 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2016 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -34,8 +34,9 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @class UpdaterAbstractCreate
  *
  * @brief abstract updater to create systems
- * 
- * @details This abstract class provides the three basic functions to create systems: add a single monomer, add a connected monomer and move the system to find some free space
+ *
+ * @details This abstract class provides the three basic functions to create systems: add a single monomer, add a connected monomer and move the system to find some free space.
+ * This Updater requires FeatureAttributes.
  *
  * @tparam IngredientsType
  *
@@ -45,44 +46,46 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/MonomerGroup.h>
 #include <LeMonADE/utility/DepthIterator.h>
 #include <LeMonADE/utility/Vector3D.h>
+#include <LeMonADE/updater/moves/MoveLocalSc.h>
+#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 template<class IngredientsType>
 class UpdaterAbstractCreate:public AbstractUpdater
 {
 public:
   UpdaterAbstractCreate(IngredientsType& ingredients_):ingredients(ingredients_){}
-  
+
   virtual void initialize();
   virtual bool execute();
   virtual void cleanup();
-  
+
 protected:
   IngredientsType& ingredients;
-  
+
   //! function to add a standalone monomer
   bool addSingleMonomer(int32_t type=1);
-  
+
   //! function to add a monomer to a parent monomer
   bool addMonomerToParent(uint32_t parent_id, int32_t type=1);
-  
+
   //! function to add a monomer at a spezific place
   bool addMonomerAtPosition(VectorInt3 pos, int32_t type=1);
-  
+
   //! function to add a new monomer inbetween two others
   bool addMonomerInsideConnectedPair(uint32_t indexA, uint32_t indexB, int32_t type=1);
-  
+
   //! function to move the whole system
   void moveSystem(int32_t nsteps);
-  
+
   //! function to find groups of connected monomers
   void linearizeSystem();
-  
+
   //! function to get a random bondvector of length 2
   VectorInt3 randomBondvector();
-  
+
 private:
   RandomNumberGenerators rng;
-  
+
 };
 
 /**
@@ -92,7 +95,7 @@ private:
 */
 template < class IngredientsType >
 void UpdaterAbstractCreate<IngredientsType>::initialize(){
-  
+
 }
 
 /**
@@ -102,7 +105,7 @@ void UpdaterAbstractCreate<IngredientsType>::initialize(){
 */
 template < class IngredientsType >
 bool UpdaterAbstractCreate<IngredientsType>::execute(){
-  
+
 }
 
 /**
@@ -112,7 +115,7 @@ bool UpdaterAbstractCreate<IngredientsType>::execute(){
 */
 template < class IngredientsType >
 void UpdaterAbstractCreate<IngredientsType>::cleanup(){
-  
+
 }
 
 /******************************************************************************/
@@ -127,7 +130,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addSingleMonomer(int32_t type){
   MoveAddMonomerSc addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
-  
+
   int32_t counter(0);
   while(counter<10000){
     VectorInt3 newPosition((rng.r250_rand32() % (ingredients.getBoxX()-1)),
@@ -156,16 +159,16 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerToParent(uint32_t parent_
   MoveAddMonomerSc addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
-  
+
   int32_t counter(0);
-  
+
   while(counter<10000){
     //try at most 30 random bondvectors to find a new monomer position
     for(uint i=0;i<30;i++){
       VectorInt3 bondvector(randomBondvector());
       // set position of new monomer
       addmove.setPosition(ingredients.getMolecules()[parent_id]+bondvector);
-    
+
       // check new position (excluded volume)
       if(addmove.check(ingredients)==true){
 	addmove.apply(ingredients);
@@ -182,7 +185,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerToParent(uint32_t parent_
 
 /******************************************************************************/
 /**
- * @brief function to add a monomer to a specific position. if position is not free return false 
+ * @brief function to add a monomer to a specific position. if position is not free return false
  * @param VectorInt3 position
  * @param type attribute tag of the new monomer
  * @return <b false> if position is not free, <b true> if move was applied
@@ -192,7 +195,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtPosition(VectorInt3 pos
   MoveAddMonomerSc addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
-  
+
   addmove.setPosition(position);
   if(addmove.check(ingredients)==true){
     addmove.apply(ingredients);
@@ -215,13 +218,13 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerInsideConnectedPair(uint3
   //first check if monomers are connected
   if( ! ingredients.getMolecules().areConnected(indexA,indexB))
     return false;
-  
+
   MoveAddMonomerSc addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
-  
+
   int32_t counter(0);
-  
+
   while(counter<10000){
     //try at most 30 random bondvectors to find a new monomer position
     for(uint i=0;i<30;i++){
@@ -229,7 +232,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerInsideConnectedPair(uint3
       VectorInt3 bondvector(randomBondvector());
       // set position of new monomer
       addmove.setPosition(ingredients.getMolecules()[indexA]+bondvector);
-    
+
       // check new position (excluded volume, other features)
       if(addmove.check(ingredients)==true){
 	//check the new bondvector bewten the new monomer and indexB
@@ -270,7 +273,7 @@ void UpdaterAbstractCreate<IngredientsType>::moveSystem(int32_t nsteps){
 
 /******************************************************************************/
 /**
- * @brief function to find groups of connected monomers and resort ingredients 
+ * @brief function to find groups of connected monomers and resort ingredients
  * to write out longest possible bondvector series
  */
 
@@ -278,23 +281,23 @@ template<class IngredientsType>
 void UpdaterAbstractCreate<IngredientsType>::linearizeSystem(){
   //call ingredients copy constructor
   IngredientsType newIngredients(ingredients);
-  
+
   //delete all the informations in molecules
   newIngredients.modifyMolecules().clear();
-  
+
   std::vector < MonomerGroup<typename IngredientsType::molecules_type> > LinearMonomerGroupsVector;
 
   fill_connected_groups( ingredients.getMolecules(), LinearMonomerGroupsVector, MonomerGroup<typename IngredientsType::molecules_type>(ingredients.getMolecules()), alwaysTrue() );
-  
+
   for(size_t groups=0; groups < LinearMonomerGroupsVector.size(); ++groups){
     if(groups==0)
       newIngredients.modifyMolecules() = LinearMonomerGroupsVector[groups].copyGroup();
     else
       newIngredients.modifyMolecules() += LinearMonomerGroupsVector[groups].copyGroup();
   }
-  
+
   ingredients=newIngredients;
-  
+
 }
 
 /******************************************************************************/
@@ -328,7 +331,7 @@ VectorInt3 UpdaterAbstractCreate<IngredientsType>::randomBondvector(){
       bondvector.setAllCoordinates(0,0,-2);
       break;
   }
-  
+
   //check if bondvector is part of the bondvectorset
   if(ingredients.getBondset().isValid(bondvector)){
     return bondvector;
