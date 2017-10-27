@@ -309,7 +309,7 @@ TEST_F( TestDepthIterator, DepthIteratorPredicates )
  
   // change connectivities and redo the last three tests
   ingredients.modifyMolecules().connect(6,7);
-  ingredients.modifyMolecules().connect(3,4);
+  ingredients.modifyMolecules().disconnect(3,4);
   
   // test alwaysTrue of connected monomers
   groupsVector.clear();
@@ -355,7 +355,43 @@ TEST_F( TestDepthIterator, DepthIteratorPredicates )
   EXPECT_EQ(groupsVector.at(1).trueIndex(1),5);
   EXPECT_EQ(groupsVector.at(1).trueIndex(2),6);
   EXPECT_EQ(groupsVector.at(1).trueIndex(3),7);
+ 
+  // add a very simple branch
+  ingredients.modifyMolecules().resize(9);
+  ingredients.modifyMolecules()[8].setAttributeTag(3);
+  ingredients.modifyMolecules()[0].setAllCoordinates(0,2,12);
+  ingredients.modifyMolecules().connect(6,8);
+  ingredients.modifyMolecules().connect(3,4);
   
+  groupsVector.clear();
+  fill_connected_groups(ingredients.getMolecules(), groupsVector, ingredients.getMolecules(), belongsToLinearStrand());
+  EXPECT_EQ(groupsVector.size(),3);
+  EXPECT_EQ(groupsVector.at(0).size(),6);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(0),0);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(1),1);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(2),2);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(3),3);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(4),4);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(5),5);
+  EXPECT_EQ(groupsVector.at(1).size(),1);
+  EXPECT_EQ(groupsVector.at(1).trueIndex(0),7);
+  EXPECT_EQ(groupsVector.at(2).size(),1);
+  EXPECT_EQ(groupsVector.at(2).trueIndex(0),8);
+  
+  // now always true and belongsToLinearStrand should differ
+  groupsVector.clear();
+  fill_connected_groups(ingredients.getMolecules(), groupsVector, ingredients.getMolecules(), alwaysTrue());
+  EXPECT_EQ(groupsVector.size(),1);
+  EXPECT_EQ(groupsVector.at(0).size(),9);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(0),0);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(1),1);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(2),2);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(3),3);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(4),4);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(5),5);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(6),6);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(7),7);
+  EXPECT_EQ(groupsVector.at(0).trueIndex(8),8);
 }
 
 /// @todo test generate_connected_groups.
