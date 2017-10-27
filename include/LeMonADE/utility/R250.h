@@ -87,7 +87,7 @@ public:
 	//! initializes the generator with a predefined state, such that numbers can be reproduced.
 	void loadDefaultState();
 	//! initializes the internal state array with 256 values from argument stateArray.
-	void setState(uint32_t* stateArray);
+	void setState( uint32_t const * stateArray );
 
 private:
 	//! applies the random number algorithm to the internal state array (next 256 numbers are generated)

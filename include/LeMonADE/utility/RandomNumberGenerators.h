@@ -35,15 +35,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 //#define RANDOMNUMBERGENERATOR_ENABLE_CPP11
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
-#include <random>
-#endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
-
-#include <stdexcept>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cstdlib>
+#include <vector>
 
 #include <LeMonADE/utility/R250.h>
 
@@ -94,6 +86,10 @@ class RandomNumberGenerators
 		////////////////////////////////////////////////////////////////
 		//functions for seeding the random number generators
 
+        //! methods which take 256+1+1 32 bit seeds to be used as seeds
+        void seedAll( uint32_t const * pSeeds );
+        void seedAll( std::vector< uint32_t > const & vSeeds );
+        void seedAll( std::string const & fname );
 		//! randomly initializes all provided RNGs
 		void seedAll();
 		//R250Engine seeding
@@ -101,10 +97,11 @@ class RandomNumberGenerators
 		//! randomly seed only R250Engine from /dev/urandom
 		void seedR250();
 		//! seed R250Engine with array given as argument
-		void seedR250(uint32_t* seedArray);
+		void seedR250( uint32_t const * seedArray );
 
 		//! randomly seed std:rand()
 		void seedSTDRAND();
+		void seedSTDRAND( uint32_t seed );
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 		//! randomly seed only Mersenne Twister from /dev/urandom
 		void seedMT();

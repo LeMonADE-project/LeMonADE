@@ -25,7 +25,19 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
+#include <cassert>
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
+#   include <random>
+#endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
+#include <sstream>
+#include <stdexcept>
+#include <vector>
+
 #include <LeMonADE/utility/RandomNumberGenerators.h>
+
 
 R250* RandomNumberGenerators::r250Engine=0;
 
@@ -66,6 +78,90 @@ RandomNumberGenerators::~RandomNumberGenerators()
 
 }
 
+/**
+ * Uses seeds from a given array. Currently needs 256+1 or 256+1+1 seeds.
+ * Very unsafe. Better to use the std::vector function which checks for enough
+ * input!
+ */
+void RandomNumberGenerators::seedAll( uint32_t const * pSeeds )
+{
+    uint32_t const * curPos = pSeeds;
+
+	//seed the standard rand
+	seedSTDRAND( *( curPos++ ) );
+	//randomly initialize all provided RNGs
+	seedR250( curPos );
+    curPos += R250_RANDOM_PREFETCH;
+
+#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
+	seedMT( *( curPos++ ) );
+#endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
+}
+
+/**
+ * Uses seeds from a given array. Currently needs 256+1 or 256+1+1 seeds.
+ * Very unsafe. Better to use the std::vector function which checks for enough
+ * input!
+ */
+void RandomNumberGenerators::seedAll( std::vector< uint32_t > const & vSeeds )
+{
+    uint32_t const * curPos = &vSeeds[0];
+    size_t nSeedsRemaining = vSeeds.size();
+
+	//seed the standard rand
+    if ( ! ( nSeedsRemaining >= 1 ) )
+        throw std::invalid_argument( "[seedAll] Not enough seeds given" );
+    --nSeedsRemaining;
+	seedSTDRAND( *( curPos++ ) );
+
+
+	//randomly initialize all provided RNGs
+    if ( ! ( nSeedsRemaining >= R250_RANDOM_PREFETCH ) )
+        throw std::invalid_argument( "[seedAll] Not enough seeds given" );
+	seedR250( curPos );
+    nSeedsRemaining -= R250_RANDOM_PREFETCH;
+    curPos          += R250_RANDOM_PREFETCH;
+
+#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
+    if ( ! ( nSeedsRemaining >= 1 ) )
+        throw std::invalid_argument( "[seedAll] Not enough seeds given" );
+    --nSeedsRemaining;
+	seedMT( *( curPos++ ) );
+#endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
+}
+
+/**
+ * Reads random seeds from an input file. The file is supposed to contain raw
+ * random data, e.g. created with:
+ *  head -c $(( (256+2)*4 )) /dev/urandom > seeds.dat
+ */
+void RandomNumberGenerators::seedAll( std::string const & fname )
+{
+    std::ifstream fileSeeds( fname.c_str() );
+    if ( fileSeeds.fail() )
+    {
+        std::stringstream msg;
+        msg << "[seedAll] Couldn't open seed file '" << fname << "'";
+        throw std::invalid_argument( msg.str() );
+    }
+    /* seek to end to get file size in bytes */
+    fileSeeds.seekg( 0, std::ios_base::end );
+    size_t const nBytes = fileSeeds.tellg();
+    fileSeeds.seekg( 0 );   // set to beginning again
+    if ( fileSeeds.fail() )
+    {
+        std::stringstream msg;
+        msg << "[seedAll] An error occured when trying to get file size for seed file '" << fname << "'";
+        throw std::invalid_argument( msg.str() );
+    }
+    size_t const nLongs = nBytes / sizeof( uint32_t );
+    std::cerr << "[seedAll] Seed file contains " << nLongs << " uint32_t data\n";
+
+    std::vector< uint32_t > vSeeds( nLongs );
+    fileSeeds.read( (char *) &vSeeds[0], nLongs * sizeof( uint32_t ) );
+    seedAll( vSeeds );
+}
+
 void RandomNumberGenerators::seedAll()
 {
 	//seed the standard rand
@@ -88,7 +184,7 @@ void RandomNumberGenerators::seedR250()
 
 //seed R250Engine with array of 256 values
 //state array has to contain 256 ideally random values
-void RandomNumberGenerators::seedR250(uint32_t* stateArray)
+void RandomNumberGenerators::seedR250( uint32_t const * stateArray )
 {
 	r250Engine->setState(stateArray);
 }
@@ -114,6 +210,11 @@ void RandomNumberGenerators::seedSTDRAND()
 
 	}
 
+}
+
+void RandomNumberGenerators::seedSTDRAND( uint32_t const seed )
+{
+    std::srand( seed );
 }
 
 
@@ -142,7 +243,7 @@ void RandomNumberGenerators::seedMT()
 }
 
 //seed Mersenne Twister
-void RandomNumberGenerators::seedMT(uint32_t seed)
+void RandomNumberGenerators::seedMT( uint32_t seed )
 {
 	mt19937Engine->seed(seed);
 }
