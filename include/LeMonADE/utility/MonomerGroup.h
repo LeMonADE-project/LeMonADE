@@ -81,6 +81,7 @@ public:
   MonomerGroup& operator = (const MonomerGroup& src) {
     this->moleculesGroup = src.moleculesGroup;
     this->indices = src.indices;
+    return *this;
   }
 
   size_t size() const { return indices.size();}
