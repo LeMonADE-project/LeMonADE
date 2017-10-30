@@ -88,7 +88,7 @@ public:
 
   int trueIndex( int i ) const {return indices.at(i);}
 
-  const uint64_t getAge() const {return moleculesGroup->getAge();}
+  uint64_t getAge() const {return moleculesGroup->getAge();}
 
   MoleculesType copyGroup() const;
 
