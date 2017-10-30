@@ -321,7 +321,7 @@ template < class IngredientsType > void ReadMcs< IngredientsType >::execute()
   }
 
   //if total number of monomers in !mcs differs from previous, throw exception
-  if(monomerCount!=molecules.size()){
+  if((uint32_t)monomerCount!=molecules.size()){
 
     std::stringstream errormessage;
     errormessage<<"ReadMcs<IngredientsType>::execute()\n"

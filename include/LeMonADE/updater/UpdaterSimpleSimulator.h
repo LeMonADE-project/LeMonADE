@@ -73,9 +73,9 @@ public:
 	time_t startTimer = time(NULL); //in seconds
 	std::cout<<"mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) <<std::endl;
 
-    for(int n=0;n<nsteps;n++){
+    for(uint32_t n=0;n<nsteps;n++){
 
-	for(int m=0;m<ingredients.getMolecules().size();m++)
+	for(size_t m=0;m<ingredients.getMolecules().size();m++)
 	{
 		move.init(ingredients);
 
