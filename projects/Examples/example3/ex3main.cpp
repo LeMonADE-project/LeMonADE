@@ -41,9 +41,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
-
   /* ***************************************************************************
    * The definition of the Ingredients and the features used can conveniently done
    * using some typedefs at the beginning of the main function. These usually make

@@ -86,10 +86,10 @@ public:
   typedef ::Loki::NullType monomer_extensions;
 
   //! Export the relevant functionality for reading bfm-files to the responsible reader object
-  template < class FileRead  > void exportRead ( FileRead & file){}
+  template < class FileRead  > void exportRead ( FileRead & ){}
 
   //! Export the relevant functionality for writing bfm-files to the responsible writer object
-  template < class FileWrite > void exportWrite( FileWrite& file) const {}
+  template < class FileWrite > void exportWrite( FileWrite& ) const {}
 
 
   /**
@@ -101,7 +101,7 @@ public:
    * @param [in] move General move (maybe MoveLocalSc or MoveLocalBcc).
    * @return true Always!
    */
-  template < class IngredientsType> bool checkMove( const IngredientsType& ingredients, const MoveBase& move ) const{ return true; }
+  template < class IngredientsType> bool checkMove( const IngredientsType&, const MoveBase& ) const{ return true; }
 
   /**
    * @brief Apply all Move. Does Nothing.
@@ -112,7 +112,7 @@ public:
    * @param [in] ingredients A reference to the IngredientsType - mainly the system
    * @param [in] move General move (maybe MoveLocalSc or MoveLocalBcc).
    */
-  template < class IngredientsType> void applyMove( IngredientsType& ingredients, const MoveBase& move ) { }
+  template < class IngredientsType> void applyMove( IngredientsType&, const MoveBase& ) { }
 
   /**
    * @brief Synchronizes the Features and establishing consistency in the system.
@@ -125,7 +125,7 @@ public:
    *
    * @param ingredients A reference to the IngredientsType - mainly the system.
    */
-  template < class IngredientsType > void synchronize(IngredientsType& ingredients) {};
+  template < class IngredientsType > void synchronize(IngredientsType&) {};
 
   /**
    * @brief Overloaded function to stream all metadata to an output stream.
@@ -135,7 +135,7 @@ public:
    *
    * @param stream output stream
    */
-  virtual void printMetaData(std::ostream& stream) const{}
+  virtual void printMetaData(std::ostream&) const{}
 
 
 };
