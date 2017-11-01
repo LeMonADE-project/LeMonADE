@@ -33,10 +33,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/utility/RandomNumberGenerators.h>
 
-int main(int argc, char* argv[]){
-
-
-
+int main(int, char**)
+{
 	/* ****************************************************************
 	* The class RandomNumberGenerators provides an interface for
 	* seeding the provided random number generators with a random

@@ -355,7 +355,7 @@ void FeatureLatticeBase<SpecializedClass<ValueType> >::setupLattice()
 	// Allocate memory
 	lattice = new ValueType[_boxX*_boxY*_boxZ];
 
-	for(int i = 0; i < _boxX*_boxY*_boxZ; i++)
+	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
 		lattice[i]=ValueType();
 
 	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(ValueType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(ValueType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
@@ -392,7 +392,7 @@ void FeatureLatticeBase<SpecializedClass<ValueType> >::setupLattice(uint32_t box
 	// Allocate memory
 	lattice = new ValueType[_boxX*_boxY*_boxZ];
 
-	for(int i = 0; i < _boxX*_boxY*_boxZ; i++)
+	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
 		lattice[i]=ValueType();
 
 	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(ValueType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(ValueType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
@@ -409,7 +409,7 @@ void FeatureLatticeBase<SpecializedClass<ValueType> >::clearLattice()
 {
 
 	// initialize to native value (=0)
-	for(int i = 0; i < _boxX*_boxY*_boxZ; i++)
+	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
 		lattice[i]=ValueType();
 }
 

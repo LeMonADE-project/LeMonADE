@@ -28,7 +28,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/utility/Vector3D.h>
 
-int main(int argc, char* argv[])
+int main(int, char**)
 {
   /* ***************************************************************************
    * As a first example of how the class Molecules can be used we define a

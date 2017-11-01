@@ -122,10 +122,10 @@ AnalyzerRadiusOfGyration<IngredientsType>::AnalyzerRadiusOfGyration(
 	const IngredientsType& ing,
 	std::string filename)
 :ingredients(ing)
+,Rg2TimeSeries(4,std::vector<double>(0))
 ,bufferSize(100)
 ,outputFile(filename)
 ,isFirstFileDump(true)
-,Rg2TimeSeries(4,std::vector<double>(0))
 {
 }
 

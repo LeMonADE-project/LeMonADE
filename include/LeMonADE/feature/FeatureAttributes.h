@@ -125,7 +125,7 @@ public:
 
   //! For all unknown moves: this does nothing
   template<class IngredientsType>
-    void applyMove(IngredientsType& ing, const MoveBase& move){};
+    void applyMove(IngredientsType&, const MoveBase&){};
 
   //! Overloaded for moves of type MoveAddMonomerBase to set the attribute tag by inserting a monomer
   template<class IngredientsType,class AddMoveType>
