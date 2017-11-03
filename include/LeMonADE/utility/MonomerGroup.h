@@ -80,14 +80,15 @@ public:
 
   MonomerGroup& operator = (const MonomerGroup& src) {
     this->moleculesGroup = src.moleculesGroup;
-    this-> indices = src.indices;
+    this->indices = src.indices;
+    return *this;
   }
 
   size_t size() const { return indices.size();}
 
   int trueIndex( int i ) const {return indices.at(i);}
 
-  const uint64_t getAge() const {return moleculesGroup->getAge();}
+  uint64_t getAge() const {return moleculesGroup->getAge();}
 
   MoleculesType copyGroup() const;
 

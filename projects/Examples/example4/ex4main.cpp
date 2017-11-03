@@ -46,8 +46,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
 
 
-int main(int argc, char* argv[]){
-
+int main(int, char**)
+{
     /* ****************************************************************
       * as described in the previous examples, we quickly seed the
       * random number generator, and set up a system in a box with the

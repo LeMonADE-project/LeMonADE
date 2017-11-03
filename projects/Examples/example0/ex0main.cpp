@@ -36,8 +36,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/utility/Vector3D.h>
 
-int main(int argc, char* argv[]){
-
+int main(int, char**)
+{
   /* ********************************************************************
    * Vector3D is a class template with the template parameter specifying
    * the underlying basic data type. For example:
@@ -139,5 +139,4 @@ int main(int argc, char* argv[]){
    ***********************************************************************/
 
   return 0;
-
 }

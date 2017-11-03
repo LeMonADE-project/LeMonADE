@@ -213,12 +213,13 @@ void Connected<Vertex,max_connectivity>::connect(int32_t b) {
 		throw std::runtime_error("Connected::connect(uint b): b < 0");
 	}
 	// check whether object b is already connected to me
-	for (int i = 0; i < counter; i++)
+	for (uint32_t i = 0; i < counter; i++)
 	{
 		if (((uint32_t)b) == links[i]){
-#ifdef DEBUG
+/*#ifdef DEBUG
 			std::cerr<< "Connected::connect(unit b): Vertices already connected" << std::endl;
 #endif	// End DEBUG
+			/*  */
 			return;
 		}
 	}

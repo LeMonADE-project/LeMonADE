@@ -112,14 +112,14 @@ void ResultFormattingTools::writeTable(std::ostream& stream,
 	stream << commentStream.str() << std::endl;
 
 	//check if all column have the same size
-	int columnSize = results[0].size();
-	for (int i = 0; i < results.size(); ++i) {
+	size_t columnSize = results[0].size();
+	for (size_t i = 0; i < results.size(); ++i) {
 		if (results[i].size() != columnSize)
 			throw std::runtime_error("ResultFormattingTools::writeTable():Columns do not have the same size\n");
 	}
 
-	for (int row = 0; row < results[0].size(); ++row) {
-		for (int column = 0; column < results.size(); ++column) {
+	for (size_t row = 0; row < results[0].size(); ++row) {
+		for (size_t column = 0; column < results.size(); ++column) {
 			stream << results[column][row] << "\t";
 		}
 		stream << std::endl;
@@ -164,8 +164,8 @@ void ResultFormattingTools::appendToResultFile(std::string filename,ResultType& 
 		throw std::runtime_error("ResultFormattingTools::appendToResultFile(): error opening output file"+filename+"\n");
 
 	//check if all column have the same size
-	int columnSize = results[0].size();
-	for (int i = 0; i < results.size(); ++i) {
+	size_t columnSize = results[0].size();
+	for (size_t i = 0; i < results.size(); ++i) {
 		if (results[i].size() != columnSize){
 			std::stringstream errormessage;
 			errormessage<<"ResultFormattingTools::appendToResultFile():Columns do not have the same size\n";
@@ -175,8 +175,8 @@ void ResultFormattingTools::appendToResultFile(std::string filename,ResultType& 
 	}
 
 	//write content
-	for (int row = 0; row < results[0].size(); ++row) {
-		for (int column = 0; column < results.size(); ++column) {
+	for (size_t row = 0; row < results[0].size(); ++row) {
+		for (size_t column = 0; column < results.size(); ++column) {
 			file << results[column][row] << "\t";
 		}
 		file << std::endl;

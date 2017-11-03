@@ -48,8 +48,8 @@ FastBondset::~FastBondset(){}
  * @param copyBondSet
  */
 FastBondset::FastBondset(const FastBondset& copyBondSet):// Copy the map Bondvectors explicitly
-  lookupSynchronized(false),
-  BondVectors(copyBondSet.BondVectors)
+  BondVectors(copyBondSet.BondVectors),
+  lookupSynchronized(false)
 	    {
 #ifdef DEBUG
 		// check call of copy constructor
