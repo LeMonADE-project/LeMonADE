@@ -336,7 +336,13 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 		VectorInt3 neighborPosition(ingredients.getMolecules()[neighborID]);
 		VectorInt3 parentPosition(ingredients.getMolecules()[currentParent]);
 		VectorInt3 bond(neighborPosition-parentPosition);
-		if(bond.getLength() == 2)
+		uint32_t otherParentNeighbor; 
+		uint32_t otherNeighborNeighbor;
+		neighborDirection ? otherParentNeighbor=(ingredients.getMolecules().getNeighborIdx(currentParent,0)) :  otherParentNeighbor=(ingredients.getMolecules().getNeighborIdx(currentParent,1));
+		(ingredients.getMolecules().getNeighborIdx(neighborID,0)==currentParent) ? otherNeighborNeighbor=(ingredients.getMolecules().getNeighborIdx(neighborID,1)): otherNeighborNeighbor=(ingredients.getMolecules().getNeighborIdx(neighborID,0));
+		VectorInt3 neighborParentBond(parentPosition-ingredients.getMolecules()[otherParentNeighbor]);
+		VectorInt3 neighborNeighborBond(neighborPosition-ingredients.getMolecules()[otherNeighborNeighbor]);
+		if(bond.getLength() == 2 && (neighborParentBond.getLength()<3) &&(neighborNeighborBond.getLength()<3))
 		{
 		    for(uint32_t i=0; i<8; i++)
 		    {
@@ -354,8 +360,10 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 			  if(rng.r250_drand()>0.5){dy1=2;dy2=0;dz1=0;dz2=2;}
 			  else {dy1=0;dy2=2;dz1=2;dz2=0;}
 			  int32_t dx3,dx4;
-			  rng.r250_drand()>0.5 ? dx3=1 : dx3=-1;
-			  rng.r250_drand()>0.5 ? dx4=1 : dx4=-1;
+			  if(rng.r250_drand()>0.5){dx3=1;dx4=-1;}
+			  else{dx3=-1;dx4=1;}
+// 			  rng.r250_drand()>0.5 ? dx3=1 : dx3=-1;
+// 			  rng.r250_drand()>0.5 ? dx4=1 : dx4=-1;
 			  vec1=VectorInt3( dx2+dx3,  dy2,  dz2);
 			  vec2=VectorInt3(-dx2+dx4, -dy2, -dz2);
 			}
@@ -366,8 +374,10 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 			  if(rng.r250_drand()>0.5){dx1=2;dx2=0;dz1=0;dz2=2;}
 			  else {dx1=0;dx2=2;dz1=2;dz2=0;}
 			  int32_t dy3,dy4;
-			  rng.r250_drand()>0.5 ? dy3=1 : dy3=-1;
-			  rng.r250_drand()>0.5 ? dy4=1 : dy4=-1;
+			  if(rng.r250_drand()>0.5){dy3=1;dy4=-1;}
+			  else{dy3=-1;dy4=1;}
+// 			  rng.r250_drand()>0.5 ? dy3=1 : dy3=-1;
+// 			  rng.r250_drand()>0.5 ? dy4=1 : dy4=-1;
 			  vec1=VectorInt3( dx2,  dy2+dy3,  dz2);
 			  vec2=VectorInt3(-dx2, -dy2+dy4, -dz2);
 			}
@@ -378,8 +388,10 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 			  if(rng.r250_drand()>0.5){dx1=2;dx2=0;dy1=0;dy2=2;}
 			  else {dx1=0;dx2=2;dy1=2;dy2=0;}
 			  int32_t dz3,dz4;
-			  rng.r250_drand()>0.5 ? dz3=1 : dz3=-1;
-			  rng.r250_drand()>0.5 ? dz4=1 : dz4=-1;
+			  if(rng.r250_drand()>0.5){dz3=1;dz4=-1;}
+			  else{dz3=-1;dz4=1;}
+// 			  rng.r250_drand()>0.5 ? dz3=1 : dz3=-1;
+// 			  rng.r250_drand()>0.5 ? dz4=1 : dz4=-1;
 			  vec1=VectorInt3( dx2,  dy2,  dz2+dz3);
 			  vec2=VectorInt3(-dx2, -dy2, -dz2+dz4);
 			}
@@ -387,8 +399,8 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 			std::vector<VectorInt3> PotentialPositions(6,StartPosition);
 			PotentialPositions[0]+=VectorInt3( dx1, dy1, dz1);
 			PotentialPositions[2]+=VectorInt3(-dx1,-dy1,-dz1);
-			PotentialPositions[4]+=VectorInt3( dx2, dy2, dz2);
-			PotentialPositions[5]+=VectorInt3(-dx2,-dy2,-dz2);
+			PotentialPositions[4]+=VectorInt3( dx2, dy2, dz2);//position to check, not to use for a monomer 
+			PotentialPositions[5]+=VectorInt3(-dx2,-dy2,-dz2);//position to check, not to use for a monomer 
 			PotentialPositions[1]+=vec1;
 			PotentialPositions[3]+=vec2;
 			
@@ -401,7 +413,6 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 			  addmove.setPosition(PotentialPositions[i]);
 			  if(addmove.check(ingredients)==false){PositionsFit=false;}
 			}
-			
 			// add ring to system
 			if (PositionsFit)
 			{
@@ -414,6 +425,8 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 			    {
 			      for (uint32_t j=0;j<i;j++)
 			      {
+				//this is a dangerous thing, because it could happen that a monomer is added that freeze in 4 monomers of the system. 
+				//I must get new safer function ....
 				if (addMonomerInsideConnectedPair(ingredients.getMolecules().size()-(1+j%i),ingredients.getMolecules().size()-(1+(1+j)%i),type)) 
 				{
 				  AddRing=true;
