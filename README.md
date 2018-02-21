@@ -85,6 +85,14 @@ This can be found in the documentation.
     cmake ..
     make docs
 ```
+
+
+## Contributions
+
+* Any contributions making the programm better are welcome
+* Every contribution should be made by following the guidelines made by the [gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+
+
 ## References
 
 This library has been used in the following publications (without guarantee for completeness)

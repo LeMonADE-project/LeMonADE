@@ -138,8 +138,8 @@ TEST(RandomNumberGeneratorsTest,R250BitsUsage){
 	//check that all bits have been used are within 3sigma of the expectation
 	//value. this test may of course fail
 	for(size_t n=0;n<32;n++){
-		EXPECT_LE(bitUsage[n],(10000+200));
-		EXPECT_GE(bitUsage[n],(10000-200));
+		EXPECT_LE(bitUsage[n],(10000+300));
+		EXPECT_GE(bitUsage[n],(10000-300));
 	}
 
 

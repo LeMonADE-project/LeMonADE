@@ -96,7 +96,7 @@ void R250::loadRandomState()
 }
 
 //this allows to set the internal state array to given values.
-void R250::setState(uint32_t* stateArray)
+void R250::setState( uint32_t const * stateArray )
 {
 		for(size_t i=0;i<R250_RANDOM_PREFETCH;i++)
 		{
@@ -109,12 +109,18 @@ void R250::setState(uint32_t* stateArray)
 		refresh();
 }
 
-//this resets the state array to a predefined value, so that a defined state
-//can always be obtained if needed. the numbers were generated from /dev/urandom
-//once and then simply copied here.
+/**
+ * this resets the state array to a predefined value, so that a defined state
+ * can always be obtained if needed. the numbers were generated from /dev/urandom
+ * once and then simply copied here.
+ * The array can e.g. be generated with:
+ *   head -c 1024 /dev/urandom | hexdump -v -e '4 4 "0x%08X, " "\n"'; echo
+ */
 void R250::loadDefaultState()
 {
-	uint32_t tmp[R250_RANDOM_PREFETCH] ={128861083 ,1578465172 ,1132109222 ,1536640935 ,488265105 ,249545814 ,
+	static uint32_t const tmp[R250_RANDOM_PREFETCH] =
+    {
+        128861083 ,1578465172 ,1132109222 ,1536640935 ,488265105 ,249545814 ,
 		931473061 ,816964859 ,296369473 ,818986032 ,530371272 ,295126204 ,
 		1516346231 ,3026009 ,245630516 ,671061864 ,791099058 ,852977361 ,
 		635292087 ,1059222032 ,288528100 ,877554999 ,1941668641 ,407091003 ,
@@ -156,7 +162,8 @@ void R250::loadDefaultState()
 		866089755 ,313184427 ,619508128 ,759157274 ,627786029 ,640921970 ,
 		5035326 ,351442498 ,310023587 ,713733322 ,1567488348 ,225865858 ,
 		1379860041 ,1091951759 ,952392682 ,650949040 ,2000007399 ,82102099 ,
-		1654883130 ,394023729 ,2069457331 ,1270363068};
+		1654883130 ,394023729 ,2069457331 ,1270363068
+    };
 
 	for (size_t i=0;i<R250_RANDOM_PREFETCH;i++)
 	{

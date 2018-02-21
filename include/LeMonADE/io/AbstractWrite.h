@@ -72,7 +72,7 @@ public:
   AbstractWrite(const Source& src):src(src){}
   virtual ~AbstractWrite(){}
 
-  virtual void writeStream(std::ostream& strm) {};
+  virtual void writeStream(std::ostream&) {};
 
   const Source& getSource() const {return src;}
 protected:

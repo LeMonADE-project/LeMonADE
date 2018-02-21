@@ -293,7 +293,7 @@ public:
 	std::string getSumOfComments() const
 	{
 		std::string SumOfComments;
-		for (int i=0; i<comments.size(); ++i){
+		for (size_t i=0; i<comments.size(); ++i){
 			SumOfComments += comments[i];
 		}
 		return SumOfComments;

@@ -133,7 +133,7 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    *
    * @return The actual time in the graph.
    */
-  const uint64_t 	getAge() const 			{return myAge;}
+  uint64_t 	getAge() const 			{return myAge;}
 
   /**
    * @brief Sets the actual time to a given value \a newAge in the graph.

@@ -266,11 +266,11 @@ void FeatureLatticePowerOfTwo<ValueType>::synchronize(IngredientsType& val) {
 		}
 		this->proXY=resultshift;
 
-		std::cout << "use bit shift for boxX: (1 << "<< this->xPro << " ) = " << (1 << this->xPro) << " = " << (this->_boxX) << std::endl;
-		std::cout << "use bit shift for boxX*boxY: (1 << "<< this->proXY << " ) = " << (1 << this->proXY) << " = " << (this->_boxX*this->_boxY) << std::endl;
+		std::cout << "use bit shift for boxX: (1 << "<< this->xPro << " ) = " << (1u << this->xPro) << " = " << (this->_boxX) << std::endl;
+		std::cout << "use bit shift for boxX*boxY: (1 << "<< this->proXY << " ) = " << (1u << this->proXY) << " = " << (this->_boxX*this->_boxY) << std::endl;
 
 		// check if shift is correct
-		if ( (this->_boxX != (1 << this->xPro)) || ((this->_boxX*this->_boxY) != (1 << this->proXY)) )
+		if ( (this->_boxX != (1u << this->xPro)) || ((this->_boxX*this->_boxY) != (1u << this->proXY)) )
 		{
 			throw  std::runtime_error("Could not determine value for bit shift. Sure your box size is a power of 2?\nl Use feature FeatureLattice instead of FeatureLatticePowerOfTwo\n");
 		}

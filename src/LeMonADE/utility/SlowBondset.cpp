@@ -45,7 +45,7 @@ SlowBondset::SlowBondset():bondsetLookup(0),lookupOffset(0){}
  * @param copyBondSet
  */
 SlowBondset::SlowBondset(const SlowBondset& copyBondSet):
-  lookupOffset(copyBondSet.lookupOffset)
+  FastBondset(), lookupOffset(copyBondSet.lookupOffset)
 	    {
 #ifdef DEBUG
 		// check call of copy constructor
@@ -57,8 +57,6 @@ SlowBondset::SlowBondset(const SlowBondset& copyBondSet):
 	        // perform the lookup update
 		  // set manually field pointer to 0 to avoid memory leak
 		this->bondsetLookup=NULL;
-		  // set synchronized bool to false to refresh lookup
-		this->lookupSynchronized=false;
 		  // perform the reset
 		this->updateLookupTable();
 	    }
