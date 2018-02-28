@@ -28,7 +28,6 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LEMONADE_FEATURE_FEATUREEXCLUDEDVOLUMESC_IDONLATTICE_H
 #define LEMONADE_FEATURE_FEATUREEXCLUDEDVOLUMESC_IDONLATTICE_H
 
-// #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/feature/FeatureLattice.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
@@ -36,11 +35,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
-// #include <LeMonADE/updater/moves/MoveLocalBcc.h>
-// #include <LeMonADE/updater/moves/MoveAddMonomerBcc.h>
-
 #include <LeMonADE/feature/FeatureAttributes.h>
-#include "../Utilities/LatticePredicates.h"
+#include <LeMonADE/utility/LatticePredicates.h>
 
 /*****************************************************************************/
 /**
