@@ -113,7 +113,6 @@ template<int AttributeType1,int AttributeType2>
 class hasOneOfTheseTwoTypes
 {
 public:
-  
 	template<class MoleculesType>
 	bool operator()(const MoleculesType& m, int i)
 	{

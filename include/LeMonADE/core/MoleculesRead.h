@@ -191,16 +191,16 @@ void ReadBreaks<IngredientsType>::execute()
 
   //get line from file for processing
   getline(this->getInputStream(),line);
-  
+
   //start processing the line
   while(!line.empty() && this->getInputStream().good()){
-    
+
     //if the line contains a bfm Read, stop the procedure and set the get pointer back
     if(this->detectRead(line)){
       this->getInputStream().seekg(previous);
       break;
     }
-    
+
     //initialize a stringstream with the line for easier processing
     std::stringstream stream(line);
 
@@ -208,12 +208,12 @@ void ReadBreaks<IngredientsType>::execute()
     stream>>a>>b;
     //throw exception if something went wrong
     if(stream.fail()){
-      
+
     	std::stringstream errormessage;
       errormessage<<"ReadBreaks<IngredientsType>::execute()\n"
 		  <<"Could not read broken bond partners in "<<nBreaks+1<<" th broken bond definition\n";
       throw std::runtime_error(errormessage.str());
-      
+
     }
       
     //if still here, add broken bond to bondset

@@ -112,7 +112,7 @@ public:
    * @param [in] ingredients A reference to the IngredientsType - mainly the system
    * @param [in] move General move (maybe MoveLocalSc or MoveLocalBcc).
    */
-  template < class IngredientsType> void applyMove( IngredientsType&, const MoveBase& ) { }
+  template < class IngredientsType> void applyMove( IngredientsType& ingredients, const MoveBase& move ) { }
 
   /**
    * @brief Synchronizes the Features and establishing consistency in the system.
@@ -125,7 +125,7 @@ public:
    *
    * @param ingredients A reference to the IngredientsType - mainly the system.
    */
-  template < class IngredientsType > void synchronize(IngredientsType&) {};
+  template < class IngredientsType > void synchronize(IngredientsType& ingredients) {};
 
   /**
    * @brief Overloaded function to stream all metadata to an output stream.
@@ -135,8 +135,7 @@ public:
    *
    * @param stream output stream
    */
-  virtual void printMetaData(std::ostream&) const{}
-
+  virtual void printMetaData(std::ostream& stream) const{}
 
 };
 

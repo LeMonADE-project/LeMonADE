@@ -29,8 +29,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * This example program demonstrates how to use the provided functions
  * for obtaining pseudo random number series.
  * ********************************************************************/
- #include <iostream>
 
+#include <iostream>
 #include <LeMonADE/utility/RandomNumberGenerators.h>
 
 int main(int, char**)

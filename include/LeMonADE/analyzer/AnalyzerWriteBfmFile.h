@@ -389,7 +389,6 @@ bool AnalyzerWriteBfmFile<IngredientsType>::execute(){
 
   if(myWriteType==OVERWRITE) startOverwriteNewFile(_filename);
 
-
   std::vector< std::pair<std::string,SuperAbstractWrite*> >::iterator it;
   SuperAbstractWrite* mcsCommand=0;
   //write all Writes that do not have the writeHeaderOnly flag set

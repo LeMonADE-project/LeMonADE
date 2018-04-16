@@ -86,22 +86,21 @@ class RandomNumberGenerators
 		////////////////////////////////////////////////////////////////
 		//functions for seeding the random number generators
 
-        //! methods which take 256+1+1 32 bit seeds to be used as seeds
-        void seedAll( uint32_t const * pSeeds );
-        void seedAll( std::vector< uint32_t > const & vSeeds );
-        void seedAll( std::string const & fname );
+		//! methods which take 256+1+1 32 bit seeds to be used as seeds
+		void seedAll( uint32_t const * pSeeds );
+		void seedAll( std::vector< uint32_t > const & vSeeds );
+		void seedAll( std::string const & fname );
 		//! randomly initializes all provided RNGs
 		void seedAll();
 		//R250Engine seeding
-
 		//! randomly seed only R250Engine from /dev/urandom
 		void seedR250();
 		//! seed R250Engine with array given as argument
 		void seedR250( uint32_t const * seedArray );
-
 		//! randomly seed std:rand()
 		void seedSTDRAND();
 		void seedSTDRAND( uint32_t seed );
+
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 		//! randomly seed only Mersenne Twister from /dev/urandom
 		void seedMT();
