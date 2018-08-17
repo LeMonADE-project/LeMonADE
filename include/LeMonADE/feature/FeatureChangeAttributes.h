@@ -60,6 +60,8 @@ class FeatureChangeAttributes:public FeatureAttributes
 public:
   //! This Feature requires a monomer_extensions.
   typedef LOKI_TYPELIST_1(MonomerAttributeTag) monomer_extensions;
+  
+  typedef LOKI_TYPELIST_1(FeatureAttributes) required_features_back;
 
   //! Export the relevant functionality for reading bfm-files to the responsible reader object
   template<class IngredientsType>
@@ -94,7 +96,7 @@ template<class IngredientsType>
 void FeatureChangeAttributes::exportRead(FileImport< IngredientsType >& fileReader)
 {
   auto  reader = new ReadAttributes<IngredientsType>(fileReader.getDestination());
-  fileReader.registerRead("!attributes",reader);
+//   fileReader.registerRead("!attributes",reader);
   fileReader.registerRead("!changeattributes",reader);
 }
 
@@ -110,7 +112,7 @@ void FeatureChangeAttributes::exportRead(FileImport< IngredientsType >& fileRead
 template<class IngredientsType>
 void FeatureChangeAttributes::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
-  fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType>(fileWriter.getIngredients_()));
+//   fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType>(fileWriter.getIngredients_()));
   fileWriter.registerWrite("!changeattributes",new WriteChangeAttributes<IngredientsType>(fileWriter.getIngredients_()));
 }
 
