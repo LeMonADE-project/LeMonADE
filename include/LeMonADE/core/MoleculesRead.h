@@ -177,7 +177,7 @@ class ReadBreaks: public ReadToDestination < IngredientsType >
  **/
 
 template < class IngredientsType >
-void ReadBreaks<IngredientsType>::execute()
+void ReadRemoveBonds<IngredientsType>::execute()
 {
   std::cout << "ReadBreaks:execute() : updating " <<std::endl;
   int a,b;
