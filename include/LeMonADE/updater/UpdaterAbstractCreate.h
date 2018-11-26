@@ -288,7 +288,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtConnectedPair(uint32_t 
     
       // check new position (excluded volume, other features)
       if(addmove.check(ingredients)==true){
-	//check the new bondvector bewten the new monomer and indexB
+	//check the new bondvector between the new monomer and indexB
 	VectorInt3 checkBV(addmove.getPosition()-ingredients.getMolecules()[indexB]);
 	if( (checkBV.getLength() < 3) && (ingredients.getBondset().isValidStrongCheck(checkBV)) ){
 	  addmove.apply(ingredients);

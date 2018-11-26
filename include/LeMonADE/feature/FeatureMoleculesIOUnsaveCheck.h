@@ -130,7 +130,7 @@ void FeatureMoleculesIOUnsaveCheck::exportRead(FileImport<IngredientsType>& file
 	fileReader.registerRead("!number_of_monomers", new  ReadNrOfMonomers< IngredientsType > (destination) );
 	fileReader.registerRead("!bonds", new  ReadBonds< IngredientsType > (destination) );
 	fileReader.registerRead("!add_bonds", new  ReadBonds< IngredientsType > (destination) );
-	fileReader.registerRead("!remove_bonds", new  ReadBreaks< IngredientsType > (destination) );
+	fileReader.registerRead("!remove_bonds", new  ReadRemoveBonds< IngredientsType > (destination) );
 	fileReader.registerRead("!mcs", new  ReadMcs< IngredientsType > (destination) );
 }
 
