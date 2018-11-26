@@ -260,7 +260,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerInsideConnectedPair(uint3
 }
 /******************************************************************************/
 /**
- * @brief function to add a new monomer two already existing ones.
+ * @brief function to add a new monomer to two already existing ones such that all three monomers are connected.
  * @param indexA
  * @param indexB
  * @param type attribute tag of the new monomer
