@@ -63,7 +63,7 @@ struct MonomerID
  *
  * @brief Functor returning attribute and monomer id .
  *
- * @details Thie functor writes on the first two bits the attribute and on the remaining bits the monomer id.
+ * @details This functor writes on the first two bits the attribute and on the remaining bits the monomer id.
  * The id's start at 1. To get the monomer id use: LatticeEntry>>6 and to get the attribute use LatticeEntry&63.
  * Up to know there can be only attributes stored from 0 to 63 and monomer id's up to 67.108.864
  * @deprecated

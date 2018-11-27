@@ -155,17 +155,17 @@ void ReadBonds<IngredientsType>::execute()
 
 /***********************************************************************/
 /**
- * @class ReadBreaks
+ * @class ReadRemoveBonds
  * @brief Handles BFM-File-Reads \b !remove_bonds.
  *
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
 template < class IngredientsType >
-class ReadBreaks: public ReadToDestination < IngredientsType >
+class ReadRemoveBonds: public ReadToDestination < IngredientsType >
 {
  public:
 	//! Empty Constructor, but delegates call to the Feature
-	ReadBreaks(IngredientsType& destination):ReadToDestination< IngredientsType > (destination){}
+	ReadRemoveBonds(IngredientsType& destination):ReadToDestination< IngredientsType > (destination){}
 
 	void execute();
 };
@@ -177,9 +177,9 @@ class ReadBreaks: public ReadToDestination < IngredientsType >
  **/
 
 template < class IngredientsType >
-void ReadBreaks<IngredientsType>::execute()
+void ReadRemoveBonds<IngredientsType>::execute()
 {
-  std::cout << "ReadBreaks:execute() : updating " <<std::endl;
+  std::cout << "ReadRemoveBonds:execute() : updating " <<std::endl;
   int a,b;
   int nBreaks=0;
   
@@ -210,7 +210,7 @@ void ReadBreaks<IngredientsType>::execute()
     if(stream.fail()){
 
     	std::stringstream errormessage;
-      errormessage<<"ReadBreaks<IngredientsType>::execute()\n"
+      errormessage<<"ReadRemoveBonds<IngredientsType>::execute()\n"
 		  <<"Could not read broken bond partners in "<<nBreaks+1<<" th broken bond definition\n";
       throw std::runtime_error(errormessage.str());
 
@@ -223,7 +223,7 @@ void ReadBreaks<IngredientsType>::execute()
     getline(this->getInputStream(),line);
   }
   
-  std::cout << "ReadBreaks:execute() : done " <<std::endl;
+  std::cout << "ReadRemoveBonds:execute() : done " <<std::endl;
 }
 
 /***********************************************************************/

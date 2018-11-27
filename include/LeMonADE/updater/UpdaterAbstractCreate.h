@@ -260,7 +260,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerInsideConnectedPair(uint3
 }
 /******************************************************************************/
 /**
- * @brief function to add a new monomer two already existing ones.
+ * @brief function to add a new monomer to two already existing ones such that all three monomers are connected.
  * @param indexA
  * @param indexB
  * @param type attribute tag of the new monomer
@@ -288,7 +288,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtConnectedPair(uint32_t 
 
       // check new position (excluded volume, other features)
       if(addmove.check(ingredients)==true){
-	//check the new bondvector bewten the new monomer and indexB
+	//check the new bondvector between the new monomer and indexB
 	VectorInt3 checkBV(addmove.getPosition()-ingredients.getMolecules()[indexB]);
 	if( (checkBV.getLength() < 3) && (ingredients.getBondset().isValidStrongCheck(checkBV)) ){
 	  addmove.apply(ingredients);
