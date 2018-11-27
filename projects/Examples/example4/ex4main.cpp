@@ -46,6 +46,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
 
 
+
 int main(int, char**)
 {
     /* ****************************************************************

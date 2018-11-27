@@ -213,6 +213,7 @@ class FeatureBondset : public Feature
   }
 
 protected:
+
   //! Stores the set of allowed bond-vectors.
   BondSetType bondset;
 

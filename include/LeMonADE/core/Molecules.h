@@ -133,7 +133,8 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    *
    * @return The actual time in the graph.
    */
-  uint64_t 	getAge() const 			{return myAge;}
+  const uint64_t 	getAge() const 			{return myAge;}
+
 
   /**
    * @brief Sets the actual time to a given value \a newAge in the graph.
@@ -267,7 +268,6 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
 
   //! returns the edges of the graph 
   std::map < std::pair < uint32_t, uint32_t > , Edge > getEdges() const {return edges;}
-
 
 private:
 

@@ -209,7 +209,6 @@ void RandomNumberGenerators::seedSTDRAND()
 		throw std::runtime_error(errormessage.str());
 
 	}
-
 }
 
 void RandomNumberGenerators::seedSTDRAND( uint32_t const seed )

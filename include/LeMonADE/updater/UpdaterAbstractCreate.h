@@ -275,9 +275,9 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtConnectedPair(uint32_t 
   MoveAddMonomerSc addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
-  
+
   int32_t counter(0);
-  
+
   while(counter<10000){
     //try at most 30 random bondvectors to find a new monomer position
     for(uint i=0;i<30;i++){
@@ -285,7 +285,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtConnectedPair(uint32_t 
       VectorInt3 bondvector(randomBondvector());
       // set position of new monomer
       addmove.setPosition(ingredients.getMolecules()[indexA]+bondvector);
-    
+
       // check new position (excluded volume, other features)
       if(addmove.check(ingredients)==true){
 	//check the new bondvector between the new monomer and indexB

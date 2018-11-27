@@ -133,8 +133,6 @@ public:
       //add ring
       checker=addRing(3,4,8);
     }
-    
-
     numExec++;
     return checker;
 
@@ -294,7 +292,7 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   EXPECT_TRUE(ingredients.getMolecules().areConnected(2,3));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(3,4));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(4,5));
-  
+
   //sixth execution
   EXPECT_EQ(6,Tommy.getNumExec());
   EXPECT_TRUE(Tommy.execute());
@@ -304,10 +302,12 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   EXPECT_TRUE(ingredients.getMolecules().areConnected(2,3));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(3,4));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(4,5));
+
   //seventh execution
   EXPECT_EQ(7, Tommy.getNumExec());
   EXPECT_ANY_THROW(Tommy.execute());
   EXPECT_EQ(5,ingredients.getMolecules().size());
+
   //Eigth execution 
   EXPECT_EQ(8, Tommy.getNumExec());
   EXPECT_TRUE(Tommy.execute());
@@ -316,6 +316,7 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   {
     EXPECT_EQ(1,ingredients.getMolecules()[5+j].getAttributeTag());
   }
+
   //Ninth execution 
   EXPECT_EQ(9, Tommy.getNumExec());
   EXPECT_TRUE(Tommy.execute());
