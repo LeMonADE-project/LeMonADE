@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        |
+    ooo                        | 
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -25,46 +25,46 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_FEATURE_FEATUREMOLECULESIO_H
-#define LEMONADE_FEATURE_FEATUREMOLECULESIO_H
-
-#include<stdint.h>
+#ifndef LEMONADE_FEATURE_FEATUREMOLECULESIOUNSAVECHECK_H
+#define LEMONADE_FEATURE_FEATUREMOLECULESIOUNSAVECHECK_H
 
 #include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
 #include <LeMonADE/core/MoleculesWrite.h>
 #include <LeMonADE/core/MoleculesRead.h>
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/feature/FeatureBox.h>
-#include <LeMonADE/feature/FeatureBondset.h>
+#include <LeMonADE/feature/FeatureBondsetUnsaveCheck.h>
 #include <LeMonADE/io/FileImport.h>
 
 /**
- * @file class FeatureMoleculesIO
+ * @file class FeatureMoleculesIOUnsaveCheck
+ * @author Toni
  * */
 
 /**
- * @class FeatureMoleculesIO
+ * @class FeatureMoleculesIOUnsaveCheck
  * @brief Feature providing standard read/write commands for molecules
  * @details Feature providing standard read/write commands for molecules. The commands
- * provided are !number_of_monomers,!bonds,!add_bonds,!mcs
+ * provided are !number_of_monomers,!bonds,!add_bonds,!mcs. Uses FeatureBondsetUnsaveCheck
+ * which allows bonds between refolded monomers. 
  * */
-class FeatureMoleculesIO:public Feature
+class FeatureMoleculesIOUnsaveCheck:public Feature
 {
 public:
-	typedef LOKI_TYPELIST_2(FeatureBox,FeatureBondset< >) required_features_back;
-
-	FeatureMoleculesIO():numberOfMonomers(0),maxConnectivity(0){}
+	typedef LOKI_TYPELIST_2(FeatureBox,FeatureBondsetUnsaveCheck< >) required_features_back;
+	
+	FeatureMoleculesIOUnsaveCheck():numberOfMonomers(0),maxConnectivity(0){}
 	//! Export the relevant functionality for reading bfm-files to the responsible reader object
-	template<class IngredientsType>
+	template<class IngredientsType> 
 	void exportRead(FileImport<IngredientsType>& fileReader);
-
+	
 	//! Export the relevant functionality for writing bfm-files to the responsible writer object
-	template<class IngredientsType>
+	template<class IngredientsType> 
 	void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
 
-	template<class IngredientsType>
+	template<class IngredientsType> 
 	void synchronize(IngredientsType& ingredients);
-
+	
 	/**
 	* @brief Overloaded function to stream all metadata to an output stream
 	* @details Gives the number of vertices (monomers), and maximum connectivity
@@ -75,13 +75,13 @@ public:
 		streamOut << "\tNumber of monomers: " << numberOfMonomers << std::endl;
 		streamOut << "\tmax connectivity: " << maxConnectivity << std::endl;
 	}
-
+	
 	//! add a range of particle indices to be written in compressed (solvent) format
 	void setCompressedOutputIndices(size_t startIdx, size_t stopIdx)
 	{
 		solventIndices[startIdx]=stopIdx;
 	}
-
+	
 	//! add a range of particle indices to be written in compressed (solvent) format
 		void clearCompressedOutputIndices()
 		{
@@ -100,7 +100,7 @@ private:
 	uint numberOfMonomers,maxConnectivity;
 	//monomers to be compressed
 	std::map<size_t,size_t> solventIndices;
-
+	
 };
 
 
@@ -109,7 +109,7 @@ private:
 
 
 /**
-* The function is called by the Ingredients class when an object of type Ingredients
+* The function is called by the Ingredients class when an object of type Ingredients 
 * is associated with an object of type FileImport. The export of the Reads is thus
 * taken care automatically when it becomes necessary.\n
 * Registered Read-In Commands:
@@ -124,7 +124,7 @@ private:
 */
 
 template < class IngredientsType >
-void FeatureMoleculesIO::exportRead(FileImport<IngredientsType>& fileReader)
+void FeatureMoleculesIOUnsaveCheck::exportRead(FileImport<IngredientsType>& fileReader)
 {
 	IngredientsType& destination=fileReader.getDestination();
 	fileReader.registerRead("!number_of_monomers", new  ReadNrOfMonomers< IngredientsType > (destination) );
@@ -136,7 +136,7 @@ void FeatureMoleculesIO::exportRead(FileImport<IngredientsType>& fileReader)
 
 
 /**
-* The function is called by the Ingredients class when an object of type Ingredients
+* The function is called by the Ingredients class when an object of type Ingredients 
 * is associated with an object of type AnalyzerWriteBfmFile. The export of the Writes is thus
 * taken care automatically when it becomes necessary.\n
 * Registered Write-Out Commands:
@@ -150,7 +150,7 @@ void FeatureMoleculesIO::exportRead(FileImport<IngredientsType>& fileReader)
 * @tparam IngredientsType Features used in the system. See Ingredients.
 */
 template < class IngredientsType >
-void FeatureMoleculesIO::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const
+void FeatureMoleculesIOUnsaveCheck::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const
 {
 	const IngredientsType& source=fileWriter.getIngredients_();
 	fileWriter.registerWrite("!number_of_monomers", new WriteNrOfMonomers <IngredientsType> (source));
@@ -164,8 +164,8 @@ void FeatureMoleculesIO::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& file
 
 
 
-template<class IngredientsType>
-void FeatureMoleculesIO::synchronize(IngredientsType& ingredients)
+template<class IngredientsType> 
+void FeatureMoleculesIOUnsaveCheck::synchronize(IngredientsType& ingredients)
 {
 	numberOfMonomers=ingredients.getMolecules().size();
 	maxConnectivity=ingredients.getMolecules().getMaxConnectivity();

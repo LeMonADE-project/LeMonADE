@@ -127,7 +127,7 @@ TEST_F(FeatureAttributesTest,exportWrite)
   setupIngrediens.modifyMolecules()[1].setAttributeTag(1);
   setupIngrediens.modifyMolecules()[4].setAttributeTag(2);
   //write to file and read back in
-  AnalyzerWriteBfmFile<MyIngredients> outfile("tests/attributesTestOut.test",setupIngrediens);
+  AnalyzerWriteBfmFile<MyIngredients> outfile("tests/attributesTestOut.test",setupIngrediens,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
   outfile.initialize();
 
   FileImport<MyIngredients> infile ("tests/attributesTestOut.test",ingredients);

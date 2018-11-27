@@ -203,7 +203,6 @@ class FeatureBondset : public Feature
      for (size_t j=0; j< molecules.getNumLinks(i); ++j){
 
 	 uint n = molecules.getNeighborIdx(i,j);
-       // if (!bondset.isValid(molecules[n]-molecules[i]))
 	 if (!bondset.isValidStrongCheck(molecules[n]-molecules[i]))
 	{
 	  std::ostringstream errorMessage;
@@ -213,8 +212,7 @@ class FeatureBondset : public Feature
     }
   }
 
- private:
-
+protected:
   //! Stores the set of allowed bond-vectors.
   BondSetType bondset;
 

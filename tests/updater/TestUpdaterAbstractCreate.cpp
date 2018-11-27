@@ -109,7 +109,31 @@ public:
       checker=addMonomerInsideConnectedPair(1,ingredients.getMolecules().size()-1,4);
     }else if(numExec==5){
       linearizeSystem();
+    }else if(numExec==6){
+      ingredients.modifyMolecules().resize(0);
+      ingredients.synchronize();
+      //setup test chain
+      checker=addMonomerAtPosition(VectorInt3(2,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),1);
+      checker=addMonomerAtPosition(VectorInt3(4,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),1);
+      ingredients.modifyMolecules().connect(ingredients.getMolecules().size()-2, ingredients.getMolecules().size()-1);
+      checker=addMonomerAtPosition(VectorInt3(6,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),1);
+      ingredients.modifyMolecules().connect(ingredients.getMolecules().size()-2, ingredients.getMolecules().size()-1);
+      checker=addMonomerAtPosition(VectorInt3(8,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),1);
+      ingredients.modifyMolecules().connect(ingredients.getMolecules().size()-2, ingredients.getMolecules().size()-1);
+      checker=addMonomerAtPosition(VectorInt3(10,ingredients.getBoxY()/2,ingredients.getBoxZ()/2),1);
+      ingredients.modifyMolecules().connect(ingredients.getMolecules().size()-2, ingredients.getMolecules().size()-1);
+    }else if(numExec==7){
+      //try adding a ring on non existing parent
+      numExec++;
+      checker=addRing(5);
+    }else if(numExec==8){
+      //add ring
+      checker=addRing(2);
+    }else if(numExec==9){
+      //add ring
+      checker=addRing(3,4,8);
     }
+    
 
     numExec++;
     return checker;
@@ -127,6 +151,7 @@ private:
   using BaseClass::addSingleMonomer;
   using BaseClass::addMonomerAtPosition;
   using BaseClass::addMonomerInsideConnectedPair;
+  using BaseClass::addRing;
   using BaseClass::moveSystem;
   using BaseClass::linearizeSystem;
 };
@@ -269,6 +294,36 @@ TEST_F(UpdaterAbstractCreateTest, TestUpdater)
   EXPECT_TRUE(ingredients.getMolecules().areConnected(2,3));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(3,4));
   EXPECT_TRUE(ingredients.getMolecules().areConnected(4,5));
+  
+  //sixth execution
+  EXPECT_EQ(6,Tommy.getNumExec());
+  EXPECT_TRUE(Tommy.execute());
+  EXPECT_EQ(5,ingredients.getMolecules().size());
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(1,2));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(2,3));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(3,4));
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(4,5));
+  //seventh execution
+  EXPECT_EQ(7, Tommy.getNumExec());
+  EXPECT_ANY_THROW(Tommy.execute());
+  EXPECT_EQ(5,ingredients.getMolecules().size());
+  //Eigth execution 
+  EXPECT_EQ(8, Tommy.getNumExec());
+  EXPECT_TRUE(Tommy.execute());
+  EXPECT_EQ(10,ingredients.getMolecules().size());
+  for (uint32_t j=0;j<5;j++)
+  {
+    EXPECT_EQ(1,ingredients.getMolecules()[5+j].getAttributeTag());
+  }
+  //Ninth execution 
+  EXPECT_EQ(9, Tommy.getNumExec());
+  EXPECT_TRUE(Tommy.execute());
+  EXPECT_EQ(18,ingredients.getMolecules().size());
+  for (uint32_t j=0;j<8;j++)
+  {
+    EXPECT_EQ(4,ingredients.getMolecules()[10+j].getAttributeTag());
+  }
 
 }
 
