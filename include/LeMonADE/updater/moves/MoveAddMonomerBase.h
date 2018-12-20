@@ -56,7 +56,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 /*****************************************************************************/
-template <class SpecializedMove>
+template<class SpecializedMove, class TagType>
 class MoveAddMonomerBase:public MoveBase
 {
 public:
@@ -69,13 +69,13 @@ public:
   template <class IngredientsType> void apply(IngredientsType& ingredients);
 
   //! setter function for monomerTag of new monomer
-  void setTag(int32_t tag){monomerTag=tag;}
+  void setTag(TagType tag){monomerTag=tag;}
   //! setter function for position of new monomer taking a VectorInt3
   void setPosition(VectorInt3 pos){position=pos;}
   //! setter function for position of new monomer taking a triple of ints
   void setPosition(int32_t x,int32_t y,int32_t z){position.setX(x);position.setY(y);position.setZ(z);}
   //! getter function for the monomerTag of the new monomer
-  int32_t getTag() const{return monomerTag;}
+  TagType getTag() const{return monomerTag;}
   //! getter function for the position of the new monomer returning a VectorInt3
   const VectorInt3 getPosition() const {return position;}
   //! getter function for index of the new monomer. This is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
@@ -88,7 +88,7 @@ private:
   //! position where the new monomer is placed in the simulation box
   VectorInt3 position;
   //! monomerTag that is applied to the new monomer, requires Feature FeatureAttributes with int-Type
-  int32_t monomerTag;
+  TagType monomerTag;
   /**
    * @brief Index of new PartileThis is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
    * @details It is set when apply is called. useful if Features want to alter the particle when applying the move
@@ -109,9 +109,9 @@ private:
  * @tparam <SpecializedMove> name of the specialized move.
  **/
 /*****************************************************************************/
-template <class SpecializedMove>
+template<class SpecializedMove, class TagType>
 template <class IngredientsType>
-void MoveAddMonomerBase<SpecializedMove>::init(const IngredientsType& ingredients)
+void MoveAddMonomerBase<SpecializedMove, TagType>::init(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients);
 }
@@ -126,9 +126,9 @@ void MoveAddMonomerBase<SpecializedMove>::init(const IngredientsType& ingredient
  * @tparam <SpecializedMove> name of the specialized move.
  **/
 /*****************************************************************************/
-template <class SpecializedMove>
+template<class SpecializedMove, class TagType>
 template <class IngredientsType>
-void MoveAddMonomerBase<SpecializedMove>::check(const IngredientsType& ingredients)
+void MoveAddMonomerBase<SpecializedMove, TagType>::check(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->check(ingredients);
 }
@@ -143,9 +143,9 @@ void MoveAddMonomerBase<SpecializedMove>::check(const IngredientsType& ingredien
  * @tparam <SpecializedMove> name of the specialized move.
  * */
 /*****************************************************************************/
-template <class SpecializedMove>
+template<class SpecializedMove, class TagType>
 template <class IngredientsType>
-void MoveAddMonomerBase<SpecializedMove>::apply(IngredientsType& ingredients)
+void MoveAddMonomerBase<SpecializedMove, TagType>::apply(IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->apply(ingredients);
 }

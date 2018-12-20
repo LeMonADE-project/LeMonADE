@@ -40,7 +40,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Add monomer move for the bccBFM to add a vertex/monomer
  *
  **/
-class MoveAddMonomerBcc:public MoveAddMonomerBase<MoveAddMonomerBcc>
+template<class TagType=int32_t>
+class MoveAddMonomerBcc:public MoveAddMonomerBase<MoveAddMonomerBcc, TagType>
 {
 public:
   MoveAddMonomerBcc(){};
@@ -65,8 +66,9 @@ public:
 /**
  * @brief reset the probability and calculate particle index
  */
+template <class TagType>
 template <class IngredientsType>
-void MoveAddMonomerBcc::init(const IngredientsType& ing)
+void MoveAddMonomerBcc<TagType>::init(const IngredientsType& ing)
 {
     this->resetProbability();
     this->setMonomerIndex(ing.getMolecules().size());
@@ -76,8 +78,9 @@ void MoveAddMonomerBcc::init(const IngredientsType& ing)
 /**
  * @brief check if the move is allowed by the system given as argument.
  */
+template <class TagType>
 template <class IngredientsType>
-bool MoveAddMonomerBcc::check(IngredientsType& ing)
+bool MoveAddMonomerBcc<TagType>::check(IngredientsType& ing)
 {
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
@@ -87,8 +90,9 @@ bool MoveAddMonomerBcc::check(IngredientsType& ing)
 /**
  * @brief apply the move to the system given as argument
  */
-template< class IngredientsType>
-void MoveAddMonomerBcc::apply(IngredientsType& ing)
+template <class TagType>
+template <class IngredientsType>
+void MoveAddMonomerBcc<TagType>::apply(IngredientsType& ing)
 {
   //first add the new monomer at the desired position. this is because
   //some features may want to do things with it

@@ -41,7 +41,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Standard local bfm-move on simple cubic lattice for the scBFM to add a vertex/monomer
  *
  **/
-class MoveAddMonomerSc : public MoveAddMonomerBase<MoveAddMonomerSc>
+template<class TagType=int32_t>
+class MoveAddMonomerSc : public MoveAddMonomerBase<MoveAddMonomerSc, TagType>
 {
 public:
   MoveAddMonomerSc(){};
@@ -65,8 +66,9 @@ public:
 /**
  * @brief reset the probability
  */
+template <class TagType>
 template <class IngredientsType>
-void MoveAddMonomerSc::init(const IngredientsType& ing)
+void MoveAddMonomerSc<TagType>::init(const IngredientsType& ing)
 {
     this->resetProbability();
     this->setMonomerIndex(ing.getMolecules().size());
@@ -76,8 +78,9 @@ void MoveAddMonomerSc::init(const IngredientsType& ing)
 /**
  * @brief check if the move is allowed by the system given as argument.
  */
+template <class TagType>
 template <class IngredientsType>
-bool MoveAddMonomerSc::check(IngredientsType& ing)
+bool MoveAddMonomerSc<TagType>::check(IngredientsType& ing)
 {
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
@@ -87,8 +90,9 @@ bool MoveAddMonomerSc::check(IngredientsType& ing)
 /**
  * @brief apply the move to the system given as argument
  */
-template< class IngredientsType>
-void MoveAddMonomerSc::apply(IngredientsType& ing)
+template <class TagType>
+template <class IngredientsType>
+void MoveAddMonomerSc<TagType>::apply(IngredientsType& ing)
 {
   //FIRST add the new monomer at the desired position. this is because
   //some features may want to do things with it

@@ -126,12 +126,12 @@ public:
 	bool checkMove(const IngredientsType& ingredients, const MoveLocalBcc& move) const;
 
 	//! check move for adding an sc monomer
-	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerSc& move) const;
+	template<class IngredientsType, class TagType>
+	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerSc<TagType>& move) const;
 
 	//! check bcc addmove: Throw error if wrong lattice Type is used
-	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBcc& move) const;
+	template<class IngredientsType, class TagType>
+	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBcc<TagType>& move) const;
 
 	//! apply move for basic moves - does nothing
 	template<class IngredientsType>
@@ -146,8 +146,8 @@ public:
 	void applyMove(IngredientsType& ing, const MoveLocalScDiag& move);
 	
 	//! apply move for adding an sc monomer
-	template<class IngredientsType>
-	void applyMove(IngredientsType& ing, const MoveAddMonomerSc& move);
+	template<class IngredientsType, class TagType>
+	void applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move);
 
 	//! Synchronize with system: Fill the lattice with 1 (occupied) and 0 (free).
 	template<class IngredientsType>
@@ -229,10 +229,12 @@ bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove(co
  * @param [in] move MoveAddMonomerBcc, which is the wrong one in this case
  * @return false, throws an exception
  */
-/******************************************************************************/
+/*****************************************************************************
+*/
+
 template<template<typename> class LatticeClassType, typename LatticeValueType>
-template<class IngredientsType>
-bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove(const IngredientsType& ingredients, const MoveAddMonomerBcc& addmove) const
+template<class IngredientsType, class TagType>
+bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove(const IngredientsType& ingredients, const MoveAddMonomerBcc<TagType>& addmove) const
 {
 	throw std::runtime_error("*****FeatureExcludedVolumeSc::check MoveAddMonomerBcc: wrong lattice type ... \n");
 	return false;
@@ -541,8 +543,8 @@ void FeatureExcludedVolumeSc<LatticeClassType<LatticeValueType> >::applyMove(Ing
  * */
 /******************************************************************************/
 template<template<typename> class LatticeClassType, typename LatticeValueType>
-template < class IngredientsType>
-bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddMonomerSc& move ) const
+template < class IngredientsType, class TagType>
+bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveAddMonomerSc<TagType>& move ) const
 {
   if (!latticeFilledUp)
 	throw std::runtime_error("*****FeatureExcludedVolumeSc::checkMove....lattice is not populated. Run synchronize!\n");
@@ -578,8 +580,8 @@ bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( c
  * */
 /******************************************************************************/
 template<template<typename> class LatticeClassType, typename LatticeValueType>
-template<class IngredientsType>
-void FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing, const MoveAddMonomerSc& move)
+template<class IngredientsType, class TagType>
+void FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move)
 {
   VectorInt3 pos=move.getPosition();
   VectorInt3 dx(1,0,0);
