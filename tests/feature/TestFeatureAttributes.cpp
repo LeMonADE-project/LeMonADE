@@ -47,6 +47,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/ConfigureSystem.h>
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
+#include <LeMonADE/utility/AttributeTags.h>
 
 using namespace std;
 /************************************************************************/
@@ -58,11 +59,16 @@ using namespace std;
 class FeatureAttributesTest: public ::testing::Test{
   
 public:
-  typedef int32_t TagType;
+  typedef Integer TagType;
   typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes<TagType>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> MyIngredients;
 
+  //used for testing another tag type 
+  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes<MonomerLabel>) FeaturesTags;
+  typedef ConfigureSystem<VectorInt3,FeaturesTags> ConfigTags;
+  typedef Ingredients<Config> MyIngredientsTags;
+  
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
@@ -222,5 +228,22 @@ TEST_F(FeatureAttributesTest,CopyConstructor)
 	EXPECT_EQ(molecules1[4].getAttributeTag(),molecules2[4].getAttributeTag());
 	EXPECT_EQ(molecules1[4].getAttributeTag(),molecules3[4].getAttributeTag());
 
+}
+
+TEST_F(FeatureAttributesTest,AttributeTag)
+{
+  MonomerAttributeTag<MonomerLabel> tag;
+  EXPECT_EQ(0,tag.getAttributeTag().getChainID());
+  EXPECT_EQ(0,tag.getAttributeTag().getNLabels());
+  EXPECT_EQ(0,tag.getAttributeTag().getLabelID());
+  //test assign operator 
+  tag.setAttributeTag(MonomerLabel(1,23,45));
+  EXPECT_EQ(1,tag.getAttributeTag().getChainID());
+  EXPECT_EQ(23,tag.getAttributeTag().getNLabels());
+  EXPECT_EQ(45,tag.getAttributeTag().getLabelID());
+//   tag
+//   EXPECT_EQ(-1,tag.getAttributeTag());
+//   tag.setAttributeTag(15);
+//   EXPECT_EQ(15,tag.getAttributeTag());
 }
 
