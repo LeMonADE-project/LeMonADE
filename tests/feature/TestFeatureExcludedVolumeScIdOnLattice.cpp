@@ -89,7 +89,7 @@ TEST_F(TestFeatureExcludedVolumeScIdOnLattice,LatticeEntryMonomerID)
 
     //one move of every type
     MoveLocalSc scmove;
-    MoveAddMonomerSc addmove;
+    MoveAddMonomerSc<> addmove;
     ingredients.modifyMolecules().resize(3);
     ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
     ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);

@@ -1158,7 +1158,7 @@ TEST_F(NNInteractionBccTest,ApplyMoveAddMonomerBcc)
 
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
 
-    MoveAddMonomerBcc addMonomer;
+    MoveAddMonomerBcc<> addMonomer;
 
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);

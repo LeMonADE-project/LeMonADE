@@ -56,8 +56,10 @@ using namespace std;
 /************************************************************************/
 
 class FeatureAttributesTest: public ::testing::Test{
+  
 public:
-  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes) Features;
+  typedef int32_t TagType;
+  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes<TagType>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> MyIngredients;
 
@@ -79,7 +81,7 @@ private:
 
 TEST_F(FeatureAttributesTest,MonomerAttributeTag)
 {
-  MonomerAttributeTag tag;
+  MonomerAttributeTag<TagType> tag;
   EXPECT_EQ(0,tag.getAttributeTag());
   tag.setAttributeTag(-1);
   EXPECT_EQ(-1,tag.getAttributeTag());
@@ -150,7 +152,7 @@ TEST_F(FeatureAttributesTest,ReadAttributesClass)
   //this test is for testing the reaction of the read class to incorrectly
   //formatted input
   MyIngredients ingredients;
-  ReadAttributes<MyIngredients> read(ingredients);
+  ReadAttributes<MyIngredients,TagType> read(ingredients);
 
   ingredients.modifyMolecules().resize(10);
 

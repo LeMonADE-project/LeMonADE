@@ -82,7 +82,7 @@ TEST(TestFeatureWall,Moves)
 
     //one move of every type
     MoveLocalSc scmove;
-    MoveAddMonomerSc addmove;
+    MoveAddMonomerSc<> addmove;
 
     ingredients.modifyMolecules().resize(3);
     ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);

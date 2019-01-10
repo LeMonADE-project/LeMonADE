@@ -88,7 +88,7 @@ TEST_F(TestFeatureExcludedVolumeBcc,Moves)
     //one move of every type
     UnknownMove basemove;
     MoveLocalBcc bccmove;
-    MoveAddMonomerBcc addmove;
+    MoveAddMonomerBcc<> addmove;
 
     ingredients.modifyMolecules().resize(4);
     ingredients.modifyMolecules()[0].setAllCoordinates(1,1,1);
@@ -103,7 +103,7 @@ TEST_F(TestFeatureExcludedVolumeBcc,Moves)
     scmove.init(ingredients);
     EXPECT_ANY_THROW(scmove.check(ingredients));
 
-    MoveAddMonomerSc addscmove;
+    MoveAddMonomerSc<> addscmove;
     addscmove.init(ingredients);
     EXPECT_ANY_THROW(addscmove.check(ingredients));
 

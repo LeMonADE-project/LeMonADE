@@ -311,8 +311,8 @@ public:
 	 * @return True if move is allowed with p.b.c. or rejected (false).
 	 *
 	 */
-	template<class IngredientsType,class AddMoveType>
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType>& addmove) const
+	template<class IngredientsType,class AddMoveType, class TagType>
+	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType, TagType>& addmove) const
 	{
 		VectorInt3 pos=addmove.getPosition();
 

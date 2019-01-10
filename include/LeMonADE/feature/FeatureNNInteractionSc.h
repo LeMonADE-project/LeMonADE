@@ -111,7 +111,7 @@ public:
   //FeatureAttributes needs to be in front, because when a monomer is added to the system
   //by a MoveAddMonomerSc, its attribute has to be set before it is written to the lattice.
   typedef LOKI_TYPELIST_2(
-      FeatureAttributes,
+      FeatureAttributes<int32_t>,
       FeatureExcludedVolumeSc<FeatureLatticeType<lattice_value_type> >)
     required_features_front;
 
@@ -138,7 +138,7 @@ public:
 
   //! apply function for adding a monomer in sc-BFM
   template<class IngredientsType>
-    void applyMove(IngredientsType& ing, const MoveAddMonomerSc& move);
+    void applyMove(IngredientsType& ing, const MoveAddMonomerSc<int32_t>& move);
 
   //note: apply function for sc-BFM local move is not necessary, because
   //job of moving lattice entries is done by the underlying FeatureLatticeType
@@ -255,7 +255,7 @@ bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& 
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
 void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing,
-							 const MoveAddMonomerSc& move)
+							 const MoveAddMonomerSc<int32_t>& move)
 {
     //get the position and attribute tag of the monomer to be inserted
     VectorInt3 pos=move.getPosition();

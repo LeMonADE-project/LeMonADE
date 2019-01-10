@@ -156,7 +156,7 @@ private:
 
 TEST_F(UpdaterAbstractCreateTest, Constructor)
 {
-  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
 
@@ -168,7 +168,7 @@ TEST_F(UpdaterAbstractCreateTest, Constructor)
 
 TEST_F(UpdaterAbstractCreateTest, TestUpdater)
 {
-  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
 

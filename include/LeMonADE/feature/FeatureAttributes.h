@@ -77,7 +77,8 @@ private:
  * @brief Handles BFM-File-Reads \b !attributes
  * @tparam IngredientsType Ingredients class storing all system information.
  */
-template < class IngredientsType>
+template < class IngredientsType, class TagType>
+// template < class TagType> 
 class ReadAttributes: public ReadToDestination<IngredientsType>
 {
 public:
@@ -94,7 +95,8 @@ public:
  * @brief Handles BFM-File-Write \b !attributes
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
-template <class IngredientsType>
+template <class IngredientsType, class TagType>
+// template < class TagType> 
 class WriteAttributes:public AbstractWrite<IngredientsType>
 {
 public:
@@ -110,7 +112,7 @@ public:
  * @class FeatureAttributes
  * @brief Extends vertex/monomer by an attribute tag (MonomerAttributeTag) and provides read/write functionality.
  **/
-template<class TagType>
+template<class TagType=int32_t>
 class FeatureAttributes:public Feature
 {
 public:
@@ -158,7 +160,7 @@ template<class TagType>
 template<class IngredientsType>
 void FeatureAttributes<TagType>::exportRead(FileImport< IngredientsType >& fileReader)
 {
-  fileReader.registerRead("!attributes",new ReadAttributes<IngredientsType>(fileReader.getDestination()));
+  fileReader.registerRead("!attributes",new ReadAttributes<IngredientsType,TagType>(fileReader.getDestination()));
 }
 
 
@@ -175,7 +177,7 @@ template<class TagType>
 template<class IngredientsType>
 void FeatureAttributes<TagType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
-  fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType>(fileWriter.getIngredients_()));
+  fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType,TagType>(fileWriter.getIngredients_()));
 }
 
 
@@ -198,13 +200,15 @@ void FeatureAttributes<TagType>::applyMove(IngredientsType& ingredients, const M
  *
  * @throw <std::runtime_error> attributes and identifier could not be read.
  **/
-template < class IngredientsType>
-void ReadAttributes<IngredientsType>::execute()
+template < class IngredientsType, class TagType >
+// template <class TagType >
+void ReadAttributes<IngredientsType,TagType>::execute()
 {
   //some variables used during reading
   //counts the number of attribute lines in the file
   int nAttributes=0;
-  int startIndex,stopIndex,attribute;
+  int startIndex,stopIndex;
+  TagType attribute;
   //contains the latest line read from file
   std::string line;
   //used to reset the position of the get pointer after processing the command
@@ -304,8 +308,9 @@ void ReadAttributes<IngredientsType>::execute()
 
 
 //! Executes the routine to write \b !attributes.
-template < class IngredientsType>
-void WriteAttributes<IngredientsType>::writeStream(std::ostream& strm)
+template < class IngredientsType, class TagType>
+// template <class TagType >
+void WriteAttributes<IngredientsType,TagType>::writeStream(std::ostream& strm)
 {
   //for all output the indices are increased by one, because the file-format
   //starts counting indices at 1 (not 0)

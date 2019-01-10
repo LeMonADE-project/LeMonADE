@@ -42,7 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 template<class TagType=int32_t>
-class MoveAddMonomerSc : public MoveAddMonomerBase<MoveAddMonomerSc, TagType>
+class MoveAddMonomerSc : public MoveAddMonomerBase<MoveAddMonomerSc<TagType>, TagType>
 {
 public:
   MoveAddMonomerSc(){};

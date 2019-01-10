@@ -135,7 +135,7 @@ protected:
 		ingredients.modifyMolecules()[3].setAllCoordinates(0,3,0);
 	}
 	//define system
-	typedef LOKI_TYPELIST_1(FeatureAttributes) Features;
+	typedef LOKI_TYPELIST_1(FeatureAttributes<>) Features;
 	typedef ConfigureSystem<VectorInt3,Features> Config;
 	typedef Ingredients < Config> MyIngredients;
 	MyIngredients ingredients;
