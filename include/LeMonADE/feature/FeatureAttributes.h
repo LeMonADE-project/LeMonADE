@@ -96,7 +96,6 @@ public:
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
 template <class IngredientsType, class TagType>
-// template < class TagType> 
 class WriteAttributes:public AbstractWrite<IngredientsType>
 {
 public:
@@ -309,7 +308,6 @@ void ReadAttributes<IngredientsType,TagType>::execute()
 
 //! Executes the routine to write \b !attributes.
 template < class IngredientsType, class TagType>
-// template <class TagType >
 void WriteAttributes<IngredientsType,TagType>::writeStream(std::ostream& strm)
 {
   //for all output the indices are increased by one, because the file-format

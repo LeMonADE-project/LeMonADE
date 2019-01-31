@@ -145,6 +145,7 @@ public:
     NLabels=NLabels_ ;
     LabelID=LabelID_ ;
   }
+  //!set all information 
   void     setAll(const std::vector<uint32_t> in_)
   {
     ChainID=in_[0] ;
@@ -158,6 +159,13 @@ public:
     Labels[1]=(NLabels);
     Labels[2]=(LabelID);
     return Labels;
+  }
+  //! reset all info to the default value
+  void reset()
+  {
+    ChainID=0;
+    NLabels=0;
+    LabelID=0;
   }
   
 private:

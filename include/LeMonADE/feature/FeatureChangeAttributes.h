@@ -38,7 +38,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Handles BFM-File-Write \b !changeattributes
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
-template <class IngredientsType>
+template <class IngredientsType, class TagType>
 class WriteChangeAttributes:public AbstractWrite<IngredientsType>
 {
 public:
@@ -55,13 +55,14 @@ public:
  * @class FeatureChangeAttributes
  * @brief Extends vertex/monomer by an attribute tag (MonomerAttributeTag) and provides read/write functionality as well as the motivication during the simulation.
  **/
-class FeatureChangeAttributes:public FeatureAttributes
+template<class TagType=int32_t>
+class FeatureChangeAttributes:public FeatureAttributes<TagType>
 {
 public:
   //! This Feature requires a monomer_extensions.
-  typedef LOKI_TYPELIST_1(MonomerAttributeTag) monomer_extensions;
+  typedef LOKI_TYPELIST_1(MonomerAttributeTag<TagType>) monomer_extensions;
   
-  typedef LOKI_TYPELIST_1(FeatureAttributes) required_features_back;
+  typedef LOKI_TYPELIST_1(FeatureAttributes<TagType>) required_features_back;
 
   //! Export the relevant functionality for reading bfm-files to the responsible reader object
   template<class IngredientsType>
@@ -92,10 +93,11 @@ public:
  * @param destination List of Feature to write-in from the read values.
  * @tparam IngredientsType Features used in the system. See Ingredients.
  **/
+template<class TagType>
 template<class IngredientsType>
-void FeatureChangeAttributes::exportRead(FileImport< IngredientsType >& fileReader)
+void FeatureChangeAttributes<TagType>::exportRead(FileImport< IngredientsType >& fileReader)
 {
-  auto  reader = new ReadAttributes<IngredientsType>(fileReader.getDestination());
+  auto  reader = new ReadAttributes<IngredientsType,TagType>(fileReader.getDestination());
 //   fileReader.registerRead("!attributes",reader);
   fileReader.registerRead("!changeattributes",reader);
 }
@@ -109,19 +111,20 @@ void FeatureChangeAttributes::exportRead(FileImport< IngredientsType >& fileRead
  *
  * @param fileWriter File writer for the bfm-file.
  */
+template<class TagType>
 template<class IngredientsType>
-void FeatureChangeAttributes::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
+void FeatureChangeAttributes<TagType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
 //   fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType>(fileWriter.getIngredients_()));
-  fileWriter.registerWrite("!changeattributes",new WriteChangeAttributes<IngredientsType>(fileWriter.getIngredients_()));
+  fileWriter.registerWrite("!changeattributes",new WriteChangeAttributes<IngredientsType,TagType>(fileWriter.getIngredients_()));
 }
 
 
 
 
 //! Executes the routine to write \b !changeattributes.
-template < class IngredientsType>
-void WriteChangeAttributes<IngredientsType>::writeStream(std::ostream& strm)
+template < class IngredientsType, class TagType>
+void WriteChangeAttributes<IngredientsType,TagType>::writeStream(std::ostream& strm)
 {
   //for all output the indices are increased by one, because the file-format
   //starts counting indices at 1 (not 0)
@@ -137,7 +140,7 @@ void WriteChangeAttributes<IngredientsType>::writeStream(std::ostream& strm)
   //counter varable
   size_t n=0;
   //attribute to be written (updated in loop below)
-  int attribute=molecules[0].getAttributeTag();
+  TagType attribute=molecules[0].getAttributeTag();
 
   //write attibutes (blockwise)
   while(n<nMonomers){
