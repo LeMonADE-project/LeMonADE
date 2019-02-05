@@ -73,8 +73,7 @@ class MoveConnectBase:public MoveBase
 	template <class IngredientsType> void init(const IngredientsType& ingredients);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t bondpartner);
-	template <class IngredientsType> void init(const IngredientsType& ing, VectorInt3 dir);
-	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
+
 	template <class IngredientsType> void check(const IngredientsType& ingredients);
 	template <class IngredientsType> void apply(IngredientsType& ingredients);
 
@@ -91,25 +90,6 @@ class MoveConnectBase:public MoveBase
 	 */
 	void setPartner(uint32_t i) {bondpartner=i;}
 
-	
-	/**
-	 * @brief Set the move direction of the Vertex (monomer) which should be moved
-	 * @param dir The displacement in direction on the Cartesian-space.
-	 */
-	void setDir(const VectorInt3& dir) {direction=dir;}
-
-	/**
-	 * @brief Set the move direction of the Vertex (monomer) which should be moved
-	 *
-	 * @param dx The displacement in x-direction in the Cartesian space
-	 * @param dy The displacement in y-direction in the Cartesian space
-	 * @param dz The displacement in z-direction in the Cartesian space
-	 */
-	void setDir(const int32_t dx, const int32_t dy, const int32_t dz)
-	{
-		direction.setAllCoordinates(dx,dy,dz);
-	}
-
 	//! Random Number Generator (RNG)
 	RandomNumberGenerators randomNumbers;
 
@@ -122,8 +102,6 @@ class MoveConnectBase:public MoveBase
 	//! Index of the Vertex (monomer) in the graph which is intented for connecting to the index 
 	uint32_t bondpartner;
 	
-	//! Direction for the move
-	VectorInt3 direction;
 };
 
 
@@ -182,39 +160,6 @@ void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, 
   static_cast<SpecializedMove*>(this)->init(ingredients, index, bondpartner);
 }
 
-/*****************************************************************************/
-/**
- * @brief Initialize the move with a given direction. Done by the SpecializedMove.
- *
- * @details Here, this is only redirected to the implementation
- * given in the template parameter
- *
- * @tparam <SpecializedMove> name of the specialized move.
- **/
-/*****************************************************************************/
-template <class SpecializedMove>
-template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, VectorInt3 dir)
-{
-  static_cast<SpecializedMove*>(this)->init(ingredients, dir);
-}
-
-/*****************************************************************************/
-/**
- * @brief Initialize the move with a given monomer index and direction. Done by the SpecializedMove.
- *
- * @details Here, this is only redirected to the implementation
- * given in the template parameter
- *
- * @tparam <SpecializedMove> name of the specialized move.
- **/
-/*****************************************************************************/
-template <class SpecializedMove>
-template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, VectorInt3 dir)
-{
-  static_cast<SpecializedMove*>(this)->init(ingredients, index, dir);
-}
 /*****************************************************************************/
 /**
  * @brief Check if the move is accepted by the system. Done by the SpecializedMove.

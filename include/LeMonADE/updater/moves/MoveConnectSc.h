@@ -28,36 +28,65 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LEMONADE_UPDATER_MOVES_MOVELOCALSC_H
 #define LEMONADE_UPDATER_MOVES_MOVELOCALSC_H
 
-#include <LeMonADE/updater/moves/MoveLocalBase.h>
+#include <LeMonADE/updater/moves/MoveConnectBase.h>
 
 /*****************************************************************************/
 /**
  * @file
  *
- * @class MoveLocalSc
+ * @class MoveConnectSc
  *
  * @brief Standard local bfm-move on simple cubic lattice for the scBFM.
  *
  * @details The class is a specialization of MoveLocalBase using the (CRTP) to avoid virtual functions.
  **/
 /*****************************************************************************/
-class MoveLocalSc:public MoveLocalBase<MoveLocalSc>
+class MoveConnectSc:public MoveConnectBase<MoveConnectSc>
 {
 public:
-  MoveLocalSc(){
-	steps[0]=VectorInt3(1,0,0);
-	steps[1]=VectorInt3(-1,0,0);
-	steps[2]=VectorInt3(0,1,0);
-	steps[3]=VectorInt3(0,-1,0);
-	steps[4]=VectorInt3(0,0,1);
-	steps[5]=VectorInt3(0,0,-1);
+  MoveConnectSc(){
+    shellPositions[0]=VectorInt3( 2, 0, 0);
+    shellPositions[1]=VectorInt3(-1, 0, 0);
+    shellPositions[2]=VectorInt3( 0, 2, 0);
+    shellPositions[3]=VectorInt3( 0,-1, 0);
+    shellPositions[4]=VectorInt3( 0, 0, 2);
+    shellPositions[5]=VectorInt3( 0, 0,-1);
+	
+// 	shellPositions[ 0]=VectorInt3(2,0,0);
+// 	shellPositions[ 1]=VectorInt3(2,0,1);
+// 	shellPositions[ 2]=VectorInt3(2,1,0);
+// 	shellPositions[ 3]=VectorInt3(2,1,1);
+// 	
+// 	shellPositions[ 4]=VectorInt3(-1,0,0);
+// 	shellPositions[ 5]=VectorInt3(-1,0,1);
+// 	shellPositions[ 6]=VectorInt3(-1,1,0);
+// 	shellPositions[ 7]=VectorInt3(-1,1,1);
+// 	
+// 	shellPositions[ 8]=VectorInt3(0,2,0);
+// 	shellPositions[ 9]=VectorInt3(1,2,0);
+// 	shellPositions[10]=VectorInt3(0,2,1);
+// 	shellPositions[11]=VectorInt3(1,2,1);
+// 	
+// 	shellPositions[12]=VectorInt3(0,-1,0);
+// 	shellPositions[13]=VectorInt3(1,-1,0);
+// 	shellPositions[14]=VectorInt3(0,-1,1);
+// 	shellPositions[15]=VectorInt3(1,-1,1);
+// 	
+// 	shellPositions[16]=VectorInt3(0,0,2);
+// 	shellPositions[17]=VectorInt3(0,1,2);
+// 	shellPositions[18]=VectorInt3(1,0,2);
+// 	shellPositions[19]=VectorInt3(1,1,2);
+// 	
+// 	shellPositions[20]=VectorInt3(0,0,-1);
+// 	shellPositions[21]=VectorInt3(0,1,-1);
+// 	shellPositions[22]=VectorInt3(1,0,-1);
+// 	shellPositions[23]=VectorInt3(1,1,-1);
   }
 
   // overload initialise function to be able to set the moves index and direction if neccessary
   template <class IngredientsType> void init(const IngredientsType& ing);
   template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
-  template <class IngredientsType> void init(const IngredientsType& ing, VectorInt3 dir);
-  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
+  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t bondpartner);
 
   template <class IngredientsType> bool check(IngredientsType& ing);
   template< class IngredientsType> void apply(IngredientsType& ing);
@@ -67,16 +96,20 @@ private:
   /**
    * @brief Array that holds the 6 possible move directions
    *
-   * @details In the scBFM the classic moves (dx,dy,dz) are along the lattice-axes as:
-   * * steps   = (dx, dy, dz)
-   * * steps[0]= ( 1,  0,  0);
-   * * steps[1]= (-1,  0,  0);
-   * * steps[2]= ( 0,  1,  0);
-   * * steps[3]= ( 0, -1,  0);
-   * * steps[4]= ( 0,  0,  1);
-   * * steps[5]= ( 0,  0, -1);
+   * @details In the scBFM where each monomer occupies 8 lattice sites and only one position is store (front, bottom, left) 
+   * there are 1 positions in every move direction, which could be checked. But the positive directions have an offset due to the 
+   * * shellPositions   = (dx, dy, dz)
+   * * shellPositions[0]= ( 2,  0,  0);
+   * * shellPositions[1]= (-1,  0,  0);
+   * * shellPositions[2]= ( 0,  2,  0);
+   * * shellPositions[3]= ( 0, -1,  0);
+   * * shellPositions[4]= ( 0,  0,  2);
+   * * shellPositions[5]= ( 0,  0, -1);
+   * -1 {-1,0,1}
+   * 0 {-1,0,1}
+   * 1 {-1,0,1}
    */
-  VectorInt3 steps[6];
+  VectorInt3 shellPositions[6];
 };
 
 
@@ -94,7 +127,7 @@ private:
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template <class IngredientsType>
-void MoveLocalSc::init(const IngredientsType& ing)
+void MoveConnectSc::init(const IngredientsType& ing)
 {
   this->resetProbability();
 
@@ -103,8 +136,7 @@ void MoveLocalSc::init(const IngredientsType& ing)
 
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
-  this->setDir(steps[randomDir]);
-
+  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[Mon] + shellPositions[randomDir]) );
 }
 
 /*****************************************************************************/
@@ -114,10 +146,10 @@ void MoveLocalSc::init(const IngredientsType& ing)
  * @details Resets the move probability to unity. Dice a new random direction.
  *
  * @param ing A reference to the IngredientsType - mainly the system
- * @param index index of the monomer to be moved
+ * @param index index of the monomer to be connected
  **/
 template <class IngredientsType>
-void MoveLocalSc::init(const IngredientsType& ing, uint32_t index)
+void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
 {
   this->resetProbability();
 
@@ -125,56 +157,25 @@ void MoveLocalSc::init(const IngredientsType& ing, uint32_t index)
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
-    throw std::runtime_error("MoveLocalSc::init(ing, index): index out of range!");
+    throw std::runtime_error("MoveConnectSc::init(ing, index): index out of range!");
 
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
-  this->setDir(steps[randomDir]);
-
+  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[Mon] + shellPositions[randomDir]) );
 }
 
 /*****************************************************************************/
 /**
- * @brief Initialize the move with a given direction.
+ * @brief Initialize the move with a given monomer index.
  *
- * @details Resets the move probability to unity. Dice a random monomer index and set move direction.
- *
- * @param ing A reference to the IngredientsType - mainly the system
- * @param dir The direction of the move: must be one of the vectors P+-(1,0,0).
- **/
-template <class IngredientsType>
-void MoveLocalSc::init(const IngredientsType& ing, VectorInt3 dir)
-{
-  this->resetProbability();
-
-  //draw index
-  this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-
-  //set direction
-  if(dir==steps[0] ||
-    dir==steps[1] ||
-    dir==steps[2] ||
-    dir==steps[3] ||
-    dir==steps[4] ||
-    dir==steps[5]  )
-    this->setDir(dir);
-  else
-    throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
-
-}
-
-/*****************************************************************************/
-/**
- * @brief Initialize the move with a given monomer index and a given direction.
- *
- * @details Resets the move probability to unity and set the move properties index and direction.
+ * @details Resets the move probability to unity. Dice a new random direction.
  *
  * @param ing A reference to the IngredientsType - mainly the system
- * @param index index of the monomer to be moved
- * @param dir The direction of the move: must be one of the vectors P+-(1,0,0).
+ * @param index index of the monomer to be connected
+ * @param bondpartner index of the monomer to connect to 
  **/
 template <class IngredientsType>
-void MoveLocalSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir)
+void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t bondpartner )
 {
   this->resetProbability();
 
@@ -182,18 +183,13 @@ void MoveLocalSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 di
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
-    throw std::runtime_error("MoveLocalSc::init(ing, index, dir): index out of range!");
+    throw std::runtime_error("MoveConnectSc::init(ing, index, bondpartner): index out of range!");
 
-  //set direction
-  if(dir==steps[0] ||
-    dir==steps[1] ||
-    dir==steps[2] ||
-    dir==steps[3] ||
-    dir==steps[4] ||
-    dir==steps[5]  )
-    this->setDir(dir);
+  //set bond partner
+  if( (bondpartner >= 0) && (bondpartner <= (ing.getMolecules().size()-1)) )
+    this->setPartner( bondpartner );
   else
-    throw std::runtime_error("MoveLocalSc::init(ing, index, dir): direction vector out of range!");
+    throw std::runtime_error("MoveConnectSc::init(ing, index, bondpartner): bondpartner out of range!");
 }
 
 /*****************************************************************************/
@@ -206,7 +202,7 @@ void MoveLocalSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 di
  * @return True if move is valid. False, otherwise.
  **/
 template <class IngredientsType>
-bool MoveLocalSc::check(IngredientsType& ing)
+bool MoveConnectSc::check(IngredientsType& ing)
 {
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
@@ -222,7 +218,7 @@ bool MoveLocalSc::check(IngredientsType& ing)
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template< class IngredientsType>
-void MoveLocalSc::apply(IngredientsType& ing)
+void MoveConnectSc::apply(IngredientsType& ing)
 {
 	///@todo Think about the applying of move. Esp. make this independent of the order to avoid confusion!!
 	///@todo check if it makes any difference in this case?!
