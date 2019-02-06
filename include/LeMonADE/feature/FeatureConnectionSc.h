@@ -27,16 +27,51 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef LEMONADE_FEATURE_FEATURECONNECTIONSC_H
 #define LEMONADE_FEATURE_FEATURECONNECTIONSC_H
+
 #include <LeMonADE/feature/Feature.h>
-#include <LeMonADE/feature/FeatureConnectionScIdOnLattice.h>
+#include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
-#include <LeMonADE/updater/moves/MoveLocalSc.h>
-#include <LeMonADE/updater/moves/MoveLocalScDiag.h>
-#include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
-#include <LeMonADE/updater/moves/MoveLocalBcc.h>
-#include <LeMonADE/updater/moves/MoveAddMonomerBcc.h>
 #include <LeMonADE/updater/moves/MoveConnectBase.h>
 #include <LeMonADE/updater/moves/MoveConnectSc.h>
+
+/**
+ * @class MonomerReactivity
+ * @brief set the monomer reactive or unreactive 
+ * 
+ */
+class MonomerReactivity
+{
+  public:
+
+	//! Standard constructor- initially the reactivity is set to false.
+	MonomerReactivity():reactivity(false),nMaxBonds(2){}
+
+	//! Getting the reactivity of the monomer.
+	bool IsReactive() const {return reactivity;}
+	
+	//! Getting the number of maximum possible bonds for the monomer.
+	uint32_t getNMaxBonds() const {return nMaxBonds;};
+
+	/**
+	 * @brief Setting the reactivity of the monomer with \para reactivity_.
+	 *
+	 * @param reactivity_ either trueor false
+	 */
+	void setReactive(bool reactivity_){ reactivity=reactivity_;}
+	/**
+	 * @brief Setting the maximum possible bonds of the monomer with \para nMaxBonds_.
+	 *
+	 * @param nMaxBonds_ 
+	 */	
+	void setNMaxBonds(uint32_t nMaxBonds_){nMaxBonds=nMaxBonds_;} 
+
+private:
+     //! Private variable holding the tag. Default is NULL.
+     bool reactivity;
+     //!
+     uint32_t nMaxBonds;
+     
+};
 
 /*****************************************************************************/
 /**
@@ -52,72 +87,77 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @tparam 
  * */
 /*****************************************************************************/
-
+/**
+ * @brief Forward declaration. Equivalent to FeatureExcludedVolumeSc< FeatureLattice <uint32_t> >
+ */
+template<class LatticeClassType = FeatureLattice<uint32_t> > class FeatureConnectionSc;
 
 ///////////////////////////////////////////////////////////////////////////////
 //DEFINITION OF THE CLASS TEMPLATE   	                                ///////
 //Implementation of the members below					///////
 ///////////////////////////////////////////////////////////////////////////////
-
-class FeatureConnectionSc : public Feature {
+template<template<typename> class LatticeClassType, typename LatticeValueType>
+class FeatureConnectionSc< LatticeClassType<LatticeValueType> > : public Feature {
   
-typedef FeatureExcludedVolumeScIdOnLattice<FeatureLatticePowerOfTwo<uint32_t>, MonomerID  > ExcludedVolumeFeature;
 public:
-  
-	//! This Feature requires a lattice.
-	typedef LOKI_TYPELIST_1(ExcludedVolumeFeature) required_features_front;
+  	//! This Feature requires a lattice.
+	typedef LOKI_TYPELIST_1(LatticeClassType<LatticeValueType>) required_features_front;
+	//! This Feature requires a monomer_extensions.
+	typedef LOKI_TYPELIST_1(MonomerReactivity) monomer_extensions;
+
+	/**
+	 * Returns true if the underlying lattice is synchronized and all excluded volume condition
+	 * (e.g. monomer/vertex occupies lattice edges) is applied.
+	 * Returns false if this feature is out-of-sync.
+	 *
+	 * @return true if this feature is synchronized
+	 * 		   false if this feature is out-of-sync.
+	 **/
+	bool isLatticeFilledUp() const {
+		return latticeFilledUp;
+	}
+
+	/**
+	 * Set's the need of synchronization of this feature e.g. escp. if the underlying lattice needs
+	 * to refilled and if all excluded volume condition needs to be updated.
+	 *
+	 * @param[in] latticeFilledUp Specified if ExVol should be refilled (false) or everything is in-sync (true).
+	 *
+	 **/
+	void setLatticeFilledUp(bool latticeFilledUp) {
+		this->latticeFilledUp = latticeFilledUp;
+	}
 
 	//constructor
-	FeatureConnectionSc() :
+	FeatureConnectionSc() :latticeFilledUp(false)
 	{}
 
-	//! check move for basic move - always true
-	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients, const MoveBase& move) const;
-
-	//! check move for sc local move: Throw error if wrong lattice Type is used
-	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients, const MoveLocalSc& move) const;
-
-	//! check move for sc local diagonal move : Throw error if wrong lattice Type is used
-	template<class IngredientsType>	
-	bool checkMove( const IngredientsType& ingredients, const MoveLocalScDiag& move ) const;
-	//! check bcc move: Throw error if wrong lattice Type is used
-	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients, const MoveLocalBcc& move) const;
-
-	//! check move for adding an sc monomer : Throw error if wrong lattice Type is used
-	template<class IngredientsType, class TagType>
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerSc<TagType>& move) const;
-
-	//! check bcc addmove: Throw error if wrong lattice Type is used
-	template<class IngredientsType, class TagType>
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBcc<TagType>& move) const;
+// 	//! check move for basic move - always true
+// 	template<class IngredientsType>
+// 	bool checkMove(const IngredientsType& ingredients, const MoveBase& move) const;
 
 	//! check bas connect move - always true 
-	template<class IngredientsType, class TagType>
+	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveConnectBase& move) const;
 	
 	//! check bas connect move 
-	template<class IngredientsType, class TagType>
+	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveConnectSc& move) const;
 	
-	//! apply move for basic moves - does nothing
-	template<class IngredientsType>
-	void applyMove(IngredientsType& ing, const MoveBase& move);
-
-	//! apply move for local sc moves
-	template<class IngredientsType>
-	void applyMove(IngredientsType& ing, const MoveLocalSc& move);
 	
-	//! apply move for local sc diagonal moves 
-	template<class IngredientsType>
-	void applyMove(IngredientsType& ing, const MoveLocalScDiag& move);
+// 	//! apply move for basic moves - does nothing
+// 	template<class IngredientsType>
+// 	void applyMove(IngredientsType& ing, const MoveBase& move);
 	
-	//! apply move for adding an sc monomer
-	template<class IngredientsType, class TagType>
-	void applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move);
-
+	//! apply move for the baseic connection - does nothing
+	template<class IngredientsType>
+	void applyMove(IngredientsType& ing, const MoveConnectBase& move) const;
+	
+	//!apply move for the scBFM connection move for connection
+	template<class IngredientsType>
+	void applyMove(IngredientsType& ing, const MoveConnectSc& move) const;
+	
+	
 	//! Synchronize with system: Fill the lattice with 1 (occupied) and 0 (free).
 	template<class IngredientsType>
 	void synchronize(IngredientsType& ingredients);
@@ -138,178 +178,6 @@ protected:
 
 /******************************************************************************/
 /**
- * @fn bool FeatureConnectionSc::checkMove( const IngredientsType& ingredients, const MoveBase& move )const
- * @brief Returns true for all moves other than the ones that have specialized versions of this function.
- * This dummy function is implemented for generality.
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
- * @return true Always!
- */
-/******************************************************************************/
-template<class IngredientsType>
-bool FeatureConnectionSc::checkMove(const IngredientsType& ingredients, const MoveBase& move) const
-{
-	return true;
-}
-
-/******************************************************************************/
-/**
- * @fn void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveBase& move)
- * @brief This function applies for unknown moves other than the ones that have specialized versions of this function.
- * It does nothing and is implemented for generality.
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
- */
-/******************************************************************************/
- 
-template<class IngredientsType>
-void FeatureConnectionSc ::applyMove(IngredientsType& ing,const MoveBase& move)
-{
-
-}
-
-/******************************************************************************/
-/**
- * @fn bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveLocalBcc& move )const
- * @brief Throws a runtime error because the lattice type is inconsitent with the move type
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move MoveLocalBcc, which is the wrong one in this case
- * @return false, throws an exception
- */
-/******************************************************************************/
- 
-template<class IngredientsType>
-bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const MoveLocalBcc& move) const
-{
-	throw std::runtime_error("*****FeatureConnectionSc::check MoveLocalBcc: wrong move for connection ... \n");
-	return false;
-}
-
-/******************************************************************************/
-/**
- * @fn bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveAddMonomerBcc& addmove )const
- * @brief Throws a runtime error because the lattice type is inconsitent with the move type
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move MoveAddMonomerBcc, which is the wrong one in this case
- * @return false, throws an exception
- */
-/*****************************************************************************
-*/
-
- 
-template<class IngredientsType, class TagType>
-bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const MoveAddMonomerBcc<TagType>& addmove) const
-{
-	throw std::runtime_error("*****FeatureConnectionSc::check MoveAddMonomerBcc: wrong move for connection ... \n");
-	return false;
-}
-
-/******************************************************************************/
-/**
- * @fn bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveLocalSc& move )const
- * @brief checks excluded volume for moves of type MoveLocalSc
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system.
- * @param [in] move A reference to MoveLocalSc.
- * @return if move is allowed (\a true) or rejected (\a false).
- * */
-/******************************************************************************/
- 
-template < class IngredientsType>
-bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveLocalSc& move ) const
-{
-	throw std::runtime_error("*****FeatureConnectionSc::check MoveLocalSc: wrong move for connection ... \n");
-	return false;
-}
-
-/******************************************************************************/
-/**
- * @fn bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveLocalScDiag& move )const
- * @brief checks excluded volume for moves of type MoveLocalScDiag
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system.
- * @param [in] move A reference to MoveLocalSc.
- * @return if move is allowed (\a true) or rejected (\a false).
- * */
-/******************************************************************************/
- 
-template < class IngredientsType>
-bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveLocalScDiag& move ) const
-{
-	throw std::runtime_error("*****FeatureConnectionSc::check MoveLocalScDiag: wrong move for connection ... \n");
-	return false;
-}
-/******************************************************************************/
-/**
- * @fn void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveLocalSc<LocalMoveType>& move)
- * @brief Updates the lattice occupation according to the move for moves of type MoveLocalSc.
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system.
- * @param [in] move A reference to MoveLocalSc.
- * */
-/******************************************************************************/
- 
-template<class IngredientsType>
-void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveLocalSc& move)
-{
-	
-
-}
-/******************************************************************************/
-/**
- * @fn void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveLocalScDiag& move)
- * @brief updates the lattice ocupation according to the move for types MoveLocalScDiag 
- * 
- * @param [in] ingredients A reference to the IngredientsType - mainly the system.
- * @param [in] move A reference to MoveLocalSc.
- * */
-/******************************************************************************/
- 
-template<class IngredientsType>
-void FeatureConnectionSc<LatticeClassType<LatticeValueType> >::applyMove(IngredientsType& ing, const MoveLocalScDiag& move)
-{       
-	
-}
-
-/******************************************************************************/
-/**
- * @fn bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveAddMonomerSc& move )const
- * @brief check excluded volume for insertion of a monomer on a sc lattice
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system.
- * @param [in] move A reference to MoveAddMonomerSc.
- * */
-/******************************************************************************/
- 
-template < class IngredientsType, class TagType>
-bool FeatureConnectionSc ::checkMove( const IngredientsType& ingredients, const MoveAddMonomerSc<TagType>& move ) const
-{
- 	throw std::runtime_error("*****FeatureConnectionSc::check MoveAddMonomerSc: wrong move for connection ... \n");
-	return false;
-}
-
-
-/******************************************************************************/
-/**
- * @fn void FeatureConnectionSc ::applyMove( const IngredientsType& ingredients, const MoveAddMonomerSc& move )const
- * @brief apply excluded volume for MoveAddMonomerSc.
- *
- * @param [in] ingredients A reference to the IngredientsType - mainly the system.
- * @param [in] move A reference to MoveAddMonomerSc.
- * */
-/******************************************************************************/
- 
-template<class IngredientsType, class TagType>
-void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move)
-{
-}
-
-/******************************************************************************/
-/**
  * @fn bool FeatureConnectionSc::checkMove( const IngredientsType& ingredients, const MoveConnectBase& move )const
  * @brief Returns true for all moves other than the ones that have specialized versions of this function.
  * This dummy function is implemented for generality.
@@ -319,6 +187,7 @@ void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveAddMonomerS
  * @return true Always!
  */
 /******************************************************************************/
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
 bool FeatureConnectionSc::checkMove(const IngredientsType& ingredients, const MoveConnectBase& move) const
 {
@@ -334,9 +203,9 @@ bool FeatureConnectionSc::checkMove(const IngredientsType& ingredients, const Mo
  * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
  */
 /******************************************************************************/
- 
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-void FeatureConnectionSc ::applyMove(IngredientsType& ing,const MoveConnectBase& move)
+void FeatureConnectionSc< LatticeClassType<LatticeValueType> > ::applyMove(IngredientsType& ing,const MoveConnectBase& move)
 {
 
 }
@@ -351,8 +220,9 @@ void FeatureConnectionSc ::applyMove(IngredientsType& ing,const MoveConnectBase&
  * @return true Always!
  */
 /******************************************************************************/
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-bool FeatureConnectionSc::checkMove(const IngredientsType& ingredients, const MoveConnectSc& move) const
+bool FeatureConnectionSc< LatticeClassType<LatticeValueType> >::checkMove(const IngredientsType& ingredients, const MoveConnectSc& move) const
 {
   ///@todo implementation 
   
@@ -368,9 +238,9 @@ bool FeatureConnectionSc::checkMove(const IngredientsType& ingredients, const Mo
  * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
  */
 /******************************************************************************/
- 
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-void FeatureConnectionSc ::applyMove(IngredientsType& ing,const MoveConnectSc& move)
+void FeatureConnectionSc< LatticeClassType<LatticeValueType> > ::applyMove(IngredientsType& ing,const MoveConnectSc& move)
 {
 
 }
@@ -383,12 +253,48 @@ void FeatureConnectionSc ::applyMove(IngredientsType& ing,const MoveConnectSc& m
  * @param ingredients A reference to the IngredientsType - mainly the system.
  */
 /******************************************************************************/
- 
+template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<class IngredientsType>
-void FeatureConnectionSc ::synchronize(IngredientsType& ingredients)
+void FeatureConnectionSc< LatticeClassType<LatticeValueType> > ::synchronize(IngredientsType& ingredients)
 {
 
-// 	std::cout << "FeatureConnectionSc::synchronizing lattice occupation...\n";
-// 	std::cout << "done\n";
+	std::cout << "FeatureConnectionSc::synchronizing lattice occupation...\n";
+	fillLattice(ingredients);
+	std::cout << "done\n";
+}
+
+
+/******************************************************************************/
+/**
+ * @fn void FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::fillLattice(IngredientsType& ingredients)
+ * @brief This function populates the lattice directly with positions from molecules.
+ * It also has a simple check if the target lattice is already occupied.
+ *
+ * @param ingredients A reference to the IngredientsType - mainly the system.
+ * */
+/******************************************************************************/
+template<template<typename> class LatticeClassType, typename LatticeValueType>
+template<class IngredientsType>
+void FeatureConnectionSc< LatticeClassType<LatticeValueType> >::fillLattice(IngredientsType& ingredients)
+{
+	const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+	//copy the lattice occupation from the monomer coordinates
+	for(size_t n=0;n<molecules.size();n++)
+	{
+		VectorInt3 pos=ingredients.getMolecules()[n];
+		if( ingredients.getLatticeEntry(pos)!=0 )
+		{
+			throw std::runtime_error("********** FeatureConnectionSc::fillLattice: multiple lattice occupation ******************");
+		}
+		else if (ingredients.getMolecules()[n].IsReactive())
+		{
+			//here we simply set the monomer id (plus one!) on the lattice site 
+			// the offset implies that the index zero is still used for unoccupied
+			// with and unreactive monomer
+			VectorInt3 pos=molecules[n];
+			ingredients.setLatticeEntry(pos,n+1);
+		}
+	}
+	latticeFilledUp=true;
 }
 #endif

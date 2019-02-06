@@ -46,11 +46,11 @@ class MoveConnectSc:public MoveConnectBase<MoveConnectSc>
 public:
   MoveConnectSc(){
     shellPositions[0]=VectorInt3( 2, 0, 0);
-    shellPositions[1]=VectorInt3(-1, 0, 0);
+    shellPositions[1]=VectorInt3(-2, 0, 0);
     shellPositions[2]=VectorInt3( 0, 2, 0);
-    shellPositions[3]=VectorInt3( 0,-1, 0);
+    shellPositions[3]=VectorInt3( 0,-2, 0);
     shellPositions[4]=VectorInt3( 0, 0, 2);
-    shellPositions[5]=VectorInt3( 0, 0,-1);
+    shellPositions[5]=VectorInt3( 0, 0,-2);
 	
 // 	shellPositions[ 0]=VectorInt3(2,0,0);
 // 	shellPositions[ 1]=VectorInt3(2,0,1);
@@ -96,18 +96,14 @@ private:
   /**
    * @brief Array that holds the 6 possible move directions
    *
-   * @details In the scBFM where each monomer occupies 8 lattice sites and only one position is store (front, bottom, left) 
-   * there are 1 positions in every move direction, which could be checked. But the positive directions have an offset due to the 
+   * @details 
    * * shellPositions   = (dx, dy, dz)
    * * shellPositions[0]= ( 2,  0,  0);
-   * * shellPositions[1]= (-1,  0,  0);
+   * * shellPositions[1]= (-2,  0,  0);
    * * shellPositions[2]= ( 0,  2,  0);
-   * * shellPositions[3]= ( 0, -1,  0);
+   * * shellPositions[3]= ( 0, -2,  0);
    * * shellPositions[4]= ( 0,  0,  2);
-   * * shellPositions[5]= ( 0,  0, -1);
-   * -1 {-1,0,1}
-   * 0 {-1,0,1}
-   * 1 {-1,0,1}
+   * * shellPositions[5]= ( 0,  0, -2);
    */
   VectorInt3 shellPositions[6];
 };
@@ -136,7 +132,7 @@ void MoveConnectSc::init(const IngredientsType& ing)
 
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
-  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[Mon] + shellPositions[randomDir]) );
+  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[this->getIndex()] + shellPositions[randomDir]) );
 }
 
 /*****************************************************************************/
@@ -161,7 +157,7 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
 
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
-  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[Mon] + shellPositions[randomDir]) );
+  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[this->getIndex()] + shellPositions[randomDir]) );
 }
 
 /*****************************************************************************/
@@ -175,7 +171,7 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
  * @param bondpartner index of the monomer to connect to 
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t bondpartner )
+void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir )
 {
   this->resetProbability();
 
@@ -185,11 +181,16 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t bo
   else
     throw std::runtime_error("MoveConnectSc::init(ing, index, bondpartner): index out of range!");
 
-  //set bond partner
-  if( (bondpartner >= 0) && (bondpartner <= (ing.getMolecules().size()-1)) )
-    this->setPartner( bondpartner );
+  //set direction
+  if(dir==shellPositions[0] ||
+    dir==shellPositions[1] ||
+    dir==shellPositions[2] ||
+    dir==shellPositions[3] ||
+    dir==shellPositions[4] ||
+    dir==shellPositions[5]  )
+    this->setDir(dir);
   else
-    throw std::runtime_error("MoveConnectSc::init(ing, index, bondpartner): bondpartner out of range!");
+    throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
 }
 
 /*****************************************************************************/
@@ -227,7 +228,7 @@ void MoveConnectSc::apply(IngredientsType& ing)
 	ing.applyMove(ing,*this);
 	
 	//THEN the bond is inserted 
-	ing.modifyMolecules().connect(this->getIndex(),this->getPartner());
+	ing.modifyMolecules().connect(this->getIndex(),ingredients.);
 	
 
 }

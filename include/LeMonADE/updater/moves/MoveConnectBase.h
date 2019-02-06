@@ -62,9 +62,6 @@ class MoveConnectBase:public MoveBase
  public:
 	//! Returns the index of the Vertex (monomer) in the graph which searches for a partner
 	uint32_t getIndex() const {return index;}
-
-	//! Returns the index of the Vertex (monomer) in the graph which is intented for connecting to the index
-	uint32_t getPartner() const {return bondpartner;}
 	
 	//! Returns the direction of the Vertex (monomer) in the graph which should be moved
 	const VectorInt3& getDir() const { return direction;}
@@ -72,7 +69,7 @@ class MoveConnectBase:public MoveBase
 	//here come the functions that are implemented by the specialization
 	template <class IngredientsType> void init(const IngredientsType& ingredients);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
-	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t bondpartner);
+	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
 
 	template <class IngredientsType> void check(const IngredientsType& ingredients);
 	template <class IngredientsType> void apply(IngredientsType& ingredients);
@@ -85,11 +82,22 @@ class MoveConnectBase:public MoveBase
 	void setIndex(uint32_t i) {index=i;}
 
 	/**
-	 * @brief Set the index of the Vertex (monomer) in the graph which is intented for connecting to the index 
-	 * @param i the index in the graph
+	 * @brief Set the move direction of the Vertex (monomer) which should be moved
+	 * @param dir The displacement in direction on the Cartesian-space.
 	 */
-	void setPartner(uint32_t i) {bondpartner=i;}
+	void setDir(const VectorInt3& dir) {direction=dir;}
 
+	/**
+	 * @brief Set the move direction of the Vertex (monomer) which should be moved
+	 *
+	 * @param dx The displacement in x-direction in the Cartesian space
+	 * @param dy The displacement in y-direction in the Cartesian space
+	 * @param dz The displacement in z-direction in the Cartesian space
+	 */
+	void setDir(const int32_t dx, const int32_t dy, const int32_t dz)
+	{
+		direction.setAllCoordinates(dx,dy,dz);
+	}
 	//! Random Number Generator (RNG)
 	RandomNumberGenerators randomNumbers;
 
@@ -99,12 +107,10 @@ class MoveConnectBase:public MoveBase
 	//! Index of the Vertex (monomer) in the graph which searches for a partner
 	uint32_t index;
 
-	//! Index of the Vertex (monomer) in the graph which is intented for connecting to the index 
-	uint32_t bondpartner;
+	//! Direction for the move
+	VectorInt3 direction;
 	
 };
-
-
 
 ////////////////////////////////////////////////////////////////////////////////
 // implementation of the members
@@ -155,9 +161,9 @@ void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, 
 /*****************************************************************************/
 template <class SpecializedMove>
 template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, uint32_t bondpartner)
+void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, VectorInt3 dir)
 {
-  static_cast<SpecializedMove*>(this)->init(ingredients, index, bondpartner);
+  static_cast<SpecializedMove*>(this)->init(ingredients, index, dir);
 }
 
 /*****************************************************************************/
