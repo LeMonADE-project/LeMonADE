@@ -32,10 +32,11 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @class Lattice 
  * @brief is a simple multidimensional lattice with value type
+ * @todo add the copying of the values of the lattice in the  copy and assign constructor
  */
 
-template <class LatticeType>
-class Lattice<LatticeType>
+template <class LatticeType = uint32_t >
+class Lattice
 {
 
 public:
@@ -44,7 +45,7 @@ public:
 	
 	//!copy constructor 
 	Lattice(const Lattice& LatticeSource);
-
+	//!assign operator
  	Lattice& operator= (const Lattice &LatticeSource);
 
 	//! Allocate memory for the lattice
@@ -104,13 +105,24 @@ private:
 
 	//! Hold the value of for indexing the lattice (FeatureLattice: boxX*boxY; FeatureLatticePowerOfTwo: log(boxX,2)*log(boxY,2))
 	uint32_t proXY;
+	
+	//! Functions for folding absolute coordinates into the lattice in X
+	uint32_t foldBackX(int value) const;
+
+	//! Functions for folding absolute coordinates into the lattice in Y
+	uint32_t foldBackY(int value) const;
+
+	//! Functions for folding absolute coordinates into the lattice in Z
+	uint32_t foldBackZ(int value) const;
+	
   	/**
-	 * @brief Linearized 3D lattice of type ValueType to 1D.
+	 * @brief Linearized 3D lattice of type LatticeType to 1D.
 	 *
-	 * @details Linearized 3D lattice of type \a ValueType to 1D by formula in:
+	 * @details Linearized 3D lattice of type \a LatticeType to 1D by formula in:
 	 * FeatureLattice: lattice[idx]=lattice[x+y*xPro+z*proXY]
 	 * FeatureLatticePowerOfTwo: lattice[idx]=lattice[x+(y<<xPro)+(z<<proXY)]
 	 */
+public:
 	LatticeType* lattice;
 };
 /******************************************************************************/
@@ -121,7 +133,7 @@ private:
 template <class LatticeType>
 Lattice< LatticeType >::~Lattice()
 {
- this->deleteLattice();
+  deleteLattice();
 };
 
 template <class LatticeType>
@@ -148,7 +160,7 @@ Lattice< LatticeType >::Lattice(const Lattice& LatticeSource)
 	xPro = LatticeSource.xPro;
 	proXY = LatticeSource.proXY;
 
-	lattice = new ValueType[_boxX*_boxY*_boxZ];
+	lattice = new LatticeType[_boxX*_boxY*_boxZ];
 }
 
 template <class LatticeType>
@@ -176,8 +188,8 @@ Lattice< LatticeType >&  Lattice< LatticeType >::operator = (const Lattice< Latt
 
     if ( oldSize != newSize )
     {
-        this->deleteLattice();
-        lattice = new ValueType[_boxX*_boxY*_boxZ];
+         deleteLattice();
+        lattice = new LatticeType[_boxX*_boxY*_boxZ];
     }
 
     // do the copy
@@ -185,7 +197,7 @@ Lattice< LatticeType >&  Lattice< LatticeType >::operator = (const Lattice< Latt
     return *this;
 }
 /**
- * This method allocates memory for the lattice and fill it with the native value of \a ValueType.
+ * This method allocates memory for the lattice and fill it with the native value of \a LatticeType.
  */
 template <class LatticeType>
 void Lattice< LatticeType >::setupLattice()
@@ -194,17 +206,17 @@ void Lattice< LatticeType >::setupLattice()
 	std::cout<<"setting up lattice...";
 
 	// Allocate memory
-	lattice = new ValueType[_boxX*_boxY*_boxZ];
+	lattice = new LatticeType[_boxX*_boxY*_boxZ];
 
 	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
-		lattice[i]=ValueType();
+		lattice[i]=LatticeType();
 
-	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(ValueType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(ValueType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
+	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(LatticeType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(LatticeType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
 
 }
 
 /**
- * This method allocates memory for the lattice and fill it with the native value of \a ValueType.
+ * This method allocates memory for the lattice and fill it with the native value of \a LatticeType.
  */
 template <class LatticeType>
 void Lattice< LatticeType >::setupLattice(uint32_t boxX, uint32_t boxY,uint32_t boxZ )
@@ -214,35 +226,35 @@ void Lattice< LatticeType >::setupLattice(uint32_t boxX, uint32_t boxY,uint32_t 
 	_boxY = boxY;
 	_boxZ = boxZ;
 
-	this->boxXm1=this->_boxX-1;
-	this->boxYm1=this->_boxY-1;
-	this->boxZm1=this->_boxZ-1;
+	 boxXm1= _boxX-1;
+	 boxYm1= _boxY-1;
+	 boxZm1= _boxZ-1;
 
 	// determine the shift values for first multiplication
-	this->xPro=this->_boxX;
+	 xPro= _boxX;
 
 	// determine the shift values for second multiplication
-	this->proXY=this->_boxX*this->_boxY;
+	 proXY= _boxX* _boxY;
 
-	std::cout << "use bit shift for boxX: ("<< this->xPro << " ) = " << (this->xPro) << " = " << (this->_boxX) << std::endl;
-	std::cout << "use bit shift for boxX*boxY: ("<< this->proXY << " ) = " << (this->proXY) << " = " << (this->_boxX*this->_boxY) << std::endl;
+	std::cout << "use bit shift for boxX: ("<<  xPro << " ) = " << ( xPro) << " = " << ( _boxX) << std::endl;
+	std::cout << "use bit shift for boxX*boxY: ("<<  proXY << " ) = " << ( proXY) << " = " << ( _boxX* _boxY) << std::endl;
 
 
 	std::cout<<"setting up lattice...";
 
 	// Allocate memory
-	lattice = new ValueType[_boxX*_boxY*_boxZ];
+	lattice = new LatticeType[_boxX*_boxY*_boxZ];
 
 	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
-		lattice[i]=ValueType();
+		lattice[i]=LatticeType();
 
-	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(ValueType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(ValueType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
+	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(LatticeType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(LatticeType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
 
 }
 
 
 /**
- * All lattice entries are set to the native value of \a ValueType (in most cases Zero).
+ * All lattice entries are set to the native value of \a LatticeType (in most cases Zero).
  * This method only clears the lattice. It will not destroy nor recreate the array.
  */
 template <class LatticeType>
@@ -251,30 +263,36 @@ void Lattice< LatticeType >::clearLattice()
 
 	// initialize to native value (=0)
 	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
-		lattice[i]=ValueType();
+		lattice[i]=LatticeType();
 }
-
 
 
 /******************************************************************************/
 /**
  * @details Move a lattice point to a new position. The data at the new position
- * is overwritten and the old position is set to ValueType() (most Zero).
+ * is overwritten and the old position is set to LatticeType() (most Zero).
  *
  * @param oldPos old position
  * @param newPos new position
  */
 /******************************************************************************/
-template<template<typename> class SpecializedClass, typename ValueType>
-inline void FeatureLatticeBase<SpecializedClass<ValueType> >::moveOnLattice(const VectorInt3& oldPos, const VectorInt3& newPos)
+template<class LatticeType>
+inline void Lattice<LatticeType>::moveOnLattice(const VectorInt3& oldPos, const VectorInt3& newPos)
 {
-	static_cast<SpecializedClass<ValueType>* >(this)->moveOnLattice(oldPos, newPos);
+	uint32_t xOld,yOld,zOld;
+	xOld=foldBackX(oldPos[0]);
+	yOld=foldBackY(oldPos[1]);
+	zOld=foldBackZ(oldPos[2]);
+
+	 lattice[foldBackX(newPos[0])+(foldBackY(newPos[1]) *  xPro)+(foldBackZ(newPos[2])* proXY)] =  lattice[xOld+(yOld *  xPro)+(zOld* proXY)];
+	 lattice[xOld+(yOld *  xPro)+(zOld* proXY)] = LatticeType();
+
 }
 
 /******************************************************************************/
 /**
  * @details Move a lattice point to a new position. The data at the new position
- * is overwritten and the old position is set to ValueType() (most Zero).
+ * is overwritten and the old position is set to LatticeType() (most Zero).
  *
  * @param[in] xOldPos x-coordinate of old position in absolute coordinates
  * @param[in] yOldPos y-coordinate of old position in absolute coordinates
@@ -284,22 +302,28 @@ inline void FeatureLatticeBase<SpecializedClass<ValueType> >::moveOnLattice(cons
  * @param[in] zNewPos z-coordinate of new position in absolute coordinates
  */
 /******************************************************************************/
-
-template<template<typename> class SpecializedClass, typename ValueType>
-inline void FeatureLatticeBase<SpecializedClass<ValueType> >::moveOnLattice(const int xOldPos, const int yOldPos, const int zOldPos, const int xNewPos, const int yNewPos, const int zNewPos)
+template<class LatticeType>
+inline void Lattice<LatticeType>::moveOnLattice(const int xOldPos, const int yOldPos, const int zOldPos, const int xNewPos, const int yNewPos, const int zNewPos)
 {
-	static_cast<SpecializedClass<ValueType>* >(this)->moveOnLattice(xOldPos, yOldPos, zOldPos, xNewPos, yNewPos, zNewPos);
+	uint32_t xOld,yOld,zOld;
+	xOld=foldBackX(xOldPos);
+	yOld=foldBackY(yOldPos);
+	zOld=foldBackZ(zOldPos);
+
+	lattice[foldBackX(xNewPos)+(foldBackY(yNewPos) * xPro)+(foldBackZ(zNewPos)*proXY)] = lattice[xOld+(yOld *  xPro)+(zOld* proXY)];
+	lattice[xOld+(yOld * xPro)+(zOld*proXY)] = LatticeType();
+
 }
 
 /**
  * Get the value stored on the lattice at coordinates given by VectorInt3 \a pos.
  * @param[in] pos specified position
- * @return \p ValueType value on the specified position \a pos
+ * @return \p LatticeType value on the specified position \a pos
  */
-template<template<typename> class SpecializedClass, typename ValueType>
-inline ValueType FeatureLatticeBase<SpecializedClass<ValueType> >::getLatticeEntry(const VectorInt3& pos) const
+template<class LatticeType>
+inline LatticeType Lattice<LatticeType>::getLatticeEntry(const VectorInt3& pos) const
 {
-	return static_cast<const SpecializedClass<ValueType>* >(this)->getLatticeEntry(pos);
+	return ( lattice[foldBackX(pos[0])+(foldBackY(pos[1])*  xPro)+(foldBackZ(pos[2])* proXY)]);
 }
 
 
@@ -308,24 +332,24 @@ inline ValueType FeatureLatticeBase<SpecializedClass<ValueType> >::getLatticeEnt
  * @param[in] x x-coordinate on the Cartesian lattice
  * @param[in] y y-coordinate on the Cartesian lattice
  * @param[in] z z-coordinate on the Cartesian lattice
- * @return \a ValueType value on the specified position at x y z
+ * @return \a LatticeType value on the specified position at x y z
  */
-template<template<typename> class SpecializedClass, typename ValueType>
-inline ValueType FeatureLatticeBase<SpecializedClass<ValueType> >::getLatticeEntry(const int x, const int y, const int z) const
+template<class LatticeType>
+inline LatticeType Lattice<LatticeType>::getLatticeEntry(const int x, const int y, const int z) const
 {
-	return static_cast<const SpecializedClass<ValueType>* >(this)->getLatticeEntry(x, y, z);
+	return( lattice[foldBackX(x)+(foldBackY(y)* xPro)+(foldBackZ(z)* proXY)]);
 }
 
 
 /**
  * Set the value \a val on the lattice at coordinates given by \a pos.
  * @param[in] pos specified position
- * @param[in] val \e ValueType to set on \a pos
+ * @param[in] val \e LatticeType to set on \a pos
  */
-template<template<typename> class SpecializedClass, typename ValueType>
-inline void FeatureLatticeBase<SpecializedClass<ValueType> >::setLatticeEntry(const VectorInt3& pos, ValueType val)
+template<class LatticeType>
+inline void Lattice<LatticeType>::setLatticeEntry(const VectorInt3& pos, LatticeType val)
 {
-	static_cast<SpecializedClass<ValueType>* >(this)->setLatticeEntry(pos, val);
+	 lattice[foldBackX(pos[0])+(foldBackY(pos[1])*  xPro)+(foldBackZ(pos[2])* proXY)]=val;
 }
 
 
@@ -334,13 +358,48 @@ inline void FeatureLatticeBase<SpecializedClass<ValueType> >::setLatticeEntry(co
  * @param[in] x x-coordinate on the Cartesian lattice
  * @param[in] y y-coordinate on the Cartesian lattice
  * @param[in] z z-coordinate on the Cartesian lattice
- * @param[in] val \e ValueType to set on \a pos
+ * @param[in] val \e LatticeType to set on \a pos
  */
-template<template<typename> class SpecializedClass, typename ValueType>
-inline void FeatureLatticeBase<SpecializedClass<ValueType> >::setLatticeEntry(const int x, const int y, const int z, ValueType val)
+template<class LatticeType>
+inline void Lattice<LatticeType>::setLatticeEntry(const int x, const int y, const int z, LatticeType val)
 {
-	static_cast<SpecializedClass<ValueType>* >(this)->setLatticeEntry(x, y, z, val);
+	 lattice[foldBackX(x)+(foldBackY(y)*  xPro)+(foldBackZ(z)* proXY)]=val;
 }
+
+
+/**
+ * Fold back the absolute coordinate into the relative coordinate in X by modulo operation.
+ *
+ * @param value absolute coordinate in X
+ * @return \a uint32_t relative coordinate in X
+ */
+template<class LatticeType>
+inline uint32_t Lattice<LatticeType>::foldBackX(int value) const{
+	return (((value% _boxX)+ _boxX)% _boxX);
+}
+
+/**
+ * Fold back the absolute coordinate into the relative coordinate in Y by modulo operation.
+ *
+ * @param value absolute coordinate in Y
+ * @return \a uint32_t relative coordinate in Y
+ */
+template<class LatticeType>
+inline uint32_t Lattice<LatticeType>::foldBackY(int value) const{
+	return (((value% _boxY)+ _boxY)% _boxY);
+}
+
+/**
+ * Fold back the absolute coordinate into the relative coordinate in Z by modulo operation.
+ *
+ * @param value absolute coordinate in Z
+ * @return \a uint32_t relative coordinate in Z
+ */
+template<class LatticeType>
+inline uint32_t Lattice<LatticeType>::foldBackZ(int value) const{
+	return (((value% _boxZ)+ _boxZ)% _boxZ);
+}
+
 
 
 #endif /* LEMONADE_UTILITY_LATTICE_H */
