@@ -25,8 +25,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_UPDATER_MOVES_MOVELOCALSC_H
-#define LEMONADE_UPDATER_MOVES_MOVELOCALSC_H
+#ifndef LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
+#define LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
 
 #include <LeMonADE/updater/moves/MoveConnectBase.h>
 
@@ -41,6 +41,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @details The class is a specialization of MoveLocalBase using the (CRTP) to avoid virtual functions.
  **/
 /*****************************************************************************/
+
 class MoveConnectSc:public MoveConnectBase<MoveConnectSc>
 {
 public:
@@ -51,42 +52,12 @@ public:
     shellPositions[3]=VectorInt3( 0,-2, 0);
     shellPositions[4]=VectorInt3( 0, 0, 2);
     shellPositions[5]=VectorInt3( 0, 0,-2);
-	
-// 	shellPositions[ 0]=VectorInt3(2,0,0);
-// 	shellPositions[ 1]=VectorInt3(2,0,1);
-// 	shellPositions[ 2]=VectorInt3(2,1,0);
-// 	shellPositions[ 3]=VectorInt3(2,1,1);
-// 	
-// 	shellPositions[ 4]=VectorInt3(-1,0,0);
-// 	shellPositions[ 5]=VectorInt3(-1,0,1);
-// 	shellPositions[ 6]=VectorInt3(-1,1,0);
-// 	shellPositions[ 7]=VectorInt3(-1,1,1);
-// 	
-// 	shellPositions[ 8]=VectorInt3(0,2,0);
-// 	shellPositions[ 9]=VectorInt3(1,2,0);
-// 	shellPositions[10]=VectorInt3(0,2,1);
-// 	shellPositions[11]=VectorInt3(1,2,1);
-// 	
-// 	shellPositions[12]=VectorInt3(0,-1,0);
-// 	shellPositions[13]=VectorInt3(1,-1,0);
-// 	shellPositions[14]=VectorInt3(0,-1,1);
-// 	shellPositions[15]=VectorInt3(1,-1,1);
-// 	
-// 	shellPositions[16]=VectorInt3(0,0,2);
-// 	shellPositions[17]=VectorInt3(0,1,2);
-// 	shellPositions[18]=VectorInt3(1,0,2);
-// 	shellPositions[19]=VectorInt3(1,1,2);
-// 	
-// 	shellPositions[20]=VectorInt3(0,0,-1);
-// 	shellPositions[21]=VectorInt3(0,1,-1);
-// 	shellPositions[22]=VectorInt3(1,0,-1);
-// 	shellPositions[23]=VectorInt3(1,1,-1);
   }
 
   // overload initialise function to be able to set the moves index and direction if neccessary
   template <class IngredientsType> void init(const IngredientsType& ing);
   template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
-  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t bondpartner);
+  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir );
 
   template <class IngredientsType> bool check(IngredientsType& ing);
   template< class IngredientsType> void apply(IngredientsType& ing);
@@ -132,7 +103,8 @@ void MoveConnectSc::init(const IngredientsType& ing)
 
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
-  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[this->getIndex()] + shellPositions[randomDir]) );
+  this->setDir(randomDir);
+  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
 }
 
 /*****************************************************************************/
@@ -157,7 +129,9 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
 
   //draw direction
   uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
-  this->setPartner( ing.getLatticeEntry(ingredients.getMolecules()[this->getIndex()] + shellPositions[randomDir]) );
+  this->setDir(randomDir);
+  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
+  
 }
 
 /*****************************************************************************/
@@ -191,6 +165,7 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 
     this->setDir(dir);
   else
     throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
+  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+dir));
 }
 
 /*****************************************************************************/
@@ -228,7 +203,7 @@ void MoveConnectSc::apply(IngredientsType& ing)
 	ing.applyMove(ing,*this);
 	
 	//THEN the bond is inserted 
-	ing.modifyMolecules().connect(this->getIndex(),ingredients.);
+	ing.modifyMolecules().connect(this->getIndex(),this->getPartner());
 	
 
 }

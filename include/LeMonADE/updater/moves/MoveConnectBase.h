@@ -25,8 +25,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_UPDATER_MOVES_MOVELOCALBASE_H
-#define LEMONADE_UPDATER_MOVES_MOVELOCALBASE_H
+#ifndef LEMONADE_UPDATER_MOVES_MOVECONNECTBASE_H
+#define LEMONADE_UPDATER_MOVES_MOVECONNECTBASE_H
 
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/utility/Vector3D.h>
@@ -62,10 +62,13 @@ class MoveConnectBase:public MoveBase
  public:
 	//! Returns the index of the Vertex (monomer) in the graph which searches for a partner
 	uint32_t getIndex() const {return index;}
-	
+
 	//! Returns the direction of the Vertex (monomer) in the graph which should be moved
 	const VectorInt3& getDir() const { return direction;}
-
+	
+	//! Returns the index of the Vertex (monomer) in the graph which searches for a partner
+	uint32_t getPartner() const {return bondpartern;}
+	
 	//here come the functions that are implemented by the specialization
 	template <class IngredientsType> void init(const IngredientsType& ingredients);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
@@ -80,6 +83,9 @@ class MoveConnectBase:public MoveBase
 	 * @param i the index in the graph
 	 */
 	void setIndex(uint32_t i) {index=i;}
+
+	//! potential bond partner 
+	void setPartner(uint32_t i) {bondpartern=i;}
 
 	/**
 	 * @brief Set the move direction of the Vertex (monomer) which should be moved
@@ -109,6 +115,9 @@ class MoveConnectBase:public MoveBase
 
 	//! Direction for the move
 	VectorInt3 direction;
+	
+	//!
+	uint32_t bondpartern;
 	
 };
 
