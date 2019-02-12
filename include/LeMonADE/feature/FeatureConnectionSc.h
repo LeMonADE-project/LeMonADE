@@ -375,7 +375,7 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 template<class IngredientsType>
 void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveConnectSc& move)
 {
-
+    ing.modifyMolecules().connect(move.getIndex(), move.getPartner());
 }
 /******************************************************************************/
 /**
