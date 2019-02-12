@@ -31,7 +31,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
 #include <LeMonADE/utility/RandomNumberGenerators.h>
-#include "./UpdaterAbstractConnection.h"
+#include<LeMonADE/updater/AbstractUpdater.h>
 #include <LeMonADE/updater/moves/MoveConnectSc.h>
 
 /**
@@ -139,10 +139,10 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 		// choose a random monomer 
 		uint32_t ID(TagedMonomers[ rng.r250_rand32() % nTags ]);
 		//vicinity reaction  
-		connectionMove.init(ID);
-		if ( connectionMove.check() )
+		connectionMove.init(ingredients,ID);
+		if ( connectionMove.check(ingredients) )
 		{
-		  connectionMove.apply();
+		  connectionMove.apply(ingredients);
 		  NReactedSites+=2;
 		}
 	}
@@ -154,17 +154,17 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
       return false;
 };
 template<class IngredientsType,class MoveType, class ConnectionMoveType>
-void  UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::intitialize()
+void  UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::initialize()
 {
   for(uint32_t i = 0 ; i < ingredients.getMolecules().size(); i++ )
   {
     if ( ingredients.getMolecules()[i].IsReactive() )
     {
-      uint32_t NLinks(ingredients.getMolecules()[i].getNumLinks());
+      uint32_t NLinks(ingredients.getMolecules().getNumLinks(i));
       uint32_t nIrreversibleBonds;
       for (uint32_t n = 0 ; n < NLinks ;n++)
       {
-	uint32_t neighbor(ingredients.getMolecules()[i].getNeighborIdx(i,n));
+	uint32_t neighbor(ingredients.getMolecules().getNeighborIdx(i,n));
 	if( ingredients.getMolecules()[i].IsReactive() )
 	  NReactedSites+=2;
 	nIrreversibleBonds++;

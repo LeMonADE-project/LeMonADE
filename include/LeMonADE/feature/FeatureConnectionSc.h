@@ -29,6 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #define LEMONADE_FEATURE_FEATURECONNECTIONSC_H
 
 #include <LeMonADE/feature/Feature.h>
+#include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureLatticePowerOfTwo.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveConnectBase.h>
@@ -54,24 +55,31 @@ class MonomerReactivity
 	MonomerReactivity():reactivity(false),nMaxBonds(2){}
 
 	//! Getting the reactivity of the monomer.
-	bool IsReactive() const {return reactivity;}
+	const bool IsReactive() const {return reactivity;}
 	
 	//! Getting the number of maximum possible bonds for the monomer.
-	uint32_t getNMaxBonds() const {return nMaxBonds;};
+	const uint32_t getNMaxBonds() const {return nMaxBonds;};
 
-	MonomerReactivity getReactivity(){return *this; }
+	MonomerReactivity& operator= (const MonomerReactivity source)
+	{
+	  reactivity=source.IsReactive();
+	  nMaxBonds=source.getNMaxBonds();
+	  return *this;
+	}
+	const MonomerReactivity& getReactivity() const {return *this; }
+	
 	void setReactivity(const MonomerReactivity& react)
 	{
 	  reactivity = react.IsReactive();
 	  nMaxBonds = react.getNMaxBonds();
 	}
-	bool operator == (const MonomerReactivity &react)
+	const bool operator == (const MonomerReactivity &react) const 
 	{
 	  if ( react.getNMaxBonds() == nMaxBonds  ) return false;
 	  if ( react.IsReactive()   == reactivity ) return false;
 	  return true;
 	}
-	bool operator!= (const MonomerReactivity &react) 
+	const bool operator!= (const MonomerReactivity &react) const 
 	{ 
 	  return !(*this == react);
 	}
@@ -175,7 +183,7 @@ public:
  * @class FeatureConnectionSc
  * @brief This Feature add new bonds between monomers.
  *
- * @details 
+ * @details Works only in combination with an excluded volume feature
  *
  * @tparam 
  * */
@@ -190,10 +198,13 @@ class FeatureConnectionSc : public Feature {
 public:
 	//! This Feature requires a monomer_extensions.
 	typedef LOKI_TYPELIST_1(MonomerReactivity) monomer_extensions;
+	
+	//! 
+	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc<>) required_features_back;
 
 	//constructor
 	FeatureConnectionSc() :latticeFilledUp(false)
-	{lattice.setupLattice();}
+	{connectionLattice.setupLattice();}
 	
 	/**
 	 * Returns true if the underlying lattice is synchronized and all excluded volume condition
@@ -269,10 +280,10 @@ public:
 	void synchronize(IngredientsType& ingredients);
 	
 	//! Get the lattice value at a certain point
-	uint32_t getIdFromLattice(const VectorInt3& pos) const { return lattice.getLatticeEntry(pos)-1;} ;
+	uint32_t getIdFromLattice(const VectorInt3& pos) const { return connectionLattice.getLatticeEntry(pos)-1;} ;
 
 	//! Get the lattice value at a certain point
-	uint32_t getIdFromLattice(const int x, const int y, const int z) const { return lattice.getLatticeEntry(x,y,z)-1;};
+	uint32_t getIdFromLattice(const int x, const int y, const int z) const { return connectionLattice.getLatticeEntry(x,y,z)-1;};
 
 protected:
 
@@ -283,7 +294,7 @@ protected:
 	//! Tag for indication if the lattice is populated.
 	bool latticeFilledUp;
 	//!
-	Lattice<uint32_t> lattice;
+	Lattice<uint32_t> connectionLattice;
 
 };
 
@@ -340,12 +351,12 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 	VectorInt3 dir(move.getDir());
 	VectorInt3 Pos(ingredients.getMolecules()[ID]);
 	//check if there is a monomer to connect with
-	if ( lattice.getLatticeEntry(Pos+dir) == 0 ) return false;
+	if ( connectionLattice.getLatticeEntry(Pos+dir) == 0 ) return false;
 	//check for maximum number of bonds for the first monomer
-	if ( ingredients.getMolecules()[ID].getNMaxBonds() >= ingredients.getMolecules()[ID].getNumLinks() ) return false;
-	uint32_t Neighbor(lattice.getLatticeEntry(Pos+dir)-1);
+	if ( ingredients.getMolecules()[ID].getNMaxBonds() >= ingredients.getMolecules().getNumLinks(ID) ) return false;
+	uint32_t Neighbor(connectionLattice.getLatticeEntry(Pos+dir)-1);
 	//check for maximum number of bonds for the second monomer
-	if ( ingredients.getMolecules()[Neighbor].getNMaxBonds() >= ingredients.getMolecules()[Neighbor].getNumLinks() ) return false;
+	if ( ingredients.getMolecules()[Neighbor].getNMaxBonds() >= ingredients.getMolecules().getNumLinks(Neighbor) ) return false;
 	//check if the two monomers are already connected
 	if ( ingredients.getMolecules().areConnected(ID,Neighbor) ) return false;
 	//if still here, then the two monomers are allowed to connect 
@@ -382,7 +393,7 @@ void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveLocalSc& mo
   VectorInt3 oldPos=ing.getMolecules()[move.getIndex()];
   VectorInt3 direction=move.getDir();
   VectorInt3 oldPlusDir=oldPos+direction;
-  lattice.moveOnLattice(oldPos,oldPlusDir);
+  connectionLattice.moveOnLattice(oldPos,oldPlusDir);
 }
 /******************************************************************************/
 /**
@@ -400,7 +411,7 @@ void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveAddMonomerS
   uint32_t MonID(move.getIndex());
   VectorInt3 pos=ing.getMolecules()[MonID];
   if (ing.getMolecules()[MonID].IsReactive())
-    lattice.setLatticeEntry(pos,MonID+1 );
+    connectionLattice.setLatticeEntry(pos,MonID+1 );
 }
 /******************************************************************************/
 /**
@@ -434,13 +445,13 @@ template<class IngredientsType>
 void FeatureConnectionSc::fillLattice(IngredientsType& ingredients)
 {
   
-	lattice.setupLattice(ingredients.getBoxX(),ingredients.getBoxY(),ingredients.getBoxZ());
+	connectionLattice.setupLattice(ingredients.getBoxX(),ingredients.getBoxY(),ingredients.getBoxZ());
 	const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 	//copy the lattice occupation from the monomer coordinates
 	for(size_t n=0;n<molecules.size();n++)
 	{
 		VectorInt3 pos=ingredients.getMolecules()[n];
-		if( lattice.getLatticeEntry(pos)!=0 )
+		if( connectionLattice.getLatticeEntry(pos)!=0 )
 		{
 			throw std::runtime_error("********** FeatureConnectionSc::fillLattice: multiple lattice occupation ******************");
 		}
@@ -450,7 +461,7 @@ void FeatureConnectionSc::fillLattice(IngredientsType& ingredients)
 			// the offset implies that the index zero is still used for unoccupied
 			// with and unreactive monomer
 			VectorInt3 pos=molecules[n];
-			lattice.setLatticeEntry(pos,n+1);
+			connectionLattice.setLatticeEntry(pos,n+1);
 		}
 	}
 	latticeFilledUp=true;

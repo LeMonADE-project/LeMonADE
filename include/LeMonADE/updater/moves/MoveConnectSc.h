@@ -102,9 +102,9 @@ void MoveConnectSc::init(const IngredientsType& ing)
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
 
   //draw direction
-  uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
+  VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
   this->setDir(randomDir);
-  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
+  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir) );
 }
 
 /*****************************************************************************/
@@ -128,7 +128,7 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
     throw std::runtime_error("MoveConnectSc::init(ing, index): index out of range!");
 
   //draw direction
-  uint32_t randomDir=this->randomNumbers.r250_rand32() % 6;
+  VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
   this->setDir(randomDir);
   this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
   
