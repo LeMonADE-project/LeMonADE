@@ -200,7 +200,7 @@ public:
 	typedef LOKI_TYPELIST_1(MonomerReactivity) monomer_extensions;
 	
 	//! 
-	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc<>) required_features_back;
+// 	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc<>) required_features_back;
 
 	//constructor
 	FeatureConnectionSc() :latticeFilledUp(false)
