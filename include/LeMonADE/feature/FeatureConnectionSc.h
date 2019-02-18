@@ -55,14 +55,14 @@ class MonomerReactivity
 	MonomerReactivity():reactivity(false),nMaxBonds(2){}
 
 	//! Getting the reactivity of the monomer.
-	const bool IsReactive() const {return reactivity;}
+	const bool isReactive() const {return reactivity;}
 	
 	//! Getting the number of maximum possible bonds for the monomer.
 	const uint32_t getNMaxBonds() const {return nMaxBonds;};
 
 	MonomerReactivity& operator= (const MonomerReactivity source)
 	{
-	  reactivity=source.IsReactive();
+	  reactivity=source.isReactive();
 	  nMaxBonds=source.getNMaxBonds();
 	  return *this;
 	}
@@ -70,13 +70,13 @@ class MonomerReactivity
 	
 	void setReactivity(const MonomerReactivity& react)
 	{
-	  reactivity = react.IsReactive();
+	  reactivity = react.isReactive();
 	  nMaxBonds = react.getNMaxBonds();
 	}
 	const bool operator == (const MonomerReactivity &react) const 
 	{
-	  if ( react.getNMaxBonds() == nMaxBonds  ) return false;
-	  if ( react.IsReactive()   == reactivity ) return false;
+	  if ( react.getNMaxBonds() != nMaxBonds  ) return false;
+	  if ( react.isReactive()   != reactivity ) return false;
 	  return true;
 	}
 	const bool operator!= (const MonomerReactivity &react) const 
@@ -107,20 +107,22 @@ private:
   /**
   * @brief \b Stream \b Out \b operator of the MonomerReactivity
   *
-  * @details Streams out the elements chain ID, number of labels and the label 
+  * @details Streams out the elements chain ID, number of labels and the label
   * 	     ID  of the label separated by space
   *
   * @param stream output-stream
   * @param label object of class MonomerReactivity
   * @return output-stream
   **/
-  std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
+  // stream overload leads to wrong file output
+ /* std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
   {
-	  stream 	  
-	  << Reactivity.IsReactive() << "/" 
+	  stream
+	  << Reactivity.isReactive() << "/"
 	  << Reactivity.getNMaxBonds();
 	  return stream;
   };
+*/
 
   /**
   * @brief \b Stream \b In \b operator of the MonomerReactivity
@@ -131,6 +133,7 @@ private:
   * @param label object of class MonomerReactivity
   * @return input-stream
   **/
+// stream overload leads to wrong file input
   std::istream& operator >> (std::istream& stream, MonomerReactivity & Reactivity)
   {
 	  int temp;
@@ -138,6 +141,7 @@ private:
 	  stream >> temp; Reactivity.setNMaxBonds(temp); 
 	  return stream;
   }
+
 
 
 /*****************************************************************/
@@ -455,7 +459,7 @@ void FeatureConnectionSc::fillLattice(IngredientsType& ingredients)
 		{
 			throw std::runtime_error("********** FeatureConnectionSc::fillLattice: multiple lattice occupation ******************");
 		}
-		else if (ingredients.getMolecules()[n].IsReactive())
+		else if (ingredients.getMolecules()[n].isReactive())
 		{
 			//here we simply set the monomer id (plus one!) on the lattice site 
 			// the offset implies that the index zero is still used for unoccupied
@@ -602,14 +606,16 @@ void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm)
   while(n<nMonomers){
     if(molecules[n].getReactivity()!=reactivity)
     {
-      strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
+      //strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
+      strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNMaxBonds()<<std::endl;
       reactivity=molecules[n].getReactivity();
       startIndex=n;
     }
     n++;
   }
   //write final reactivity
-  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
+  //strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
+  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity.isReactive() << "/"<< reactivity.getNMaxBonds()<<std::endl<<std::endl;
 
 }
 #endif

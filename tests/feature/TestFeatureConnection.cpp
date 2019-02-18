@@ -80,14 +80,33 @@ TEST_F(TestFeatureConnectionSc,MonomerReactivitySetting)
     ingredients.modifyMolecules()[0].setNMaxBonds(1);
     ingredients.modifyMolecules()[1].setNMaxBonds(17);
     ingredients.modifyMolecules()[2].setNMaxBonds(3);
-    EXPECT_TRUE (ingredients.getMolecules()[0].IsReactive() );
-    EXPECT_TRUE (ingredients.getMolecules()[1].IsReactive() );
-    EXPECT_FALSE(ingredients.getMolecules()[2].IsReactive() );
+    EXPECT_TRUE (ingredients.getMolecules()[0].isReactive() );
+    EXPECT_TRUE (ingredients.getMolecules()[1].isReactive() );
+    EXPECT_FALSE(ingredients.getMolecules()[2].isReactive() );
     EXPECT_EQ(ingredients.getMolecules()[0].getNMaxBonds(),1);
     EXPECT_EQ(ingredients.getMolecules()[1].getNMaxBonds(),17);
     EXPECT_EQ(ingredients.getMolecules()[2].getNMaxBonds(),3);
     ingredients.synchronize(ingredients);
     
+    size_t idx = ingredients.modifyMolecules().addMonomer(34,7,8);
+    ingredients.modifyMolecules()[idx].setReactive(true);
+    ingredients.modifyMolecules()[idx].setNMaxBonds(1);
+
+    EXPECT_TRUE  (ingredients.getMolecules()[0].isReactive() == ingredients.getMolecules()[0].isReactive());
+    EXPECT_FALSE (ingredients.getMolecules()[2].isReactive() == ingredients.getMolecules()[0].isReactive());
+
+    MonomerReactivity reactivity0=ingredients.getMolecules()[0].getReactivity();
+    MonomerReactivity reactivity1=ingredients.getMolecules()[1].getReactivity();
+    MonomerReactivity reactivity2=ingredients.getMolecules()[2].getReactivity();
+    MonomerReactivity reactivity3=ingredients.getMolecules()[idx].getReactivity();
+
+    EXPECT_TRUE  (reactivity0 == reactivity3);
+    EXPECT_FALSE (reactivity0 == reactivity1);
+    EXPECT_FALSE (reactivity0 == reactivity2);
+
+    EXPECT_FALSE  (reactivity0 != reactivity3);
+    EXPECT_TRUE (reactivity0 != reactivity1);
+    EXPECT_TRUE (reactivity0 != reactivity2);
 }
 // Test_F(TestFeatureConnectionSc,LatticeSetup)
 // {
