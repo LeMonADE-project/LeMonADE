@@ -51,31 +51,32 @@ class MonomerReactivity
 {
   public:
 
-	//! Standard constructor- initially the reactivity is set to false.
-	MonomerReactivity():reactivity(false),nMaxBonds(2){}
+	//! Standard constructor- initially the reactivity is set to false and default numMaxLinks is unconnected monomer.
+	MonomerReactivity():reactivity(false),numMaxLinks(0){}
 
 	//! Getting the reactivity of the monomer.
 	const bool isReactive() const {return reactivity;}
 	
 	//! Getting the number of maximum possible bonds for the monomer.
-	const uint32_t getNMaxBonds() const {return nMaxBonds;};
+	const uint32_t getNumMaxLinks() const {return numMaxLinks;};
 
 	MonomerReactivity& operator= (const MonomerReactivity source)
 	{
 	  reactivity=source.isReactive();
-	  nMaxBonds=source.getNMaxBonds();
+	  numMaxLinks=source.getNumMaxLinks();
 	  return *this;
 	}
-	const MonomerReactivity& getReactivity() const {return *this; }
+	const MonomerReactivity& getMonomerReactivity() const {return *this; }
 	
-	void setReactivity(const MonomerReactivity& react)
+	void setMonomerReactivity(const MonomerReactivity& react)
 	{
 	  reactivity = react.isReactive();
-	  nMaxBonds = react.getNMaxBonds();
+	  numMaxLinks = react.getNumMaxLinks();
+	  /// \todo There should be a check in the function to test against the "default" maximum connectivity for consistency reason.
 	}
 	const bool operator == (const MonomerReactivity &react) const 
 	{
-	  if ( react.getNMaxBonds() != nMaxBonds  ) return false;
+	  if ( react.getNumMaxLinks() != numMaxLinks  ) return false;
 	  if ( react.isReactive()   != reactivity ) return false;
 	  return true;
 	}
@@ -91,17 +92,18 @@ class MonomerReactivity
 	void setReactive(bool reactivity_){ reactivity=reactivity_;}
 	
 	/**
-	 * @brief Setting the maximum possible bonds of the monomer with \para nMaxBonds_.
+	 * @brief Setting the maximum possible bonds of the monomer with \para NumMaxLinks_.
 	 *
-	 * @param nMaxBonds_ 
+	 * @param NumMaxLinks_
+	 * \todo There should be a check in the function to test against the "default" maximum connectivity for consistency reason.
 	 */	
-	void setNMaxBonds(uint32_t nMaxBonds_){nMaxBonds=nMaxBonds_;} 
+	void setNumMaxLinks(uint32_t numMaxLinks_){numMaxLinks=numMaxLinks_;}
 
 private:
      //! Private variable holding the tag. Default is NULL.
      bool reactivity;
-     //!
-     uint32_t nMaxBonds;
+     //! Number of maximimum possible links/connections to another not-yet-connected monomers
+     uint32_t numMaxLinks;
 };
 
   /**
@@ -119,7 +121,7 @@ private:
   {
 	  stream
 	  << Reactivity.isReactive() << "/"
-	  << Reactivity.getNMaxBonds();
+	  << Reactivity.getNumMaxLinks();
 	  return stream;
   };
 */
@@ -138,7 +140,8 @@ private:
   {
 	  int temp;
 	  stream >> temp; Reactivity.setReactive(temp); stream.ignore(1);
-	  stream >> temp; Reactivity.setNMaxBonds(temp); 
+	  stream >> temp; Reactivity.setNumMaxLinks(temp);
+
 	  return stream;
   }
 
@@ -203,8 +206,8 @@ public:
 	//! This Feature requires a monomer_extensions.
 	typedef LOKI_TYPELIST_1(MonomerReactivity) monomer_extensions;
 	
-	//! 
-// 	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc<>) required_features_back;
+	//! this feature will not use any of FeatureExcludedVolumeSc<> but we need excluded volume property
+ 	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc<>) required_features_back;
 
 	//constructor
 	FeatureConnectionSc() :latticeFilledUp(false)
@@ -284,9 +287,13 @@ public:
 	void synchronize(IngredientsType& ingredients);
 	
 	//! Get the lattice value at a certain point
+	//! return monomer index between (0; molecules.size()-1) if there's a monomer
+	//! return uint32_t(-1)=4294967295 if place is empty
 	uint32_t getIdFromLattice(const VectorInt3& pos) const { return connectionLattice.getLatticeEntry(pos)-1;} ;
 
 	//! Get the lattice value at a certain point
+	//! return monomer index between (0; molecules.size()-1) if there's a monomer
+	//! return uint32_t(-1)=4294967295 if place is empty
 	uint32_t getIdFromLattice(const int x, const int y, const int z) const { return connectionLattice.getLatticeEntry(x,y,z)-1;};
 
 protected:
@@ -356,13 +363,18 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 	VectorInt3 Pos(ingredients.getMolecules()[ID]);
 	//check if there is a monomer to connect with
 	if ( connectionLattice.getLatticeEntry(Pos+dir) == 0 ) return false;
+
 	//check for maximum number of bonds for the first monomer
-	if ( ingredients.getMolecules()[ID].getNMaxBonds() >= ingredients.getMolecules().getNumLinks(ID) ) return false;
+	if ( ingredients.getMolecules().getNumLinks(ID) >=  ingredients.getMolecules()[ID].getNumMaxLinks()) return false;
+
 	uint32_t Neighbor(connectionLattice.getLatticeEntry(Pos+dir)-1);
+
 	//check for maximum number of bonds for the second monomer
-	if ( ingredients.getMolecules()[Neighbor].getNMaxBonds() >= ingredients.getMolecules().getNumLinks(Neighbor) ) return false;
+	if ( ingredients.getMolecules().getNumLinks(Neighbor) >= ingredients.getMolecules()[Neighbor].getNumMaxLinks() ) return false;
+
 	//check if the two monomers are already connected
 	if ( ingredients.getMolecules().areConnected(ID,Neighbor) ) return false;
+
 	//if still here, then the two monomers are allowed to connect 
 	return true;
 }
@@ -379,6 +391,7 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 template<class IngredientsType>
 void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveConnectSc& move)
 {
+	std::cout << "Establish connection between " << move.getIndex() << " and " << move.getPartner() << std::endl;
     ing.modifyMolecules().connect(move.getIndex(), move.getPartner());
 }
 /******************************************************************************/
@@ -518,7 +531,7 @@ void ReadReactivity<IngredientsType>::execute()
     if(stream.fail()){
       std::stringstream messagestream;
       messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Could not read first index in attributes line "<<nReactiveBlocks+1;
+		   <<"Could not read first index in reactivity line "<<nReactiveBlocks+1;
       throw std::runtime_error(messagestream.str());
     }
 
@@ -527,8 +540,8 @@ void ReadReactivity<IngredientsType>::execute()
 
     	std::stringstream messagestream;
       messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Wrong definition of attributes\nCould not find separator \"-\" "
-		   <<"in attribute definition no "<<nReactiveBlocks+1;
+		   <<"Wrong definition of reactivity\nCould not find separator \"-\" "
+		   <<"in reactivity definition no "<<nReactiveBlocks+1;
       throw std::runtime_error(messagestream.str());
 
     }
@@ -540,7 +553,7 @@ void ReadReactivity<IngredientsType>::execute()
     if(stream.fail()){
     	std::stringstream messagestream;
       messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Could not read second index in attributes line "<<nReactiveBlocks+1;
+		   <<"Could not read second index in reactivity line "<<nReactiveBlocks+1;
       throw std::runtime_error(messagestream.str());
     }
 
@@ -549,8 +562,8 @@ void ReadReactivity<IngredientsType>::execute()
 
     	std::stringstream messagestream;
       messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Wrong definition of attributes\nCould not find separator \":\" "
-		   <<"in attribute definition no "<<nReactiveBlocks+1;
+		   <<"Wrong definition of reactivity\nCould not find separator \":\" "
+		   <<"in reactivity definition no "<<nReactiveBlocks+1;
       throw std::runtime_error(messagestream.str());
 
     }
@@ -563,7 +576,8 @@ void ReadReactivity<IngredientsType>::execute()
       for(int n=startIndex;n<=stopIndex;n++)
       {
 	//use n-1 as index, because bfm-files start counting indices at 1 (not 0)
-	molecules[n-1].setReactivity(reactivity);
+	molecules[n-1].setMonomerReactivity(reactivity);
+	std::cout << "idx" << n-1 << " reactivity: " << reactivity.isReactive() << " numMaxBonds" << reactivity.getNumMaxLinks() << std::endl;
       }
       nReactiveBlocks++;
       getline((source),line);
@@ -574,7 +588,7 @@ void ReadReactivity<IngredientsType>::execute()
 
     	std::stringstream messagestream;
       messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
-		   <<"could not read attribute in attribute definition no "<<nReactiveBlocks+1;
+		   <<"could not read reactivity information in reactivity definition no "<<nReactiveBlocks+1;
       throw std::runtime_error(messagestream.str());
 
     }
@@ -597,25 +611,25 @@ void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm)
   size_t nMonomers=molecules.size();
   //reactivity blocks begin with startIndex
   size_t startIndex=0;
-  //counter varable
+  //counter variable
   size_t n=0;
   //reactivity to be written (updated in loop below)
-  MonomerReactivity reactivity=molecules[0].getReactivity();
+  MonomerReactivity reactivity=molecules[0].getMonomerReactivity();
 
   //write reactivity (blockwise)
   while(n<nMonomers){
-    if(molecules[n].getReactivity()!=reactivity)
+    if(molecules[n].getMonomerReactivity()!=reactivity)
     {
       //strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
-      strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNMaxBonds()<<std::endl;
-      reactivity=molecules[n].getReactivity();
+      strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks()<<std::endl;
+      reactivity=molecules[n].getMonomerReactivity();
       startIndex=n;
     }
     n++;
   }
   //write final reactivity
   //strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
-  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity.isReactive() << "/"<< reactivity.getNMaxBonds()<<std::endl<<std::endl;
+  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks()<<std::endl<<std::endl;
 
 }
 #endif

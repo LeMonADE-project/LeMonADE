@@ -95,18 +95,25 @@ public:
 private:
   //! Specialized move to be used for the movement of the monomers 
   MoveType move;
-  //! 
+
+  //! Specialized move to be used for the connection between reactive monomers
   ConnectionMoveType connectionMove;
+
   //! Number of mcs to be executed
   uint32_t nsteps;
+
   //! random number generator (seed set in main program)
   RandomNumberGenerators rng;
-  //! 
+
+  //! A reference to the IngredientsType - mainly the system
   IngredientsType& ingredients;
+
   //! number of monomers which could have a reaction bond
   uint32_t NReactiveSites;
+
   //! number of already reacted monomers
   uint32_t NReactedSites;
+
   //! get conversion of the reaction process
   double getConversion(){return (1.*NReactedSites)/(1.*NReactiveSites);};
   
@@ -118,59 +125,67 @@ template<class IngredientsType,class MoveType, class ConnectionMoveType>
 bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execute()
 {
   
-      time_t startTimer = time(NULL); //in seconds
-      std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) <<std::endl;
-      for(int n=0;n<nsteps;n++)
-      {
-	  std::vector<uint32_t> TagedMonomers; 
-	for(size_t m=0;m<ingredients.getMolecules().size();m++)
+	time_t startTimer = time(NULL); //in seconds
+	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) <<std::endl;
+
+	for(int n=0;n<nsteps;n++)
 	{
-		if( ingredients.getMolecules()[m].IsReactive() ) TagedMonomers.push_back(m);
-		move.init(ingredients);
-		if(move.check(ingredients)==true)
+		std::vector<uint32_t> TagedMonomers;
+
+		for(size_t m=0;m<ingredients.getMolecules().size();m++)
 		{
-			move.apply(ingredients);
+			if( ingredients.getMolecules()[m].isReactive() )
+				TagedMonomers.push_back(m);
+
+			move.init(ingredients);
+
+			if(move.check(ingredients)==true)
+			{
+				move.apply(ingredients);
+			}
 		}
-	}
-	uint32_t nTags(TagedMonomers.size());
-	
-	for(uint32_t i =0; i < nTags;i++)
-	{
-		// choose a random monomer 
-		uint32_t ID(TagedMonomers[ rng.r250_rand32() % nTags ]);
-		//vicinity reaction  
-		connectionMove.init(ingredients,ID);
-		if ( connectionMove.check(ingredients) )
+		uint32_t nTags(TagedMonomers.size());
+
+		for(uint32_t i =0; i < nTags;i++)
 		{
-		  connectionMove.apply(ingredients);
-		  NReactedSites+=2;
+			// choose a random monomer
+			uint32_t ID(TagedMonomers[ rng.r250_rand32() % nTags ]);
+
+			// vicinity reaction
+			connectionMove.init(ingredients,ID);
+
+			if ( connectionMove.check(ingredients) )
+			{
+				connectionMove.apply(ingredients);
+				NReactedSites+=2;
+			}
 		}
+		ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+1);
 	}
-	ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+1);
-      }
-      std::cout <<"Conversion at "<<ingredients.getMolecules().getAge() << " is " << getConversion()  << std::endl;
-      std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " with " << (((1.0*nsteps)*ingredients.getMolecules().size())/(difftime(time(NULL), startTimer)) ) << " [attempted connections/s]" <<std::endl;
-      std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) << " with " << nsteps << "connection MCS "<<std::endl;
-      return false;
+	std::cout <<"Conversion at "<<ingredients.getMolecules().getAge() << " is " << getConversion()  << std::endl;
+	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " with " << (((1.0*nsteps)*ingredients.getMolecules().size())/(difftime(time(NULL), startTimer)) ) << " [attempted connections/s]" <<std::endl;
+	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) << " with " << nsteps << "connection MCS "<<std::endl;
+	return false;
 };
+
 template<class IngredientsType,class MoveType, class ConnectionMoveType>
 void  UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::initialize()
 {
-  for(uint32_t i = 0 ; i < ingredients.getMolecules().size(); i++ )
-  {
-    if ( ingredients.getMolecules()[i].IsReactive() )
-    {
-      uint32_t NLinks(ingredients.getMolecules().getNumLinks(i));
-      uint32_t nIrreversibleBonds;
-      for (uint32_t n = 0 ; n < NLinks ;n++)
-      {
-	uint32_t neighbor(ingredients.getMolecules().getNeighborIdx(i,n));
-	if( ingredients.getMolecules()[i].IsReactive() )
-	  NReactedSites+=2;
-	nIrreversibleBonds++;
-      }
-      NReactiveSites+=(ingredients.getMolecules()[i].getNMaxBonds()-nIrreversibleBonds);
-    }
-  }
+	for(size_t i = 0 ; i < ingredients.getMolecules().size(); i++ )
+	{
+		if ( ingredients.getMolecules()[i].isReactive() )
+		{
+			uint32_t NLinks(ingredients.getMolecules().getNumLinks(i));
+			uint32_t nIrreversibleBonds=0;
+			for (uint32_t n = 0 ; n < NLinks ;n++)
+			{
+				uint32_t neighbor(ingredients.getMolecules().getNeighborIdx(i,n));
+				if( ingredients.getMolecules()[i].isReactive() )
+					NReactedSites+=2;
+				nIrreversibleBonds++;
+			}
+			NReactiveSites+=(ingredients.getMolecules()[i].getNumMaxLinks()-nIrreversibleBonds);
+		}
+	}
 };
 #endif 	/*LEMONADE_UPDATER_UPDATERSIMPLECONNECTION_H*/
