@@ -130,12 +130,12 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 
 	for(int n=0;n<nsteps;n++)
 	{
-		std::vector<uint32_t> TagedMonomers;
+		// std::vector<uint32_t> TagedMonomers;
 
 		for(size_t m=0;m<ingredients.getMolecules().size();m++)
 		{
-			if( ingredients.getMolecules()[m].isReactive() )
-				TagedMonomers.push_back(m);
+			// if( ingredients.getMolecules()[m].isReactive() )
+			//	 TagedMonomers.push_back(m);
 
 			move.init(ingredients);
 
@@ -143,8 +143,24 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 			{
 				move.apply(ingredients);
 			}
+			else // move is reject due to e.g. excluded volume, bond length, Metropolis etc
+			{
+				// as we connect as face-to-face colliding algorithm
+				// use the move direction in previous check as destination direction
+				if( ingredients.getMolecules()[move.getIndex()].isReactive() )
+				{
+					// vicinity reaction
+					connectionMove.init(ingredients,move.getIndex(), 2*move.getDir());
+
+					if ( connectionMove.check(ingredients) )
+					{
+						connectionMove.apply(ingredients);
+						NReactedSites+=2; // to check
+					}
+				}
+			}
 		}
-		uint32_t nTags(TagedMonomers.size());
+		/*uint32_t nTags(TagedMonomers.size());
 
 		for(uint32_t i =0; i < nTags;i++)
 		{
@@ -160,6 +176,7 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 				NReactedSites+=2;
 			}
 		}
+		*/
 		ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+1);
 	}
 	std::cout <<"Conversion at "<<ingredients.getMolecules().getAge() << " is " << getConversion()  << std::endl;

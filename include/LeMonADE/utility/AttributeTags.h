@@ -153,7 +153,7 @@ public:
     LabelID=in_[2] ;
   }
   //! get the chain ID, number of labels and label id 
-  const std::vector<uint32_t>& getAll() const { 
+  const std::vector<uint32_t> getAll() const {
     std::vector<uint32_t> Labels(3,0);
     Labels[0]=(ChainID);
     Labels[1]=(NLabels);

@@ -77,28 +77,30 @@ TEST_F(TestFeatureConnectionSc,MonomerReactivitySetting)
     ingredients.modifyMolecules()[0].setReactive(true);
     ingredients.modifyMolecules()[1].setReactive(true);
     ingredients.modifyMolecules()[2].setReactive(false);
-    ingredients.modifyMolecules()[0].setNMaxBonds(1);
-    ingredients.modifyMolecules()[1].setNMaxBonds(17);
-    ingredients.modifyMolecules()[2].setNMaxBonds(3);
+    ingredients.modifyMolecules()[0].setNumMaxLinks(1);
+    ingredients.modifyMolecules()[1].setNumMaxLinks(17);
+    ingredients.modifyMolecules()[2].setNumMaxLinks(3);
     EXPECT_TRUE (ingredients.getMolecules()[0].isReactive() );
     EXPECT_TRUE (ingredients.getMolecules()[1].isReactive() );
     EXPECT_FALSE(ingredients.getMolecules()[2].isReactive() );
-    EXPECT_EQ(ingredients.getMolecules()[0].getNMaxBonds(),1);
-    EXPECT_EQ(ingredients.getMolecules()[1].getNMaxBonds(),17);
-    EXPECT_EQ(ingredients.getMolecules()[2].getNMaxBonds(),3);
+    EXPECT_EQ(ingredients.getMolecules()[0].getNumMaxLinks(),1);
+    EXPECT_EQ(ingredients.getMolecules()[1].getNumMaxLinks(),17);
+    EXPECT_EQ(ingredients.getMolecules()[2].getNumMaxLinks(),3);
     ingredients.synchronize(ingredients);
     
     size_t idx = ingredients.modifyMolecules().addMonomer(34,7,8);
     ingredients.modifyMolecules()[idx].setReactive(true);
-    ingredients.modifyMolecules()[idx].setNMaxBonds(1);
+    ingredients.modifyMolecules()[idx].setNumMaxLinks(1);
+
+    ingredients.synchronize(ingredients);
 
     EXPECT_TRUE  (ingredients.getMolecules()[0].isReactive() == ingredients.getMolecules()[0].isReactive());
     EXPECT_FALSE (ingredients.getMolecules()[2].isReactive() == ingredients.getMolecules()[0].isReactive());
 
-    MonomerReactivity reactivity0=ingredients.getMolecules()[0].getReactivity();
-    MonomerReactivity reactivity1=ingredients.getMolecules()[1].getReactivity();
-    MonomerReactivity reactivity2=ingredients.getMolecules()[2].getReactivity();
-    MonomerReactivity reactivity3=ingredients.getMolecules()[idx].getReactivity();
+    MonomerReactivity reactivity0=ingredients.getMolecules()[0].getMonomerReactivity();
+    MonomerReactivity reactivity1=ingredients.getMolecules()[1].getMonomerReactivity();
+    MonomerReactivity reactivity2=ingredients.getMolecules()[2].getMonomerReactivity();
+    MonomerReactivity reactivity3=ingredients.getMolecules()[idx].getMonomerReactivity();
 
     EXPECT_TRUE  (reactivity0 == reactivity3);
     EXPECT_FALSE (reactivity0 == reactivity1);
@@ -108,21 +110,62 @@ TEST_F(TestFeatureConnectionSc,MonomerReactivitySetting)
     EXPECT_TRUE (reactivity0 != reactivity1);
     EXPECT_TRUE (reactivity0 != reactivity2);
 }
-// Test_F(TestFeatureConnectionSc,LatticeSetup)
-// {
-//   //prepare ingredients
-//     ingredients.setBoxX(32);
-//     ingredients.setBoxY(32);
-//     ingredients.setBoxZ(32);
-//     ingredients.setPeriodicX(1);
-//     ingredients.setPeriodicY(1);
-//     ingredients.setPeriodicZ(1);
-//     ingredients.modifyMolecules().resize(3);
-//     ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
-//     ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
-//     ingredients.modifyMolecules()[2].setAllCoordinates(1,0,30);
-// 
-//     ingredients.synchronize(ingredients);
-//     
-//     
-// }
+
+TEST_F(TestFeatureConnectionSc,ReadReactivity)
+{
+  //this test is for testing the reaction of the read class to incorrectly
+  //formatted input
+  Ing ingredients;
+  ReadReactivity<Ing> read(ingredients);
+
+  ingredients.modifyMolecules().resize(10);
+
+  std::stringstream stream1;
+  read.setInputStream(&stream1);
+  stream1<<"\ni am a parrot\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+  std::stringstream stream2;
+  read.setInputStream(&stream2);
+  stream2<<"\n1:2:2\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+  std::stringstream stream3;
+  read.setInputStream(&stream3);
+  stream3<<"\n1-2-3\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+  std::stringstream stream4;
+  read.setInputStream(&stream4);
+  stream4<<"\n1-a:4\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+  std::stringstream stream5;
+  read.setInputStream(&stream5);
+  stream5<<"\n1-2:0/6\n";
+  stream5<<"3-5:1/3\n";
+  stream5<<"6-10:0/9\n";
+  EXPECT_NO_THROW(read.execute());
+
+  for(size_t i = 0; i < 2; i++)
+      EXPECT_FALSE(ingredients.getMolecules()[i].isReactive());
+
+  for(size_t i = 2; i < 5; i++)
+	  EXPECT_TRUE(ingredients.getMolecules()[i].isReactive());
+
+  for(size_t i = 5; i < ingredients.getMolecules().size(); i++)
+  	  EXPECT_FALSE(ingredients.getMolecules()[i].isReactive());
+
+  for(size_t i = 0; i < 2; i++)
+	  EXPECT_EQ(ingredients.getMolecules()[i].getNumMaxLinks(),6);
+
+  for(size_t i = 2; i < 5; i++)
+	  EXPECT_EQ(ingredients.getMolecules()[i].getNumMaxLinks(),3);
+
+  for(size_t i = 5; i < ingredients.getMolecules().size(); i++)
+	  EXPECT_EQ(ingredients.getMolecules()[i].getNumMaxLinks(),9);
+}
+
