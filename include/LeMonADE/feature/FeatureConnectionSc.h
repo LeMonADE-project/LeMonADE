@@ -207,7 +207,7 @@ public:
 	typedef LOKI_TYPELIST_1(MonomerReactivity) monomer_extensions;
 	
 	//! this feature will not use any of FeatureExcludedVolumeSc<> but we need excluded volume property
- 	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc<>) required_features_back;
+//  	typedef LOKI_TYPELIST_1(FeatureExcludedVolumeSc<>) required_features_back;
 
 	//constructor
 	FeatureConnectionSc() :latticeFilledUp(false)
