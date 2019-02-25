@@ -40,7 +40,7 @@ class TestFeatureConnectionSc : public ::testing::Test
 {
 public:
   typedef LOKI_TYPELIST_3(FeatureConnectionSc, FeatureBondset< >,FeatureBox ) Features;
-  typedef ConfigureSystem<VectorInt3,Features> Config;
+  typedef ConfigureSystem<VectorInt3,Features,9> Config;
   typedef Ingredients<Config> Ing;
   Ing ingredients;
 

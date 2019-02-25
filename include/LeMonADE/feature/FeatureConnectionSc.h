@@ -45,7 +45,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @class MonomerReactivity
  * @brief set the monomer reactive or unreactive 
- * 
+ * @todo The Implementation of the output stream operator does not work properly. 
  */
 class MonomerReactivity
 {
@@ -575,9 +575,19 @@ void ReadReactivity<IngredientsType>::execute()
       //save attributes
       for(int n=startIndex;n<=stopIndex;n++)
       {
-	//use n-1 as index, because bfm-files start counting indices at 1 (not 0)
-	molecules[n-1].setMonomerReactivity(reactivity);
-	std::cout << "idx" << n-1 << " reactivity: " << reactivity.isReactive() << " numMaxBonds" << reactivity.getNumMaxLinks() << std::endl;
+	//check if the number of maximum bonds is consistent with the maximum number of bonds given for ingredients
+	if ( this->getDestination().getMolecules().getMaxConnectivity() >= reactivity.getNumMaxLinks() ) 
+	{
+	    //use n-1 as index, because bfm-files start counting indices at 1 (not 0)
+	    molecules[n-1].setMonomerReactivity(reactivity);
+	    std::cout << "idx" << n-1 << " reactivity: " << reactivity.isReactive() << " numMaxBonds" << reactivity.getNumMaxLinks() << std::endl;
+	}else 
+	{
+    	std::stringstream messagestream;
+      messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
+		   <<"the numMaxBonds for the current monomer is exceeding the max number of allowed connectivity for ingredients!"<<nReactiveBlocks+1;
+      throw std::runtime_error(messagestream.str());
+	}
       }
       nReactiveBlocks++;
       getline((source),line);
