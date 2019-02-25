@@ -235,15 +235,15 @@ TEST_F(FeatureAttributesTest,MonomerLabel)
   MonomerLabel Label1(2,14,5);
   //copy constructor
   MonomerLabel Label2(Label1);
-  EXPECT_EQ(Label1.getChainID(),Label2.getChainID() );
-  EXPECT_EQ(Label1.getNLabels(),Label2.getNLabels() );
-  EXPECT_EQ(Label1.getLabelID(),Label2.getLabelID() );
+  EXPECT_EQ(Label1.getchainID(),Label2.getchainID() );
+  EXPECT_EQ(Label1.getnLabels(),Label2.getnLabels() );
+  EXPECT_EQ(Label1.getlabelID(),Label2.getlabelID() );
   
   //default constructor
   MonomerAttributeTag<MonomerLabel> tag;
-  EXPECT_EQ(0,tag.getAttributeTag().getChainID());
-  EXPECT_EQ(0,tag.getAttributeTag().getNLabels());
-  EXPECT_EQ(0,tag.getAttributeTag().getLabelID());
+  EXPECT_EQ(0,tag.getAttributeTag().getchainID());
+  EXPECT_EQ(0,tag.getAttributeTag().getnLabels());
+  EXPECT_EQ(0,tag.getAttributeTag().getlabelID());
   
   typedef MyIngredientsTags::molecules_type MyMolecules1;
   MyMolecules1 molecules9;
@@ -252,9 +252,9 @@ TEST_F(FeatureAttributesTest,MonomerLabel)
   molecules9.resize(3);
   //if it runs throught then there is no error in the assign constructor
   molecules9[0].setAttributeTag(MonomerLabel(1,23,45));
-  EXPECT_EQ( molecules9[0].getAttributeTag().getChainID(), 1);
-  EXPECT_EQ( molecules9[0].getAttributeTag().getNLabels(),23);
-  EXPECT_EQ( molecules9[0].getAttributeTag().getLabelID(),45);
+  EXPECT_EQ( molecules9[0].getAttributeTag().getchainID(), 1);
+  EXPECT_EQ( molecules9[0].getAttributeTag().getnLabels(),23);
+  EXPECT_EQ( molecules9[0].getAttributeTag().getlabelID(),45);
   molecules9[1].setAttributeTag(MonomerLabel(3,2,4));
 
   //negative falues do not make much sense
@@ -338,21 +338,21 @@ TEST_F(FeatureAttributesTest,exportWriteTags)
   //scan file for !mcs and read-in first frame
   infile.initialize();
 
-  EXPECT_EQ(1,molecules[0].getAttributeTag().getChainID());
-  EXPECT_EQ(23,molecules[0].getAttributeTag().getNLabels());
-  EXPECT_EQ(54,molecules[0].getAttributeTag().getLabelID());
-  EXPECT_EQ(2,molecules[1].getAttributeTag().getChainID());
-  EXPECT_EQ(3,molecules[1].getAttributeTag().getNLabels());
-  EXPECT_EQ(17,molecules[1].getAttributeTag().getLabelID());
-  EXPECT_EQ(0,molecules[2].getAttributeTag().getChainID()); /*has default value*/
-  EXPECT_EQ(0,molecules[2].getAttributeTag().getNLabels()); /*has default value*/
-  EXPECT_EQ(0,molecules[2].getAttributeTag().getLabelID()); /*has default value*/
-  EXPECT_EQ(0,molecules[3].getAttributeTag().getChainID()); /*has default value*/
-  EXPECT_EQ(0,molecules[3].getAttributeTag().getNLabels()); /*has default value*/
-  EXPECT_EQ(0,molecules[3].getAttributeTag().getLabelID()); /*has default value*/
-  EXPECT_EQ(5,molecules[4].getAttributeTag().getChainID());
-  EXPECT_EQ(4,molecules[4].getAttributeTag().getNLabels());
-  EXPECT_EQ(104,molecules[4].getAttributeTag().getLabelID());
+  EXPECT_EQ(1,molecules[0].getAttributeTag().getchainID());
+  EXPECT_EQ(23,molecules[0].getAttributeTag().getnLabels());
+  EXPECT_EQ(54,molecules[0].getAttributeTag().getlabelID());
+  EXPECT_EQ(2,molecules[1].getAttributeTag().getchainID());
+  EXPECT_EQ(3,molecules[1].getAttributeTag().getnLabels());
+  EXPECT_EQ(17,molecules[1].getAttributeTag().getlabelID());
+  EXPECT_EQ(0,molecules[2].getAttributeTag().getchainID()); /*has default value*/
+  EXPECT_EQ(0,molecules[2].getAttributeTag().getnLabels()); /*has default value*/
+  EXPECT_EQ(0,molecules[2].getAttributeTag().getlabelID()); /*has default value*/
+  EXPECT_EQ(0,molecules[3].getAttributeTag().getchainID()); /*has default value*/
+  EXPECT_EQ(0,molecules[3].getAttributeTag().getnLabels()); /*has default value*/
+  EXPECT_EQ(0,molecules[3].getAttributeTag().getlabelID()); /*has default value*/
+  EXPECT_EQ(5,molecules[4].getAttributeTag().getchainID());
+  EXPECT_EQ(4,molecules[4].getAttributeTag().getnLabels());
+  EXPECT_EQ(104,molecules[4].getAttributeTag().getlabelID());
 
     //remove the temporary file
   EXPECT_EQ(0,remove("tests/attributesTestOut.test"));
