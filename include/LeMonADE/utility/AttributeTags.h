@@ -45,7 +45,9 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @todo 
  **/
 
-
+/**
+ * @brief this is just a short form 
+ */
 typedef  int32_t Integer;
 
 
@@ -55,9 +57,13 @@ typedef  int32_t Integer;
  *
  * @brief Class for labels on chains
  *
- * @details The class stores the chainID it belongs to and the number of Labels
- * 	    sitting on the monomer. 
+ * @details The class is a intended to be used as a monomer extension which stores information 
+ *	    about the chain ID, the number of labels sitting on the monomer and the label ID.
  *
+ * @param chainID the monomer is intended to be in a chain of a certain ID
+ * @param nLabels stores the number of labels sitting on the monomer
+ * @param labelID stores the label ID (like a color). It is implicitly assumed 
+ * 		  that all labels sitting on the same monomer have the same label ID!
  * @todo 
  **/
 class MonomerLabel
@@ -66,26 +72,26 @@ public:
   /**
   * @brief standard constructor for a monomer Label 
   */
-  MonomerLabel( const int32_t ChainID_, 
-	        const int32_t NLabels_, 
-	        const int32_t LabelID_):
-  ChainID(ChainID_),NLabels(NLabels_),LabelID(LabelID_)
-  { if (ChainID_ < 0 || NLabels_ < 0 || LabelID_ < 0  )
-      throw std::runtime_error("ChainID, NLabels and LabelID should not be smaller 0! "); 
+  MonomerLabel( const int32_t chainID_, 
+	        const int32_t nLabels_, 
+	        const int32_t labelID_):
+  chainID(chainID_),nLabels(nLabels_),labelID(labelID_)
+  { if (chainID_ < 0 || nLabels_ < 0 || labelID_ < 0  )
+      throw std::runtime_error("chainID, nLabels and labelID should not be smaller 0! "); 
   }
   /**
   * @brief default constructor
   */
-  MonomerLabel():ChainID(0),NLabels(0),LabelID(0){}
+  MonomerLabel():chainID(0),nLabels(0),labelID(0){}
   /**
   * @brief copy constructor
   */
   MonomerLabel(const MonomerLabel &Label )
   {
     
-    ChainID = Label.ChainID;
-    NLabels = Label.NLabels;
-    LabelID = Label.LabelID;    
+    chainID = Label.chainID;
+    nLabels = Label.nLabels;
+    labelID = Label.labelID;    
   }
 
   /**
@@ -98,9 +104,9 @@ public:
   */
   MonomerLabel& operator= ( const MonomerLabel &Label )
   { 
-    ChainID = Label.ChainID;
-    NLabels = Label.NLabels;
-    LabelID = Label.LabelID;
+    chainID = Label.chainID;
+    nLabels = Label.nLabels;
+    labelID = Label.labelID;
   }
   
   /**
@@ -108,13 +114,13 @@ public:
   */
   bool operator == (const MonomerLabel& Label )
   { 
-    if( Label.ChainID != ChainID ) return false; 
-    if( Label.LabelID != LabelID ) return false; 
-    if( Label.NLabels != NLabels ) return false; 
+    if( Label.chainID != chainID ) return false; 
+    if( Label.labelID != labelID ) return false; 
+    if( Label.nLabels != nLabels ) return false; 
     return true;
   };
   
-    /**
+  /**
   * @brief unequality operator
   */
   bool operator != (const MonomerLabel& Label )
@@ -124,54 +130,57 @@ public:
 
   
   //! set the chain ID the Label belongs to 
-  void     setChainID(const uint32_t ChainID_){ChainID=ChainID_ ;}
+  void     setchainID(const uint32_t chainID_){chainID=chainID_ ;}
   //! get the chain ID the Label belongs to
-  const uint32_t& getChainID(		       ) const { return ChainID  ;}
+  const uint32_t& getchainID(		       ) const { return chainID  ;}
   
   //! set the number of labels sitting on the monomer 
-  void     setNLabels(const uint32_t NLabels_){NLabels=NLabels_ ;}
+  void     setnLabels(const uint32_t nLabels_){nLabels=nLabels_ ;}
   //! get the number of labels sitting on the monomer 
-  const uint32_t& getNLabels(		       ) const { return NLabels  ;}
+  const uint32_t& getnLabels(		       ) const { return nLabels  ;}
   
   //! set the ID of the label(s) on the monomer
-  void     setLabelID(const uint32_t LabelID_){LabelID=LabelID_ ;}
+  void     setlabelID(const uint32_t labelID_){labelID=labelID_ ;}
   //! get the ID of the label(s) on the monomer
-  const uint32_t& getLabelID(		       ) const { return LabelID  ;}
+  const uint32_t& getlabelID(		       ) const { return labelID  ;}
   
   //! set the chain ID, number of labels and label id 
-  void     setAll(const uint32_t ChainID_,const uint32_t NLabels_,const uint32_t LabelID_)
+  void     setAll(const uint32_t chainID_,const uint32_t nLabels_,const uint32_t labelID_)
   {
-    ChainID=ChainID_ ;
-    NLabels=NLabels_ ;
-    LabelID=LabelID_ ;
+    chainID=chainID_ ;
+    nLabels=nLabels_ ;
+    labelID=labelID_ ;
   }
   //!set all information 
   void     setAll(const std::vector<uint32_t> in_)
   {
-    ChainID=in_[0] ;
-    NLabels=in_[1] ;
-    LabelID=in_[2] ;
+    chainID=in_[0] ;
+    nLabels=in_[1] ;
+    labelID=in_[2] ;
   }
   //! get the chain ID, number of labels and label id 
-  const std::vector<uint32_t> getAll() const {
-    std::vector<uint32_t> Labels(3,0);
-    Labels[0]=(ChainID);
-    Labels[1]=(NLabels);
-    Labels[2]=(LabelID);
-    return Labels;
+  const std::vector<uint32_t> getAll() const { 
+    std::vector<uint32_t> label(3,0);
+    label[0]=(chainID);
+    label[1]=(nLabels);
+    label[2]=(labelID);
+    return label;
   }
   //! reset all info to the default value
   void reset()
   {
-    ChainID=0;
-    NLabels=0;
-    LabelID=0;
+    chainID=0;
+    nLabels=0;
+    labelID=0;
   }
   
 private:
-  uint32_t ChainID;
-  uint32_t NLabels;
-  uint32_t LabelID;
+  //! is intended to store the chain ID of the monomer where the label is sitting on 
+  uint32_t chainID;
+  //! the number of labels sitting on the monomer 
+  uint32_t nLabels;
+  //! the label ID, because there could be more than only one (like a color)
+  uint32_t labelID;
   
 };
   
@@ -179,7 +188,7 @@ private:
   * @brief \b Stream \b Out \b operator of the MonomerLabel
   *
   * @details Streams out the elements chain ID, number of labels and the label 
-  * 	     ID  of the label separated by space
+  * 	     ID  of the label separated by slash 
   *
   * @param stream output-stream
   * @param label object of class MonomerLabel
@@ -188,16 +197,17 @@ private:
   std::ostream& operator<< (std::ostream& stream, const MonomerLabel & label)
   {
 	  stream 	  
-	  << label.getChainID() << "/" 
-	  << label.getNLabels() << "/" 
-	  << label.getLabelID();
+	  << label.getchainID() << "/" 
+	  << label.getnLabels() << "/" 
+	  << label.getlabelID();
 	  return stream;
   };
 
   /**
   * @brief \b Stream \b In \b operator of the MonomerLabel
   *
-  * @details Streams in the elements. And setting at first chainID, then NLabels, at last LabelID.
+  * @details Streams in the elements. And setting at first chainID, then nLabels, at last labelID,
+  * 	     which are assumed to be separated by slashes. Otherwise throw a runtime error.
   *
   * @param stream input-stream
   * @param label object of class MonomerLabel
@@ -206,9 +216,17 @@ private:
   std::istream& operator >> (std::istream& stream, MonomerLabel & label)
   {
 	  int temp;
-	  stream >> temp; label.setChainID(temp); stream.ignore(1);
-	  stream >> temp; label.setNLabels(temp); stream.ignore(1);
-	  stream >> temp; label.setLabelID(temp);
+	  stream >> temp; label.setchainID(temp);
+	  if (stream.peek()=='/') 
+	      stream.ignore(1);
+	  else 
+	    throw std::runtime_error("MonomerLabel::operator>> Wrong separator!");
+	  stream >> temp; label.setnLabels(temp); 
+	  if (stream.peek()=='/') 
+	      stream.ignore(1);
+	  else 
+	    throw std::runtime_error("MonomerLabel::operator>> Wrong separator!");
+	  stream >> temp; label.setlabelID(temp);
 	  return stream;
   }
 
