@@ -98,54 +98,51 @@ class MonomerReactivity
 	 * \todo There should be a check in the function to test against the "default" maximum connectivity for consistency reason.
 	 */	
 	void setNumMaxLinks(uint32_t numMaxLinks_){numMaxLinks=numMaxLinks_;}
+	
+	/**
+	* @brief \b Stream \b Out \b operator of the MonomerReactivity
+	*
+	* @details Streams out the elements chain ID, number of labels and the label
+	* 	   ID  of the label separated by space
+	*          its implemented inside the class to not break the one definition rule (ODR)
+	* 	   (another solution would be to put the Implementation into a cpp file...)
+	* @param stream output-stream
+	* @param label object of class MonomerReactivity
+	* @return output-stream
+	**/
+	friend std::istream& operator>> (std::istream& stream, MonomerReactivity & Reactivity)
+	{
+	  int temp;
+	  stream >> temp; Reactivity.setReactive(temp); stream.ignore(1);
+	  stream >> temp; Reactivity.setNumMaxLinks(temp);
 
+	  return stream;
+	}
+	
+	/**
+	* @brief \b Stream \b Out \b operator of the MonomerReactivity
+	*
+	* @details Streams out the elements chain ID, number of labels and the label
+	* 	     ID  of the label separated by space
+	*
+	* @param stream output-stream
+	* @param label object of class MonomerReactivity
+	* @return output-stream
+	**/
+	friend std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
+	{
+		stream
+		<< Reactivity.isReactive() << "/"
+		<< Reactivity.getNumMaxLinks();
+		return stream;
+	};
+	
 private:
      //! Private variable holding the tag. Default is NULL.
      bool reactivity;
      //! Number of maximimum possible links/connections to another not-yet-connected monomers
      uint32_t numMaxLinks;
 };
-
-  /**
-  * @brief \b Stream \b Out \b operator of the MonomerReactivity
-  *
-  * @details Streams out the elements chain ID, number of labels and the label
-  * 	     ID  of the label separated by space
-  *
-  * @param stream output-stream
-  * @param label object of class MonomerReactivity
-  * @return output-stream
-  **/
-  // stream overload leads to wrong file output
- /* std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
-  {
-	  stream
-	  << Reactivity.isReactive() << "/"
-	  << Reactivity.getNumMaxLinks();
-	  return stream;
-  };
-*/
-
-  /**
-  * @brief \b Stream \b In \b operator of the MonomerReactivity
-  *
-  * @details Streams in the elements. And setting at first chainID, then NLabels, at last LabelID.
-  *
-  * @param stream input-stream
-  * @param label object of class MonomerReactivity
-  * @return input-stream
-  **/
-// stream overload leads to wrong file input
-  std::istream& operator >> (std::istream& stream, MonomerReactivity & Reactivity)
-  {
-	  int temp;
-	  stream >> temp; Reactivity.setReactive(temp); stream.ignore(1);
-	  stream >> temp; Reactivity.setNumMaxLinks(temp);
-
-	  return stream;
-  }
-
-
 
 /*****************************************************************/
 /**
@@ -363,7 +360,7 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 	const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 	VectorInt3 Pos(ingredients.getMolecules()[ID]);
 	//check if there is a monomer to connect with
-	if ( connectionLattice.getLatticeEntry(Pos+dir) == 0 ) return false;
+// 	if ( connectionLattice.getLatticeEntry(Pos+dir) == 0 ) return false;
 
 	//check for maximum number of bonds for the first monomer
 	if ( molecules.getNumLinks(ID) >=  molecules[ID].getNumMaxLinks()) return false;
@@ -428,7 +425,7 @@ void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveAddMonomerS
 {
   uint32_t MonID(move.getMonomerIndex()); 
   VectorInt3 pos=ing.getMolecules()[MonID];
-  if (ing.getMolecules()[MonID].isReactive()) 
+  if (move.isReactive()) 
     connectionLattice.setLatticeEntry(pos,MonID+1 );
 }
 /******************************************************************************/
@@ -631,16 +628,13 @@ void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm)
   while(n<nMonomers){
     if(molecules[n].getMonomerReactivity()!=reactivity)
     {
-      //strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
-      strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks()<<std::endl;
+      strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
       reactivity=molecules[n].getMonomerReactivity();
       startIndex=n;
     }
     n++;
   }
   //write final reactivity
-  //strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
-  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks()<<std::endl<<std::endl;
-
+  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
 }
 #endif

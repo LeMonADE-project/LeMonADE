@@ -27,7 +27,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
 #define LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
-
+#include <limits>
 #include <LeMonADE/updater/moves/MoveConnectBase.h>
 
 /*****************************************************************************/
@@ -180,6 +180,10 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 
 template <class IngredientsType>
 bool MoveConnectSc::check(IngredientsType& ing)
 {
+  /**
+   * @todo Think about this approach. Maybe we can put this statement somewhere else? 
+   */
+  if (std::numeric_limits<uint32_t>::max() == this->getPartner() ) return false ; 
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
 }

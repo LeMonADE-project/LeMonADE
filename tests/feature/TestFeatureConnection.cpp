@@ -32,6 +32,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/core/ConfigureSystem.h>
 #include <LeMonADE/feature/FeatureBondset.h>
+#include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureBox.h>
 #include <LeMonADE/feature/FeatureConnectionSc.h>
 #include <LeMonADE/utility/Vector3D.h>
@@ -39,7 +40,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 class TestFeatureConnectionSc : public ::testing::Test
 {
 public:
-  typedef LOKI_TYPELIST_3(FeatureConnectionSc, FeatureBondset< >,FeatureBox ) Features;
+  typedef LOKI_TYPELIST_4(FeatureConnectionSc,FeatureExcludedVolumeSc<>, FeatureBondset< >,FeatureBox ) Features;
   typedef ConfigureSystem<VectorInt3,Features,9> Config;
   typedef Ingredients<Config> Ing;
   Ing ingredients;
@@ -169,3 +170,74 @@ TEST_F(TestFeatureConnectionSc,ReadReactivity)
 	  EXPECT_EQ(ingredients.getMolecules()[i].getNumMaxLinks(),9);
 }
 
+TEST_F(TestFeatureConnectionSc,MoveAddMonomerSc)
+{
+  //prepare ingredients
+    ingredients.setBoxX(12);
+    ingredients.setBoxY(12);
+    ingredients.setBoxZ(12);
+    ingredients.setPeriodicX(1);
+    ingredients.setPeriodicY(1);
+    ingredients.setPeriodicZ(1);
+    ingredients.modifyMolecules().resize(2);
+    ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
+    ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
+    ingredients.modifyMolecules()[0].setReactive(true);
+    ingredients.modifyMolecules()[1].setReactive(false);
+    ingredients.modifyMolecules()[0].setNumMaxLinks(1);
+    ingredients.modifyMolecules()[1].setNumMaxLinks(17);
+    EXPECT_TRUE (ingredients.getMolecules()[0].isReactive() );
+    EXPECT_FALSE(ingredients.getMolecules()[1].isReactive() );
+    EXPECT_EQ(ingredients.getMolecules()[0].getNumMaxLinks(),1);
+    EXPECT_EQ(ingredients.getMolecules()[1].getNumMaxLinks(),17);
+    ingredients.synchronize(ingredients);
+    EXPECT_EQ(0,ingredients.getIdFromLattice(0,0,0));    
+    MoveAddMonomerSc<> move;
+    move.init(ingredients);
+    VectorInt3 pos(0,2,0);
+    move.setPosition(pos);
+    move.setReactive(true);
+    EXPECT_TRUE(move.isReactive());
+    move.setNumMaxLinks(4);
+    EXPECT_EQ(4,move.getNumMaxLinks());
+    EXPECT_TRUE(move.check(ingredients));
+    move.apply(ingredients);
+    EXPECT_EQ(2,ingredients.getIdFromLattice(pos));
+}
+
+TEST_F(TestFeatureConnectionSc,MoveLocalSc)
+{
+  //prepare ingredients
+    ingredients.setBoxX(12);
+    ingredients.setBoxY(12);
+    ingredients.setBoxZ(12);
+    ingredients.setPeriodicX(1);
+    ingredients.setPeriodicY(1);
+    ingredients.setPeriodicZ(1);
+    ingredients.modifyMolecules().resize(2);
+    ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
+    ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
+    ingredients.modifyMolecules()[0].setReactive(true);
+    ingredients.modifyMolecules()[1].setReactive(false);
+    ingredients.modifyMolecules()[0].setNumMaxLinks(1);
+    ingredients.modifyMolecules()[1].setNumMaxLinks(17);
+    EXPECT_TRUE (ingredients.getMolecules()[0].isReactive() );
+    EXPECT_FALSE(ingredients.getMolecules()[1].isReactive() );
+    EXPECT_EQ(ingredients.getMolecules()[0].getNumMaxLinks(),1);
+    EXPECT_EQ(ingredients.getMolecules()[1].getNumMaxLinks(),17);
+    ingredients.synchronize(ingredients);
+    EXPECT_EQ(0,ingredients.getIdFromLattice(0,0,0));    
+    EXPECT_EQ(std::numeric_limits<uint32_t>::max(),ingredients.getIdFromLattice(2,0,0));    
+    MoveLocalSc move;
+
+    VectorInt3 dir(0,1,0);
+    move.init(ingredients,0,dir);
+    EXPECT_TRUE(move.check(ingredients));
+    move.apply(ingredients);
+    EXPECT_EQ(0,ingredients.getIdFromLattice(dir));
+    
+    move.init(ingredients,1,dir);
+    EXPECT_TRUE(move.check(ingredients));
+    move.apply(ingredients);
+    EXPECT_EQ(std::numeric_limits<uint32_t>::max(),ingredients.getIdFromLattice(2,1,0));
+}

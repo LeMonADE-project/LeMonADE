@@ -173,17 +173,6 @@ public:
     nLabels=0;
     labelID=0;
   }
-  
-private:
-  //! is intended to store the chain ID of the monomer where the label is sitting on 
-  uint32_t chainID;
-  //! the number of labels sitting on the monomer 
-  uint32_t nLabels;
-  //! the label ID, because there could be more than only one (like a color)
-  uint32_t labelID;
-  
-};
-  
   /**
   * @brief \b Stream \b Out \b operator of the MonomerLabel
   *
@@ -194,15 +183,14 @@ private:
   * @param label object of class MonomerLabel
   * @return output-stream
   **/
-  std::ostream& operator<< (std::ostream& stream, const MonomerLabel & label)
+  friend std::ostream& operator<< (std::ostream& stream, const MonomerLabel & label)
   {
 	  stream 	  
 	  << label.getchainID() << "/" 
 	  << label.getnLabels() << "/" 
 	  << label.getlabelID();
-	  return stream;
-  };
-
+	  return stream;    
+  }
   /**
   * @brief \b Stream \b In \b operator of the MonomerLabel
   *
@@ -213,9 +201,9 @@ private:
   * @param label object of class MonomerLabel
   * @return input-stream
   **/
-  std::istream& operator >> (std::istream& stream, MonomerLabel & label)
+  friend std::istream& operator >> (std::istream& stream, MonomerLabel & label)
   {
-	  int temp;
+    	  int temp;
 	  stream >> temp; label.setchainID(temp);
 	  if (stream.peek()=='/') 
 	      stream.ignore(1);
@@ -229,5 +217,15 @@ private:
 	  stream >> temp; label.setlabelID(temp);
 	  return stream;
   }
+private:
+  //! is intended to store the chain ID of the monomer where the label is sitting on 
+  uint32_t chainID;
+  //! the number of labels sitting on the monomer 
+  uint32_t nLabels;
+  //! the label ID, because there could be more than only one (like a color)
+  uint32_t labelID;
+  
+};
+
 
 #endif
