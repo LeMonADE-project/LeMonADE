@@ -92,6 +92,10 @@ public:
    **/
   virtual void cleanup(){};
 
+  
+  //! get conversion of the reaction process
+  double getConversion(){return (1.*NReactedSites)/(1.*NReactiveSites);};
+  
 private:
   //! Specialized move to be used for the movement of the monomers 
   MoveType move;
@@ -113,9 +117,6 @@ private:
 
   //! number of already reacted monomers
   uint32_t NReactedSites;
-
-  //! get conversion of the reaction process
-  double getConversion(){return (1.*NReactedSites)/(1.*NReactiveSites);};
   
 };
 /**Implementation of the member functions
@@ -149,7 +150,7 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 				// use the move direction in previous check as destination direction
 				if( ingredients.getMolecules()[move.getIndex()].isReactive() )
 				{
-					// vicinity reaction
+					// collision reaction
 					connectionMove.init(ingredients,move.getIndex(), 2*move.getDir());
 
 					if ( connectionMove.check(ingredients) )
@@ -160,23 +161,7 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 				}
 			}
 		}
-		/*uint32_t nTags(TagedMonomers.size());
 
-		for(uint32_t i =0; i < nTags;i++)
-		{
-			// choose a random monomer
-			uint32_t ID(TagedMonomers[ rng.r250_rand32() % nTags ]);
-
-			// vicinity reaction
-			connectionMove.init(ingredients,ID);
-
-			if ( connectionMove.check(ingredients) )
-			{
-				connectionMove.apply(ingredients);
-				NReactedSites+=2;
-			}
-		}
-		*/
 		ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+1);
 	}
 	std::cout <<"Conversion at "<<ingredients.getMolecules().getAge() << " is " << getConversion()  << std::endl;
@@ -197,12 +182,20 @@ void  UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::init
 			for (uint32_t n = 0 ; n < NLinks ;n++)
 			{
 				uint32_t neighbor(ingredients.getMolecules().getNeighborIdx(i,n));
-				if( ingredients.getMolecules()[i].isReactive() )
-					NReactedSites+=2;
-				nIrreversibleBonds++;
+				if( ingredients.getMolecules()[neighbor].isReactive() )
+					NReactedSites++;
+				else
+					nIrreversibleBonds++;
 			}
 			NReactiveSites+=(ingredients.getMolecules()[i].getNumMaxLinks()-nIrreversibleBonds);
 		}
 	}
+	if ( NReactiveSites == 0  )
+	{
+	  std::stringstream errormessage;
+	  errormessage << "UpdaterSimpleConnection::initialize(): The number of possible reactive sites is zero. \n"
+		       << "Check if the system is correctly setup with reactivity!";
+	  throw std::runtime_error(errormessage.str());
+	} 
 };
 #endif 	/*LEMONADE_UPDATER_UPDATERSIMPLECONNECTION_H*/
