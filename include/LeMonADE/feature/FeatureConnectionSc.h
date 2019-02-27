@@ -426,9 +426,9 @@ void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveLocalSc& mo
 template<class IngredientsType, class TagType>
 void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveAddMonomerSc<TagType>& move)
 {
-  uint32_t MonID(move.getIndex());
+  uint32_t MonID(move.getMonomerIndex()); // getindex() --> getMonomerIndex()
   VectorInt3 pos=ing.getMolecules()[MonID];
-  if (ing.getMolecules()[MonID].IsReactive())
+  if (ing.getMolecules()[MonID].isReactive()) /e/IsReactive --> isReactiv
     connectionLattice.setLatticeEntry(pos,MonID+1 );
 }
 /******************************************************************************/
