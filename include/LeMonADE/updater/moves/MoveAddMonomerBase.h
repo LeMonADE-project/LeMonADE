@@ -60,6 +60,7 @@ template<class SpecializedMove, class TagType>
 class MoveAddMonomerBase:public MoveBase
 {
 public:
+  MoveAddMonomerBase():monomerTag(TagType()),reactivity(false), numMaxLinks(0){};
   //here come the functions that are implemented by the specialization
   //! Reset the probability
   template <class IngredientsType> void init(const IngredientsType& ingredients);
@@ -74,26 +75,38 @@ public:
   void setPosition(VectorInt3 pos){position=pos;}
   //! setter function for position of new monomer taking a triple of ints
   void setPosition(int32_t x,int32_t y,int32_t z){position.setX(x);position.setY(y);position.setZ(z);}
+    //! setter function for the reactivity 
+  void setReactive(bool reactivity_){reactivity=reactivity_;}
+  //! setter function for the maximum number of links the monomer should have 
+  void setNumMaxLinks(uint32_t numMaxLinks_){numMaxLinks=numMaxLinks_;}
   //! getter function for the monomerTag of the new monomer
   TagType getTag() const{return monomerTag;}
   //! getter function for the position of the new monomer returning a VectorInt3
   const VectorInt3 getPosition() const {return position;}
   //! getter function for index of the new monomer. This is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
   size_t getMonomerIndex() const {return monomerIndex;}
-
+  //! getter function for the reactivity 
+  bool isReactive() const {return reactivity;}
+  //! getter function for the maximum number of links the monomer should have 
+  uint32_t getNumMaxLinks() const {return numMaxLinks;}
+  
 protected:
   void setMonomerIndex(size_t index){monomerIndex=index;}
 
 private:
   //! position where the new monomer is placed in the simulation box
   VectorInt3 position;
-  //! monomerTag that is applied to the new monomer, requires Feature FeatureAttributes with int-Type
+  //! monomerTag that is applied to the new monomer and is required in  feature FeatureAttributes with TagType
   TagType monomerTag;
   /**
    * @brief Index of new PartileThis is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
    * @details It is set when apply is called. useful if Features want to alter the particle when applying the move
    */
   size_t monomerIndex;
+  //! choose if the monomer is reactive ( can establish additional bonds in a connection process) used in feature FeatureConnectionSc
+  bool reactivity;
+  //! the maximum number of links the monomer should have mainly used in feature FeatureConnectionSc
+  uint32_t numMaxLinks;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
