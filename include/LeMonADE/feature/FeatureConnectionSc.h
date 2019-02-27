@@ -368,17 +368,13 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 	//check for maximum number of bonds for the first monomer
 	if ( molecules.getNumLinks(ID) >=  molecules[ID].getNumMaxLinks()) return false;
 
-	uint32_t Neighbor(connectionLattice.getLatticeEntry(Pos+dir)-1);
+	uint32_t Neighbor(move.getPartner());
 
 	//check for maximum number of bonds for the second monomer
 	if ( molecules.getNumLinks(Neighbor) >= molecules[Neighbor].getNumMaxLinks() ) return false;
 
 	//check if the two monomers are already connected
 	if ( molecules.areConnected(ID,Neighbor) ) return false;
-	
-	//check if the absolute(non-refolded) bond is in the bondvector set 
-	VectorInt3 checkBV(molecules[ID]-molecules[Neighbor]);
-	if ( !( ingredients.getBondset().isValidStrongCheck(checkBV) ) )return false ;
 
 	//if still here, then the two monomers are allowed to connect 
 	return true;

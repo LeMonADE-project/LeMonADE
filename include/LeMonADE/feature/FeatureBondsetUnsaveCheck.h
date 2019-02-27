@@ -59,7 +59,29 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
   virtual ~FeatureBondsetUnsaveCheck(){}
 
   using FeatureBondset<BondSetType>::bondset;
-  
+    /**
+   * @brief Overloaded for MoveConnectBase. 
+   *
+   * @details Checks if the new bond for this move of type ConnectMoveType is valid.
+   * Returns if move is allowed (\a true ) or rejected (\a false ).
+   *
+   * @param [in] ingredients A reference to the IngredientsType - mainly the system.
+   * @param [in] move A reference to ConnectMoveType.
+   * @return if move is allowed (true) or rejected (false).
+   */
+  template<class IngredientsType,class ConnectMoveType>
+  bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<ConnectMoveType>& move) const
+  {
+
+	  //get the number of bond partners of the particle to be moved
+          uint32_t MonID=move.getIndex();
+	  uint32_t partnerID=move.getPartner();
+          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+
+	  if (!bondset.isValid(molecules[MonID]-molecules[partnerID])) return false;
+
+          return true;
+  }
   /**
    * @brief Updates the bond-set lookup table if necessary
    *

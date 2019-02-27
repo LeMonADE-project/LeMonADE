@@ -40,6 +40,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
+#include <LeMonADE/updater/moves/MoveConnectBase.h>
 
 
 
@@ -162,11 +163,11 @@ class FeatureBondset : public Feature
   /**
    * @brief Overloaded for MoveLocalBase. See MoveLocalSc and MoveLocalBcc
    *
-   * @details Checks if the new bond for this move of type MoveLocalSc is valid.
+   * @details Checks if the new bond for this move of type LocalMoveType is valid.
    * Returns if move is allowed (\a true ) or rejected (\a false ).
    *
    * @param [in] ingredients A reference to the IngredientsType - mainly the system.
-   * @param [in] move A reference to MoveLocalSc.
+   * @param [in] move A reference to LocalMoveType.
    * @return if move is allowed (true) or rejected (false).
    */
   template<class IngredientsType,class LocalMoveType>
@@ -183,7 +184,30 @@ class FeatureBondset : public Feature
 
           return true;
   }
+  
+  /**
+   * @brief Overloaded for MoveConnectBase. 
+   *
+   * @details Checks if the new bond for this move of type ConnectMoveType is valid.
+   * Returns if move is allowed (\a true ) or rejected (\a false ).
+   *
+   * @param [in] ingredients A reference to the IngredientsType - mainly the system.
+   * @param [in] move A reference to ConnectMoveType.
+   * @return if move is allowed (true) or rejected (false).
+   */
+  template<class IngredientsType,class ConnectMoveType>
+  bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<ConnectMoveType>& move) const
+  {
 
+	  //get the number of bond partners of the particle to be moved
+          uint32_t MonID=move.getIndex();
+	  uint32_t partnerID=move.getPartner();
+          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+
+	  if (!bondset.isValidStrongCheck(molecules[MonID]-molecules[partnerID])) return false;
+
+          return true;
+  }
   /**
    * @brief Updates the bond-set lookup table if necessary
    *
