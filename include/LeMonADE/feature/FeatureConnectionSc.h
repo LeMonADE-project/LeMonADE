@@ -128,14 +128,15 @@ class MonomerReactivity
 	* @param stream output-stream
 	* @param label object of class MonomerReactivity
 	* @return output-stream
+	* @todo this operator does override the <<molecules[i] operator
 	**/
-	friend std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
-	{
-		stream
-		<< Reactivity.isReactive() << "/"
-		<< Reactivity.getNumMaxLinks();
-		return stream;
-	};
+// 	friend std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
+// 	{
+// 		stream
+// 		<< Reactivity.isReactive() << "/"
+// 		<< Reactivity.getNumMaxLinks();
+// 		return stream;
+// 	};
 	
 private:
      //! Private variable holding the tag. Default is NULL.
@@ -582,8 +583,9 @@ void ReadReactivity<IngredientsType>::execute()
 	}else 
 	{
     	std::stringstream messagestream;
-      messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
-		   <<"the numMaxBonds for the current monomer is exceeding the max number of allowed connectivity for ingredients!"<<nReactiveBlocks+1;
+      messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
+		   <<"the numMaxBonds for the current monomer is exceeding the max number \n"
+		   <<"of allowed connectivity for ingredients in "<<nReactiveBlocks+1;
       throw std::runtime_error(messagestream.str());
 	}
       }
@@ -628,13 +630,15 @@ void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm)
   while(n<nMonomers){
     if(molecules[n].getMonomerReactivity()!=reactivity)
     {
-      strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
+//       strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
+      strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks() <<std::endl;
       reactivity=molecules[n].getMonomerReactivity();
       startIndex=n;
     }
     n++;
   }
   //write final reactivity
-  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
+//   strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
+  strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks() <<std::endl;
 }
 #endif

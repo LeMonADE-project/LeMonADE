@@ -33,6 +33,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/ConfigureSystem.h>
 #include <LeMonADE/feature/FeatureBondset.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
+#include <LeMonADE/feature/FeatureMoleculesIO.h>
 #include <LeMonADE/feature/FeatureBox.h>
 #include <LeMonADE/feature/FeatureConnectionSc.h>
 #include <LeMonADE/utility/Vector3D.h>
@@ -40,8 +41,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 class TestFeatureConnectionSc : public ::testing::Test
 {
 public:
-  typedef LOKI_TYPELIST_4(FeatureConnectionSc,FeatureExcludedVolumeSc<>, FeatureBondset< >,FeatureBox ) Features;
-  typedef ConfigureSystem<VectorInt3,Features,9> Config;
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureConnectionSc,FeatureExcludedVolumeSc<> ) Features;
+  typedef ConfigureSystem<VectorInt3,Features,17> Config;
   typedef Ingredients<Config> Ing;
   Ing ingredients;
 
@@ -168,6 +169,63 @@ TEST_F(TestFeatureConnectionSc,ReadReactivity)
 
   for(size_t i = 5; i < ingredients.getMolecules().size(); i++)
 	  EXPECT_EQ(ingredients.getMolecules()[i].getNumMaxLinks(),9);
+}
+TEST_F(TestFeatureConnectionSc, WriteReactivity)
+{
+  Ing ingredients;
+  WriteReactivity<Ing> write(ingredients);
+  ingredients.modifyMolecules().resize(4);
+  std::stringstream writeStream;
+      ingredients.setBoxX(12);
+    ingredients.setBoxY(12);
+    ingredients.setBoxZ(12);
+    ingredients.modifyMolecules().setAge(10000);
+    ingredients.setPeriodicX(1);
+    ingredients.setPeriodicY(1);
+    ingredients.setPeriodicZ(1);
+    ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
+    ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
+    ingredients.modifyMolecules()[2].setAllCoordinates(2,2,0);
+    ingredients.modifyMolecules()[3].setAllCoordinates(2,0,2);
+    ingredients.modifyMolecules()[0].setReactive(true);
+    ingredients.modifyMolecules()[1].setReactive(false);
+    ingredients.modifyMolecules()[2].setReactive(false);
+    ingredients.modifyMolecules()[3].setReactive(true);
+    ingredients.modifyMolecules()[0].setNumMaxLinks(1);
+    ingredients.modifyMolecules()[1].setNumMaxLinks(17);
+    ingredients.modifyMolecules()[2].setNumMaxLinks(17);
+    ingredients.modifyMolecules()[3].setNumMaxLinks(7);
+    ingredients.synchronize(ingredients);
+  
+    //now create file with the information entered above
+    std::string filename("tmpWriteReactivity.bfm");
+    EXPECT_EQ(0,remove(filename.c_str()));
+    AnalyzerWriteBfmFile<Ing> outputFile(filename,ingredients,AnalyzerWriteBfmFile<Ing>::NEWFILE);
+    outputFile.initialize();
+    outputFile.execute();
+    outputFile.closeFile();
+
+    //now read the file back in and compare
+    Ing checkIngredients;
+    FileImport<Ing> inputFile(filename,checkIngredients);
+    inputFile.initialize();
+
+    //check age
+    EXPECT_EQ(checkIngredients.getMolecules().getAge(),10000);
+    //check number of monomers
+    EXPECT_EQ(checkIngredients.getMolecules().size(),4);
+    EXPECT_TRUE(checkIngredients.getMolecules()[0].isReactive()); 
+    EXPECT_FALSE(checkIngredients.getMolecules()[1].isReactive()); 
+    EXPECT_FALSE(checkIngredients.getMolecules()[2].isReactive()); 
+    EXPECT_TRUE(checkIngredients.getMolecules()[3].isReactive()); 
+    
+    EXPECT_EQ(1,ingredients.getMolecules()[0].getNumMaxLinks());
+    EXPECT_EQ(17,ingredients.getMolecules()[1].getNumMaxLinks());
+    EXPECT_EQ(17,ingredients.getMolecules()[2].getNumMaxLinks());
+    EXPECT_EQ(7,ingredients.getMolecules()[3].getNumMaxLinks());
+    //remove temporary file tmp.bfm (and let test fail if not removed)
+    EXPECT_EQ(0,remove(filename.c_str()));
+     
 }
 
 TEST_F(TestFeatureConnectionSc,MoveAddMonomerSc)
