@@ -199,7 +199,6 @@ TEST_F(TestFeatureConnectionSc, WriteReactivity)
   
     //now create file with the information entered above
     std::string filename("tmpWriteReactivity.bfm");
-    EXPECT_EQ(0,remove(filename.c_str()));
     AnalyzerWriteBfmFile<Ing> outputFile(filename,ingredients,AnalyzerWriteBfmFile<Ing>::NEWFILE);
     outputFile.initialize();
     outputFile.execute();
