@@ -179,7 +179,7 @@ class FeatureBondset : public Feature
           const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 
           for (size_t j=0; j< molecules.getNumLinks(monoIndex); ++j){
-              if (!bondset.isValid(molecules[molecules.getNeighborIdx(monoIndex,j)]-(molecules[monoIndex]+move.getDir()))) return false;
+              if (!bondset.isValidStrongCheck(molecules[molecules.getNeighborIdx(monoIndex,j)]-(molecules[monoIndex]+move.getDir()))) return false;
           }
 
           return true;
