@@ -39,26 +39,27 @@ struct reaction
   bool type;
   uint32_t MonID1;
   uint32_t MonID2;
+  /****************************************************************************/
+  /**
+  * @brief \b Stream \b Out \b operator of the reaction
+  *
+  * @details Streams out the elements of the class 
+  *
+  * @param stream output-stream
+  * @param label object of class reaction
+  * @return output-stream
+  **/
+  friend std::ostream& operator<< (std::ostream& stream, const reaction & Reactivity)
+  {
+	  stream 	  
+	  << Reactivity::type   << " " 
+	  << Reactivity::time   << " "
+	  << Reactivity::MonID1 << " "
+	  << Reactivity::MonID2 << " ";
+	  return stream;
+  }
 };
-/****************************************************************************/
-/**
-* @brief \b Stream \b Out \b operator of the reaction
-*
-* @details Streams out the elements of the class 
-*
-* @param stream output-stream
-* @param label object of class reaction
-* @return output-stream
-**/
-std::ostream& operator<< (std::ostream& stream, const reaction & Reactivity)
-{
-	stream 	  
-	<< Reactivity::type   << " " 
-	<< Reactivity::time   << " "
-	<< Reactivity::MonID1 << " "
-	<< Reactivity::MonID2 << " ";
-	return stream;
-};
+
 /****************************************************************************/
 class tracker
 {
