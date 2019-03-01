@@ -209,7 +209,9 @@ void MoveConnectSc::apply(IngredientsType& ing)
 	//THEN the bond is inserted 
 	ing.modifyMolecules().connect(this->getIndex(),this->getPartner());
 	
-	std::cout << " Connect: " << this->getIndex() << " to " << this->getPartner() << " at ("<<ing.modifyMolecules()[this->getIndex()] << ") - ("<< ing.modifyMolecules()[this->getPartner()] <<")"<< std::endl;
+	//the next line can produce a lot of output
+	//thus use only if needed:
+	//std::cout << " Connect: " << this->getIndex() << " to " << this->getPartner() << " at ("<<ing.modifyMolecules()[this->getIndex()] << ") - ("<< ing.modifyMolecules()[this->getPartner()] <<")"<< std::endl;
 }
 
 #endif

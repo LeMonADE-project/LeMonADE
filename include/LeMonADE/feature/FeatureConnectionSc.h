@@ -130,13 +130,13 @@ class MonomerReactivity
 	* @return output-stream
 	* @todo this operator does override the <<molecules[i] operator
 	**/
-// 	friend std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
-// 	{
-// 		stream
-// 		<< Reactivity.isReactive() << "/"
-// 		<< Reactivity.getNumMaxLinks();
-// 		return stream;
-// 	};
+	friend std::ostream& operator<< (std::ostream& stream, const MonomerReactivity & Reactivity)
+	{
+		stream
+		<< Reactivity.isReactive() << "/"
+		<< Reactivity.getNumMaxLinks();
+		return stream;
+	};
 	
 private:
      //! Private variable holding the tag. Default is NULL.
@@ -368,6 +368,9 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 
 	uint32_t Neighbor(move.getPartner());
 
+	//check if neighbor is reactive 
+	if ( !molecules[Neighbor].isReactive() ) return false;
+	
 	//check for maximum number of bonds for the second monomer
 	if ( molecules.getNumLinks(Neighbor) >= molecules[Neighbor].getNumMaxLinks() ) return false;
 
@@ -390,7 +393,6 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
 template<class IngredientsType>
 void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveConnectSc& move)
 {
-	std::cout << "Establish connection between " << move.getIndex() << " and " << move.getPartner() << std::endl;
     ing.modifyMolecules().connect(move.getIndex(), move.getPartner());
 }
 /******************************************************************************/
@@ -630,15 +632,13 @@ void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm)
   while(n<nMonomers){
     if(molecules[n].getMonomerReactivity()!=reactivity)
     {
-//       strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
-      strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks() <<std::endl;
+      strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
       reactivity=molecules[n].getMonomerReactivity();
       startIndex=n;
     }
     n++;
   }
   //write final reactivity
-//   strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
-  strm<<startIndex+1<<"-"<<n<<":"<<reactivity.isReactive() << "/"<< reactivity.getNumMaxLinks() <<std::endl;
+  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
 }
 #endif

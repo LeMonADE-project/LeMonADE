@@ -76,7 +76,9 @@ TEST(Vector3DTest, getterAndSetter) {
 	EXPECT_EQ( 9, vec2A.getVector3D().getY());
 	EXPECT_EQ(-3, vec2A.getVector3D().getZ());
 	EXPECT_EQ(26, vec2A.getVector3D()*vecC.getVector3D());
-
+	
+	EXPECT_NO_THROW(vec2A.modifyVector3D().setX(34));
+	EXPECT_EQ( 34, vec2A.getVector3D().getX());
 
 #ifdef DEBUG
 	EXPECT_ANY_THROW(vec[5] = int(4));
