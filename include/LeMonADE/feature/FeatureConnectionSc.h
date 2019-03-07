@@ -36,6 +36,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveConnectSc.h>
 #include <LeMonADE/updater/moves/MoveLocalBcc.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
+#include <LeMonADE/updater/moves/MoveLocalScDiag.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerBcc.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 #include <LeMonADE/utility/Lattice.h>
@@ -245,12 +246,17 @@ public:
 	bool checkMove(const IngredientsType& ingredients, const MoveBase& move) const{ return true;};
 
 	//! check bas connect move - always true 
-	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients, const MoveConnectSc& move) const;
+	template<class IngredientsType, class SpecializedMove> 
+	bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<SpecializedMove>& move) const;
 
 	//! check bas connect move - always true 
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveLocalSc& move) const {return true;};
+	
+	//! check bas connect move - always true 
+	template<class IngredientsType>
+	bool checkMove(const IngredientsType& ingredients, const MoveLocalScDiag& move) const {return true;};
+	
 	
 	//! check bas connect move - always true 
 	template<class IngredientsType>
@@ -269,12 +275,16 @@ public:
 	void applyMove(IngredientsType& ing, const MoveBase& move){};
 	
 	//!apply move for the scBFM connection move for connection
-	template<class IngredientsType>
-	void applyMove(IngredientsType& ing, const MoveConnectSc& move);
+	template<class IngredientsType, class SpecializedMove> 
+	void applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove>& move);
 	
 	//!apply move for the scBFM local move which changes the lattice
 	template<class IngredientsType>
 	void applyMove(IngredientsType& ing, const MoveLocalSc& move);	
+	
+	//!apply move for the scBFM local diagonal move which changes the lattice
+	template<class IngredientsType>
+	void applyMove(IngredientsType& ing, const MoveLocalScDiag& move);	
 
 	//!
 	template<class IngredientsType, class TagType>
@@ -353,15 +363,14 @@ void FeatureConnectionSc::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& f
  * @return true Always!
  */
 /******************************************************************************/
-template<class IngredientsType>
-bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const MoveConnectSc& move) const
+template<class IngredientsType, class SpecializedMove> 
+bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const MoveConnectBase<SpecializedMove>& move) const
 {
+  
+  	if (!latticeFilledUp)
+	    throw std::runtime_error("*****FeatureConnectionSc::checkMove....lattice is not populated. Run synchronize!\n");
 	uint32_t ID(move.getIndex());
-	VectorInt3 dir(move.getDir());
 	const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
-	VectorInt3 Pos(ingredients.getMolecules()[ID]);
-	//check if there is a monomer to connect with
-// 	if ( connectionLattice.getLatticeEntry(Pos+dir) == 0 ) return false;
 
 	//check for maximum number of bonds for the first monomer
 	if ( molecules.getNumLinks(ID) >=  molecules[ID].getNumMaxLinks()) return false;
@@ -390,16 +399,22 @@ bool FeatureConnectionSc ::checkMove(const IngredientsType& ingredients, const M
  * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
  */
 /******************************************************************************/
-template<class IngredientsType>
-void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveConnectSc& move)
+template<class IngredientsType, class SpecializedMove> 
+void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveConnectBase<SpecializedMove>& move)
 {
-    ing.modifyMolecules().connect(move.getIndex(), move.getPartner());
+  //because in the most cases we have an irreversible connection we can erase the lattice entry 
+  const typename IngredientsType::molecules_type& molecules=ing.getMolecules();
+  uint32_t ID(move.getIndex());
+  if ( molecules.getNumLinks(ID) ==  molecules[ID].getNumMaxLinks())
+    connectionLattice.setLatticeEntry(molecules[ID].getVector3D(),0);
+  uint32_t Neighbor(move.getPartner());
+  if ( molecules.getNumLinks(Neighbor) ==  molecules[Neighbor].getNumMaxLinks())
+    connectionLattice.setLatticeEntry(molecules[Neighbor].getVector3D(),0);
+//connection is made in the move 
 }
 /******************************************************************************/
 /**
  * @fn void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveLocalSc& move)
- * @brief This function applies for unknown moves other than the ones that have specialized versions of this function.
- * It does nothing and is implemented for generality.
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
  * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
@@ -415,9 +430,23 @@ void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveLocalSc& mo
 }
 /******************************************************************************/
 /**
+ * @fn void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveLocalScDiag& move)
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
+ */
+/******************************************************************************/
+template<class IngredientsType>
+void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveLocalScDiag& move)
+{
+  VectorInt3 oldPos=ing.getMolecules()[move.getIndex()];
+  VectorInt3 direction=move.getDir();
+  VectorInt3 oldPlusDir=oldPos+direction;
+  connectionLattice.moveOnLattice(oldPos,oldPlusDir);
+}
+/******************************************************************************/
+/**
  * @fn void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move)
- * @brief This function applies for unknown moves other than the ones that have specialized versions of this function.
- * It does nothing and is implemented for generality.
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
  * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
@@ -473,7 +502,7 @@ void FeatureConnectionSc::fillLattice(IngredientsType& ingredients)
 		{
 			throw std::runtime_error("********** FeatureConnectionSc::fillLattice: multiple lattice occupation ******************");
 		}
-		else if (ingredients.getMolecules()[n].isReactive())
+		else if (ingredients.getMolecules()[n].isReactive() && (molecules.getNumLinks(n) <  molecules[n].getNumMaxLinks()) )
 		{
 			//here we simply set the monomer id (plus one!) on the lattice site 
 			// the offset implies that the index zero is still used for unoccupied
@@ -581,7 +610,7 @@ void ReadReactivity<IngredientsType>::execute()
 	{
 	    //use n-1 as index, because bfm-files start counting indices at 1 (not 0)
 	    molecules[n-1].setMonomerReactivity(reactivity);
-	    std::cout << "idx" << n-1 << " reactivity: " << reactivity.isReactive() << " numMaxBonds" << reactivity.getNumMaxLinks() << std::endl;
+// 	    std::cout << "idx" << n-1 << " reactivity: " << reactivity.isReactive() << " numMaxBonds" << reactivity.getNumMaxLinks() << std::endl;
 	}else 
 	{
     	std::stringstream messagestream;
