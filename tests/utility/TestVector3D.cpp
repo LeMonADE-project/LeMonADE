@@ -35,6 +35,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include "gtest/gtest.h"
 
 #include <sstream>
+#include <limits>
 
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/utility/NumericResultTypes.h>
@@ -172,3 +173,16 @@ TEST(Vector3DTest, Operators) {
 	
 }
 
+TEST(Vector3DTest, Normalize) {
+	VectorDouble3 a(1.0,2.0,3.0);
+	VectorDouble3 b(0.0,0.0,0.0);
+	VectorDouble3 c(std::numeric_limits<double>::infinity(),0.0,0.0);
+	VectorDouble3 d(-1.0*std::numeric_limits<double>::infinity(),0.0,0.0);
+	
+	EXPECT_NO_THROW(a.normalize());
+	EXPECT_EQ(a.getLength(),1.0);
+	
+	EXPECT_THROW(b.normalize(),std::runtime_error);
+	EXPECT_THROW(c.normalize(),std::runtime_error);
+	EXPECT_THROW(d.normalize(),std::runtime_error);
+}

@@ -129,7 +129,7 @@ int main(int argc, char* argv[]){
     //add the radius of gyration calculation. we execute this only 
     //every 10th time
     taskmanager.addAnalyzer(new 
-    AnalyzerRadiusOfGyration<MyIngredients>(mySystem,"polymer"),10);
+    AnalyzerRadiusOfGyration<MyIngredients>(mySystem,"Rg2.dat"),10);
 
     //now add the ex5analyzer. execute it every second circle
     std::string outputFilename("ex5output.dat");

@@ -493,6 +493,12 @@ public:
 	{
 	  T prod = (*this)*(*this); 
 	  *this /= sqrt(prod);
+	  if ( this->getX() != this->getX() || this->getY() != this->getY() || this->getZ() != this->getZ() )
+	  {
+		  std::ostringstream strm;
+		  strm << "Vector3D::normalize() leading to nan " << std::endl;
+		  throw std::runtime_error(strm.str().c_str());
+	  }
 	  return *this;
 	}
 

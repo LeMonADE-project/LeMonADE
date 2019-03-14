@@ -41,7 +41,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/feature/FeatureMoleculesIO.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
-#include <LeMonADE/feature/FeatureExcludedVolume.h>
+#include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
 
 using namespace std;
@@ -171,9 +171,9 @@ TEST_F(CopyOperatorTest,Molecules)
 }
 
 
-TEST_F(CopyOperatorTest,FeatureExcludedVolume)
+TEST_F(CopyOperatorTest,FeatureExcludedVolumeSc)
 {
-    typedef LOKI_TYPELIST_2(FeatureMoleculesIO,FeatureExcludedVolume< FeatureLattice <int8_t> >) Features1;
+    typedef LOKI_TYPELIST_2(FeatureMoleculesIO,FeatureExcludedVolumeSc< FeatureLattice <int8_t> >) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 ingredients;
