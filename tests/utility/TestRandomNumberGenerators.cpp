@@ -111,44 +111,62 @@ TEST(RandomNumberGeneratorsTest,R250MultipleInstances){
 
 //very simple test to see if on average all bits are being used equally
 TEST(RandomNumberGeneratorsTest,R250BitsUsage){
+
+	// a statistical test may fail even if everything is fine.
+	// to minimize failure rate and keep runtime justifiable the test is repeated if it fails
+	// if test fails multiple times something might be seriously wrong and the test does not pass
+	uint32_t successCounter(0);
+	uint32_t maxFails(10);
+	bool testPassed(false);
 	
 	std::vector<uint32_t> bitUsage(32);
 	
 	RandomNumberGenerators rng;
 	
-		
-	//seed using rng1
-	rng.seedAll();
-	
-	//draw 20000 numbers. then, each bit should have been used on average
-	//10000 times with a standard deviation of 100. in this loop we count 
-	//for each bit the number of times it is used within 20000 random numbers
-	for(size_t i=0;i<20000;i++){
-		uint32_t randomNumber=rng.r250_rand32();
-		for(uint32_t n=1;n<=32;n++){			
-			bitUsage[n-1]+=(randomNumber & (uint32_t(std::pow(2,n))-1))>>(n-1);
-			
-		}
-		
-	}
-	
-	std::cout<<"THIS TEST MAY FAIL EVEN IF EVERYTHING IS WORKING PROPERLY\n"
-	<<"THE EXPECTED VALUES ARE 10000+-300, WHERE 300 IS 2SIGMA. THAT IS 99.7 PERCENT OF\n"
-	<<"THE CASES THE TEST WILL SUCCEED IF EVERYTHING IS OK....IF IT FAILS, TRY RUNNING AGAIN\n";
-	//check that all bits have been used are within 3sigma of the expectation
-	//value. this test may of course fail
-	for(size_t n=0;n<32;n++){
-		EXPECT_LE(bitUsage[n],(10000+200));
-		EXPECT_GE(bitUsage[n],(10000-200));
-	}
+	// repeat test is a rate event of failing occurs, but not arbitrarily often
+	while( (successCounter<maxFails) && !testPassed){
 
+		//seed using rng
+		rng.seedAll();
+
+		//draw 20000 numbers. then, each bit should have been used on average
+		//10000 times with a standard deviation of 100. in this loop we count 
+		//for each bit the number of times it is used within 20000 random numbers
+		for(size_t i=0;i<20000;i++){
+			uint32_t randomNumber=rng.r250_rand32();
+			for(uint32_t n=1;n<=32;n++){			
+				bitUsage[n-1]+=(randomNumber & (uint32_t(std::pow(2,n))-1))>>(n-1);
+			}
+		}
+
+		std::cout<<"THIS TEST MAY FAIL EVEN IF EVERYTHING IS WORKING PROPERLY\n"
+		<<"THE EXPECTED VALUES ARE 10000+-300, WHERE 300 IS 2SIGMA. THAT IS 99.7 PERCENT OF\n"
+		<<"THE CASES THE TEST WILL SUCCEED IF EVERYTHING IS OK....IF IT FAILS, TRY RUNNING AGAIN\n";
+		//check that all bits have been used are within 3sigma of the expectation
+		//value. this test may of course fail
+
+		// store test result in a dummy bool
+		bool testBitwisePassed(true);
+		for(size_t n=0;n<32;n++){
+			//EXPECT_LE(bitUsage[n],(10000+300));
+			if( !(bitUsage[n] <= (10000+300)) ) testBitwisePassed=false;
+			//EXPECT_GE(bitUsage[n],(10000-300));
+			if( !(bitUsage[n] >= (10000-300)) ) testBitwisePassed=false;
+		}
+
+		if(testBitwisePassed) testPassed=true;
+		successCounter++;
+	}
+	// use the test routines here
+	std::cout << "random number test was executed "<<successCounter<<" times."<<std::endl;
+	EXPECT_LT(successCounter,maxFails);
+	EXPECT_TRUE(testPassed);
 	
 }
 
 //this test is somewhat random, it can in principle fail, even if everything is
 //working correctly. the probability for the test to fail is roughly 1%.
 TEST(RandomNumberGeneratorsTest,R250RangeOfNumbers){
-	
 	
 	RandomNumberGenerators rng;
 	
