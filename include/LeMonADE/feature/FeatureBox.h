@@ -43,7 +43,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerBase.h>
-
+#include <LeMonADE/updater/moves/MoveConnectBase.h>
+#include <LeMonADE/updater/moves/MoveConnectSc.h>
 
 /*****************************************************************/
 /**
@@ -295,7 +296,36 @@ public:
 
 	}
 
+	/**
+	 * @brief Overloaded for MoveConnectSc
+	 *
+	 * @details Returns true if the moves doesn´t violate the p.b.c. esp. the new link is not created of walls.
+	 * The periodicity is set to \a false ,
+	 * the faces of rectangular cuboid behave like hard walls. In fact, the new position \a pos of the monomer can not exceed
+	 * the limit in Length [pos.getX()<(getBoxX()-1)], Width [pos.getY()<(getBoxY()-1)] or Height [pos.getZ()<(getBoxZ()-1)]
+	 * or be smaller than 0 in the corresponding directions. \n
+	 * If the periodicity is set to \a true , the Move is not limited to the (virtual) simulation box.
+	 *
+	 * @param [in] ingredients A reference to the IngredientsType - mainly the system
+	 * @param [in] move General move other than MoveConnectSc.
+	 * @return True if move is allowed with p.b.c. or rejected (false).
+	 *
+	 * @todo This implementation of "walls" maybe slow down the algorithm. Discuss a new FeatureWall
+	 */
+	template<class IngredientsType>
+	bool checkMove(const IngredientsType& ingredients, const MoveConnectSc& move) const
+	{
+		typename IngredientsType::molecules_type::vertex_type targetedPos=ingredients.getMolecules()[move.getIndex()];
+		targetedPos+=move.getDir(); // // pos += P+-(2,0,0)
+		if(	(periodicX || (targetedPos.getX()<(getBoxX()-1) && targetedPos.getX()>=0) ) &&
+			(periodicY || (targetedPos.getY()<(getBoxY()-1) && targetedPos.getY()>=0) ) &&
+			(periodicZ || (targetedPos.getZ()<(getBoxZ()-1) && targetedPos.getZ()>=0) )
+		)
+			return true;
+		else
+			return false;
 
+	}
 
 	/**
 	 * @brief Overloaded for MoveAddMonomerBase(MoveAddMonomerSc and MoveAddMonomerBcc)
@@ -311,8 +341,8 @@ public:
 	 * @return True if move is allowed with p.b.c. or rejected (false).
 	 *
 	 */
-	template<class IngredientsType,class AddMoveType>
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType>& addmove) const
+	template<class IngredientsType,class AddMoveType, class TagType>
+	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType, TagType>& addmove) const
 	{
 		VectorInt3 pos=addmove.getPosition();
 

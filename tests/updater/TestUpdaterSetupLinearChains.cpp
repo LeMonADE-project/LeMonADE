@@ -77,7 +77,7 @@ private:
 
 TEST_F(TestUpdaterAddLinearChains, Constructor)
 {
-  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
 
@@ -94,7 +94,7 @@ TEST_F(TestUpdaterAddLinearChains, Constructor)
 
 TEST_F(TestUpdaterAddLinearChains, TestUpdater)
 {
-  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
 
@@ -138,7 +138,7 @@ TEST_F(TestUpdaterAddLinearChains, TestUpdater)
 
 TEST_F(TestUpdaterAddLinearChains, TestCompressedSolvent)
 {
-  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >,FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
 

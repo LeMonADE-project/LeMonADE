@@ -41,6 +41,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
+#include <LeMonADE/updater/moves/MoveConnectBase.h>
 
 /*****************************************************************/
 /**
@@ -59,7 +60,34 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
   virtual ~FeatureBondsetUnsaveCheck(){}
 
   using FeatureBondset<BondSetType>::bondset;
+  // this is neccessary because we overwrite one checkMove in the following and 
+  // therefore we need to explicitly load the other (overloaded ) checkMove-function.
+  using FeatureBondset<BondSetType>::checkMove;
+  /**
+   * @brief Overloaded for MoveConnectBase. 
+   *
+   * @details Checks if the new bond for this move of type ConnectMoveType is valid.
+   * Returns if move is allowed (\a true ) or rejected (\a false ).
+   *
+   * @param [in] ingredients A reference to the IngredientsType - mainly the system.
+   * @param [in] move A reference to ConnectMoveType.
+   * @return if move is allowed (true) or rejected (false).
+   */
+  template<class IngredientsType,class ConnectMoveType>
+  bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<ConnectMoveType>& move) const
+  {
+
+	  //get the number of bond partners of the particle to be moved
+          uint32_t MonID=move.getIndex();
+	  uint32_t partnerID=move.getPartner();
+          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+
+	  if (!bondset.isValid(molecules[partnerID]-molecules[MonID])) return false;
+
+          return true;
+  }
   
+//   using FeatureBondset<BondSetType>::checkMove;
   /**
    * @brief Updates the bond-set lookup table if necessary
    *
@@ -79,7 +107,6 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
      for (size_t j=0; j< molecules.getNumLinks(i); ++j){
        
 	 uint n = molecules.getNeighborIdx(i,j);
-       // if (!bondset.isValid(molecules[n]-molecules[i]))
 	 if (!bondset.isValid(molecules[n]-molecules[i]))
 	{
 	  std::ostringstream errorMessage;

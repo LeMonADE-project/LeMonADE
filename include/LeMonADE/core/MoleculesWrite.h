@@ -35,6 +35,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <algorithm>
 
 #include <LeMonADE/io/AbstractWrite.h>
+#include <LeMonADE/utility/Vector3D.h>
 
 
 /***********************************************************************/
@@ -130,18 +131,18 @@ void WriteMcs<IngredientsType>::writeStream(std::ostream& strm)
 		if(molecules.getNumLinks(n)==0)
 		{
 			contents<<"\n";
-			contents<<molecules[n];
+			contents << molecules[n].getVector3D();
 		}
 		else if(n==0)
 		{
 			contents<<"\n";
-			contents<<molecules[n];
+			contents << molecules[n].getVector3D();
 			contents<<" ";
 		}
 		//if the actual monomer is a chainstart, start a new subchain in !mcs Read
 		else if (!molecules.areConnected(n,n-1)){
 			contents<<"\n";
-			contents << molecules[n];
+			contents << molecules[n].getVector3D();
 			contents << " ";
 		}
 		//otherwise write the bond

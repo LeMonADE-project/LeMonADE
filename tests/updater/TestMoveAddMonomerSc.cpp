@@ -47,7 +47,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 class TestMoveAddMonomerSc: public ::testing::Test{
 public:
-  typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
+  typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes<>, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
 
@@ -84,7 +84,7 @@ TEST_F(TestMoveAddMonomerSc, initialiseSetterGetter)
 
   EXPECT_NO_THROW(ingredients.synchronize());
 
-  MoveAddMonomerSc addmove;
+  MoveAddMonomerSc<> addmove;
 
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
@@ -141,7 +141,7 @@ TEST_F(TestMoveAddMonomerSc, checkAndApply)
 
   EXPECT_NO_THROW(ingredients.synchronize());
 
-  MoveAddMonomerSc addmove;
+  MoveAddMonomerSc<> addmove;
 
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);

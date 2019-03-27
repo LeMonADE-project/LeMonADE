@@ -60,9 +60,6 @@ private:
   std::ostringstream tempStream;
 };
 
-
-
-
 TEST(TestFeatureWall,Moves)
 {
 
@@ -82,7 +79,7 @@ TEST(TestFeatureWall,Moves)
 
     //one move of every type
     MoveLocalSc scmove;
-    MoveAddMonomerSc addmove;
+    MoveAddMonomerSc<> addmove;
 
     ingredients.modifyMolecules().resize(3);
     ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
@@ -90,8 +87,6 @@ TEST(TestFeatureWall,Moves)
     ingredients.modifyMolecules()[2].setAllCoordinates(2,2,0);
 
     EXPECT_NO_THROW(ingredients.synchronize(ingredients));
-
-
 
     //************  scmove  ***************
 
@@ -167,8 +162,6 @@ TEST(TestFeatureWall,Moves)
     while((scmove.getDir().getX()==-1) || (scmove.getDir().getY()==-1) || (scmove.getIndex()!=2)) scmove.init(ingredients);
     EXPECT_TRUE(ingredients.checkMove(ingredients,scmove));
 
-
-
     ingredients.clearAllWalls();
 
     //add former wall1 again
@@ -195,8 +188,6 @@ TEST(TestFeatureWall,Moves)
     //check possible monomer 2 movements
     while((scmove.getDir().getX()==-1) || (scmove.getDir().getX()==1) || (scmove.getIndex()!=2)) scmove.init(ingredients);
     EXPECT_TRUE(ingredients.checkMove(ingredients,scmove));
-
-
 
 
     //************  addmove  ***************
@@ -247,15 +238,7 @@ TEST(TestFeatureWall,Moves)
     addmove.setPosition(4,2,0);
     EXPECT_TRUE(ingredients.checkMove(ingredients,addmove));
 
-
-
-
-
 }
-
-
-
-
 
 
 TEST(TestFeatureWall,ReadWriteRoutine)

@@ -83,7 +83,7 @@ protected:
   }
 
   //define system
-  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients < Config> MyIngredients;
   MyIngredients ingredients;

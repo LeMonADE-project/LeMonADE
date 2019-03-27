@@ -125,8 +125,8 @@ public:
     bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move);
 
     //! check move function for add sc move
-    template<class IngredientsType>
-    bool checkMove(const IngredientsType& ingredients,MoveAddMonomerSc& addmove);
+    template<class IngredientsType, class TagType>
+    bool checkMove(const IngredientsType& ingredients,MoveAddMonomerSc<TagType>& addmove);
 
     //! implemantation of synchronize
     template<class IngredientsType>
@@ -242,8 +242,8 @@ bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveLocalSc& mov
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
  * @param [in] addmove move to add sc monomer
  */
-template<class IngredientsType>
-bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddMonomerSc& addmove)
+template<class IngredientsType, class TagType>
+bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddMonomerSc<TagType>& addmove)
 {
     uint32_t counter(0);
 

@@ -373,7 +373,7 @@ TEST_F(FeatureBoxTest, checkAddMonomerMove)
 	// coordinates for non-periodicity 0 <= x,y,z <= BOX-2 (Wall at BOX)
 
 	// first check with periodic boundary conditions
-	MoveAddMonomerSc move;
+	MoveAddMonomerSc<> move;
 
 	move.init(ingredients);
 	move.setPosition(-1,3,5);

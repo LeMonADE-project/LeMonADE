@@ -221,7 +221,7 @@ TEST_F(CopyOperatorTest,FeatureExcludedVolumeSc)
 
 TEST_F(CopyOperatorTest,FeatureAttributes)
 {
-    typedef LOKI_TYPELIST_2(FeatureMoleculesIO,FeatureAttributes) Features1;
+    typedef LOKI_TYPELIST_2(FeatureMoleculesIO,FeatureAttributes<>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 ingredients;

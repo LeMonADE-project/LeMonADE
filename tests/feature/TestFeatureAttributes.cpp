@@ -47,6 +47,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/core/ConfigureSystem.h>
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
+#include <LeMonADE/utility/AttributeTags.h>
 
 using namespace std;
 /************************************************************************/
@@ -56,11 +57,18 @@ using namespace std;
 /************************************************************************/
 
 class FeatureAttributesTest: public ::testing::Test{
+  
 public:
-  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes) Features;
+  typedef Integer TagType;
+  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes<TagType>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> MyIngredients;
 
+  //used for testing another tag type 
+  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes<MonomerLabel>) FeaturesTags;
+  typedef ConfigureSystem<VectorInt3,FeaturesTags> ConfigTags;
+  typedef Ingredients<ConfigTags> MyIngredientsTags;
+  
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
@@ -79,7 +87,7 @@ private:
 
 TEST_F(FeatureAttributesTest,MonomerAttributeTag)
 {
-  MonomerAttributeTag tag;
+  MonomerAttributeTag<TagType> tag;
   EXPECT_EQ(0,tag.getAttributeTag());
   tag.setAttributeTag(-1);
   EXPECT_EQ(-1,tag.getAttributeTag());
@@ -150,7 +158,7 @@ TEST_F(FeatureAttributesTest,ReadAttributesClass)
   //this test is for testing the reaction of the read class to incorrectly
   //formatted input
   MyIngredients ingredients;
-  ReadAttributes<MyIngredients> read(ingredients);
+  ReadAttributes<MyIngredients,TagType> read(ingredients);
 
   ingredients.modifyMolecules().resize(10);
 
@@ -220,5 +228,133 @@ TEST_F(FeatureAttributesTest,CopyConstructor)
 	EXPECT_EQ(molecules1[4].getAttributeTag(),molecules2[4].getAttributeTag());
 	EXPECT_EQ(molecules1[4].getAttributeTag(),molecules3[4].getAttributeTag());
 
+}
+
+TEST_F(FeatureAttributesTest,MonomerLabel)
+{
+  MonomerLabel Label1(2,14,5);
+  //copy constructor
+  MonomerLabel Label2(Label1);
+  EXPECT_EQ(Label1.getchainID(),Label2.getchainID() );
+  EXPECT_EQ(Label1.getnLabels(),Label2.getnLabels() );
+  EXPECT_EQ(Label1.getlabelID(),Label2.getlabelID() );
+  
+  //default constructor
+  MonomerAttributeTag<MonomerLabel> tag;
+  EXPECT_EQ(0,tag.getAttributeTag().getchainID());
+  EXPECT_EQ(0,tag.getAttributeTag().getnLabels());
+  EXPECT_EQ(0,tag.getAttributeTag().getlabelID());
+  
+  typedef MyIngredientsTags::molecules_type MyMolecules1;
+  MyMolecules1 molecules9;
+
+  //check if attributes are copied corriectly by copy constructor
+  molecules9.resize(3);
+  //if it runs throught then there is no error in the assign constructor
+  molecules9[0].setAttributeTag(MonomerLabel(1,23,45));
+  EXPECT_EQ( molecules9[0].getAttributeTag().getchainID(), 1);
+  EXPECT_EQ( molecules9[0].getAttributeTag().getnLabels(),23);
+  EXPECT_EQ( molecules9[0].getAttributeTag().getlabelID(),45);
+  molecules9[1].setAttributeTag(MonomerLabel(3,2,4));
+
+  //negative falues do not make much sense
+  EXPECT_THROW(molecules9[2].setAttributeTag(MonomerLabel(12,5,-1)), std::runtime_error);
+  EXPECT_THROW(molecules9[2].setAttributeTag(MonomerLabel(12,-5,1)), std::runtime_error);
+  EXPECT_THROW(molecules9[2].setAttributeTag(MonomerLabel(-12,5,1)), std::runtime_error);
+  molecules9[2].setAttributeTag(MonomerLabel(12,5,1));
+  
+  // equality operator
+  EXPECT_FALSE( molecules9[1].getAttributeTag() == molecules9[2].getAttributeTag() );
+  molecules9[1].setAttributeTag(molecules9[2].getAttributeTag());
+  EXPECT_TRUE( molecules9[1].getAttributeTag() == molecules9[2].getAttributeTag() );
+
+}
+
+TEST_F(FeatureAttributesTest,ReadAttributesClassForMonomerLabels)
+{
+  //this test is for testing the reaction of the read class to incorrectly
+  //formatted input
+  MyIngredientsTags ingredients;
+  ReadAttributes<MyIngredientsTags, MonomerLabel> read(ingredients);
+
+  ingredients.modifyMolecules().resize(10);
+
+  std::stringstream stream1;
+  read.setInputStream(&stream1);
+  stream1<<"\ni am a parrot\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+  std::stringstream stream2;
+  read.setInputStream(&stream2);
+  stream2<<"\n1:2:2\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+  std::stringstream stream3;
+  read.setInputStream(&stream3);
+  stream3<<"\n1-2-3\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+  std::stringstream stream4;
+  read.setInputStream(&stream4);
+  stream4<<"\n1-a:4\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+  std::stringstream stream5;
+  read.setInputStream(&stream5);
+  stream5<<"\n1-5:c\n";
+  EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+}
+
+
+TEST_F(FeatureAttributesTest,exportWriteTags)
+{
+  MyIngredientsTags setupIngrediens;
+  MyIngredientsTags ingredients;
+
+  MyIngredientsTags::molecules_type const& setupMolecules= setupIngrediens.getMolecules();
+  MyIngredientsTags::molecules_type const& molecules= ingredients.getMolecules();
+
+  setupIngrediens.setBoxX(100);
+  setupIngrediens.setPeriodicX(true);
+  setupIngrediens.setBoxY(100);
+  setupIngrediens.setPeriodicY(true);
+  setupIngrediens.setBoxZ(100);
+  setupIngrediens.setPeriodicZ(true);
+  setupIngrediens.modifyMolecules().resize(5);
+  setupIngrediens.modifyMolecules()[0].setAttributeTag(MonomerLabel(1,23,54));
+  setupIngrediens.modifyMolecules()[1].setAttributeTag(MonomerLabel(2,3,17));
+  setupIngrediens.modifyMolecules()[4].setAttributeTag(MonomerLabel(5,4,104));
+  //write to file and read back in
+  AnalyzerWriteBfmFile<MyIngredientsTags> outfile("tests/attributesTestOut.test",setupIngrediens,AnalyzerWriteBfmFile<MyIngredientsTags>::NEWFILE);
+  outfile.initialize();
+
+  FileImport<MyIngredientsTags> infile ("tests/attributesTestOut.test",ingredients);
+
+  //scan file for !mcs and read-in first frame
+  infile.initialize();
+
+  EXPECT_EQ(1,molecules[0].getAttributeTag().getchainID());
+  EXPECT_EQ(23,molecules[0].getAttributeTag().getnLabels());
+  EXPECT_EQ(54,molecules[0].getAttributeTag().getlabelID());
+  EXPECT_EQ(2,molecules[1].getAttributeTag().getchainID());
+  EXPECT_EQ(3,molecules[1].getAttributeTag().getnLabels());
+  EXPECT_EQ(17,molecules[1].getAttributeTag().getlabelID());
+  EXPECT_EQ(0,molecules[2].getAttributeTag().getchainID()); /*has default value*/
+  EXPECT_EQ(0,molecules[2].getAttributeTag().getnLabels()); /*has default value*/
+  EXPECT_EQ(0,molecules[2].getAttributeTag().getlabelID()); /*has default value*/
+  EXPECT_EQ(0,molecules[3].getAttributeTag().getchainID()); /*has default value*/
+  EXPECT_EQ(0,molecules[3].getAttributeTag().getnLabels()); /*has default value*/
+  EXPECT_EQ(0,molecules[3].getAttributeTag().getlabelID()); /*has default value*/
+  EXPECT_EQ(5,molecules[4].getAttributeTag().getchainID());
+  EXPECT_EQ(4,molecules[4].getAttributeTag().getnLabels());
+  EXPECT_EQ(104,molecules[4].getAttributeTag().getlabelID());
+
+    //remove the temporary file
+  EXPECT_EQ(0,remove("tests/attributesTestOut.test"));
 }
 

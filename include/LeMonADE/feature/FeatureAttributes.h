@@ -46,26 +46,27 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Extends monomers by an signed integer (int32_t) as tag along with getter and setter\n
  * 		  Initially the tag is set to NULL.
  * */
+template<class TagType=int32_t>
 class MonomerAttributeTag
 {
 public:
 
 	//! Standard constructor- initially the tag is set to NULL.
-	MonomerAttributeTag():tag(0){}
+	MonomerAttributeTag():tag(){}
 
 	//! Getting the tag of the monomer.
-	int32_t getAttributeTag() const {return tag;}
+	TagType getAttributeTag() const {return tag;}
 
 	/**
 	 * @brief Setting the tag of the monomer with \para attr.
 	 *
 	 * @param attr
 	 */
-	void setAttributeTag(int attribute){ tag=attribute;}
+	void setAttributeTag(TagType attribute){ tag=attribute;}
 
 private:
 	 //! Private variable holding the tag. Default is NULL.
-     int32_t tag;
+     TagType tag;
 };
 
 
@@ -76,7 +77,8 @@ private:
  * @brief Handles BFM-File-Reads \b !attributes
  * @tparam IngredientsType Ingredients class storing all system information.
  */
-template < class IngredientsType>
+template < class IngredientsType, class TagType>
+// template < class TagType> 
 class ReadAttributes: public ReadToDestination<IngredientsType>
 {
 public:
@@ -93,7 +95,7 @@ public:
  * @brief Handles BFM-File-Write \b !attributes
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
-template <class IngredientsType>
+template <class IngredientsType, class TagType>
 class WriteAttributes:public AbstractWrite<IngredientsType>
 {
 public:
@@ -109,11 +111,12 @@ public:
  * @class FeatureAttributes
  * @brief Extends vertex/monomer by an attribute tag (MonomerAttributeTag) and provides read/write functionality.
  **/
+template<class TagType=int32_t>
 class FeatureAttributes:public Feature
 {
 public:
   //! This Feature requires a monomer_extensions.
-  typedef LOKI_TYPELIST_1(MonomerAttributeTag) monomer_extensions;
+  typedef LOKI_TYPELIST_1(MonomerAttributeTag<TagType>) monomer_extensions;
 
   //! Export the relevant functionality for reading bfm-files to the responsible reader object
   template<class IngredientsType>
@@ -130,7 +133,7 @@ public:
 
   //! Overloaded for moves of type MoveAddMonomerBase to set the attribute tag by inserting a monomer
   template<class IngredientsType,class AddMoveType>
-  void applyMove(IngredientsType& ing, const MoveAddMonomerBase<AddMoveType>& move);
+  void applyMove(IngredientsType& ing, const MoveAddMonomerBase<AddMoveType, TagType>& move);
 
 };
 
@@ -152,10 +155,11 @@ public:
  * @param destination List of Feature to write-in from the read values.
  * @tparam IngredientsType Features used in the system. See Ingredients.
  **/
+template<class TagType>
 template<class IngredientsType>
-void FeatureAttributes::exportRead(FileImport< IngredientsType >& fileReader)
+void FeatureAttributes<TagType>::exportRead(FileImport< IngredientsType >& fileReader)
 {
-  fileReader.registerRead("!attributes",new ReadAttributes<IngredientsType>(fileReader.getDestination()));
+  fileReader.registerRead("!attributes",new ReadAttributes<IngredientsType,TagType>(fileReader.getDestination()));
 }
 
 
@@ -168,10 +172,11 @@ void FeatureAttributes::exportRead(FileImport< IngredientsType >& fileReader)
  *
  * @param fileWriter File writer for the bfm-file.
  */
+template<class TagType>
 template<class IngredientsType>
-void FeatureAttributes::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
+void FeatureAttributes<TagType>::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
-  fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType>(fileWriter.getIngredients_()));
+  fileWriter.registerWrite("!attributes",new WriteAttributes<IngredientsType,TagType>(fileWriter.getIngredients_()));
 }
 
 
@@ -181,8 +186,9 @@ void FeatureAttributes::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fil
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
  * @param [in] move general addmove (MoveAddScMonomer/MoveAddBccMonomer)
  */
+template<class TagType>
 template<class IngredientsType,class AddMoveType>
-void FeatureAttributes::applyMove(IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType>& move)
+void FeatureAttributes<TagType>::applyMove(IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType, TagType>& move)
 {
 	ingredients.modifyMolecules()[move.getMonomerIndex()].setAttributeTag(move.getTag());
 }
@@ -193,13 +199,15 @@ void FeatureAttributes::applyMove(IngredientsType& ingredients, const MoveAddMon
  *
  * @throw <std::runtime_error> attributes and identifier could not be read.
  **/
-template < class IngredientsType>
-void ReadAttributes<IngredientsType>::execute()
+template < class IngredientsType, class TagType >
+// template <class TagType >
+void ReadAttributes<IngredientsType,TagType>::execute()
 {
   //some variables used during reading
   //counts the number of attribute lines in the file
   int nAttributes=0;
-  int startIndex,stopIndex,attribute;
+  int startIndex,stopIndex;
+  TagType attribute;
   //contains the latest line read from file
   std::string line;
   //used to reset the position of the get pointer after processing the command
@@ -299,8 +307,8 @@ void ReadAttributes<IngredientsType>::execute()
 
 
 //! Executes the routine to write \b !attributes.
-template < class IngredientsType>
-void WriteAttributes<IngredientsType>::writeStream(std::ostream& strm)
+template < class IngredientsType, class TagType>
+void WriteAttributes<IngredientsType,TagType>::writeStream(std::ostream& strm)
 {
   //for all output the indices are increased by one, because the file-format
   //starts counting indices at 1 (not 0)
@@ -316,9 +324,9 @@ void WriteAttributes<IngredientsType>::writeStream(std::ostream& strm)
   //counter varable
   size_t n=0;
   //attribute to be written (updated in loop below)
-  int attribute=molecules[0].getAttributeTag();
+  TagType attribute=molecules[0].getAttributeTag();
 
-  //write attibutes (blockwise)
+  //write attribute (blockwise)
   while(n<nMonomers){
     if(molecules[n].getAttributeTag()!=attribute)
     {

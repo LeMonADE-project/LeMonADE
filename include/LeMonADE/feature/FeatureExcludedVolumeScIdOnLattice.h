@@ -87,7 +87,7 @@ class FeatureExcludedVolumeScIdOnLattice<LatticeClassType<LatticeValueType>, Pre
 
 public:	
 	//This feature uses the attributes to write on the lattice for some predicates
-	typedef LOKI_TYPELIST_1(FeatureAttributes) required_features_back;
+	typedef LOKI_TYPELIST_1(FeatureAttributes<>) required_features_back;
 
 	//constructor
 	FeatureExcludedVolumeScIdOnLattice(const Predicate& pred_ = Predicate()) :
@@ -99,8 +99,8 @@ public:
 	using BaseClass::applyMove;
 
 	//! apply move for adding an sc monomer
-	template<class IngredientsType>
-	void applyMove(IngredientsType& ing, const MoveAddMonomerSc& move);
+	template<class IngredientsType,class TagType>
+	void applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move);
 	
 	//! Synchronize with system: Fill the lattice with 1 (occupied) and 0 (free).
 	template<class IngredientsType>
@@ -132,8 +132,8 @@ private:
 /******************************************************************************/
 // template<template<typename> class LatticeClassType, typename LatticeValueType>
 template<template<typename> class LatticeClassType, typename LatticeValueType, class Predicate>
-template<class IngredientsType>
-void FeatureExcludedVolumeScIdOnLattice< LatticeClassType<LatticeValueType> , Predicate>::applyMove(IngredientsType& ing, const MoveAddMonomerSc& move)
+template<class IngredientsType, class TagType>
+void FeatureExcludedVolumeScIdOnLattice< LatticeClassType<LatticeValueType> , Predicate>::applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move)
 {
   VectorInt3 pos=move.getPosition();
   VectorInt3 dx(1,0,0);

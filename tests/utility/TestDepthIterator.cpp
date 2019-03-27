@@ -114,7 +114,7 @@ TEST_F( TestDepthIterator, Iteration )
 
 TEST_F( TestDepthIterator, DepthIteratorPredicates )
 {
-  typedef LOKI_TYPELIST_1(FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_1(FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
   

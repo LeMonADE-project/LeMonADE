@@ -133,7 +133,7 @@ void UpdaterAbstractCreate<IngredientsType>::cleanup(){
 template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::addSingleMonomer(int32_t type){
   // set properties of add Monomer Move
-  MoveAddMonomerSc addmove;
+  MoveAddMonomerSc<> addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
 
@@ -162,7 +162,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addSingleMonomer(int32_t type){
 template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::addMonomerToParent(uint32_t parent_id, int32_t type){
   // set properties of add Monomer Move
-  MoveAddMonomerSc addmove;
+  MoveAddMonomerSc<> addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
 
@@ -198,7 +198,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerToParent(uint32_t parent_
  */
 template<class IngredientsType>
 bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtPosition(VectorInt3 position, int32_t type){
-  MoveAddMonomerSc addmove;
+  MoveAddMonomerSc<> addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
 
@@ -225,7 +225,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerInsideConnectedPair(uint3
   if( ! ingredients.getMolecules().areConnected(indexA,indexB))
     return false;
 
-  MoveAddMonomerSc addmove;
+  MoveAddMonomerSc<> addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
 
@@ -272,7 +272,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addMonomerAtConnectedPair(uint32_t 
   if( ! ingredients.getMolecules().areConnected(indexA,indexB))
     return false;
   
-  MoveAddMonomerSc addmove;
+  MoveAddMonomerSc<> addmove;
   addmove.init(ingredients);
   addmove.setTag(type);
 
@@ -408,7 +408,7 @@ bool UpdaterAbstractCreate<IngredientsType>::addRing(uint32_t parent, int32_t ty
 			bool PositionsFit(true);
 			for(uint32_t i=0; i <PotentialPositions.size();i++)
 			{
-			  MoveAddMonomerSc addmove;
+			  MoveAddMonomerSc<> addmove;
 			  addmove.init(ingredients);
 			  addmove.setPosition(PotentialPositions[i]);
 			  if(addmove.check(ingredients)==false){PositionsFit=false;}
