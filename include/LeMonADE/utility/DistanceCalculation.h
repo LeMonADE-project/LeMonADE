@@ -40,69 +40,49 @@ namespace Lemonade
 {
 
 /**
- * @brief Calculation of Distance in the Minimum Image Convention.
- *
- * @deprecated
- *
- * @param[out] distance Distance in MIC
- * @param[in] period Length of the Unit Cell
- *
- * @todo we should reconsider this approach for usability
- *
- * @todo Different namespace?
- **/
-template < class T1, class T2 > void reduceDistanceInPeriodicSpace( T1& distance, const T2& period)
+ * @fn MinImageDistanceForPowerOfTwo
+ * @brief returns the minimal distance between two images for a box size of power of 2 
+ * @return double 
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+double MinImageDistanceForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
-	if (  distance > period/2 ) {while(-(distance-period)<period/2) distance -= Lemonade::safe_cast<T1>(period);  return; }
-	else
-	if ( -distance > period/2 ) { while((distance+period)<period/2) distance += Lemonade::safe_cast<T1>(period); return; }
+  return MinImageVectorForPowerOfTwo(R1,R2,ing).getLength();
 }
-
-
+  
 /**
- * @brief Calculation of Vector in Cartesian space using the Minimum Image Convention.
- *
- * @param a Vector in Cartesian space
- * @param b Vector in Cartesian space
- * @param box Length of the Unit Cell
- * @return Vector under MIC
- *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
- *
- * @todo Different namespace?
- **/
-template < class T, class BoxType >
-Vector3D<T> calcDistanceVector3D (const Vector3D< T >& a, const Vector3D< T >& b, const BoxType& box )
+ * @fn MinImageVectorForPowerOfTwo
+ * @brief returns the shortest vector between two images for a box size of power of 2 
+ * @return vector 
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+VectorInt3 MinImageVectorForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
-	Vector3D < T > result (b-a);
-	if ( box.isPeriodicX() ){ reduceDistanceInPeriodicSpace ( result[0], box.getBoxX() ); }
-	if ( box.isPeriodicY() ){ reduceDistanceInPeriodicSpace ( result[1], box.getBoxY() ); }
-	if ( box.isPeriodicZ() ){ reduceDistanceInPeriodicSpace ( result[2], box.getBoxZ() ); }
-	return result;
+  VectorInt3 dist;
+  dist.setX(MinImageDistanceForPowerOfTwo(R1.getX(),R2.getX(),ing.getBoxX()));
+  dist.setY(MinImageDistanceForPowerOfTwo(R1.getY(),R2.getY(),ing.getBoxY()));
+  dist.setZ(MinImageDistanceForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxY()));
+  return dist;
 }
-
-
 /**
- * @brief Calculation of difference vector in Cartesian space.
- *
- * @param a Vector in Cartesian space
- * @param b Vector in Cartesian space
- * @param box Length of the Unit Cell
- * @return Difference vector
- *
- * @deprecated
- *
- * @todo we should reconsider this approach for usability
- *
- * @todo Different namespace?
- **/
-template < class T >
-Vector3D<T> calcDistanceVector3D (const Vector3D< T >& a, const Vector3D< T >& b, const Loki::NullType& box )
+ * @fn  MinImageDistanceForPowerOfTwo
+ * @brief calculates the minimal distances of images for one component 
+ * @return int 
+ * @param x1 absolute coordinate
+ * @param x2 absolute coordinate
+ * @param LatticeSize size of the box in the direction of the given coordinates
+ */
+int MinImageDistanceForPowerOfTwo(const int x1, const int x2, const uint32_t latticeSize )
 {
-	Vector3D < T > result (b-a);
-	return result;
+	//this is only valid for absolute coordinates
+	uint32_t latticeSizeM1(latticeSize-1);
+	return ( (((x1-x2)&latticeSizeM1) < (latticeSize/2)) ? ((x1-x2) & latticeSizeM1) :  -((x2-x1) & latticeSizeM1));
 }
 
 };
