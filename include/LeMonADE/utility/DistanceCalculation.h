@@ -40,19 +40,19 @@ namespace Lemonade
 {
 
 /**
- * @fn MinImageDistanceForPowerOfTwo
- * @brief returns the minimal distance between two images for a box size of power of 2 
- * @return double 
- * @param R1 position vector  
- * @param R2 position vector 
- * @param ing container containing (all) system information
+ * @fn  MinImageDistanceComponentForPowerOfTwo
+ * @brief calculates the minimal distances of images for one component 
+ * @return int 
+ * @param x1 absolute coordinate
+ * @param x2 absolute coordinate
+ * @param LatticeSize size of the box in the direction of the given coordinates
  */
-template < class IngredientsType>
-double MinImageDistanceForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
+inline int MinImageDistanceComponentForPowerOfTwo(const int x1, const int x2, const uint32_t latticeSize )
 {
-  return MinImageVectorForPowerOfTwo(R1,R2,ing).getLength();
-}
-  
+	//this is only valid for absolute coordinates
+	uint32_t latticeSizeM1(latticeSize-1);
+	return ( (((x2-x1)&latticeSizeM1) < (latticeSize/2)) ? ((x2-x1) & latticeSizeM1) :  -((x1-x2) & latticeSizeM1));
+} 
 /**
  * @fn MinImageVectorForPowerOfTwo
  * @brief returns the shortest vector between two images for a box size of power of 2 
@@ -65,26 +65,76 @@ template < class IngredientsType>
 VectorInt3 MinImageVectorForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
   VectorInt3 dist;
-  dist.setX(MinImageDistanceForPowerOfTwo(R1.getX(),R2.getX(),ing.getBoxX()));
-  dist.setY(MinImageDistanceForPowerOfTwo(R1.getY(),R2.getY(),ing.getBoxY()));
-  dist.setZ(MinImageDistanceForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxY()));
+  dist.setX(MinImageDistanceComponentForPowerOfTwo(R1.getX(),R2.getX(),ing.getBoxX()));
+  dist.setY(MinImageDistanceComponentForPowerOfTwo(R1.getY(),R2.getY(),ing.getBoxY()));
+  dist.setZ(MinImageDistanceComponentForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxY()));
   return dist;
 }
 /**
- * @fn  MinImageDistanceForPowerOfTwo
- * @brief calculates the minimal distances of images for one component 
+ * @fn MinImageDistanceForPowerOfTwo
+ * @brief returns the minimal distance between two images for a box size of power of 2 
+ * @return double 
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+double MinImageDistanceForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
+{
+  return MinImageVectorForPowerOfTwo(R1,R2,ing).getLength();
+}
+
+// Implementation for arbitrary box dimensions. 
+
+/**
+ * @fn MinImageDistance
+ * @brief returns the minimal distance between two images for an arbitrary box size 
+ * @return double 
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+double MinImageDistance (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
+{
+  return MinImageVector(R1,R2,ing).getLength();
+}
+  
+/**
+ * @fn MinImageVector
+ * @brief returns the shortest vector between two images for an arbitrary box size 
+ * @return vector 
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
+{
+  VectorInt3 dist;
+  dist.setX(MinImageDistanceComponen(R1.getX(),R2.getX(),ing.getBoxX()));
+  dist.setY(MinImageDistanceComponen(R1.getY(),R2.getY(),ing.getBoxY()));
+  dist.setZ(MinImageDistanceComponen(R1.getZ(),R2.getZ(),ing.getBoxY()));
+  return dist;
+}
+/**
+ * @fn  MinImageDistanceComponen
+ * @brief calculates the minimal distances of images for an arbitrary box size 
  * @return int 
  * @param x1 absolute coordinate
  * @param x2 absolute coordinate
  * @param LatticeSize size of the box in the direction of the given coordinates
  */
-int MinImageDistanceForPowerOfTwo(const int x1, const int x2, const uint32_t latticeSize )
+inline int MinImageDistanceComponen(const int x1, const int x2, const uint32_t latticeSize )
 {
 	//this is only valid for absolute coordinates
-	uint32_t latticeSizeM1(latticeSize-1);
-	return ( (((x1-x2)&latticeSizeM1) < (latticeSize/2)) ? ((x1-x2) & latticeSizeM1) :  -((x2-x1) & latticeSizeM1));
+	int distance(x2-x1);
+	int latticeHalf(latticeSize/2);
+// 	while( std::abs(distance) > latticeHalf ) { distance=distance +- std::signbit() latticeSize; }
+	if      (  distance > latticeHalf ) { while(-(distance-latticeSize) < latticeHalf ) distance -= latticeSize; }
+	else if ( -distance > latticeHalf ) { while( (distance+latticeSize) < latticeHalf ) distance += latticeSize; }
+	return distance;
 }
-
 };
 
 
