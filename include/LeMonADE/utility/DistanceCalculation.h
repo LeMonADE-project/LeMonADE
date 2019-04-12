@@ -112,20 +112,20 @@ template < class IngredientsType>
 VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
   VectorInt3 dist;
-  dist.setX(MinImageDistanceComponen(R1.getX(),R2.getX(),ing.getBoxX()));
-  dist.setY(MinImageDistanceComponen(R1.getY(),R2.getY(),ing.getBoxY()));
-  dist.setZ(MinImageDistanceComponen(R1.getZ(),R2.getZ(),ing.getBoxY()));
+  dist.setX(MinImageDistanceComponent(R1.getX(),R2.getX(),ing.getBoxX()));
+  dist.setY(MinImageDistanceComponent(R1.getY(),R2.getY(),ing.getBoxY()));
+  dist.setZ(MinImageDistanceComponent(R1.getZ(),R2.getZ(),ing.getBoxY()));
   return dist;
 }
 /**
- * @fn  MinImageDistanceComponen
+ * @fn  MinImageDistanceComponent
  * @brief calculates the minimal distances of images for an arbitrary box size 
  * @return int 
  * @param x1 absolute coordinate
  * @param x2 absolute coordinate
  * @param LatticeSize size of the box in the direction of the given coordinates
  */
-inline int MinImageDistanceComponen(const int x1, const int x2, const uint32_t latticeSize )
+inline int MinImageDistanceComponent(const int x1, const int x2, const uint32_t latticeSize )
 {
 	//this is only valid for absolute coordinates
 	int distance(x2-x1);
