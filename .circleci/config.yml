@@ -1,0 +1,24 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: "ubuntu:bionic"
+    environment:
+      TEST_RESULTS: /tmp/test-results/LeMonADE
+    steps:
+      - checkout
+      - run:
+          name: Installing Dependencies
+          command: 'apt-get update && apt-get install -y build-essential cmake git'
+      - run:
+          name: Configure build
+          command: './configure -DLEMONADE_TESTS=ON'
+      - run:
+          name: Run build
+          command: |
+            export GTEST_OUTPUT=xml:${TEST_RESULTS}/
+            mkdir -p $TEST_RESULTS
+            make
+      - store_test_results:
+          path: /tmp/test-results
