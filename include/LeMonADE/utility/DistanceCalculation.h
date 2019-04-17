@@ -67,7 +67,7 @@ VectorInt3 MinImageVectorForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2
   VectorInt3 dist;
   dist.setX(MinImageDistanceComponentForPowerOfTwo(R1.getX(),R2.getX(),ing.getBoxX()));
   dist.setY(MinImageDistanceComponentForPowerOfTwo(R1.getY(),R2.getY(),ing.getBoxY()));
-  dist.setZ(MinImageDistanceComponentForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxY()));
+  dist.setZ(MinImageDistanceComponentForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxZ()));
   return dist;
 }
 /**
@@ -87,37 +87,6 @@ double MinImageDistanceForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, 
 // Implementation for arbitrary box dimensions. 
 
 /**
- * @fn MinImageDistance
- * @brief returns the minimal distance between two images for an arbitrary box size 
- * @return double 
- * @param R1 position vector  
- * @param R2 position vector 
- * @param ing container containing (all) system information
- */
-template < class IngredientsType>
-double MinImageDistance (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
-{
-  return MinImageVector(R1,R2,ing).getLength();
-}
-  
-/**
- * @fn MinImageVector
- * @brief returns the shortest vector between two images for an arbitrary box size 
- * @return vector 
- * @param R1 position vector  
- * @param R2 position vector 
- * @param ing container containing (all) system information
- */
-template < class IngredientsType>
-VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
-{
-  VectorInt3 dist;
-  dist.setX(MinImageDistanceComponent(R1.getX(),R2.getX(),ing.getBoxX()));
-  dist.setY(MinImageDistanceComponent(R1.getY(),R2.getY(),ing.getBoxY()));
-  dist.setZ(MinImageDistanceComponent(R1.getZ(),R2.getZ(),ing.getBoxY()));
-  return dist;
-}
-/**
  * @fn  MinImageDistanceComponent
  * @brief calculates the minimal distances of images for an arbitrary box size 
  * @return int 
@@ -135,6 +104,39 @@ inline int MinImageDistanceComponent(const int x1, const int x2, const uint32_t 
 	else if ( -distance > latticeHalf ) { while( (distance+latticeSize) < latticeHalf ) distance += latticeSize; }
 	return distance;
 }
+
+/**
+ * @fn MinImageVector
+ * @brief returns the shortest vector between two images for an arbitrary box size 
+ * @return vector 
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
+{
+  VectorInt3 dist;
+  dist.setX(MinImageDistanceComponent(R1.getX(),R2.getX(),ing.getBoxX()));
+  dist.setY(MinImageDistanceComponent(R1.getY(),R2.getY(),ing.getBoxY()));
+  dist.setZ(MinImageDistanceComponent(R1.getZ(),R2.getZ(),ing.getBoxZ()));
+  return dist;
+}
+
+/**
+ * @fn MinImageDistance
+ * @brief returns the minimal distance between two images for an arbitrary box size 
+ * @return double 
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+double MinImageDistance (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
+{
+  return MinImageVector(R1,R2,ing).getLength();
+}
+
 };
 
 
