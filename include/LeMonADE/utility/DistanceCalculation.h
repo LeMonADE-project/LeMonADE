@@ -140,6 +140,9 @@ template < class IngredientsType>
 VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
   VectorInt3 dist;
+  if( !( ing.isPeriodicX() && ing.isPeriodicY() && ing.isPeriodicZ() ) ){
+    throw std::runtime_error("MinImageDistanceComponentForPowerOfTwo: nonperiodic boundaries");
+  }
   dist.setX(MinImageDistanceComponent(R1.getX(),R2.getX(),ing.getBoxX()));
   dist.setY(MinImageDistanceComponent(R1.getY(),R2.getY(),ing.getBoxY()));
   dist.setZ(MinImageDistanceComponent(R1.getZ(),R2.getZ(),ing.getBoxZ()));

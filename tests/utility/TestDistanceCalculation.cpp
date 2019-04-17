@@ -169,4 +169,8 @@ TEST_F( TestDistanceCalculation, NonPowerOfTwoBoxes )
   EXPECT_DOUBLE_EQ(1,dist);
   EXPECT_EQ(VectorInt3(0,0,1),vec);
 
+  // check exceptions
+  ing.setPeriodicX(false);
+  EXPECT_ANY_THROW(MinImageDistance( mol[0],mol[1], ing ));
+
 }
