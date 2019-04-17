@@ -60,7 +60,7 @@ public:
    * @param steps MCS per cycle to performed by execute()
    */
   UpdaterSimpleConnection(IngredientsType& ing,uint32_t steps = 1 )
-  :ingredients(ing),nsteps(steps){}
+  :ingredients(ing),nsteps(steps),NReactiveSites(0),NReactedSites(0){}
   
  
   /**
@@ -94,7 +94,7 @@ public:
 
   
   //! get conversion of the reaction process
-  double getConversion(){return (1.*NReactedSites)/(1.*NReactiveSites);};
+  double getConversion(){return (double(NReactedSites))/(double(NReactiveSites));};
   
 private:
   //! Specialized move to be used for the movement of the monomers 
@@ -190,6 +190,9 @@ void  UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::init
 			NReactiveSites+=(ingredients.getMolecules()[i].getNumMaxLinks()-nIrreversibleBonds);
 		}
 	}
+
+	std::cout << NReactedSites <<" "<<NReactiveSites<<" "<<getConversion()<<std::endl;
+
 	if ( NReactiveSites == 0  )
 	{
 	  std::stringstream errormessage;
