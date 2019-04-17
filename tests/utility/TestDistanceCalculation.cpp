@@ -50,6 +50,7 @@ public:
 //   using Lemonade::MinImageDistanceComponen; 
 //   
   //redirect cout output
+  /*
   virtual void SetUp(){
     originalBuffer=std::cout.rdbuf();
     std::cout.rdbuf(tempStream.rdbuf());
@@ -59,6 +60,9 @@ public:
   virtual void TearDown(){
     std::cout.rdbuf(originalBuffer);
   };
+
+  /* un/-comment cout */
+
   Ing ing;
 private:
   
@@ -108,7 +112,16 @@ TEST_F( TestDistanceCalculation, PowerOfTwoBoxes )
   dist = MinImageDistanceForPowerOfTwo( mol[4],mol[0], ing );
   vec  = MinImageVectorForPowerOfTwo  ( mol[4],mol[0], ing );
   EXPECT_EQ(4,dist);
-  EXPECT_EQ(VectorInt3(0,0,4),vec);
+  EXPECT_EQ(VectorInt3(0,0,-4),vec);
+
+  // check exceptions
+  ing.setBoxX(9);
+  EXPECT_ANY_THROW(MinImageDistanceForPowerOfTwo( mol[0],mol[1], ing ));
+  ing.setBoxX(8);
+  EXPECT_NO_THROW(MinImageDistanceForPowerOfTwo( mol[0],mol[1], ing ));
+
+  ing.setPeriodicX(false);
+  EXPECT_ANY_THROW(MinImageDistanceForPowerOfTwo( mol[0],mol[1], ing ));
 
 }
 
@@ -120,12 +133,13 @@ TEST_F( TestDistanceCalculation, NonPowerOfTwoBoxes )
   ing.setPeriodicY(true);
   ing.setBoxZ(13);
   ing.setPeriodicZ(true);
-  ing.modifyMolecules().resize(5);
+  ing.modifyMolecules().resize(6);
   ing.modifyMolecules()[0].modifyVector3D().setAllCoordinates(1,1,1);
   ing.modifyMolecules()[1].modifyVector3D().setAllCoordinates(2,1,1);
-  ing.modifyMolecules()[2].modifyVector3D().setAllCoordinates(2,11,11); //(1,-3,-3)
-  ing.modifyMolecules()[3].modifyVector3D().setAllCoordinates(1,1,54); //(0,0,1)
+  ing.modifyMolecules()[2].modifyVector3D().setAllCoordinates(2,11,11); //(-1,3,3)
+  ing.modifyMolecules()[3].modifyVector3D().setAllCoordinates(1,1,54); //(0,0,-1)
   ing.modifyMolecules()[4].modifyVector3D().setAllCoordinates(1,1,-3);
+  ing.modifyMolecules()[5].modifyVector3D().setAllCoordinates(1,1,-52); //(0,0,1)
   
   Ing::molecules_type const& mol = ing.getMolecules();
   double dist;
@@ -136,23 +150,23 @@ TEST_F( TestDistanceCalculation, NonPowerOfTwoBoxes )
   dist = MinImageDistance( mol[0],mol[2], ing );
   vec  = MinImageVector  ( mol[0],mol[2], ing );
   EXPECT_NEAR(4.3588989,dist,0.0000001);
-  EXPECT_EQ(VectorInt3(1,-3,-3),vec);
+  EXPECT_EQ(VectorInt3(-1,3,3),vec);
   vec  = MinImageVector  ( mol[2],mol[0], ing );
-  EXPECT_EQ(VectorInt3(-1,3,3),vec);  
+  EXPECT_EQ(VectorInt3(1,-3,-3),vec);  
 
   dist = MinImageDistance( mol[0],mol[3], ing );
   vec  = MinImageVector  ( mol[0],mol[3], ing );
-  EXPECT_DOUBLE_EQ(1,dist);
-  EXPECT_EQ(VectorInt3(0,0,1),vec);
-
-  dist = MinImageDistance( mol[3],mol[0], ing );
-  vec  = MinImageVector  ( mol[3],mol[0], ing );
   EXPECT_DOUBLE_EQ(1,dist);
   EXPECT_EQ(VectorInt3(0,0,-1),vec);
   
   dist = MinImageDistance( mol[0],mol[4], ing );
   vec  = MinImageVector  ( mol[0],mol[4], ing );
   EXPECT_DOUBLE_EQ(4,dist);
-  EXPECT_EQ(VectorInt3(0,0,-4),vec);
+  EXPECT_EQ(VectorInt3(0,0,4),vec);
+
+  dist = MinImageDistance( mol[0],mol[5], ing );
+  vec  = MinImageVector  ( mol[0],mol[5], ing );
+  EXPECT_DOUBLE_EQ(1,dist);
+  EXPECT_EQ(VectorInt3(0,0,1),vec);
 
 }
