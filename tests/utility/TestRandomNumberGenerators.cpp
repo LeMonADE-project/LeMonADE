@@ -199,7 +199,7 @@ TEST(RandomNumberGeneratorsTest,R250RangeOfNumbers){
 	//check the size of the set. if any two drawn numbers are equal, these
 	//tests fail. one would not expect this, but of course it can happen
 	//in principle, even if the RNGs work correctly.
-	EXPECT_EQ(numbersInt.size(),10000);
-	EXPECT_EQ(numbersDouble.size(),10000);
+	EXPECT_GE(numbersInt.size(),(10000-1));
+	EXPECT_GE(numbersDouble.size(),(10000-1));
 
 }
