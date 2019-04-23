@@ -47,7 +47,7 @@ public:
 //   using Lemonade::MinImageDistanceComponentForPowerOfTwo; 
 //   using Lemonade::MinImageDistance; 
 //   using Lemonade::MinImageVector; 
-//   using Lemonade::MinImageDistanceComponen; 
+//   using Lemonade::MinImageDistanceComponent; 
 //   
   //redirect cout output
   /*
@@ -90,7 +90,9 @@ TEST_F( TestDistanceCalculation, PowerOfTwoBoxes )
   int dist;
   VectorInt3 vec;
   dist = MinImageDistanceForPowerOfTwo( mol[0],mol[1], ing );
+  vec  = MinImageVectorForPowerOfTwo  ( mol[0],mol[1], ing );
   EXPECT_EQ(1,dist);
+  EXPECT_EQ(VectorInt3(1,0,0),vec);
   
   dist = MinImageDistanceForPowerOfTwo( mol[0],mol[2], ing );
   vec  = MinImageVectorForPowerOfTwo  ( mol[0],mol[2], ing );
@@ -121,7 +123,10 @@ TEST_F( TestDistanceCalculation, PowerOfTwoBoxes )
   EXPECT_NO_THROW(MinImageDistanceForPowerOfTwo( mol[0],mol[1], ing ));
 
   ing.setPeriodicX(false);
-  EXPECT_ANY_THROW(MinImageDistanceForPowerOfTwo( mol[0],mol[1], ing ));
+  dist = MinImageDistanceForPowerOfTwo( mol[0],mol[1], ing );
+  EXPECT_EQ(1,dist);
+  vec  = MinImageVectorForPowerOfTwo  ( mol[0],mol[1], ing );
+  EXPECT_EQ(VectorInt3(1,0,0),vec);
 
 }
 
@@ -146,31 +151,36 @@ TEST_F( TestDistanceCalculation, NonPowerOfTwoBoxes )
   VectorInt3 vec;
   dist = MinImageDistance( mol[0],mol[1], ing );
   EXPECT_DOUBLE_EQ(1,dist);
+  vec  = MinImageVector  ( mol[0],mol[1], ing );
+  EXPECT_EQ(VectorInt3(1,0,0),vec);
   
   dist = MinImageDistance( mol[0],mol[2], ing );
   vec  = MinImageVector  ( mol[0],mol[2], ing );
   EXPECT_NEAR(4.3588989,dist,0.0000001);
-  EXPECT_EQ(VectorInt3(-1,3,3),vec);
+  EXPECT_EQ(VectorInt3(1,-3,-3),vec);
   vec  = MinImageVector  ( mol[2],mol[0], ing );
-  EXPECT_EQ(VectorInt3(1,-3,-3),vec);  
+  EXPECT_EQ(VectorInt3(-1,3,3),vec);  
 
   dist = MinImageDistance( mol[0],mol[3], ing );
   vec  = MinImageVector  ( mol[0],mol[3], ing );
   EXPECT_DOUBLE_EQ(1,dist);
-  EXPECT_EQ(VectorInt3(0,0,-1),vec);
+  EXPECT_EQ(VectorInt3(0,0,1),vec);
   
   dist = MinImageDistance( mol[0],mol[4], ing );
   vec  = MinImageVector  ( mol[0],mol[4], ing );
   EXPECT_DOUBLE_EQ(4,dist);
-  EXPECT_EQ(VectorInt3(0,0,4),vec);
+  EXPECT_EQ(VectorInt3(0,0,-4),vec);
 
   dist = MinImageDistance( mol[0],mol[5], ing );
   vec  = MinImageVector  ( mol[0],mol[5], ing );
   EXPECT_DOUBLE_EQ(1,dist);
-  EXPECT_EQ(VectorInt3(0,0,1),vec);
+  EXPECT_EQ(VectorInt3(0,0,-1),vec);
 
-  // check exceptions
+  // check nonperiodic boundaries
   ing.setPeriodicX(false);
-  EXPECT_ANY_THROW(MinImageDistance( mol[0],mol[1], ing ));
+  dist = MinImageDistance( mol[0],mol[1], ing );
+  EXPECT_EQ(1,dist);
+  vec  = MinImageVector  ( mol[0],mol[1], ing );
+  EXPECT_EQ(VectorInt3(1,0,0),vec);
 
 }

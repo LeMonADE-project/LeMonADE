@@ -71,12 +71,12 @@ template < class IngredientsType>
 VectorInt3 MinImageVectorForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
   VectorInt3 dist;
-  if( !( ing.isPeriodicX() && ing.isPeriodicY() && ing.isPeriodicZ() ) ){
-    throw std::runtime_error("MinImageDistanceComponentForPowerOfTwo: nonperiodic boundaries");
-  }
-  dist.setX(MinImageDistanceComponentForPowerOfTwo(R1.getX(),R2.getX(),ing.getBoxX()));
-  dist.setY(MinImageDistanceComponentForPowerOfTwo(R1.getY(),R2.getY(),ing.getBoxY()));
-  dist.setZ(MinImageDistanceComponentForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxZ()));
+  // if( !( ing.isPeriodicX() && ing.isPeriodicY() && ing.isPeriodicZ() ) ){
+  //   throw std::runtime_error("MinImageDistanceComponentForPowerOfTwo: nonperiodic boundaries");
+  // }
+  ing.isPeriodicX() ? dist.setX(MinImageDistanceComponentForPowerOfTwo(R1.getX(),R2.getX(),ing.getBoxX())) : dist.setX(R2.getX() - R1.getX());
+  ing.isPeriodicY() ? dist.setY(MinImageDistanceComponentForPowerOfTwo(R1.getY(),R2.getY(),ing.getBoxY())) : dist.setY(R2.getY() - R1.getY());
+  ing.isPeriodicZ() ? dist.setZ(MinImageDistanceComponentForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxZ())) : dist.setZ(R2.getZ() - R1.getZ());
   return dist;
 }
 /**
@@ -116,7 +116,7 @@ inline uint32_t fold(int value, int box){
  */
 inline int MinImageDistanceComponent(const int x1, const int x2, const uint32_t latticeSize )
 {
-  return ( (fold(x1-x2,latticeSize) < latticeSize/2) ?  fold(x1-x2,latticeSize) : -fold(x2-x1,latticeSize) );
+  return ( (fold(x2-x1,latticeSize) < latticeSize/2) ?  fold(x2-x1,latticeSize) : -fold(x1-x2,latticeSize) );
 	//this is only valid for absolute coordinates
 	//int distance(x2-x1);
 	//int latticeHalf(int(latticeSize/2.0));
@@ -140,12 +140,10 @@ template < class IngredientsType>
 VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
   VectorInt3 dist;
-  if( !( ing.isPeriodicX() && ing.isPeriodicY() && ing.isPeriodicZ() ) ){
-    throw std::runtime_error("MinImageDistanceComponentForPowerOfTwo: nonperiodic boundaries");
-  }
-  dist.setX(MinImageDistanceComponent(R1.getX(),R2.getX(),ing.getBoxX()));
-  dist.setY(MinImageDistanceComponent(R1.getY(),R2.getY(),ing.getBoxY()));
-  dist.setZ(MinImageDistanceComponent(R1.getZ(),R2.getZ(),ing.getBoxZ()));
+  
+  ing.isPeriodicX() ? dist.setX(MinImageDistanceComponent(R1.getX(),R2.getX(),ing.getBoxX())) : dist.setX(R2.getX()-R1.getX());
+  ing.isPeriodicY() ? dist.setY(MinImageDistanceComponent(R1.getY(),R2.getY(),ing.getBoxY())) : dist.setY(R2.getY()-R1.getY());
+  ing.isPeriodicZ() ? dist.setZ(MinImageDistanceComponent(R1.getZ(),R2.getZ(),ing.getBoxZ())) : dist.setZ(R2.getZ()-R1.getZ());
   return dist;
 }
 
