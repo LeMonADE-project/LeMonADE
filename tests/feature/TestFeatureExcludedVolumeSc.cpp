@@ -54,16 +54,16 @@ public:
 		template <class IngredientsType> void init(const IngredientsType& ingredients){};
   };
 
-  //redirect cout output
-  virtual void SetUp(){
-    originalBuffer=std::cout.rdbuf();
-    std::cout.rdbuf(tempStream.rdbuf());
-  };
-
-  //restore original output
-  virtual void TearDown(){
-    std::cout.rdbuf(originalBuffer);
-  };
+//   //redirect cout output
+//   virtual void SetUp(){
+//     originalBuffer=std::cout.rdbuf();
+//     std::cout.rdbuf(tempStream.rdbuf());
+//   };
+// 
+//   //restore original output
+//   virtual void TearDown(){
+//     std::cout.rdbuf(originalBuffer);
+//   };
 
 private:
   std::streambuf* originalBuffer;
@@ -252,6 +252,103 @@ TEST_F(TestFeatureExcludedVolumeSc,Moves)
     EXPECT_NO_THROW(ingredients.synchronize());
 
 }
+
+TEST_F(TestFeatureExcludedVolumeSc,DiagonalMoves)
+{
+
+  typedef LOKI_TYPELIST_2(FeatureBondset< >,FeatureExcludedVolumeSc< >) Features;
+
+  typedef ConfigureSystem<VectorInt3,Features> Config;
+  typedef Ingredients<Config> Ing;
+  Ing ingredients;
+
+  //prepare ingredients
+    ingredients.setBoxX(8);
+    ingredients.setBoxY(8);
+    ingredients.setBoxZ(8);
+    ingredients.setPeriodicX(1);
+    ingredients.setPeriodicY(1);
+    ingredients.setPeriodicZ(1);
+
+    //one move of every type
+    MoveLocalScDiag DiagMove;
+
+    ingredients.modifyMolecules().resize(3);
+    VectorInt3 InitPos(0,0,0);
+    ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
+    ingredients.modifyMolecules()[1].setAllCoordinates(2,2,0);
+    ingredients.modifyMolecules()[2].setAllCoordinates(1,0,30);
+
+    ingredients.synchronize(ingredients);
+
+
+    // **************   check diagonal move   **************
+    EXPECT_NO_THROW(DiagMove.init(ingredients));
+    EXPECT_NO_THROW(DiagMove.init(ingredients,0));
+    EXPECT_NO_THROW(DiagMove.init(ingredients,0,VectorInt3(1,1,0)));
+    EXPECT_ANY_THROW(DiagMove.init(ingredients,0,VectorInt3(1,1,1)));
+    
+    EXPECT_NO_THROW(DiagMove.init(ingredients,0,VectorInt3(1,1,0)));
+    EXPECT_FALSE(DiagMove.check(ingredients));
+    VectorInt3 steps[18];
+    	steps[0]=VectorInt3(1,0,0);
+	steps[1]=VectorInt3(-1,0,0);
+	steps[2]=VectorInt3(0,1,0);
+	steps[3]=VectorInt3(0,-1,0);
+	steps[4]=VectorInt3(0,0,1);
+	steps[5]=VectorInt3(0,0,-1); //fail -> monomer 2
+	//diagonal moves
+	steps[6]=VectorInt3(0,1,1);
+	steps[7]=VectorInt3(0,-1,1);
+	steps[8]=VectorInt3(0,1,-1);//fail -> monomer 2
+	steps[9]=VectorInt3(0,-1,-1);//fail -> monomer 2
+	steps[10]=VectorInt3(1,0,1);
+	steps[11]=VectorInt3(1,0,-1);//fail -> monomer 2
+	steps[12]=VectorInt3(-1,0,1);
+	steps[13]=VectorInt3(-1,0,-1);
+	steps[14]=VectorInt3(1,1,0); //fail -> monomer 1
+	steps[15]=VectorInt3(1,-1,0);
+	steps[16]=VectorInt3(-1,1,0);
+	steps[17]=VectorInt3(-1,-1,0);    
+    for (size_t i =0  ;i < 18 ; i++ )
+    {
+      std::cout << "Use "<< steps[i] <<std::endl;
+      if ( !(  i==5
+	    || i==8
+	    || i==9
+	    || i==11
+	    || i==14) )
+      {
+	EXPECT_NO_THROW(DiagMove.init(ingredients,0,steps[i]));
+	EXPECT_TRUE(DiagMove.check(ingredients));
+	EXPECT_NO_THROW(DiagMove.apply(ingredients));
+	EXPECT_NO_THROW(ingredients.synchronize());
+	ingredients.modifyMolecules()[0].modifyVector3D()=InitPos;
+	EXPECT_NO_THROW(ingredients.synchronize());
+	EXPECT_EQ(InitPos, ingredients.getMolecules()[0].getVector3D() );
+      }
+      else 
+      {
+	EXPECT_NO_THROW(DiagMove.init(ingredients,0,steps[i]));
+	EXPECT_FALSE(DiagMove.check(ingredients));
+	EXPECT_NO_THROW(DiagMove.apply(ingredients));
+	EXPECT_ANY_THROW(ingredients.synchronize());
+	ingredients.modifyMolecules()[0].modifyVector3D()=InitPos;
+	EXPECT_NO_THROW(ingredients.synchronize());
+	EXPECT_EQ(InitPos, ingredients.getMolecules()[0].getVector3D() );
+      }
+    }
+    EXPECT_NO_THROW(DiagMove.init(ingredients,0,steps[6]));
+    EXPECT_TRUE(DiagMove.check(ingredients));
+    EXPECT_NO_THROW(DiagMove.apply(ingredients));
+    
+    EXPECT_NO_THROW(DiagMove.init(ingredients,0,steps[9]));
+    EXPECT_TRUE(DiagMove.check(ingredients));
+    EXPECT_NO_THROW(DiagMove.apply(ingredients));
+    
+
+}
+
 
 TEST_F(TestFeatureExcludedVolumeSc,CheckInterface)
 {
