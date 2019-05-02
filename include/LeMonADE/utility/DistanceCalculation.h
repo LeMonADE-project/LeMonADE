@@ -49,13 +49,15 @@ namespace Lemonade
  */
 inline int MinImageDistanceComponentForPowerOfTwo(const int x1, const int x2, const uint32_t latticeSize )
 {
-	//this is only valid for absolute coordinates
-	uint32_t latticeSizeM1(latticeSize-1);
-  if(latticeSize != 0 && (latticeSize & (latticeSize-1)) == 0){
-	  return ( (((x2-x1)&latticeSizeM1) < (latticeSize/2)) ? ((x2-x1) & latticeSizeM1) :  -((x1-x2) & latticeSizeM1));
-  }else{
+  //this is only valid for absolute coordinates
+  uint32_t latticeSizeM1(latticeSize-1);
+  if(latticeSize != 0 && (latticeSize & (latticeSize-1)) == 0)
+  {
+    return ( (((x2-x1)&latticeSizeM1) < (latticeSize/2)) ? ((x2-x1) & latticeSizeM1) :  -((x1-x2) & latticeSizeM1));
+  }else
+  {
     std::stringstream errormessage;
-	  errormessage << "MinImageDistanceComponentForPowerOfTwo: Lattice size is not Power of 2: "<<latticeSize<< std::endl;
+    errormessage << "MinImageDistanceComponentForPowerOfTwo: Lattice size is not Power of 2: "<<latticeSize<< std::endl;
     throw std::runtime_error(errormessage.str());
   }
 } 
@@ -71,9 +73,6 @@ template < class IngredientsType>
 VectorInt3 MinImageVectorForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
 {
   VectorInt3 dist;
-  // if( !( ing.isPeriodicX() && ing.isPeriodicY() && ing.isPeriodicZ() ) ){
-  //   throw std::runtime_error("MinImageDistanceComponentForPowerOfTwo: nonperiodic boundaries");
-  // }
   ing.isPeriodicX() ? dist.setX(MinImageDistanceComponentForPowerOfTwo(R1.getX(),R2.getX(),ing.getBoxX())) : dist.setX(R2.getX() - R1.getX());
   ing.isPeriodicY() ? dist.setY(MinImageDistanceComponentForPowerOfTwo(R1.getY(),R2.getY(),ing.getBoxY())) : dist.setY(R2.getY() - R1.getY());
   ing.isPeriodicZ() ? dist.setZ(MinImageDistanceComponentForPowerOfTwo(R1.getZ(),R2.getZ(),ing.getBoxZ())) : dist.setZ(R2.getZ() - R1.getZ());
@@ -117,15 +116,6 @@ inline uint32_t fold(int value, int box){
 inline int MinImageDistanceComponent(const int x1, const int x2, const uint32_t latticeSize )
 {
   return ( (fold(x2-x1,latticeSize) < latticeSize/2) ?  fold(x2-x1,latticeSize) : -fold(x1-x2,latticeSize) );
-	//this is only valid for absolute coordinates
-	//int distance(x2-x1);
-	//int latticeHalf(int(latticeSize/2.0));
-  //std::cout << distance <<" "<<latticeHalf<<" "<< (distance > latticeHalf) <<" "<<( -distance > latticeHalf ) <<std::endl;
-// 	while( std::abs(distance) > latticeHalf ) { distance=distance +- std::signbit() latticeSize; }
-	//if      (  distance > latticeHalf ) { while(-(distance-latticeSize) < latticeHalf ) distance -= latticeSize; }
-	//else if ( -distance > latticeHalf ) { while( (distance+latticeSize) < latticeHalf ) distance += latticeSize; }
-	//return distance;
-
 }
 
 /**

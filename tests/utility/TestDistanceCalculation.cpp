@@ -31,6 +31,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/feature/FeatureBox.h>
 #include <LeMonADE/utility/DistanceCalculation.h>
+
 using namespace Lemonade;
 
 class TestDistanceCalculation: public ::testing::Test{
@@ -42,15 +43,9 @@ public:
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> Ing;
   
-//   using Lemonade::MinImageDistanceForPowerOfTwo; 
-//   using Lemonade::MinImageVectorForPowerOfTwo; 
-//   using Lemonade::MinImageDistanceComponentForPowerOfTwo; 
-//   using Lemonade::MinImageDistance; 
-//   using Lemonade::MinImageVector; 
-//   using Lemonade::MinImageDistanceComponent; 
-//   
+
   //redirect cout output
-  /*
+  
   virtual void SetUp(){
     originalBuffer=std::cout.rdbuf();
     std::cout.rdbuf(tempStream.rdbuf());
