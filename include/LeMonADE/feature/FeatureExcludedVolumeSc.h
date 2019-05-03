@@ -313,13 +313,12 @@ template<template<typename> class LatticeClassType, typename LatticeValueType>
 template < class IngredientsType>
 bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( const IngredientsType& ingredients, const MoveLocalScDiag& move ) const
 {
+	if(!latticeFilledUp)
+	    throw std::runtime_error("*****FeatureExcludedVolumeSc::checkMove....lattice is not populated. Run synchronize!\n");
 	if ( move.getDir()==VectorInt3(1,0,0)||move.getDir()==VectorInt3(-1,0,0)||
 	     move.getDir()==VectorInt3(0,1,0)||move.getDir()==VectorInt3(0,-1,0)||
 	     move.getDir()==VectorInt3(0,0,1)||move.getDir()==VectorInt3(0,0,-1) )
 	{
-		  if(!latticeFilledUp)
-		      throw std::runtime_error("*****FeatureExcludedVolumeSc::checkMove....lattice is not populated. Run synchronize!\n");
-
 		  //get the position of the monomer to be moved (assume "lower left corner")
 		  VectorInt3 refPos=ingredients.getMolecules()[move.getIndex()];
 		  //get the direction of the move
@@ -358,7 +357,7 @@ bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( c
 		) return false;
 	      else return true;
 	}
-	else if(false)
+	else 
 	{
 		//get the position of the monomer to be moved (assume "lower left corner")
 		VectorInt3 refPos=ingredients.getMolecules()[move.getIndex()];
@@ -394,9 +393,8 @@ bool FeatureExcludedVolumeSc< LatticeClassType<LatticeValueType> >::checkMove( c
 		  (ingredients.getLatticeEntry(refPos+vec1+vec2+vec3)||
 		  (ingredients.getLatticeEntry(refPos+vec1+vec3))||
 		  (ingredients.getLatticeEntry(refPos+vec2+vec3)))
-		) return false;
+		  ) return false;
 		else return true;
-	  
 	}
 	
 }

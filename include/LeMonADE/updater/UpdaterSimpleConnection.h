@@ -60,7 +60,8 @@ public:
    * @param steps MCS per cycle to performed by execute()
    */
   UpdaterSimpleConnection(IngredientsType& ing,uint32_t steps = 1 )
-  :ingredients(ing),nsteps(steps),NReactiveSites(0),NReactedSites(0){}
+  :ingredients(ing),nsteps(steps),NReactedSites(0),NReactiveSites(0){}
+
   
  
   /**
@@ -96,28 +97,31 @@ public:
   //! get conversion of the reaction process
   double getConversion(){return (double(NReactedSites))/(double(NReactiveSites));};
   
-private:
-  //! Specialized move to be used for the movement of the monomers 
-  MoveType move;
-
-  //! Specialized move to be used for the connection between reactive monomers
-  ConnectionMoveType connectionMove;
-
-  //! Number of mcs to be executed
-  uint32_t nsteps;
-
-  //! random number generator (seed set in main program)
-  RandomNumberGenerators rng;
-
+protected:
+  
   //! A reference to the IngredientsType - mainly the system
   IngredientsType& ingredients;
-
+  
   //! number of monomers which could have a reaction bond
   uint32_t NReactiveSites;
 
   //! number of already reacted monomers
   uint32_t NReactedSites;
   
+  //! Specialized move to be used for the movement of the monomers 
+  MoveType move;
+
+  //! Specialized move to be used for the connection between reactive monomers
+  ConnectionMoveType connectionMove;  
+  
+  //! random number generator (seed set in main program)
+  RandomNumberGenerators rng;
+  
+private:
+
+  //! Number of mcs to be executed
+  uint32_t nsteps;
+
 };
 /**Implementation of the member functions
  * @brief 
@@ -126,8 +130,8 @@ template<class IngredientsType,class MoveType, class ConnectionMoveType>
 bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execute()
 {
   
-	time_t startTimer = time(NULL); //in seconds
-	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) <<std::endl;
+// 	time_t startTimer = time(NULL); //in seconds
+// 	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) <<std::endl;
 
 	for(int n=0;n<nsteps;n++)
 	{
@@ -164,9 +168,9 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 
 		ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+1);
 	}
-	std::cout <<"Conversion at "<<ingredients.getMolecules().getAge() << " is " << getConversion()  << std::endl;
-	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " with " << (((1.0*nsteps)*ingredients.getMolecules().size())/(difftime(time(NULL), startTimer)) ) << " [attempted connections/s]" <<std::endl;
-	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) << " with " << nsteps << "connection MCS "<<std::endl;
+// 	std::cout <<"Conversion at "<<ingredients.getMolecules().getAge() << " is " << getConversion()  << std::endl;
+// 	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " with " << (((1.0*nsteps)*ingredients.getMolecules().size())/(difftime(time(NULL), startTimer)) ) << " [attempted connections/s]" <<std::endl;
+// 	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) << " with " << nsteps << "connection MCS "<<std::endl;
 	return false;
 };
 

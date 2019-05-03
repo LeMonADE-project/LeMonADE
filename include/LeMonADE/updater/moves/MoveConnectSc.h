@@ -203,11 +203,12 @@ void MoveConnectSc::apply(IngredientsType& ing)
 	///@todo Think about the applying of move. Esp. make this independent of the order to avoid confusion!!
 	///@todo check if it makes any difference in this case?!
 
-	//move must FIRST be applied to the features
-	ing.applyMove(ing,*this);
-	
-	//THEN the bond is inserted 
+	//FIRST bond is inserted 
 	ing.modifyMolecules().connect(this->getIndex(),this->getPartner());
+	
+	//THEN all features are applied 
+  	ing.applyMove(ing,*this);
+	
 	
 	//the next line can produce a lot of output
 	//thus use only if needed:
