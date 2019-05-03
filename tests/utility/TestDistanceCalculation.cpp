@@ -44,8 +44,8 @@ public:
   typedef Ingredients<Config> Ing;
   
 
-  //redirect cout output
-  
+  //redirect cout output 
+  /*
   virtual void SetUp(){
     originalBuffer=std::cout.rdbuf();
     std::cout.rdbuf(tempStream.rdbuf());
@@ -177,5 +177,72 @@ TEST_F( TestDistanceCalculation, NonPowerOfTwoBoxes )
   EXPECT_EQ(1,dist);
   vec  = MinImageVector  ( mol[0],mol[1], ing );
   EXPECT_EQ(VectorInt3(1,0,0),vec);
+
+}
+
+TEST_F( TestDistanceCalculation, DoubleValuesArbitraryBoxes )
+{
+  ing.setBoxX(13);
+  ing.setPeriodicX(true);
+  ing.setBoxY(13);
+  ing.setPeriodicY(true);
+  ing.setBoxZ(13);
+  ing.setPeriodicZ(false);
+  ing.modifyMolecules().resize(4);
+  ing.modifyMolecules()[0].modifyVector3D().setAllCoordinates(0,0,0);
+  ing.modifyMolecules()[1].modifyVector3D().setAllCoordinates(3,0,0);
+  ing.modifyMolecules()[2].modifyVector3D().setAllCoordinates(0,11,11);
+  ing.modifyMolecules()[3].modifyVector3D().setAllCoordinates(2,12,11);
+
+  
+  Ing::molecules_type const& mol = ing.getMolecules();
+  double dist;
+  VectorDouble3 CoM1,CoM2,vec;
+
+  // (1.5,0,0)
+  CoM1.setX((mol[0].getX()+mol[1].getX())/2.0);
+  CoM1.setY((mol[0].getY()+mol[1].getY())/2.0);
+  CoM1.setZ((mol[0].getZ()+mol[1].getZ())/2.0);
+
+  // (1,11.5,11)
+  CoM2.setX((mol[2].getX()+mol[3].getX())/2.0);
+  CoM2.setY((mol[2].getY()+mol[3].getY())/2.0);
+  CoM2.setZ((mol[2].getZ()+mol[3].getZ())/2.0);
+
+  //std::cout << CoM1<< " - " << CoM2 << std::endl;
+
+  // diff = (0.5,1.5,11)
+  vec  = MinImageVector  ( CoM1,CoM2, ing );
+  EXPECT_EQ(VectorDouble3(0.5,1.5,11),vec);
+  vec  = MinImageVector  ( CoM2,CoM1, ing );
+  EXPECT_EQ(VectorDouble3(-0.5,-1.5,-11),vec);
+  dist = MinImageDistance( CoM1,CoM2, ing );
+  EXPECT_DOUBLE_EQ(sqrt(0.5*0.5+1.5*1.5+11*11),dist);
+
+  ing.setPeriodicZ(true);
+  // diff = (0.5,1.5,2)
+  vec  = MinImageVector  ( CoM1,CoM2, ing );
+  EXPECT_EQ(VectorDouble3(0.5,1.5,2),vec);
+  vec  = MinImageVector  ( CoM2,CoM1, ing );
+  EXPECT_EQ(VectorDouble3(-0.5,-1.5,-2),vec);
+  dist = MinImageDistance( CoM1,CoM2, ing );
+  EXPECT_DOUBLE_EQ(sqrt(0.5*0.5+1.5*1.5+4),dist);
+
+  // diff = (1.5,0,0)-(3,0,0) = (-1.5,0,0)
+  vec  = MinImageVector  ( CoM1, (VectorDouble3)(mol[1]), ing );
+  EXPECT_EQ(VectorDouble3(-1.5,0,0),vec);
+  vec  = MinImageVector  ( (VectorDouble3)(mol[1]), CoM1, ing );
+  EXPECT_EQ(VectorDouble3(1.5,0,0),vec);
+  dist = MinImageDistance( CoM1, (VectorDouble3)(mol[1]), ing );
+  EXPECT_DOUBLE_EQ(1.5,dist);
+
+  ing.modifyMolecules()[1].modifyVector3D().setAllCoordinates(11,0,0);
+  // diff = (1.5,0,0)-(11,0,0) = (3.5,0,0)
+  vec  = MinImageVector  ( CoM1, (VectorDouble3)(mol[1]), ing );
+  EXPECT_EQ(VectorDouble3(3.5,0,0),vec);
+  vec  = MinImageVector  ( (VectorDouble3)(mol[1]), CoM1, ing );
+  EXPECT_EQ(VectorDouble3(-3.5,0,0),vec);
+  dist = MinImageDistance( CoM1, (VectorDouble3)(mol[1]), ing );
+  EXPECT_DOUBLE_EQ(3.5,dist);
 
 }
