@@ -160,7 +160,7 @@ double MinImageDistance (const VectorInt3 R1, const VectorInt3 R2, IngredientsTy
 inline double MinImageDistanceComponent(const double x1, const double x2, const uint32_t latticeSize )
 {
   double invBoxSize(1.0/latticeSize);
-  double delta(x1-x2);
+  double delta(x2-x1);
   delta-=latticeSize * nearbyint(delta * invBoxSize);
   return delta;
 }

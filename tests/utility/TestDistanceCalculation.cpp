@@ -211,37 +211,37 @@ TEST_F( TestDistanceCalculation, DoubleValuesArbitraryBoxes )
 
   //std::cout << CoM1<< " - " << CoM2 << std::endl;
 
-  // diff = (0.5,1.5,11)
+  // diff = (-0.5,-1.5,11)
   vec  = MinImageVector  ( CoM1,CoM2, ing );
-  EXPECT_EQ(VectorDouble3(0.5,1.5,11),vec);
+  EXPECT_EQ(VectorDouble3(-0.5,-1.5,11),vec);
   vec  = MinImageVector  ( CoM2,CoM1, ing );
-  EXPECT_EQ(VectorDouble3(-0.5,-1.5,-11),vec);
+  EXPECT_EQ(VectorDouble3(0.5,1.5,-11),vec);
   dist = MinImageDistance( CoM1,CoM2, ing );
   EXPECT_DOUBLE_EQ(sqrt(0.5*0.5+1.5*1.5+11*11),dist);
 
   ing.setPeriodicZ(true);
   // diff = (0.5,1.5,2)
   vec  = MinImageVector  ( CoM1,CoM2, ing );
-  EXPECT_EQ(VectorDouble3(0.5,1.5,2),vec);
-  vec  = MinImageVector  ( CoM2,CoM1, ing );
   EXPECT_EQ(VectorDouble3(-0.5,-1.5,-2),vec);
+  vec  = MinImageVector  ( CoM2,CoM1, ing );
+  EXPECT_EQ(VectorDouble3(0.5,1.5,2),vec);
   dist = MinImageDistance( CoM1,CoM2, ing );
   EXPECT_DOUBLE_EQ(sqrt(0.5*0.5+1.5*1.5+4),dist);
 
-  // diff = (1.5,0,0)-(3,0,0) = (-1.5,0,0)
+  // diff = (3,0,0)-(1.5,0,0) = (1.5,0,0)
   vec  = MinImageVector  ( CoM1, (VectorDouble3)(mol[1]), ing );
-  EXPECT_EQ(VectorDouble3(-1.5,0,0),vec);
-  vec  = MinImageVector  ( (VectorDouble3)(mol[1]), CoM1, ing );
   EXPECT_EQ(VectorDouble3(1.5,0,0),vec);
+  vec  = MinImageVector  ( (VectorDouble3)(mol[1]), CoM1, ing );
+  EXPECT_EQ(VectorDouble3(-1.5,0,0),vec);
   dist = MinImageDistance( CoM1, (VectorDouble3)(mol[1]), ing );
   EXPECT_DOUBLE_EQ(1.5,dist);
 
   ing.modifyMolecules()[1].modifyVector3D().setAllCoordinates(11,0,0);
-  // diff = (1.5,0,0)-(11,0,0) = (3.5,0,0)
+  // diff = (11,0,0)-(1.5,0,0) = (-3.5,0,0)
   vec  = MinImageVector  ( CoM1, (VectorDouble3)(mol[1]), ing );
-  EXPECT_EQ(VectorDouble3(3.5,0,0),vec);
-  vec  = MinImageVector  ( (VectorDouble3)(mol[1]), CoM1, ing );
   EXPECT_EQ(VectorDouble3(-3.5,0,0),vec);
+  vec  = MinImageVector  ( (VectorDouble3)(mol[1]), CoM1, ing );
+  EXPECT_EQ(VectorDouble3(3.5,0,0),vec);
   dist = MinImageDistance( CoM1, (VectorDouble3)(mol[1]), ing );
   EXPECT_DOUBLE_EQ(3.5,dist);
 
