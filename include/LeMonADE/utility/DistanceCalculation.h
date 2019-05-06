@@ -28,6 +28,11 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef LEMONADE_UTILITY_DISTANCECALCULATION_H
 #define LEMONADE_UTILITY_DISTANCECALCULATION_H
 
+/**
+ * @file
+ * @brief helper functions to calculate distances using the minimum image convention
+ * */
+
 #include <iostream>
 
 #include "extern/loki/NullType.h"
@@ -40,7 +45,6 @@ namespace Lemonade
 {
 
 /**
- * @fn  MinImageDistanceComponentForPowerOfTwo
  * @brief calculates the minimal distances of images for one component 
  * @return int 
  * @param x1 absolute coordinate
@@ -62,7 +66,6 @@ inline int MinImageDistanceComponentForPowerOfTwo(const int x1, const int x2, co
   }
 } 
 /**
- * @fn MinImageVectorForPowerOfTwo
  * @brief returns the shortest vector between two images for a box size of power of 2 
  * @return vector 
  * @param R1 position vector  
@@ -79,7 +82,6 @@ VectorInt3 MinImageVectorForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2
   return dist;
 }
 /**
- * @fn MinImageDistanceForPowerOfTwo
  * @brief returns the minimal distance between two images for a box size of power of 2 
  * @return double 
  * @param R1 position vector  
@@ -95,7 +97,6 @@ double MinImageDistanceForPowerOfTwo (const VectorInt3 R1, const VectorInt3 R2, 
 // Implementation for arbitrary box dimensions. 
 
 /**
- * @fn  fold
  * @brief helper function to fold back absolute coordinates to relative coordinates 
  * @return uint32_t 
  * @param value absolute coordinate difference
@@ -106,7 +107,6 @@ inline uint32_t fold(int value, int box){
 }
 
 /**
- * @fn  MinImageDistanceComponent
  * @brief calculates the minimal distances of images for an arbitrary box size 
  * @return int 
  * @param x1 absolute coordinate
@@ -119,7 +119,6 @@ inline int MinImageDistanceComponent(const int x1, const int x2, const uint32_t 
 }
 
 /**
- * @fn MinImageVector
  * @brief returns the shortest vector between two images for an arbitrary box size 
  * @return vector 
  * @param R1 position vector  
@@ -138,7 +137,6 @@ VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, Ingredients
 }
 
 /**
- * @fn MinImageDistance
  * @brief returns the minimal distance between two images for an arbitrary box size 
  * @return double 
  * @param R1 position vector  
@@ -147,6 +145,55 @@ VectorInt3 MinImageVector (const VectorInt3 R1, const VectorInt3 R2, Ingredients
  */
 template < class IngredientsType>
 double MinImageDistance (const VectorInt3 R1, const VectorInt3 R2, IngredientsType& ing)
+{
+  return MinImageVector(R1,R2,ing).getLength();
+}
+
+/**
+ * @brief calculates the minimal distances of images for an arbitrary box size 
+ * @return double 
+ * @detail overloaded minimal distance calculation function for double vectors
+ * @param x1 absolute coordinate
+ * @param x2 absolute coordinate
+ * @param LatticeSize size of the box in the direction of the given coordinates
+ */
+inline double MinImageDistanceComponent(const double x1, const double x2, const uint32_t latticeSize )
+{
+  double invBoxSize(1.0/latticeSize);
+  double delta(x2-x1);
+  delta-=latticeSize * nearbyint(delta * invBoxSize);
+  return delta;
+}
+
+/**
+ * @brief returns the shortest vector between two images for an arbitrary box size 
+ * @return vector
+ * @detail overloaded minimal distance calculation function for double vectors
+ * @param R1 position vector  
+ * @param R2 position vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+VectorDouble3 MinImageVector (const VectorDouble3 R1, const VectorDouble3 R2, IngredientsType& ing)
+{
+  VectorDouble3 dist;
+  
+  ing.isPeriodicX() ? dist.setX(MinImageDistanceComponent(R1.getX(),R2.getX(),ing.getBoxX())) : dist.setX(R2.getX()-R1.getX());
+  ing.isPeriodicY() ? dist.setY(MinImageDistanceComponent(R1.getY(),R2.getY(),ing.getBoxY())) : dist.setY(R2.getY()-R1.getY());
+  ing.isPeriodicZ() ? dist.setZ(MinImageDistanceComponent(R1.getZ(),R2.getZ(),ing.getBoxZ())) : dist.setZ(R2.getZ()-R1.getZ());
+  return dist;
+}
+
+/**
+ * @brief returns the minimal distance between two images for an arbitrary box size 
+ * @detail overloaded minimal distance calculation function for double vectors
+ * @return double 
+ * @param R1 double vector  
+ * @param R2 double vector 
+ * @param ing container containing (all) system information
+ */
+template < class IngredientsType>
+double MinImageDistance (const VectorDouble3 R1, const VectorDouble3 R2, IngredientsType& ing)
 {
   return MinImageVector(R1,R2,ing).getLength();
 }
