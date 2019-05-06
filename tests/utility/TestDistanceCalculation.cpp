@@ -244,5 +244,15 @@ TEST_F( TestDistanceCalculation, DoubleValuesArbitraryBoxes )
   EXPECT_EQ(VectorDouble3(3.5,0,0),vec);
   dist = MinImageDistance( CoM1, (VectorDouble3)(mol[1]), ing );
   EXPECT_DOUBLE_EQ(3.5,dist);
-
+  
+  //test for position apart by more than a box size
+  VectorDouble3 vec1(3.5,0.5,0.5);
+  VectorDouble3 vec2(-16.,-12.5,31.5);
+  vec  = MinImageVector  ( vec1, vec2, ing );
+  EXPECT_EQ(VectorDouble3(6.5,0,5.0),vec);
+  vec  = MinImageVector  ( vec2, vec1, ing );
+  EXPECT_EQ(VectorDouble3(-6.5,0,-5.0),vec);
+  dist = MinImageDistance( vec1, vec2, ing );
+  EXPECT_NEAR(8.2,dist,0.01);
+  
 }
