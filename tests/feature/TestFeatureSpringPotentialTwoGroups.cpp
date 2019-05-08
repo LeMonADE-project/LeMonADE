@@ -1,3 +1,30 @@
+/*--------------------------------------------------------------------------------
+    ooo      L   attice-based  |
+  o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
+ o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
+oo---0---oo  A   lgorithm and  |
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+  o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
+    ooo                        |
+----------------------------------------------------------------------------------
+
+This file is part of LeMonADE.
+
+LeMonADE is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+LeMonADE is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
+
+--------------------------------------------------------------------------------*/
+
 /*****************************************************************************/
 /**
  * @file
@@ -14,6 +41,10 @@
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/feature/FeatureMoleculesIO.h>
+
+#include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
+#include <LeMonADE/updater/moves/MoveBase.h>
+#include <LeMonADE/updater/moves/MoveLocalSc.h>
 
 #include <LeMonADE/feature/FeatureSpringPotentialTwoGroups.h>
 
@@ -79,51 +110,92 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,Basics){
 
   // other values than 0,1,2 are not allowed
   EXPECT_ANY_THROW(ingredients.modifyMolecules()[0].setMonomerGroupTag(3));
+
+  // equality operator
+  ingredients.modifyMolecules().addMonomer(2,0,0);
+  EXPECT_NO_THROW(ingredients.modifyMolecules()[1].setMonomerGroupTag(1));
+  EXPECT_FALSE( ingredients.getMolecules()[0].getMonomerGroupTag() == ingredients.getMolecules()[1].getMonomerGroupTag() );
+  ingredients.modifyMolecules()[0].setMonomerGroupTag(ingredients.getMolecules()[1].getMonomerGroupTag());
+  EXPECT_TRUE( ingredients.getMolecules()[0].getMonomerGroupTag() == ingredients.getMolecules()[1].getMonomerGroupTag() );
   
 }
-//   
-//   TEST_F(TestFeatureSpringPotentialTwoGroups,InitializeGroupSorting){
-//     //setup 
-//     ingredients.setAffectedMonomerType(1);
-//     ingredients.setSpringConstant(0.25);
-//     ingredients.setEquilibriumLength(4);
-//     ingredients.setBoxX(16);
-//     ingredients.setBoxY(16);
-//     ingredients.setBoxZ(16);
-//     ingredients.setPeriodicX(true);
-//     ingredients.setPeriodicY(true);
-//     ingredients.setPeriodicZ(true);
-//     ingredients.modifyBondset().addBFMclassicBondset();
-//   
-//      //molecule one
-//     ingredients.modifyMolecules().addMonomer(0,0,6);
-//     ingredients.modifyMolecules()[ingredients.getMolecules().size()-1].setAttributeTag(1);
-//     ingredients.modifyMolecules().addMonomer(2,0,6);
-//     ingredients.modifyMolecules()[ingredients.getMolecules().size()-1].setAttributeTag(1);
-//     ingredients.modifyMolecules().addMonomer(4,0,6);
-//     ingredients.modifyMolecules()[ingredients.getMolecules().size()-1].setAttributeTag(1);
-//     ingredients.modifyMolecules().connect(0,1);
-//     ingredients.modifyMolecules().connect(1,2);
-//     /*   o-o-o   */
-//     //molecule two
-//     ingredients.modifyMolecules().addMonomer(0,0,2);
-//     ingredients.modifyMolecules()[ingredients.getMolecules().size()-1].setAttributeTag(4);
-//     ingredients.modifyMolecules().addMonomer(2,0,2);
-//     ingredients.modifyMolecules()[ingredients.getMolecules().size()-1].setAttributeTag(4);
-//     ingredients.modifyMolecules().addMonomer(4,0,2);
-//     ingredients.modifyMolecules()[ingredients.getMolecules().size()-1].setAttributeTag(4);
-//     ingredients.modifyMolecules().addMonomer(6,0,2);
-//     ingredients.modifyMolecules()[ingredients.getMolecules().size()-1].setAttributeTag(4);
-//     ingredients.modifyMolecules().connect(3,4);
-//     ingredients.modifyMolecules().connect(4,5);
-//     ingredients.modifyMolecules().connect(5,6);
-//     /*   o-o-o-o  */
-//     
-//     EXPECT_NO_THROW(ingredients.synchronize());
-//     EXPECT_EQ(7,ingredients.getMolecules().size());
-//     EXPECT_EQ(3,ingredients.getAffectedMonomerGroup().size());
-//     EXPECT_EQ(0,ingredients.getAffectedMonomerGroup().at(0));
-//     EXPECT_EQ(1,ingredients.getAffectedMonomerGroup().at(1));
-//     EXPECT_EQ(2,ingredients.getAffectedMonomerGroup().at(2));
-//     
-//   }
+
+TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
+  //setup a small system with a rather high spring constant
+  ingredients.setSpringConstant(8.0);
+  ingredients.setEquilibriumLength(4);
+  ingredients.setBoxX(16);
+  ingredients.setBoxY(16);
+  ingredients.setBoxZ(16);
+  ingredients.setPeriodicX(true);
+  ingredients.setPeriodicY(true);
+  ingredients.setPeriodicZ(true);
+  ingredients.modifyBondset().addBFMclassicBondset();
+  ingredients.modifyMolecules().addMonomer(0,0,0);
+  ingredients.modifyMolecules().addMonomer(8,0,0);
+
+  // check the spring parameters and the monomer extension
+  EXPECT_DOUBLE_EQ(4.0,ingredients.getEquilibriumLength());
+  EXPECT_DOUBLE_EQ(8.0,ingredients.getSpringConstant());
+  EXPECT_EQ(0,ingredients.getMolecules()[0].getMonomerGroupTag());
+  EXPECT_EQ(0,ingredients.getMolecules()[1].getMonomerGroupTag());
+
+  // check the monomer extension setter and getter
+  EXPECT_NO_THROW(ingredients.modifyMolecules()[0].setMonomerGroupTag(1));
+  EXPECT_EQ(1,ingredients.getMolecules()[0].getMonomerGroupTag());
+  EXPECT_NO_THROW(ingredients.modifyMolecules()[1].setMonomerGroupTag(2));
+  EXPECT_EQ(2,ingredients.getMolecules()[1].getMonomerGroupTag());
+
+  // perform some moves and check the resulting center to center distance
+  
+}
+
+TEST_F(TestFeatureSpringPotentialTwoGroups,fileReadWrite){
+  IngredientsType ingredientsWrite;
+  IngredientsType ingredientsRead;
+
+  ingredientsWrite.setBoxX(64);
+  ingredientsWrite.setPeriodicX(true);
+  ingredientsWrite.setBoxY(64);
+  ingredientsWrite.setPeriodicY(true);
+  ingredientsWrite.setBoxZ(64);
+  ingredientsWrite.setPeriodicZ(true);
+  ingredientsWrite.setSpringConstant(1.2);
+  ingredientsWrite.setEquilibriumLength(4);
+  ingredientsWrite.modifyMolecules().addMonomer(0,0,0);
+  ingredientsWrite.modifyMolecules()[0].setMonomerGroupTag(1);
+  ingredientsWrite.modifyMolecules().addMonomer(2,0,0);
+  ingredientsWrite.modifyMolecules()[1].setMonomerGroupTag(1);
+  ingredientsWrite.modifyMolecules().addMonomer(4,0,0);
+  ingredientsWrite.modifyMolecules()[2].setMonomerGroupTag(2);
+  ingredientsWrite.modifyMolecules().addMonomer(6,0,0);
+  ingredientsWrite.modifyMolecules()[3].setMonomerGroupTag(2);
+  ingredientsWrite.modifyMolecules().addMonomer(8,0,0);
+
+  EXPECT_EQ(1,ingredientsWrite.getMolecules()[0].getMonomerGroupTag());
+  EXPECT_EQ(1,ingredientsWrite.getMolecules()[1].getMonomerGroupTag());
+  EXPECT_EQ(2,ingredientsWrite.getMolecules()[2].getMonomerGroupTag());
+  EXPECT_EQ(2,ingredientsWrite.getMolecules()[3].getMonomerGroupTag());
+  EXPECT_EQ(0,ingredientsWrite.getMolecules()[4].getMonomerGroupTag());
+
+  //write to file and read back in
+  AnalyzerWriteBfmFile<IngredientsType> outfile("tests/attributesTestOut.test",ingredientsWrite,AnalyzerWriteBfmFile<IngredientsType>::NEWFILE);
+  outfile.initialize();
+
+  FileImport<IngredientsType> infile ("tests/attributesTestOut.test",ingredientsRead);
+
+  //scan file for !mcs and read-in first frame
+  infile.initialize();
+
+  EXPECT_EQ(ingredientsRead.getMolecules()[0].getMonomerGroupTag(),1);
+  EXPECT_EQ(ingredientsRead.getMolecules()[1].getMonomerGroupTag(),1);
+  EXPECT_EQ(ingredientsRead.getMolecules()[2].getMonomerGroupTag(),2);
+  EXPECT_EQ(ingredientsRead.getMolecules()[3].getMonomerGroupTag(),2);
+  EXPECT_EQ(ingredientsRead.getMolecules()[4].getMonomerGroupTag(),0); /*has default value*/
+
+  EXPECT_DOUBLE_EQ(1.2,ingredientsRead.getSpringConstant());
+  EXPECT_DOUBLE_EQ(4.0,ingredientsRead.getEquilibriumLength());
+
+    //remove the temporary file
+  EXPECT_EQ(0,remove("tests/attributesTestOut.test"));
+}

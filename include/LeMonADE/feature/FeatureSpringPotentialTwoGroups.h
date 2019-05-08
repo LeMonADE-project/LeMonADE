@@ -229,7 +229,7 @@ void ReadSpringPotentialGroups<IngredientsType>::execute()
   std::streampos previous;
   //for convenience: get the input stream
   std::istream& source=this->getInputStream();
-  //for convenience: get the set of monomers
+	//for convenience: get the set of monomers
   typename IngredientsType::molecules_type& molecules=this->getDestination().modifyMolecules();
 
   //go to next line and save the position of the get pointer into streampos previous
@@ -317,9 +317,9 @@ void ReadSpringPotentialGroups<IngredientsType>::execute()
 template<class IngredientsType>
 void FeatureSpringPotentialTwoGroups::exportRead(FileImport< IngredientsType >& fileReader)
 {
-    fileReader.registerRead("#!spring_potential_constant", new ReadVirtualSpringConstant<FeatureSpringPotentialTwoGroups>(*this));
-    fileReader.registerRead("#!spring_potential_length", new ReadVirtualSpringLength<FeatureSpringPotentialTwoGroups>(*this));
-    fileReader.registerRead("!spring_potential_groups", new ReadSpringPotentialGroups<FeatureSpringPotentialTwoGroups>(*this));
+    fileReader.registerRead("#!spring_potential_constant", new ReadVirtualSpringConstant<IngredientsType>(fileReader.getDestination()));
+    fileReader.registerRead("#!spring_potential_length", new ReadVirtualSpringLength<IngredientsType>(fileReader.getDestination()));
+    fileReader.registerRead("!spring_potential_groups", new ReadSpringPotentialGroups<IngredientsType>(fileReader.getDestination()));
 }
 
 /***************************************************************************************/
@@ -334,7 +334,7 @@ template <class IngredientsType>
 class WriteVirtualSpringConstant:public AbstractWrite<IngredientsType>
 {
 public:
-	WriteVirtualSpringConstant(const IngredientsType& i):AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
+	WriteVirtualSpringConstant(const IngredientsType& ing):AbstractWrite<IngredientsType>(ing){this->setHeaderOnly(true);}
 
 	virtual ~WriteVirtualSpringConstant(){}
 
@@ -358,7 +358,7 @@ template <class IngredientsType>
 class WriteVirtualSpringLength:public AbstractWrite<IngredientsType>
 {
 public:
-	WriteVirtualSpringLength(const IngredientsType& i):AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
+	WriteVirtualSpringLength(const IngredientsType& ing):AbstractWrite<IngredientsType>(ing){this->setHeaderOnly(true);}
 
 	virtual ~WriteVirtualSpringLength(){}
 
@@ -383,8 +383,8 @@ class WriteSpringPotentialGroups:public AbstractWrite<IngredientsType>
 {
 public:
 	//! Only writes \b !attributes into the header of the bfm-file.
-  WriteSpringPotentialGroups(const IngredientsType& i)
-    :AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
+  WriteSpringPotentialGroups(const IngredientsType& ing)
+    :AbstractWrite<IngredientsType>(ing){this->setHeaderOnly(true);}
   virtual ~WriteSpringPotentialGroups(){}
   virtual void writeStream(std::ostream& strm);
 };
@@ -401,13 +401,13 @@ void WriteSpringPotentialGroups<IngredientsType>::writeStream(std::ostream& strm
   //get reference to monomers
   const typename IngredientsType::molecules_type& molecules=this->getSource().getMolecules();
 
-  size_t nMonomers=molecules.size();
+  size_t nMonomers = molecules.size();
   //groupTag blocks begin with startIndex
   size_t startIndex=0;
   //counter varable
   size_t n=0;
   //groupTag to be written (updated in loop below)
-  uint8_t groupTag=molecules[0].getMonomerGroupTag();
+  uint8_t groupTag = molecules[0].getMonomerGroupTag();
 
   //write groupTags (blockwise)
   while(n<nMonomers){
@@ -416,7 +416,7 @@ void WriteSpringPotentialGroups<IngredientsType>::writeStream(std::ostream& strm
 			if(groupTag != FeatureSpringPotentialTwoGroups::UNAFFECTED){
 				strm<<startIndex+1<<"-"<<n<<":"<<groupTag<<std::endl;
 			}
-      groupTag=molecules[n].getMonomerGroupTag();
+      groupTag = molecules[n].getMonomerGroupTag();
       startIndex=n;
     }
     n++;
@@ -431,9 +431,9 @@ void WriteSpringPotentialGroups<IngredientsType>::writeStream(std::ostream& strm
 template<class IngredientsType>
 void FeatureSpringPotentialTwoGroups::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const
 {
-	fileWriter.registerWrite("#!spring_potential_constant",new WriteVirtualSpringConstant<FeatureSpringPotentialTwoGroups>(*this));
-	fileWriter.registerWrite("#!spring_potential_length",new WriteVirtualSpringLength<FeatureSpringPotentialTwoGroups>(*this));
-	fileWriter.registerWrite("!spring_potential_groups",new WriteSpringPotentialGroups<FeatureSpringPotentialTwoGroups>(*this));
+	fileWriter.registerWrite("#!spring_potential_constant",new WriteVirtualSpringConstant<IngredientsType>(fileWriter.getIngredients_()));
+	fileWriter.registerWrite("#!spring_potential_length",new WriteVirtualSpringLength<IngredientsType>(fileWriter.getIngredients_()));
+	fileWriter.registerWrite("!spring_potential_groups",new WriteSpringPotentialGroups<IngredientsType>(fileWriter.getIngredients_()));
 }
 
 /***************************************************************************************/
@@ -466,7 +466,6 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 {
 	//Index of moved Monomer is monoIndex
 	uint32_t monoIndex=move.getIndex();
-	const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 
 	//if the moved monomer has the same attribute as the affectedMonomerType,
 	//get the z position of the group afer a hypothetical move
