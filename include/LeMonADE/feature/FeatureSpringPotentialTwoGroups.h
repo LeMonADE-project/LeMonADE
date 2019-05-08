@@ -43,8 +43,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @class MonomerSpringPotentialGroupTag
- * @brief Extends monomers by an unsigned integer (uint8_t) as group tag along with getter and setter\n
- * 		  Initially the tag is set to 0, that is FeatureSpringPotentialTwoGroups::SPRING_GROUP_ID::UNAFFECTED.
+ * @brief Extends monomers by an unsigned integer (uint32_t) as group tag along with getter and setter\n
+ * 		  Initially the tag is set to 0, that is FeatureSpringPotentialTwoGroups::UNAFFECTED.
  * */
 
 class MonomerSpringPotentialGroupTag{
@@ -52,7 +52,7 @@ public:
 		//! constructor setting the group tag to 0 = unaffected by default
       MonomerSpringPotentialGroupTag():tagGroup(0){}
 		//! getter of the group Tag
-      uint8_t getMonomerGroupTag() const {return tagGroup;}
+      uint32_t getMonomerGroupTag() const {return tagGroup;}
 		/**
 			 * @brief Setting the group tag of the monomer with \para tagGroup_.
 			 * 
@@ -60,7 +60,7 @@ public:
 			 *
 			 * @param tagGroup_
 			 */
-      void setMonomerGroupTag(uint8_t tagGroup_){
+      void setMonomerGroupTag(uint32_t tagGroup_){
 			if( tagGroup_ == 0 || tagGroup_ == 1 || tagGroup_ == 2 ){
 				tagGroup = tagGroup_;
 			}else{
@@ -70,7 +70,7 @@ public:
 
 private:
 		//! Private variable holding the group tag. Default is 0.
-    uint8_t tagGroup;
+    uint32_t tagGroup;
 };
 
 
@@ -86,9 +86,10 @@ public:
 	FeatureSpringPotentialTwoGroups(): equilibrium_length(0.0),spring_constant(0.0) {};
 	virtual ~FeatureSpringPotentialTwoGroups(){};
 	
+	//! This Feature require Feature Boltzmann afterwards to evaluate the potential energy change
 	typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
 
-	//! This Feature requires a monomer_extensions.
+	//! This Feature requires a monomer_extensions: MonomerSpringPotentialGroupTag
   typedef LOKI_TYPELIST_1(MonomerSpringPotentialGroupTag) monomer_extensions;
 
 	//! define an enum for the group identification
@@ -104,22 +105,27 @@ public:
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
 	
+	//! getter function for the harmonic potential spring length r0 in V(r)=k/2(r-r0)^2
 	double getEquilibriumLength() const{
 		return equilibrium_length;
 	}
 
+	//! setter function for the harmonic potential spring length r0 in V(r)=k/2(r-r0)^2
 	void setEquilibriumLength(double equilibriumLength) {
 		equilibrium_length = equilibriumLength;
 	}
 
+	//! getter function for the harmonic potential spring constant k in V(r)=k/2(r-r0)^2
 	double getSpringConstant() const{
 		return spring_constant;
 	}
 
+	//! setter function for the harmonic potential spring constant k in V(r)=k/2(r-r0)^2
 	void setSpringConstant(double springConstant){
 		spring_constant = springConstant;
 	}
 
+	//! helper function to calculate the center of mass of an arbitrary monomer group
 	template<class IngredientsType>
 	VectorDouble3 getGroupCenterOfMass(const IngredientsType& ingredients,const std::vector<uint32_t>& group) const;
 
@@ -139,16 +145,22 @@ private:
 	//! spring constant k in harmonic potential V(r)=k/2(r-r0)^2
 	double spring_constant;
 
-	//contains the indices of the monomers of type affectedMonomerType
+	//! contains the indices of the monomers of type affectedMonomerType
 	std::vector<uint32_t> affectedMonomerGroup0;
 
-	//contains the indices of the monomers of type affectedMonomerType
+	//! contains the indices of the monomers of type affectedMonomerType
 	std::vector<uint32_t> affectedMonomerGroup1;
 
 };
 
 
-
+/*****************************************************************/
+/**
+ * @class ReadVirtualSpringConstant 
+ *
+ * @brief Handles BFM-File-Read \b #!spring_potential_constant
+ * @tparam IngredientsType Ingredients class storing all system information.
+ **/
 template<class IngredientsType>
 class ReadVirtualSpringConstant:public ReadToDestination<IngredientsType>
 {
@@ -176,7 +188,13 @@ void ReadVirtualSpringConstant<IngredientsType>::execute()
 	ingredients.setSpringConstant(springConstant);
 }
 
-
+/*****************************************************************/
+/**
+ * @class ReadVirtualSpringLength 
+ *
+ * @brief Handles BFM-File-Read \b #!spring_potential_length
+ * @tparam IngredientsType Ingredients class storing all system information.
+ **/
 template < class IngredientsType>
 class ReadVirtualSpringLength: public ReadToDestination<IngredientsType>
 {
@@ -185,7 +203,6 @@ public:
   virtual ~ReadVirtualSpringLength(){}
   virtual void execute();
 };
-
 
 template<class IngredientsType>
 void ReadVirtualSpringLength<IngredientsType>::execute()
@@ -204,7 +221,13 @@ void ReadVirtualSpringLength<IngredientsType>::execute()
 	ingredients.setEquilibriumLength(springLength);
 }
 
-
+/*****************************************************************/
+/**
+ * @class ReadSpringPotentialGroups 
+ *
+ * @brief Handles BFM-File-Read \b !spring_potential_groups
+ * @tparam IngredientsType Ingredients class storing all system information.
+ **/
 template < class IngredientsType>
 class ReadSpringPotentialGroups: public ReadToDestination<IngredientsType>
 {
@@ -222,7 +245,7 @@ void ReadSpringPotentialGroups<IngredientsType>::execute()
   //counts the number of attribute lines in the file
   int nGroupTags=0;
   int startIndex,stopIndex;
-  uint8_t groupTag;
+  uint32_t groupTag;
   //contains the latest line read from file
   std::string line;
   //used to reset the position of the get pointer after processing the command
@@ -314,6 +337,13 @@ void ReadSpringPotentialGroups<IngredientsType>::execute()
   }
 }
 
+/**
+ * @brief perform the file reading using the FileImport class
+ * 
+ * @detail the following read commands are supported:
+ * #!spring_potential_constant, #!spring_potential_length, !spring_potential_groups
+ * 
+ **/
 template<class IngredientsType>
 void FeatureSpringPotentialTwoGroups::exportRead(FileImport< IngredientsType >& fileReader)
 {
@@ -407,7 +437,7 @@ void WriteSpringPotentialGroups<IngredientsType>::writeStream(std::ostream& strm
   //counter varable
   size_t n=0;
   //groupTag to be written (updated in loop below)
-  uint8_t groupTag = molecules[0].getMonomerGroupTag();
+  uint32_t groupTag = molecules[0].getMonomerGroupTag();
 
   //write groupTags (blockwise)
   while(n<nMonomers){
@@ -423,8 +453,9 @@ void WriteSpringPotentialGroups<IngredientsType>::writeStream(std::ostream& strm
   }
   //write final groupTags
 	if(groupTag != FeatureSpringPotentialTwoGroups::UNAFFECTED){
-  	strm<<startIndex+1<<"-"<<nMonomers<<":"<<groupTag<<std::endl<<std::endl;
+  	strm<<startIndex+1<<"-"<<nMonomers<<":"<<groupTag<<std::endl;
 	}
+	strm<<std::endl;
 }
 
 //! perform the file writing using the AnalyzerWriteBfmFile<IngredientsType>
@@ -462,7 +493,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
  * @param [in] the standard simple cubic lattive move: MoveLocalSc
  */
 template<class IngredientsType>
-bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalSc& move)const
+bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const
 {
 	//Index of moved Monomer is monoIndex
 	uint32_t monoIndex=move.getIndex();
@@ -470,22 +501,21 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	//if the moved monomer has the same attribute as the affectedMonomerType,
 	//get the z position of the group afer a hypothetical move
 	//otherwise return true right away
-	int32_t attributeTagMoveObject=ingredients.getMolecules()[move.getIndex()].getMonomerGroupTag();
+	int32_t moveGroupTag=ingredients.getMolecules()[move.getIndex()].getMonomerGroupTag();
 
 	VectorDouble3 COM_position_old;
 	VectorDouble3 COM_position_not_moved;
 	double size_moved_group = 0.0;
 
-
 	VectorDouble3 projected_move = move.getDir();
 
-	if(attributeTagMoveObject==GROUPA)
+	if(moveGroupTag == GROUPA)
 	{
 		COM_position_old=getGroupCenterOfMass(ingredients,affectedMonomerGroup0);
 		COM_position_not_moved=getGroupCenterOfMass(ingredients,affectedMonomerGroup1);
 		size_moved_group=affectedMonomerGroup0.size();
 	}
-	else if(attributeTagMoveObject==GROUPB)
+	else if(moveGroupTag == GROUPB)
 	{
 		COM_position_old=getGroupCenterOfMass(ingredients,affectedMonomerGroup1);
 		COM_position_not_moved=getGroupCenterOfMass(ingredients,affectedMonomerGroup0);

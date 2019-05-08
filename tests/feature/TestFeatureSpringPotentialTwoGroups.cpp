@@ -55,6 +55,23 @@ public:
   typedef ConfigureSystem<VectorInt3,Features> ConfigType;
   typedef Ingredients < ConfigType> IngredientsType;
   IngredientsType ingredients;
+
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
   
   /* suppress cout output for better readability -->un-/comment here: */
   //redirect cout output
@@ -123,7 +140,7 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,Basics){
 TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
   //setup a small system with a rather high spring constant
   ingredients.setSpringConstant(8.0);
-  ingredients.setEquilibriumLength(4);
+  ingredients.setEquilibriumLength(2);
   ingredients.setBoxX(16);
   ingredients.setBoxY(16);
   ingredients.setBoxZ(16);
@@ -135,7 +152,7 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
   ingredients.modifyMolecules().addMonomer(8,0,0);
 
   // check the spring parameters and the monomer extension
-  EXPECT_DOUBLE_EQ(4.0,ingredients.getEquilibriumLength());
+  EXPECT_DOUBLE_EQ(2.0,ingredients.getEquilibriumLength());
   EXPECT_DOUBLE_EQ(8.0,ingredients.getSpringConstant());
   EXPECT_EQ(0,ingredients.getMolecules()[0].getMonomerGroupTag());
   EXPECT_EQ(0,ingredients.getMolecules()[1].getMonomerGroupTag());
@@ -147,6 +164,53 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
   EXPECT_EQ(2,ingredients.getMolecules()[1].getMonomerGroupTag());
 
   // perform some moves and check the resulting center to center distance
+  // **************   check base move   **************
+  UnknownMove basemove;
+  basemove.init(ingredients);
+  EXPECT_TRUE(basemove.check(ingredients));
+  //should change nothing
+  basemove.apply(ingredients);
+  EXPECT_EQ(VectorInt3(0,0,0),ingredients.getMolecules()[0]);
+  EXPECT_EQ(VectorInt3(8,0,0),ingredients.getMolecules()[1]);
+  EXPECT_EQ(1,ingredients.getMolecules()[0].getMonomerGroupTag());
+  EXPECT_EQ(2,ingredients.getMolecules()[1].getMonomerGroupTag());
+  ingredients.synchronize();
+
+  //MoveLocalSc scmove;
+  MoveLocalSc scmove;
+  
+  for(uint32_t i=0;i<100;i++){
+    scmove.init(ingredients);
+    if(scmove.check(ingredients)){
+      scmove.apply(ingredients);
+    }
+  }
+  // monomers should be close
+  std::cout << (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength() <<std::endl;
+  EXPECT_TRUE(abs( abs( (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength()-2 ) ) < 2 );
+
+  // add a nonaffected monomer and check the movement
+  ingredients.modifyMolecules().addMonomer(8,8,8);
+  int32_t counter(0);
+  VectorInt3 referencePosition(ingredients.getMolecules()[2]);
+  ingredients.synchronize();
+
+  for(uint32_t i=0;i<100;i++){
+    scmove.init(ingredients);
+    if(scmove.check(ingredients)){
+      scmove.apply(ingredients);
+      if( scmove.getIndex() == 2 ){
+        EXPECT_FALSE(referencePosition == ingredients.getMolecules()[2]);
+        counter++;
+      }
+    }
+  }
+  // monomers should still be close
+  std::cout << (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength() <<std::endl
+  <<", move counter = "<<counter<<std::endl;
+  EXPECT_TRUE(abs( abs( (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength()-2 ) ) < 2 );
+  // there should have been some moves of the unaffected monomer
+  EXPECT_TRUE(counter>0);
   
 }
 
@@ -179,10 +243,11 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,fileReadWrite){
   EXPECT_EQ(0,ingredientsWrite.getMolecules()[4].getMonomerGroupTag());
 
   //write to file and read back in
-  AnalyzerWriteBfmFile<IngredientsType> outfile("tests/attributesTestOut.test",ingredientsWrite,AnalyzerWriteBfmFile<IngredientsType>::NEWFILE);
+  AnalyzerWriteBfmFile<IngredientsType> outfile("tests/springPotentialTestOut.test",ingredientsWrite,AnalyzerWriteBfmFile<IngredientsType>::NEWFILE);
   outfile.initialize();
+  outfile.execute();
 
-  FileImport<IngredientsType> infile ("tests/attributesTestOut.test",ingredientsRead);
+  FileImport<IngredientsType> infile ("tests/springPotentialTestOut.test",ingredientsRead);
 
   //scan file for !mcs and read-in first frame
   infile.initialize();
@@ -197,5 +262,5 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,fileReadWrite){
   EXPECT_DOUBLE_EQ(4.0,ingredientsRead.getEquilibriumLength());
 
     //remove the temporary file
-  EXPECT_EQ(0,remove("tests/attributesTestOut.test"));
+  EXPECT_EQ(0,remove("tests/springPotentialTestOut.test"));
 }
