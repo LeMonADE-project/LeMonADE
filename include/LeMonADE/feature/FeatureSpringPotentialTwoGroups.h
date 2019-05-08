@@ -36,13 +36,67 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureBoltzmann.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
 
+/**
+ * @file
+ * @brief Applying a harmonic spring potential to the center of mass positions of two groups.
+ * */
+
+/**
+ * @class MonomerSpringPotentialGroupTag
+ * @brief Extends monomers by an unsigned integer (uint8_t) as group tag along with getter and setter\n
+ * 		  Initially the tag is set to 0, that is FeatureSpringPotentialTwoGroups::SPRING_GROUP_ID::UNAFFECTED.
+ * */
+
+class MonomerSpringPotentialGroupTag{
+public:
+		//! constructor setting the group tag to 0 = unaffected by default
+      MonomerSpringPotentialGroupTag():tagGroup(0){}
+		//! getter of the group Tag
+      uint8_t getMonomerGroupTag() const {return tagGroup;}
+		/**
+			 * @brief Setting the group tag of the monomer with \para tagGroup_.
+			 * 
+			 * @detail The tag must be of value 0 (=unaffected), 1 (=groupA) or 2 (=groupB).
+			 *
+			 * @param tagGroup_
+			 */
+      void setMonomerGroupTag(uint8_t tagGroup_){
+			if( tagGroup_ == 0 || tagGroup_ == 1 || tagGroup_ == 2 ){
+				tagGroup = tagGroup_;
+			}else{
+				throw std::runtime_error("FeatureSpringPotentialTwoGroups::setMonomerGroupTag not of value 0, 1 or 2\n");
+			}
+		}
+
+private:
+		//! Private variable holding the group tag. Default is 0.
+    uint8_t tagGroup;
+};
+
+
+/*****************************************************************/
+/**
+ * @class FeatureSpringPotentialTwoGroups
+ * @brief Extends vertex/monomer by an group tag (MonomerSpringPotentialGroupTag). Provides read/write functionality 
+ * Implements the harmonic potential as external potential applied to the center of mass of the two groups. 
+ **/
 class FeatureSpringPotentialTwoGroups:public Feature
 {
 public:
-	FeatureSpringPotentialTwoGroups(){};
+	FeatureSpringPotentialTwoGroups(): equilibrium_length(0.0),spring_constant(0.0) {};
 	virtual ~FeatureSpringPotentialTwoGroups(){};
 	
-	typedef LOKI_TYPELIST_2(FeatureAttributes<>, FeatureBoltzmann) required_features_back;
+	typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
+
+	//! This Feature requires a monomer_extensions.
+  typedef LOKI_TYPELIST_1(MonomerSpringPotentialGroupTag) monomer_extensions;
+
+	//! define an enum for the group identification
+	enum SPRING_GROUP_ID{
+    UNAFFECTED=0,       
+    GROUPA=1,      
+    GROUPB=2
+  };
 	
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveBase& move)const;
@@ -66,21 +120,6 @@ public:
 		spring_constant = springConstant;
 	}
 
-	int32_t getAffectedMonomerType0() const {
-		return affectedMonomerType0;
-	}
-
-	void setAffectedMonomerType0(int32_t affectedMonomerType0) {
-		this->affectedMonomerType0 = affectedMonomerType0;
-	}
-
-	int32_t getAffectedMonomerType1() const {
-		return affectedMonomerType1;
-	}
-	void setAffectedMonomerType1(int32_t affectedMonomerType1) {
-		this->affectedMonomerType1 = affectedMonomerType1;
-	}
-
 	template<class IngredientsType>
 	VectorDouble3 getGroupCenterOfMass(const IngredientsType& ingredients,const std::vector<uint32_t>& group) const;
 
@@ -99,15 +138,9 @@ private:
 
 	//! spring constant k in harmonic potential V(r)=k/2(r-r0)^2
 	double spring_constant;
-	
-	//attribute tag of the monomer type affected by the potential
-	int32_t affectedMonomerType0;
 
 	//contains the indices of the monomers of type affectedMonomerType
 	std::vector<uint32_t> affectedMonomerGroup0;
-
-	//attribute tag of the monomer type affected by the potential
-	int32_t affectedMonomerType1;
 
 	//contains the indices of the monomers of type affectedMonomerType
 	std::vector<uint32_t> affectedMonomerGroup1;
@@ -138,10 +171,11 @@ void ReadVirtualSpringConstant<IngredientsType>::execute()
 	std::string line;
 	getline(source,line);
 	springConstant = atof(line.c_str());
-	std::cout << "#!virtual_spring_constant=" << (springConstant) << std::endl;
+	std::cout << "#!spring_potential_constant=" << (springConstant) << std::endl;
 
 	ingredients.setSpringConstant(springConstant);
 }
+
 
 template < class IngredientsType>
 class ReadVirtualSpringLength: public ReadToDestination<IngredientsType>
@@ -151,6 +185,7 @@ public:
   virtual ~ReadVirtualSpringLength(){}
   virtual void execute();
 };
+
 
 template<class IngredientsType>
 void ReadVirtualSpringLength<IngredientsType>::execute()
@@ -164,78 +199,137 @@ void ReadVirtualSpringLength<IngredientsType>::execute()
 	std::string line;
 	getline(source,line);
 	springLength = atof(line.c_str());
-	std::cout << "#!virtual_spring_length=" << (springLength) << std::endl;
+	std::cout << "#!spring_potential_length=" << (springLength) << std::endl;
 
 	ingredients.setEquilibriumLength(springLength);
 }
 
+
 template < class IngredientsType>
-class ReadVirtualSpringType0: public ReadToDestination<IngredientsType>
+class ReadSpringPotentialGroups: public ReadToDestination<IngredientsType>
 {
 public:
-	ReadVirtualSpringType0(IngredientsType& i):ReadToDestination<IngredientsType>(i){}
-  virtual ~ReadVirtualSpringType0(){}
+  ReadSpringPotentialGroups(IngredientsType& ingredients):ReadToDestination<IngredientsType>(ingredients){}
+  virtual ~ReadSpringPotentialGroups(){}
   virtual void execute();
 };
 
-template<class IngredientsType>
-void ReadVirtualSpringType0<IngredientsType>::execute()
-{
-	std::cout<<"reading VirtualSpringType0...";
-
-	int32_t springType0 = 0;
-	IngredientsType& ingredients=this->getDestination();
-	std::istream& source=this->getInputStream();
-
-	std::string line;
-	getline(source,line);
-	springType0 = atoi(line.c_str());
-	std::cout << "#!virtual_spring_type0=" << (springType0) << std::endl;
-
-	ingredients.setAffectedMonomerType0(springType0);
-}
-
 template < class IngredientsType>
-class ReadVirtualSpringType1: public ReadToDestination<IngredientsType>
+void ReadSpringPotentialGroups<IngredientsType>::execute()
 {
-public:
-	ReadVirtualSpringType1(IngredientsType& i):ReadToDestination<IngredientsType>(i){}
-  virtual ~ReadVirtualSpringType1(){}
-  virtual void execute();
-};
+	std::cout<<"reading SpringPotentialGroups ...";
+  //some variables used during reading
+  //counts the number of attribute lines in the file
+  int nGroupTags=0;
+  int startIndex,stopIndex;
+  uint8_t groupTag;
+  //contains the latest line read from file
+  std::string line;
+  //used to reset the position of the get pointer after processing the command
+  std::streampos previous;
+  //for convenience: get the input stream
+  std::istream& source=this->getInputStream();
+  //for convenience: get the set of monomers
+  typename IngredientsType::molecules_type& molecules=this->getDestination().modifyMolecules();
 
+  //go to next line and save the position of the get pointer into streampos previous
+  getline(source,line);
+  previous=(source).tellg();
 
+  //read and process the lines containing the bond vector definition
+  getline(source,line);
 
-template<class IngredientsType>
-void ReadVirtualSpringType1<IngredientsType>::execute()
-{
-	std::cout<<"reading VirtualSpringType1...";
+  while(!line.empty() && !((source).fail())){
 
-	int32_t springType1 = 0;
-	IngredientsType& ingredients=this->getDestination();
-	std::istream& source=this->getInputStream();
+    //stop at next Read and set the get-pointer to the position before the Read
+    if(this->detectRead(line)){
+      (source).seekg(previous);
+      break;
+    }
 
-	std::string line;
-	getline(source,line);
-	springType1 = atoi(line.c_str());
-	std::cout << "#!virtual_spring_type1=" << (springType1) << std::endl;
+    //initialize stringstream with content for ease of processing
+    std::stringstream stream(line);
 
-	ingredients.setAffectedMonomerType1(springType1);
+    //read vector components
+    stream>>startIndex;
+
+    //throw exception, if extraction fails
+    if(stream.fail()){
+      std::stringstream messagestream;
+      messagestream<<"ReadSpringPotentialGroups<IngredientsType>::execute()\n"
+                   <<"Could not read first index in groupTags line "<<nGroupTags+1;
+      throw std::runtime_error(messagestream.str());
+    }
+
+    //throw exception, if next character isnt "-"
+    if(!this->findSeparator(stream,'-')){
+
+        std::stringstream messagestream;
+      messagestream<<"ReadSpringPotentialGroups<IngredientsType>::execute()\n"
+                   <<"Wrong definition of groupTags\nCould not find separator \"-\" "
+                   <<"in attribute definition no "<<nGroupTags+1;
+      throw std::runtime_error(messagestream.str());
+    }
+
+    //read bond identifier, throw exception if extraction fails
+    stream>>stopIndex;
+
+    //throw exception, if extraction fails
+    if(stream.fail()){
+        std::stringstream messagestream;
+      messagestream<<"ReadSpringPotentialGroups<IngredientsType>::execute()\n"
+                   <<"Could not read second index in groupTags line "<<nGroupTags+1;
+      throw std::runtime_error(messagestream.str());
+    }
+
+    //throw exception, if next character isnt ":"
+    if(!this->findSeparator(stream,':')){
+
+        std::stringstream messagestream;
+      messagestream<<"ReadSpringPotentialGroups<IngredientsType>::execute()\n"
+                   <<"Wrong definition of groupTag\nCould not find separator \":\" "
+                   <<"in groupTags definition number "<<nGroupTags+1;
+      throw std::runtime_error(messagestream.str());
+    }
+    //read the attribute tag
+    stream>>groupTag;
+    //if extraction worked, save the attributes
+    if(!stream.fail()){
+
+      //save attributes
+      for(int n=startIndex;n<=stopIndex;n++)
+      {
+        //use n-1 as index, because bfm-files start counting indices at 1 (not 0)
+        molecules[n-1].setMonomerGroupTag(groupTag);
+      }
+      nGroupTags++;
+      getline((source),line);
+
+		}else{	//otherwise throw an exception
+        std::stringstream messagestream;
+      messagestream<<"ReadSpringPotentialGroups<IngredientsType>::execute()\n"
+                   <<"could not read groupTag in groupTag definition number "<<nGroupTags+1;
+      throw std::runtime_error(messagestream.str());
+    }
+  }
 }
 
 template<class IngredientsType>
 void FeatureSpringPotentialTwoGroups::exportRead(FileImport< IngredientsType >& fileReader)
 {
-    fileReader.registerRead("#!virtual_spring_constant", new ReadVirtualSpringConstant<FeatureSpringPotentialTwoGroups>(*this));
-    fileReader.registerRead("#!virtual_spring_length", new ReadVirtualSpringLength<FeatureSpringPotentialTwoGroups>(*this));
-    fileReader.registerRead("#!virtual_spring_type0", new ReadVirtualSpringType0<FeatureSpringPotentialTwoGroups>(*this));
-    fileReader.registerRead("#!virtual_spring_type1", new ReadVirtualSpringType1<FeatureSpringPotentialTwoGroups>(*this));
-
+    fileReader.registerRead("#!spring_potential_constant", new ReadVirtualSpringConstant<FeatureSpringPotentialTwoGroups>(*this));
+    fileReader.registerRead("#!spring_potential_length", new ReadVirtualSpringLength<FeatureSpringPotentialTwoGroups>(*this));
+    fileReader.registerRead("!spring_potential_groups", new ReadSpringPotentialGroups<FeatureSpringPotentialTwoGroups>(*this));
 }
 
 /***************************************************************************************/
-
-
+/*****************************************************************/
+/**
+ * @class WriteVirtualSpringConstant
+ *
+ * @brief Handles BFM-File-Write \b #!spring_potential_constant
+ * @tparam IngredientsType Ingredients class storing all system information.
+ **/
 template <class IngredientsType>
 class WriteVirtualSpringConstant:public AbstractWrite<IngredientsType>
 {
@@ -250,14 +344,14 @@ public:
 template<class IngredientsType>
 void WriteVirtualSpringConstant<IngredientsType>::writeStream(std::ostream& stream)
 {
-	stream<<"#!virtual_spring_constant=" << (this->getSource().getSpringConstant()) << std::endl<< std::endl;
+	stream<<"#!spring_potential_constant=" << (this->getSource().getSpringConstant()) << std::endl<< std::endl;
 }
 
 /*****************************************************************/
 /**
  * @class WriteVirtualSpringLength
  *
- * @brief Handles BFM-File-Write \b #!VirtualSpringLength
+ * @brief Handles BFM-File-Write \b #!spring_potential_length
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
 template <class IngredientsType>
@@ -274,70 +368,99 @@ public:
 template<class IngredientsType>
 void WriteVirtualSpringLength<IngredientsType>::writeStream(std::ostream& stream)
 {
-	stream<<"#!virtual_spring_length=" << (this->getSource().getEquilibriumLength()) << std::endl<< std::endl;
+	stream<<"#!spring_potential_length=" << (this->getSource().getEquilibriumLength()) << std::endl<< std::endl;
 }
-
 
 /*****************************************************************/
 /**
- * @class WriteVirtualSpringType0
+ * @class WriteSpringPotentialGroups
  *
- * @brief Handles BFM-File-Write \b #!VirtualSpringType0
+ * @brief Handles BFM-File-Write \b !spring_potential_groups
  * @tparam IngredientsType Ingredients class storing all system information.
  **/
 template <class IngredientsType>
-class WriteVirtualSpringType0:public AbstractWrite<IngredientsType>
+class WriteSpringPotentialGroups:public AbstractWrite<IngredientsType>
 {
 public:
-	WriteVirtualSpringType0(const IngredientsType& i):AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
-
-	virtual ~WriteVirtualSpringType0(){}
-
-	virtual void writeStream(std::ostream& strm);
+	//! Only writes \b !attributes into the header of the bfm-file.
+  WriteSpringPotentialGroups(const IngredientsType& i)
+    :AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
+  virtual ~WriteSpringPotentialGroups(){}
+  virtual void writeStream(std::ostream& strm);
 };
 
-template<class IngredientsType>
-void WriteVirtualSpringType0<IngredientsType>::writeStream(std::ostream& stream)
+//! Function to write out the spring potential groups by monomer index, similar to FeatureAttributes
+template < class IngredientsType>
+void WriteSpringPotentialGroups<IngredientsType>::writeStream(std::ostream& strm)
 {
-	stream<<"#!virtual_spring_type0=" << (this->getSource().getAffectedMonomerType0()) << std::endl<< std::endl;
+  //for all output the indices are increased by one, because the file-format
+  //starts counting indices at 1 (not 0)
+
+  //write bfm command
+  strm<<"!spring_potential_groups\n";
+  //get reference to monomers
+  const typename IngredientsType::molecules_type& molecules=this->getSource().getMolecules();
+
+  size_t nMonomers=molecules.size();
+  //groupTag blocks begin with startIndex
+  size_t startIndex=0;
+  //counter varable
+  size_t n=0;
+  //groupTag to be written (updated in loop below)
+  uint8_t groupTag=molecules[0].getMonomerGroupTag();
+
+  //write groupTags (blockwise)
+  while(n<nMonomers){
+    if(molecules[n].getMonomerGroupTag()!=groupTag)
+    {
+			if(groupTag != FeatureSpringPotentialTwoGroups::UNAFFECTED){
+				strm<<startIndex+1<<"-"<<n<<":"<<groupTag<<std::endl;
+			}
+      groupTag=molecules[n].getMonomerGroupTag();
+      startIndex=n;
+    }
+    n++;
+  }
+  //write final groupTags
+	if(groupTag != FeatureSpringPotentialTwoGroups::UNAFFECTED){
+  	strm<<startIndex+1<<"-"<<nMonomers<<":"<<groupTag<<std::endl<<std::endl;
+	}
 }
 
-
-template <class IngredientsType>
-class WriteVirtualSpringType1:public AbstractWrite<IngredientsType>
-{
-public:
-	WriteVirtualSpringType1(const IngredientsType& i):AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
-
-	virtual ~WriteVirtualSpringType1(){}
-
-	virtual void writeStream(std::ostream& strm);
-};
-
-template<class IngredientsType>
-void WriteVirtualSpringType1<IngredientsType>::writeStream(std::ostream& stream)
-{
-	stream<<"#!virtual_spring_type1=" << (this->getSource().getAffectedMonomerType1()) << std::endl<< std::endl;
-}
-
-
-
+//! perform the file writing using the AnalyzerWriteBfmFile<IngredientsType>
 template<class IngredientsType>
 void FeatureSpringPotentialTwoGroups::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const
 {
-	fileWriter.registerWrite("#!virtual_spring_constant",new WriteVirtualSpringConstant<FeatureSpringPotentialTwoGroups>(*this));
-	fileWriter.registerWrite("#!virtual_spring_length",new WriteVirtualSpringLength<FeatureSpringPotentialTwoGroups>(*this));
-	fileWriter.registerWrite("#!virtual_spring_type0",new WriteVirtualSpringType0<FeatureSpringPotentialTwoGroups>(*this));
-	fileWriter.registerWrite("#!virtual_spring_type1",new WriteVirtualSpringType1<FeatureSpringPotentialTwoGroups>(*this));
+	fileWriter.registerWrite("#!spring_potential_constant",new WriteVirtualSpringConstant<FeatureSpringPotentialTwoGroups>(*this));
+	fileWriter.registerWrite("#!spring_potential_length",new WriteVirtualSpringLength<FeatureSpringPotentialTwoGroups>(*this));
+	fileWriter.registerWrite("!spring_potential_groups",new WriteSpringPotentialGroups<FeatureSpringPotentialTwoGroups>(*this));
 }
 
+/***************************************************************************************/
+/************* private member functions of FeatureSpringPotentialTwoGroups *************/
+
+/**
+ * This function performs the Monte-Carlo check for the basic move.
+ * This is called for unknown move types.
+ * It always return true.
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] the basic move: MoveBase
+ */
 template<class IngredientsType>
 bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, const MoveBase& move) const
 {
 	return true;
 }
 
-
+/**
+ * This function performs the Monte-Carlo check for the MoveLocalSc.
+ * The center of mass differences induced by the moveand the resulting potential difference is calculated.
+ * It passes the corresponding move probability to FeatureBoltzmann. 
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] the standard simple cubic lattive move: MoveLocalSc
+ */
 template<class IngredientsType>
 bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalSc& move)const
 {
@@ -348,7 +471,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	//if the moved monomer has the same attribute as the affectedMonomerType,
 	//get the z position of the group afer a hypothetical move
 	//otherwise return true right away
-	int32_t attributeTagMoveObject=ingredients.getMolecules()[move.getIndex()].getAttributeTag();
+	int32_t attributeTagMoveObject=ingredients.getMolecules()[move.getIndex()].getMonomerGroupTag();
 
 	VectorDouble3 COM_position_old;
 	VectorDouble3 COM_position_not_moved;
@@ -357,13 +480,13 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 
 	VectorDouble3 projected_move = move.getDir();
 
-	if(attributeTagMoveObject==affectedMonomerType0)
+	if(attributeTagMoveObject==GROUPA)
 	{
 		COM_position_old=getGroupCenterOfMass(ingredients,affectedMonomerGroup0);
 		COM_position_not_moved=getGroupCenterOfMass(ingredients,affectedMonomerGroup1);
 		size_moved_group=affectedMonomerGroup0.size();
 	}
-	else if(attributeTagMoveObject==affectedMonomerType1)
+	else if(attributeTagMoveObject==GROUPB)
 	{
 		COM_position_old=getGroupCenterOfMass(ingredients,affectedMonomerGroup1);
 		COM_position_not_moved=getGroupCenterOfMass(ingredients,affectedMonomerGroup0);
@@ -393,9 +516,13 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 
 }
 
-//finds the indices of the affected monomers and checks if the
-//center of mass is in a valid position, i.e. that the potential is not
-//infinite
+/**
+ * Performs the synchronize for the utilities of the feature:
+ *   Clear the monomer groups and refill them by reading the monomer Groups Tag.
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] the standard simple cubic lattive move: MoveLocalSc
+ */
 template<class IngredientsType>
 void FeatureSpringPotentialTwoGroups::synchronize(IngredientsType& ingredients)
 {
@@ -406,12 +533,12 @@ void FeatureSpringPotentialTwoGroups::synchronize(IngredientsType& ingredients)
 	//sort the monomers into groups
 	for(size_t n=0;n<ingredients.getMolecules().size();n++)
 	{
-		if(ingredients.getMolecules()[n].getAttributeTag()==affectedMonomerType0)
+		if(ingredients.getMolecules()[n].getMonomerGroupTag()==GROUPA)
 		{
 			affectedMonomerGroup0.push_back(n);
 		}
 
-		if(ingredients.getMolecules()[n].getAttributeTag()==affectedMonomerType1)
+		if(ingredients.getMolecules()[n].getMonomerGroupTag()==GROUPB)
 		{
 			affectedMonomerGroup1.push_back(n);
 		}

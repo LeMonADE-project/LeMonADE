@@ -1,9 +1,9 @@
 /*****************************************************************************/
 /**
  * @file
- * @brief test for Feature Virtual Spring towards a wall in z-direction
+ * @brief test for Feature Spring Potential
  * @author Martin
- * @date 31.08.2017
+ * @date 08.05.2019
  * */
 /*****************************************************************************/
 #include "gtest/gtest.h"
@@ -15,7 +15,7 @@
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/feature/FeatureMoleculesIO.h>
 
-#include "FeatureSpringPotentialTwoGroups.h"
+#include <LeMonADE/feature/FeatureSpringPotentialTwoGroups.h>
 
 
 class TestFeatureSpringPotentialTwoGroups: public ::testing::Test{
@@ -42,19 +42,45 @@ private:
 };
 
 
-//   TEST_F(TestFeatureSpringPotentialTwoGroups,Constructor){
-//     // test default constructor
-//     FeatureVirtualSpringWall feature;
-//     EXPECT_DOUBLE_EQ(0.0,feature.getEquilibriumLength());
-//     EXPECT_DOUBLE_EQ(0.0,feature.getSpringConstant());
-//     EXPECT_EQ(0,feature.getAffectedMonomerType());
-//     
-//     //test constructor in ingredients
-//     EXPECT_DOUBLE_EQ(0.0,ingredients.getEquilibriumLength());
-//     EXPECT_DOUBLE_EQ(0.0,ingredients.getSpringConstant());
-//     EXPECT_EQ(0,ingredients.getAffectedMonomerType());
-//     
-//   }
+TEST_F(TestFeatureSpringPotentialTwoGroups,Basics){
+  // test default constructor
+  FeatureSpringPotentialTwoGroups feature;
+  EXPECT_DOUBLE_EQ(0.0,feature.getEquilibriumLength());
+  EXPECT_DOUBLE_EQ(0.0,feature.getSpringConstant());
+  
+  //test constructor in ingredients
+  EXPECT_DOUBLE_EQ(0.0,ingredients.getEquilibriumLength());
+  EXPECT_DOUBLE_EQ(0.0,ingredients.getSpringConstant());
+
+  //setup a small system
+  ingredients.setSpringConstant(0.25);
+  ingredients.setEquilibriumLength(4);
+  ingredients.setBoxX(16);
+  ingredients.setBoxY(16);
+  ingredients.setBoxZ(16);
+  ingredients.setPeriodicX(true);
+  ingredients.setPeriodicY(true);
+  ingredients.setPeriodicZ(true);
+  ingredients.modifyBondset().addBFMclassicBondset();
+  ingredients.modifyMolecules().addMonomer(0,0,0);
+
+  // check the spring parameters and the monomer extension
+  EXPECT_DOUBLE_EQ(4.00,ingredients.getEquilibriumLength());
+  EXPECT_DOUBLE_EQ(0.25,ingredients.getSpringConstant());
+  EXPECT_EQ(0,ingredients.getMolecules()[0].getMonomerGroupTag());
+
+  // check the monomer extension setter and getter
+  EXPECT_NO_THROW(ingredients.modifyMolecules()[0].setMonomerGroupTag(1));
+  EXPECT_EQ(1,ingredients.getMolecules()[0].getMonomerGroupTag());
+  EXPECT_NO_THROW(ingredients.modifyMolecules()[0].setMonomerGroupTag(2));
+  EXPECT_EQ(2,ingredients.getMolecules()[0].getMonomerGroupTag());
+  EXPECT_NO_THROW(ingredients.modifyMolecules()[0].setMonomerGroupTag(0));
+  EXPECT_EQ(0,ingredients.getMolecules()[0].getMonomerGroupTag());
+
+  // other values than 0,1,2 are not allowed
+  EXPECT_ANY_THROW(ingredients.modifyMolecules()[0].setMonomerGroupTag(3));
+  
+}
 //   
 //   TEST_F(TestFeatureSpringPotentialTwoGroups,InitializeGroupSorting){
 //     //setup 
