@@ -619,10 +619,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	 * V=k/2*(|R_COM|-R_0)^2
 	 * R_COM=R1-R2
 	 * dV=V(R_COM(unmoved))-V(R_COM(moved))
-	 * the simplified equation below assumes a step length of 1 !!!
 	 */
-	
-	//seems to be shorter...
 	double 	dV  = 0.5*projected_move.getLength()*projected_move.getLength()/(size_moved_group*size_moved_group);
 		dV += equilibrium_length*(rel_length_old-rel_length_moved);
 		dV += projected_move/size_moved_group*(COM_position_old-COM_position_not_moved);
