@@ -1,23 +1,20 @@
-13.07.2016:(issue4)
-*Splited FeatureExcludedVolume to Sc and Bcc version to provide the best performace implementations for local moves
-*Added MoveAddMonomersc/Bcc 
+12.08.2016:
+* Added a CHANGELOG
 
-22.07.2016:(issue6)
-*Added general Updater for system setup
-*Improved AnalyzerRadiusOfGyration to get rid of many different constructors
-*Cleaned up numeric functions, deleted all unused utility headers
+13.05.2019:
+* first update in CHANGELOG
+* only documentation of principal version changes in CHANGELOG
 
-03.08.2016:(issue40) 
-*Deleted old FeatureExlcudedVolume and corresponding test
-*Deleted FeatureVisualize 
+LeMonADE 1.0
+* bare copy of LeMonADE library from ITP (Leibniz-Institute for Polymer Research IPF) with basic functinonalities
 
-11.08.2016:(issue39, 41, 43)
-*Added new init interfaces for MoveLocalSc/Bcc to set monomer id and move direction
-*Added base move for MoveAddMonomerSc/Bcc, applied corresponding changes in FeatureBox and FeatureAttributes
-*Added tests for all specialized moves
+LeMonADE 2.0
+* adding abstract system setup Updater: UpdaterAbstractCreate
+* adding the nearest neighbor interaction Features: FeatureNNInteractionSc and FeatureNNInteractionBcc
 
-12.08.2016:(issue44)
-*Added a CHANGELOG
-*Renamed MoveAddSc/BccMonomer to MoveAddMonomerSc/Bcc and according changes in all Features and tests
-*Changed attributes interface in addmoves: setType->setTag and get.. the same
-
+LeMonADE 2.1
+* adding external potential Feature: FeatureSpringPotentialTwoGroups
+* adding dynamic bond changing: FeatureConnectionSc
+* modify FeatureAttribute: now uses a template parameter FeatureAttribute<>, default=int32_t
+* improvement of utilities: DistanceCalculation
+* introduce continuous integration: CircleCi
