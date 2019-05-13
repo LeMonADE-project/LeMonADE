@@ -45,6 +45,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
+#include <LeMonADE/updater/moves/MoveLocalScDiag.h>
 
 #include <LeMonADE/feature/FeatureSpringPotentialTwoGroups.h>
 
@@ -212,6 +213,22 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
   EXPECT_TRUE(abs( abs( (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength()-2 ) ) < 2 );
   // there should have been some moves of the unaffected monomer
   EXPECT_TRUE(counter>0);
+  
+  //MoveLocalScDiag scmovediag;
+  MoveLocalScDiag scmovediag;
+  //reste the positions
+  ingredients.modifyMolecules()[0].modifyVector3D().setAllCoordinates(0,0,0);
+  ingredients.modifyMolecules()[1].modifyVector3D().setAllCoordinates(13,8,9);
+  
+  for(uint32_t i=0;i<100;i++){
+    scmovediag.init(ingredients);
+    if(scmovediag.check(ingredients)){
+      scmovediag.apply(ingredients);
+    }
+  }
+  // monomers should be close
+  std::cout << (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength() <<std::endl;
+  EXPECT_TRUE(abs( abs( (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength()-2 ) ) < 2 );
   
 }
 

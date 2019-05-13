@@ -576,10 +576,67 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 template<class IngredientsType>
 bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalScDiag& move) const
 {
-  std::stringstream error_message;
-  error_message<< "Missing implementation for MoveLocalScDiag in FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalScDiag& move).\n";
-  error_message<< "See issue: https://github.com/LeMonADE-project/LeMonADE/issues/106";
-  std::runtime_error(error_message.str());
+  	//Index of moved Monomer is monoIndex
+	uint32_t monoIndex=move.getIndex();
+
+	//if the moved monomer has the same attribute as the affectedMonomerType,
+	//get the z position of the group afer a hypothetical move
+	//otherwise return true right away
+	int32_t moveGroupTag=ingredients.getMolecules()[move.getIndex()].getMonomerGroupTag();
+
+	//this is the COM of the group where the monomer which shall be moves belongs to 
+	VectorDouble3 COM_position_old;
+	//this is the COM of the group where the monomer does not belong to 
+	VectorDouble3 COM_position_not_moved;
+	//number of monomers which belong to the group of the potentialy moved monomer
+	double size_moved_group = 0.0;
+	
+	VectorDouble3 projected_move = move.getDir();
+
+	if(moveGroupTag == GROUPA)
+	{
+		COM_position_old=getGroupCenterOfMass(ingredients,affectedMonomerGroup0);
+		COM_position_not_moved=getGroupCenterOfMass(ingredients,affectedMonomerGroup1);
+		size_moved_group=affectedMonomerGroup0.size();
+	}
+	else if(moveGroupTag == GROUPB)
+	{
+		COM_position_old=getGroupCenterOfMass(ingredients,affectedMonomerGroup1);
+		COM_position_not_moved=getGroupCenterOfMass(ingredients,affectedMonomerGroup0);
+		size_moved_group=affectedMonomerGroup1.size();
+	}
+	else 
+	  return true;
+
+	//the rest happens only if we have not returned yet, i.e. if distance has been calculated
+	
+	//distance between the two COM if the move is not applied
+	double rel_length_old( (COM_position_old-COM_position_not_moved).getLength() );
+	//distance between the two COM if the move would be applied
+	double rel_length_moved( (COM_position_old-COM_position_not_moved+projected_move/size_moved_group).getLength() );
+
+	/* calculate the potential difference
+	 * V=k/2*(|R_COM|-R_0)^2
+	 * R_COM=R1-R2
+	 * dV=V(R_COM(unmoved))-V(R_COM(moved))
+	 * the simplified equation below assumes a step length of 1 !!!
+	 */
+	
+	//seems to be shorter...
+	double 	dV  = 0.5*projected_move.getLength()*projected_move.getLength()/(size_moved_group*size_moved_group);
+		dV += equilibrium_length*(rel_length_old-rel_length_moved);
+		dV += projected_move/size_moved_group*(COM_position_old-COM_position_not_moved);
+		dV *= spring_constant;
+	
+	//calculate the transition probability
+	//Metropolis: zeta = exp (-dV)
+	double prob=exp(-dV);
+
+	//std::cout << "prob: " <<  prob << std::endl;
+	move.multiplyProbability(prob);
+
+	return true;
+  
 }
 /**
  * Performs the synchronize for the utilities of the feature:
