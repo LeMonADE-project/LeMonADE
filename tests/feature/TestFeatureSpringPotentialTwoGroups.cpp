@@ -75,14 +75,14 @@ public:
   
   /* suppress cout output for better readability -->un-/comment here: */
   //redirect cout output
-  virtual void SetUp(){
-    originalBuffer=std::cout.rdbuf();
-    std::cout.rdbuf(tempStream.rdbuf());
-  };
-  //restore original output
-  virtual void TearDown(){
-    std::cout.rdbuf(originalBuffer);
-  };
+//   virtual void SetUp(){
+//     originalBuffer=std::cout.rdbuf();
+//     std::cout.rdbuf(tempStream.rdbuf());
+//   };
+//   //restore original output
+//   virtual void TearDown(){
+//     std::cout.rdbuf(originalBuffer);
+//   };
 private:
   std::streambuf* originalBuffer;
   std::ostringstream tempStream;
@@ -201,6 +201,7 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
       scmove.apply(ingredients);
       if( scmove.getIndex() == 2 ){
         EXPECT_FALSE(referencePosition == ingredients.getMolecules()[2]);
+	referencePosition=ingredients.getMolecules()[2];
         counter++;
       }
     }

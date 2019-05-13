@@ -31,6 +31,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
+#include <LeMonADE/updater/moves/MoveLocalScDiag.h>
 #include <LeMonADE/io/FileImport.h>
 #include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
 #include <LeMonADE/feature/FeatureBoltzmann.h>
@@ -90,20 +91,23 @@ public:
 	typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
 
 	//! This Feature requires a monomer_extensions: MonomerSpringPotentialGroupTag
-  typedef LOKI_TYPELIST_1(MonomerSpringPotentialGroupTag) monomer_extensions;
+	typedef LOKI_TYPELIST_1(MonomerSpringPotentialGroupTag) monomer_extensions;
 
 	//! define an enum for the group identification
 	enum SPRING_GROUP_ID{
-    UNAFFECTED=0,       
-    GROUPA=1,      
-    GROUPB=2
-  };
+	  UNAFFECTED=0,       
+	  GROUPA=1,      
+	  GROUPB=2
+	};
 	
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveBase& move)const;
 	
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
+
+	template<class IngredientsType>
+	bool checkMove(const IngredientsType& ingredients,MoveLocalScDiag& move) const;
 	
 	//! getter function for the harmonic potential spring length r0 in V(r)=k/2(r-r0)^2
 	double getEquilibriumLength() const{
@@ -490,7 +494,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
  * It passes the corresponding move probability to FeatureBoltzmann. 
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] the standard simple cubic lattive move: MoveLocalSc
+ * @param [in] move the standard simple cubic lattive move: MoveLocalSc
  */
 template<class IngredientsType>
 bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const
@@ -503,10 +507,13 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	//otherwise return true right away
 	int32_t moveGroupTag=ingredients.getMolecules()[move.getIndex()].getMonomerGroupTag();
 
+	//this is the COM of the group where the monomer which shall be moves belongs to 
 	VectorDouble3 COM_position_old;
+	//this is the COM of the group where the monomer does not belong to 
 	VectorDouble3 COM_position_not_moved;
+	//number of monomers which belong to the group of the potentialy moved monomer
 	double size_moved_group = 0.0;
-
+	
 	VectorDouble3 projected_move = move.getDir();
 
 	if(moveGroupTag == GROUPA)
@@ -521,19 +528,33 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 		COM_position_not_moved=getGroupCenterOfMass(ingredients,affectedMonomerGroup0);
 		size_moved_group=affectedMonomerGroup1.size();
 	}
-	else return true;
+	else 
+	  return true;
 
 	//the rest happens only if we have not returned yet, i.e. if distance has been calculated
+	
+	//distance between the two COM if the move is not applied
+	double rel_length_old( (COM_position_old-COM_position_not_moved).getLength() );
+	//distance between the two COM if the move would be applied
+	double rel_length_moved( (COM_position_old-COM_position_not_moved+projected_move/size_moved_group).getLength() );
 
-	VectorDouble3 rel_length_old(COM_position_old-COM_position_not_moved);
-	VectorDouble3 rel_length_moved(COM_position_old-COM_position_not_moved+projected_move/size_moved_group);
-
-	// calculate the potential difference
-	double dV = spring_constant*(COM_position_old*projected_move/size_moved_group);
-	dV += 0.5*spring_constant/(size_moved_group*size_moved_group);
-	dV -= spring_constant*(COM_position_not_moved*projected_move/size_moved_group);
-	dV += spring_constant*equilibrium_length*(rel_length_old.getLength()-rel_length_moved.getLength());
-
+	/* calculate the potential difference
+	 * V=k/2*(|R_COM|-R_0)^2
+	 * R_COM=R1-R2
+	 * dV=V(R_COM(unmoved))-V(R_COM(moved))
+	 * the simplified equation below assumes a step length of 1 !!!
+	 */
+	
+// 	double dV = spring_constant*(COM_position_old*projected_move/size_moved_group);
+// 	dV += 0.5*spring_constant/(size_moved_group*size_moved_group);
+// 	dV -= spring_constant*(COM_position_not_moved*projected_move/size_moved_group);
+// 	dV += spring_constant*equilibrium_length*(rel_length_old-rel_length_moved);
+	//seems to be shorter...
+	double 	dV  = 0.5/(size_moved_group*size_moved_group);
+		dV += equilibrium_length*(rel_length_old-rel_length_moved);
+		dV += projected_move/size_moved_group*(COM_position_old-COM_position_not_moved);
+		dV *= spring_constant;
+	
 	//calculate the transition probability
 	//Metropolis: zeta = exp (-dV)
 	double prob=exp(-dV);
@@ -544,7 +565,22 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	return true;
 
 }
-
+/**
+ * This function performs the Monte-Carlo check for the MoveLocalScDiag.
+ * The center of mass differences induced by the moveand the resulting potential difference is calculated.
+ * It passes the corresponding move probability to FeatureBoltzmann. 
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move the simple cubic lattive move: MoveLocalScDiag
+ */
+template<class IngredientsType>
+bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalScDiag& move) const
+{
+  std::stringstream error_message;
+  error_message<< "Missing implementation for MoveLocalScDiag in FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalScDiag& move).\n";
+  error_message<< "See issue: https://github.com/LeMonADE-project/LeMonADE/issues/106";
+  std::runtime_error(error_message.str());
+}
 /**
  * Performs the synchronize for the utilities of the feature:
  *   Clear the monomer groups and refill them by reading the monomer Groups Tag.
