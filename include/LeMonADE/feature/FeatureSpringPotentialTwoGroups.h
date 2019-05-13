@@ -104,10 +104,10 @@ public:
 	bool checkMove(const IngredientsType& ingredients, const MoveBase& move)const;
 	
 	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
+	bool checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const;
 
 	template<class IngredientsType>
-	bool checkMove(const IngredientsType& ingredients,MoveLocalScDiag& move) const;
+	bool checkMove(const IngredientsType& ingredients, MoveLocalScDiag& move) const;
 	
 	//! getter function for the harmonic potential spring length r0 in V(r)=k/2(r-r0)^2
 	double getEquilibriumLength() const{
@@ -143,7 +143,7 @@ public:
 	void synchronize(IngredientsType& ingredients);
 
 private:
-	//! equlibrium length r0 in harmonic potential V(r)=k/2(r-r0)^2
+	//! equilibrium length r0 in harmonic potential V(r)=k/2(r-r0)^2
 	double equilibrium_length;
 
 	//! spring constant k in harmonic potential V(r)=k/2(r-r0)^2
@@ -288,7 +288,7 @@ void ReadSpringPotentialGroups<IngredientsType>::execute()
       throw std::runtime_error(messagestream.str());
     }
 
-    //throw exception, if next character isnt "-"
+    //throw exception, if next character is not "-"
     if(!this->findSeparator(stream,'-')){
 
         std::stringstream messagestream;
@@ -309,7 +309,7 @@ void ReadSpringPotentialGroups<IngredientsType>::execute()
       throw std::runtime_error(messagestream.str());
     }
 
-    //throw exception, if next character isnt ":"
+    //throw exception, if next character is not ":"
     if(!this->findSeparator(stream,':')){
 
         std::stringstream messagestream;
@@ -494,7 +494,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
  * It passes the corresponding move probability to FeatureBoltzmann. 
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move the standard simple cubic lattive move: MoveLocalSc
+ * @param [in] move the standard simple cubic lattice move: MoveLocalSc
  */
 template<class IngredientsType>
 bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const
@@ -503,7 +503,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	uint32_t monoIndex=move.getIndex();
 
 	//if the moved monomer has the same attribute as the affectedMonomerType,
-	//get the z position of the group afer a hypothetical move
+	//get the z position of the group after a hypothetical move
 	//otherwise return true right away
 	int32_t moveGroupTag=ingredients.getMolecules()[move.getIndex()].getMonomerGroupTag();
 
@@ -511,7 +511,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	VectorDouble3 COM_position_old;
 	//this is the COM of the group where the monomer does not belong to 
 	VectorDouble3 COM_position_not_moved;
-	//number of monomers which belong to the group of the potentialy moved monomer
+	//number of monomers which belong to the group of the potentially moved monomer
 	double size_moved_group = 0.0;
 	
 	VectorDouble3 projected_move = move.getDir();
@@ -571,7 +571,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
  * It passes the corresponding move probability to FeatureBoltzmann. 
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move the simple cubic lattive move: MoveLocalScDiag
+ * @param [in] move the simple cubic lattice move: MoveLocalScDiag
  */
 template<class IngredientsType>
 bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredients, MoveLocalScDiag& move) const
@@ -580,7 +580,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	uint32_t monoIndex=move.getIndex();
 
 	//if the moved monomer has the same attribute as the affectedMonomerType,
-	//get the z position of the group afer a hypothetical move
+	//get the z position of the group after a hypothetical move
 	//otherwise return true right away
 	int32_t moveGroupTag=ingredients.getMolecules()[move.getIndex()].getMonomerGroupTag();
 
@@ -588,7 +588,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
 	VectorDouble3 COM_position_old;
 	//this is the COM of the group where the monomer does not belong to 
 	VectorDouble3 COM_position_not_moved;
-	//number of monomers which belong to the group of the potentialy moved monomer
+	//number of monomers which belong to the group of the potentially moved monomer
 	double size_moved_group = 0.0;
 	
 	VectorDouble3 projected_move = move.getDir();
@@ -643,7 +643,7 @@ bool FeatureSpringPotentialTwoGroups::checkMove(const IngredientsType& ingredien
  *   Clear the monomer groups and refill them by reading the monomer Groups Tag.
  *
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] the standard simple cubic lattive move: MoveLocalSc
+ * @param [in] the standard simple cubic lattice move: MoveLocalSc
  */
 template<class IngredientsType>
 void FeatureSpringPotentialTwoGroups::synchronize(IngredientsType& ingredients)
@@ -690,9 +690,6 @@ VectorDouble3 FeatureSpringPotentialTwoGroups::getGroupCenterOfMass(const Ingred
 	}
 	return VectorDouble3(sumX,sumY,sumZ)/(group.size());
 }
-
-
-
 
 
 #endif /*FEATURE_SPRINGPOTENTIAL_TWOGROUPS_H_H*/
