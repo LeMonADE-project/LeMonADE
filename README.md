@@ -106,3 +106,7 @@ This library has been used in the following publications (without guarantee for 
 ## License
 
 See the LICENSE in the root directory.
+
+## Changelog
+
+Major changes are mentioned in the [CHANGELOG](CHANGELOG) file.
