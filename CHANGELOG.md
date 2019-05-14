@@ -15,6 +15,6 @@ LeMonADE 2.0
 LeMonADE 2.1
 * adding external potential Feature: FeatureSpringPotentialTwoGroups
 * adding dynamic bond changing: FeatureConnectionSc
-* modify FeatureAttribute: now uses a template parameter FeatureAttribute<>, default=int32_t
+* modify FeatureAttribute: now uses a template parameter `FeatureAttribute<>`, default=`int32_t`
 * improvement of utilities: DistanceCalculation
 * introduce continuous integration: CircleCi
