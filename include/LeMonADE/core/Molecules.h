@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -46,15 +46,15 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @class Molecules
  *
  * @brief \b Basic \b structure \b holding \b all \b monomers \b in \b the \b system \b organized \b in \b a \b graph.
- * 
+ *
  * This is the basic structure holding all monomers of the system.
  * The structure is organized as a graph consisting of vertices and edges.
- * Typically, the single monomers are the vertices, while the edges provide 
+ * Typically, the single monomers are the vertices, while the edges provide
  * the connectivity information (However, since this is a class template with the
  * vertex- and edge-types as template parameters, on could in principle put
  * any type of information on vertices and edges.)
  * Example: Molecules<5,Position> is a graph with "Position" objects as monomers,
- * each of which can have a maximum of five bonds.  
+ * each of which can have a maximum of five bonds.
  *
  * @tparam max_connectivity maximum allowed connectivity of the sigle monomers
  * @tparam Vertex vertex type of the graph, typically associated with single
@@ -73,11 +73,11 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 template < class Vertex, uint max_connectivity = 7, class Edge = int > class Molecules
 {
-  
-  
+
+
   //! Adds a neighbor list to the vertices
   typedef Connected < Vertex, max_connectivity > internal_vertex_type;
-  
+
   public:
 
   //! Definition of the vertex type
@@ -85,16 +85,16 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
 
   //! Definition of the edge type
   typedef Edge edge_type;
-  
+
   /*****************************************************************************/
   //constructors
   /*****************************************************************************/
   //! Standard constructor that initialize with zero vertices at age equal 0
   Molecules():vertices(0),myAge(0){}
-  
+
   //! Conversion constructor
   template < class V, uint m, class E> Molecules (const Molecules<V,m,E>& src);
- 
+
   Molecules<Vertex,max_connectivity, Edge>& operator=  (const Molecules<Vertex,max_connectivity, Edge>& src);
 
   Molecules<Vertex,max_connectivity, Edge>& operator+=  (const Molecules<Vertex,max_connectivity, Edge>& src);
@@ -108,7 +108,7 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    * @return The maximum number of edges each vertex (not the actual one).
    */
   static uint 	getMaxConnectivity() 	{return max_connectivity;}
-  
+
   /**
    * @brief Resizes the graph to a new size creating/destroying vertices.
    *
@@ -127,14 +127,15 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    * @return The actual size of the graph, esp. the number of vertices.
    */
   uint32_t   	size() const {return vertices.size();}
-  
+
   /**
    * @brief Returns the actual time in the graph.
    *
    * @return The actual time in the graph.
    */
   const uint64_t 	getAge() const 			{return myAge;}
-  
+
+
   /**
    * @brief Sets the actual time to a given value \a newAge in the graph.
    *
@@ -210,12 +211,12 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    * @return The number of connections of vertex (monomer) with index \a idx.
    */
   uint32_t   getNumLinks(uint32_t idx) const 	{return vertices.at(idx).getNumLinks();}
-  
+
 
   //! Returns the index in the graph of the j-th connection (bond partner) of the vertex with index \a idx.
   uint32_t   getNeighborIdx(uint32_t idx, uint32_t j) const;
 
-  
+
   /**
    * @brief Provides direct access to the vertex (monomer) with index \a idx in the graph.
    *
@@ -243,7 +244,7 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    * @todo catch exception and use DEBUG-mode?
    */
   Vertex& operator[](uint32_t idx)	{return vertices.at(idx);}
-  
+
   //! Returns the information \a Edge stored on the connection (bond) between vertices with indices a and b
   const Edge& getLinkInfo(uint32_t a, uint32_t b) const;
 
@@ -255,7 +256,7 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
 
   //! Returns if vertices (monomers) with index a and b are connected.
   bool areConnected(uint32_t a, uint32_t b) const;
-  
+
 
   //! Clear the graph destroying all vertices&edges and setting the age to zero.
   void clear(){resize(0); edges.clear(); myAge=0;}
@@ -264,17 +265,19 @@ template < class Vertex, uint max_connectivity = 7, class Edge = int > class Mol
    * @todo check where this might be used?
    */
   void clearBonds();
-  
+
+  //! returns the edges of the graph 
+  std::map < std::pair < uint32_t, uint32_t > , Edge > getEdges() const {return edges;}
 
 private:
-  
+
   /**
    * @brief Pair of connected vertices (monomers), esp. their indices in the graph.
    *
    * @typedef IndexPair
    */
   typedef std::pair < uint32_t, uint32_t > IndexPair;
-  
+
   //! Stores the vertices (monomers) of the graph,
   std::vector < internal_vertex_type > vertices;
 
@@ -304,14 +307,14 @@ template < class Vertex, uint max_connectivity, class Edge>
 template < class V, uint m, class E >
 Molecules<Vertex,max_connectivity, Edge>::Molecules (const Molecules<V,m,E>& src)
 {
-	
+
 	clear();
 	vertices.resize(src.size());
-	
+
 	for ( uint i = 0 ; i < vertices.size(); ++i) {
-		
+
 		//this initializes a new vertex, all connectivity information is lost
-		this->vertices[i]=src[i];		
+		this->vertices[i]=src[i];
 		//copy the connectivity and edges, too
 		uint32_t nNeighbours=src.getNumLinks(i);
 		try{
@@ -324,16 +327,16 @@ Molecules<Vertex,max_connectivity, Edge>::Molecules (const Molecules<V,m,E>& src
 			errormessage<<"Error when copying connectivity information in "
 			<<"Molecules copy constructor.\n Original error:\n"
 			<<e.what();
-			
+
 			throw std::runtime_error(errormessage.str());
 		}
-		
+
 	}
-	
+
 	this->myAge = src.getAge();
-	
+
 }
-  
+
 /**
  * Assign Molecules object to another, i.e. copies vertex,
  * connectivity and age information, and does type-conversion
@@ -346,26 +349,26 @@ Molecules<Vertex,max_connectivity, Edge>::Molecules (const Molecules<V,m,E>& src
 template < class Vertex, uint max_connectivity, class Edge>
 Molecules<Vertex,max_connectivity, Edge>& Molecules<Vertex, max_connectivity, Edge>::operator=  (const Molecules<Vertex,max_connectivity, Edge>& src)
 {
-  
+
 	clear();
 	vertices.resize(src.size());
-	
+
 	for ( uint i = 0 ; i < vertices.size(); ++i) {
 		//copy all vertices.
-		//this does not copy the connectivity info, but it is copied 
+		//this does not copy the connectivity info, but it is copied
 		//in the loop below
 		this->vertices[i]=src[i];
-		
+
 		//copy the connectivity and edges, too
 		uint32_t nNeighbours=src.getNumLinks(i);
-		
+
 		for(uint j=0; j<nNeighbours;++j){
 			// copy connections and edges contents
 			connect(i, src.getNeighborIdx(i,j), src.getLinkInfo(i,src.getNeighborIdx(i,j)));
 		}
-		
+
 	}
-	
+
 	this->myAge = src.getAge();
 	return *this;
 }
@@ -385,34 +388,34 @@ template < class Vertex, uint max_connectivity, class Edge>
 Molecules<Vertex,max_connectivity, Edge>& Molecules<Vertex, max_connectivity, Edge>::operator+=  (const Molecules<Vertex,max_connectivity, Edge>& src)
 {
 	uint32_t oldsize =  vertices.size();
-	
+
 #ifdef DEBUG
 	std::cout << "old size: " << oldsize<< std::endl;
 	std::cout << "src size: " << src.size()<< std::endl;
 	std::cout << "new size: " << (oldsize+src.size())<< std::endl;
 #endif //DEBUG
-	
+
 	vertices.resize(oldsize+src.size());
-	
+
 #ifdef DEBUG
 	std::cout << "new size after resize: " << (vertices.size())<< std::endl;
-#endif //DEBUG	
-	
+#endif //DEBUG
+
 	for ( uint i = 0 ; i < src.size(); ++i) {
 		//copy all vertices.
 		this->vertices[oldsize+i]=static_cast<const typename Molecules<Vertex,max_connectivity, Edge>::vertex_type&>(src[i]);
-		
+
 		//copy the edges, too
 		uint32_t nNeighbours=src.getNumLinks(i);//vertices[i].getNumLinks();
-		
+
 		for(uint j=0; j<nNeighbours;++j){
-			
+
 			connect(oldsize+i, oldsize+src.getNeighborIdx(i,j));
-			
+
 		}
-		
+
 	}
-	
+
 	this->myAge = src.getAge();
 	return *this;
 }
@@ -420,7 +423,7 @@ Molecules<Vertex,max_connectivity, Edge>& Molecules<Vertex, max_connectivity, Ed
  * Optionally a value \a edgeVal can be assigned to the edge - default is value-initialized (most Zero).
  *
  * @throw <std::range_error> If one index exceed the boundary this displays detailed error messages.
- * 
+ *
  * @param a The index \a a of vertex (monomer) in the graph.
  * @param b The index \a b of vertex (monomer) in the graph.
  * @param edgeVal Optional value for the edge - default is value-initialized (most Zero).
@@ -445,7 +448,7 @@ void Molecules <Vertex,max_connectivity,Edge>::connect(uint32_t a, uint32_t b, c
     catch(std::out_of_range& exception){
     	std::stringstream messagestream;
       messagestream<<"Molecules::connect(int a, int b): a="<<a<<" and b="<<b<<std::endl;
-      
+
       if(a>=size()){
 	messagestream<<"a is out of range"<<std::endl;
       }
@@ -494,16 +497,16 @@ void Molecules <Vertex,max_connectivity, Edge>::disconnect(uint32_t a, uint32_t 
   /**
    * @param idx The index of vertex (monomer) in the graph.
    * @param j The j-th connection of the vertex (monomer) in the graph.
-   * 
+   *
    * @throw <runtime_error> if no \a j-th connection exist in the graph.
-   * 
+   *
    * @return Returns the index of the connected vertex (monomer) in the graph to vertex with index \a idx.
    */
 template < class Vertex, uint max_connectivity, class Edge>
 uint32_t Molecules <Vertex,max_connectivity,Edge>::getNeighborIdx(uint32_t idx, uint32_t j) const
 {
 //in the debug mode we give more useful output in case of error,
-//than the usual exception coming from the return statement can provide	
+//than the usual exception coming from the return statement can provide
 #ifdef DEBUG
 	if(j>=getNumLinks(idx)){
 		std::stringstream messagestream;
@@ -525,9 +528,9 @@ uint32_t Molecules <Vertex,max_connectivity,Edge>::getNeighborIdx(uint32_t idx, 
  */
 template < class Vertex, uint max_connectivity, class Edge>
 const Edge& Molecules <Vertex,max_connectivity,Edge>::getLinkInfo(uint32_t a, uint32_t b) const
-{   
+{
   IndexPair idx(std::min(a,b),std::max(a,b));
-  //try to find the information in edges map. if bond does not exist, display 
+  //try to find the information in edges map. if bond does not exist, display
   //detailed error and throw exception
   try{
     return edges.at(idx);

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -32,7 +32,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 /*****************************************************************************/
 /**
- * @file 
+ * @file
  * @brief Definition of classes SuperAbstractWrite and AbstractWrite
  * */
 /*****************************************************************************/
@@ -44,7 +44,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @brief Abstract base class for writing commands
  *
  * @var headerOnly
- * @brief if true, the command should only execute once at the beginning 
+ * @brief if true, the command should only execute once at the beginning
  * */
 /*****************************************************************************/
 class SuperAbstractWrite
@@ -52,7 +52,7 @@ class SuperAbstractWrite
 public:
   SuperAbstractWrite():headerOnly(false){}
   virtual ~SuperAbstractWrite(){}
-  
+
   virtual void writeStream(std::ostream& strm) = 0;
   bool writeHeaderOnly(){return headerOnly;}
 protected:
@@ -66,21 +66,22 @@ protected:
  * */
 /*****************************************************************************/
 template < class Source >
-class AbstractWrite : public SuperAbstractWrite 
+class AbstractWrite : public SuperAbstractWrite
 {
 public:
   AbstractWrite(const Source& src):src(src){}
   virtual ~AbstractWrite(){}
-  
+
   virtual void writeStream(std::ostream& strm) {};
-  
+
+
   const Source& getSource() const {return src;}
 protected:
   void setHeaderOnly(bool state){headerOnly=state;}
 private:
   const Source& src;
-  
-  
+
+
 };
 
 #endif

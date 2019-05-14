@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (Hauke Rabbel)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -26,7 +26,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------*/
 
 /* *********************************************************************
- * This example program demonstates the use of the class template
+ * This example program demonstrates the use of the class template
  * Vector3D, providing a simple 3 dimensional vector class.
  *
  * Vector3D is defined in src/utility/Vector3D.h
@@ -36,10 +36,10 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <LeMonADE/utility/Vector3D.h>
 
-int main(int argc, char* argv[]){
-
+int main(int, char**)
+{
   /* ********************************************************************
-   * Vector3D is a class template with the template parameter specifying 
+   * Vector3D is a class template with the template parameter specifying
    * the underlying basic data type. For example:
    *
    * Vector3D<int32_t> vector32; //creates a 3d vector with 32bit integer numbers
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]){
    * VectorInt3 is equivalent to Vector<double>
    * and some more (look into the source code documentation for more details)
    * *********************************************************************/
- 
+
   //create some vectors for later use in the example
   VectorInt3 vector32;
   VectorInt3 vector32_a;
@@ -89,11 +89,11 @@ int main(int argc, char* argv[]){
 	   <<vectorDouble.getX()<<" "
 	   <<vectorDouble.getY()<<" "
 	   <<vectorDouble.getZ()<<std::endl;
-  
+
 
   /* ********************************************************************
    * Vector3D provides basic mathematical, assignment and logical operations:
-   * operators +,-,* (scalar product), * (vector times scalar), /, 
+   * operators +,-,* (scalar product), * (vector times scalar), /,
    * +=, *=, /=
    * operator ==
    * there exists also a function to calculate the vector product
@@ -102,7 +102,7 @@ int main(int argc, char* argv[]){
   vector32_a=vector32;                          //assignment
   int32_t scalarProduct=vector32*vector32_a;    //scalar product
   vector32_b=-10*vector32;                      //product with scalar value
-  
+
   VectorInt3 vectorProduct=crossProduct(vector32,VectorInt3(1,0,0));
 
   //print results to screen standard output
@@ -117,10 +117,10 @@ int main(int argc, char* argv[]){
   /* ********************************************************************
    * One important feature of Vector3D is that it does not allow implicit
    * conversion with loss of data. That means you can assign the values of
-   * an integer vector to a double vector, but not the other way around. 
+   * an integer vector to a double vector, but not the other way around.
    * Trying the latter will result in a compiler error
    **********************************************************************/
-  
+
   VectorDouble3 vectorDouble_a=vector32;  //this works
   std::cout<<"Assignment of VectorInt3 to VectorDouble3 works:\n"
 		<<"\tDouble\tInt\n"
@@ -133,11 +133,10 @@ int main(int argc, char* argv[]){
   //VectorInt3 vector32_d=vectorDouble;
 
   /* ********************************************************************
-   * The class Vector3D provides some more useful functions for getting the 
-   * length of the vector, normalizing the vector, etc. To find out more, 
+   * The class Vector3D provides some more useful functions for getting the
+   * length of the vector, normalizing the vector, etc. To find out more,
    * look into the source code documentation.
    ***********************************************************************/
-  
+
   return 0;
-  
 }

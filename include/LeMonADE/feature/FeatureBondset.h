@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -40,6 +40,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
+#include <LeMonADE/updater/moves/MoveConnectBase.h>
 
 
 
@@ -89,7 +90,7 @@ class FeatureBondset : public Feature
  public:
 	//! Standard constructor (empty)
   FeatureBondset(){}
-    
+
   //! Standard destructor (empty)
   virtual ~FeatureBondset(){}
 
@@ -103,12 +104,12 @@ class FeatureBondset : public Feature
    * the two lines below.*/
 // 	SlowBondset& modifyBondset()     {return bondset;};
 //  const SlowBondset&    getBondset()const{return bondset;};
-  
-  
+
+
 
  /**
   * @brief Export the relevant functionality for reading bfm-files to the responsible reader object
-  * 
+  *
   * @details The function is called by the Ingredients class when an object of type Ingredients
   * is associated with an object of type FileImport. The export of the Reads is thus
   * taken care automatically when it becomes necessary.\n
@@ -162,11 +163,11 @@ class FeatureBondset : public Feature
   /**
    * @brief Overloaded for MoveLocalBase. See MoveLocalSc and MoveLocalBcc
    *
-   * @details Checks if the new bond for this move of type MoveLocalSc is valid.
+   * @details Checks if the new bond for this move of type LocalMoveType is valid.
    * Returns if move is allowed (\a true ) or rejected (\a false ).
    *
    * @param [in] ingredients A reference to the IngredientsType - mainly the system.
-   * @param [in] move A reference to MoveLocalSc.
+   * @param [in] move A reference to LocalMoveType.
    * @return if move is allowed (true) or rejected (false).
    */
   template<class IngredientsType,class LocalMoveType>
@@ -178,12 +179,35 @@ class FeatureBondset : public Feature
           const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 
           for (size_t j=0; j< molecules.getNumLinks(monoIndex); ++j){
-              if (!bondset.isValid(molecules[molecules.getNeighborIdx(monoIndex,j)]-(molecules[monoIndex]+move.getDir()))) return false;
+              if (!bondset.isValidStrongCheck(molecules[molecules.getNeighborIdx(monoIndex,j)]-(molecules[monoIndex]+move.getDir()))) return false;
           }
 
           return true;
   }
   
+  /**
+   * @brief Overloaded for MoveConnectBase. 
+   *
+   * @details Checks if the new bond for this move of type ConnectMoveType is valid.
+   * Returns if move is allowed (\a true ) or rejected (\a false ).
+   *
+   * @param [in] ingredients A reference to the IngredientsType - mainly the system.
+   * @param [in] move A reference to ConnectMoveType.
+   * @return if move is allowed (true) or rejected (false).
+   */
+  template<class IngredientsType,class ConnectMoveType>
+  bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<ConnectMoveType>& move) const
+  {
+
+	  //get the number of bond partners of the particle to be moved
+          uint32_t MonID=move.getIndex();
+	  uint32_t partnerID=move.getPartner();
+          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+
+	  if (!bondset.isValidStrongCheck(molecules[MonID]-molecules[partnerID])) return false;
+
+          return true;
+  }
   /**
    * @brief Updates the bond-set lookup table if necessary
    *
@@ -195,15 +219,14 @@ class FeatureBondset : public Feature
   {
     //this function only does something if the bondset has change since the last update
     bondset.updateLookupTable();
-    
+
     const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
-    
+
     for (size_t i=0; i< molecules.size(); ++i)
     {
      for (size_t j=0; j< molecules.getNumLinks(i); ++j){
-       
+
 	 uint n = molecules.getNeighborIdx(i,j);
-       // if (!bondset.isValid(molecules[n]-molecules[i]))
 	 if (!bondset.isValidStrongCheck(molecules[n]-molecules[i]))
 	{
 	  std::ostringstream errorMessage;
@@ -213,11 +236,11 @@ class FeatureBondset : public Feature
     }
   }
 
- private:
- 
+protected:
+
   //! Stores the set of allowed bond-vectors.
   BondSetType bondset;
-  
+
 
   /* if you want to use the SlowBondset, comment the line above and uncomment
    * the line below.*/
@@ -237,16 +260,16 @@ void ReadBondset <LemonadeSystem>::execute()
   int x,y,z,identifier;
   std::string line;
   std::streampos previous;
-  
+
   //go to next line and save the position of the get pointer into streampos previous
   getline(*source,line);
   previous=(*source).tellg();
 
   //read and process the lines containing the bond vector definition
   getline(*source,line);
-  
+
   while(!line.empty() && !((*source).fail())){
-    
+
     //stop at next Read and set the get-pointer to the position before the Read
     if(detectRead(line)){
       (*source).seekg(previous);
@@ -266,15 +289,15 @@ void ReadBondset <LemonadeSystem>::execute()
 		   <<"Could not read vector components in vector no "<<nBondVectors+1;
       throw std::runtime_error(messagestream.str());
     }
-    
+
     //throw exception, if next character isnt ":"
     if(!findSeparator(stream,':')){
-      
+
     	std::stringstream messagestream;
       messagestream<<"ReadBondset<LemonadeSystem>::execute()\n"
 		   <<"Wrong definition of bondvector\nCould not find separator \":\" ";
       throw std::runtime_error(messagestream.str());
-      
+
     }
 
     //read bond identifier, throw exception if extraction fails
@@ -289,7 +312,7 @@ void ReadBondset <LemonadeSystem>::execute()
 
     }
     else{
-      
+
     	std::stringstream messagestream;
       messagestream<<"ReadBondset<LemonadeSystem>::execute()\n"
 		   <<"could not read identifier in vector no "<<nBondVectors+1;
@@ -297,7 +320,7 @@ void ReadBondset <LemonadeSystem>::execute()
 
     }
   }
-  
+
 }
 
 
@@ -312,7 +335,7 @@ void WriteBondset<LemonadeSystem>::writeStream(std::ostream& strm){
     strm<<(bondVec->second)<<":"<<(bondVec->first)<<"\n";
   }
   strm<<"\n";
-  
+
 }
 
 #endif

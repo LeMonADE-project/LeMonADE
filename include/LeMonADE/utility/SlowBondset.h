@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -58,9 +58,9 @@ class SlowBondset:public FastBondset
 
 	//! True if bondsetLookup is already synchronized with added allowed bond-vectors, false otherwise.
 	using FastBondset::lookupSynchronized;
-	
+
 public:
-  
+
 	//! Default constructor
 	SlowBondset();
 
@@ -72,10 +72,10 @@ public:
 
 	//! Adding bond to the allowed set
 	void addBond(VectorInt3 bondVector, int32_t identifier);
-	
+
 	//! Adding bond to the allowed set
 	void addBond(int32_t x, int32_t y, int32_t z, int32_t identifier);
-	
+
 	//! Updates the look-up table of bond-vectors
 	void updateLookupTable();
 
@@ -84,7 +84,7 @@ public:
 
 	//! Check if a vector is a valid bond-vector (i.e. part of the set)
 	bool isValid(const VectorInt3&) const;
-	
+
 	//! Check if a vector is a valid bond-vector (i.e. part of the set)
 	bool isValidStrongCheck(const VectorInt3& bondVector ) const;
 
@@ -92,11 +92,11 @@ private:
 
   //! lookup table telling if a certain bondvector is valid
   bool*** bondsetLookup;
-  
+
   //! Coordinates in the bondsetLookup are shifted by this offset
   int32_t lookupOffset;
-  
-  
+
+
 };
 
 #endif

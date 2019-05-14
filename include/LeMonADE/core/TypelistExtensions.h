@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -41,13 +41,13 @@ namespace TL
 	{
 		typedef NullType Result;
 	};
-	
+
 	template <class H , class T >                         // Specialization 1
 	struct Erase<Typelist<H,T>, NullType>
 	{
 		typedef Typelist<H,T> Result;
 	};
-	
+
 	template <class TList> struct NoDuplicatesReverse;
 
 	template <> struct NoDuplicatesReverse<NullType>
@@ -61,15 +61,15 @@ namespace TL
 		private:
 		typedef typename NoDuplicatesReverse<Tail>::Result NewTail;
 		typedef Typelist<Head, NewTail> TmpTlist;
-		
+
 		enum { idx = ( IndexOf < NewTail, Head >::value == -1) ? -1 : 0 };
-		
+
 		public:
 		typedef typename Erase < TmpTlist, typename TypeAt < TmpTlist, idx >::Result >::Result Result;
 	};
-	
+
 // 	template < class Tlist > struct AppendIfNotNull;
-	
+
 	template < class T, class H > struct AppendIfNotNull //< Typelist< T,H > >
 	{
 		typedef typename Append< H, T > ::Result Result;

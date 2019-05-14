@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * @brief Tests for the class FeatureJumps
- * 
+ *
  * @author Martin
  * @date 07.07.2014
  * */
@@ -66,8 +66,8 @@ protected:
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> MyIngredients;
   MyIngredients ingredients;
-  
-  /* suppress cout output for better readability -->un-/comment here:*/    
+
+  /* suppress cout output for better readability -->un-/comment here:*/
 public:
   //redirect cout output
   virtual void SetUp(){
@@ -96,10 +96,12 @@ TEST_F(TestFeatureJumps, CheckWrite)
   ingredients.setPeriodicX(false);
   ingredients.setPeriodicY(false);
   ingredients.setPeriodicZ(true);
-  
+
   //add bond to the bondset
-  uint i = 0;
+  //add mirrored bond vector for consistency
   ingredients.modifyBondset().addBond(1,1,2,48);
+  ingredients.modifyBondset().addBond(-1,-1,-2,49); 
+  uint i = 0;
   for(i=0;i<16;i++){
     ingredients.modifyMolecules().addMonomer(VectorInt3(i,i,2*i+32));
   }
@@ -118,6 +120,6 @@ TEST_F(TestFeatureJumps, CheckWrite)
 /*****************************************************************************/
 TEST_F(TestFeatureJumps, CheckRead)
 {
-  
-  
+
+
 }

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -69,7 +69,7 @@ public:
 
   //! Add an updater to the list of tasks
   void addUpdater(AbstractUpdater*, int period=1);
-  
+
   int getNCircles(){return nCircles;}
 
   //! Start execution circle of updaters and analyzers
@@ -77,26 +77,26 @@ public:
 
   //! Start execution circle of updaters and analyzers with given number of cycles.
   void run(int nPeriods);
-  
+
   //! Calls initialize() routine on all updater- and analyzer-objects
   void initialize();
 
   //! Calles cleanup() routine on all updater- and analyzer-objects
   void cleanup();
-   
-private:  
+
+private:
 
   //! Holds an analyzer and executes it with period execution_period
   class AnalyzerObject;
 
   //! Holds an updater and executes it with period execution_period
   class UpdaterObject;
-  
-  
-  
+
+
+
   vector <AnalyzerObject*> analyzer;
   vector <UpdaterObject*> updater;
-  
+
   //! Running criterion for running or stopping the execution loop
   bool running;
 
@@ -107,7 +107,7 @@ private:
 /*****************************************************************************/
 /**
  * @class TaskManager::AnalyzerObject
- * 
+ *
  * @brief Holds an analyzer and executes it with period execution_period
  *
  * @details The execution period (in units of TaskManager::nCircles) is specified
@@ -118,7 +118,7 @@ class TaskManager::AnalyzerObject{
 public:
   AnalyzerObject(AbstractAnalyzer* a,unsigned int period)
     :myAnalyzer(a),execution_period(period),isFirstExecution(true){};
-    
+
   ~AnalyzerObject(){delete myAnalyzer;};
 
   /**
@@ -133,11 +133,11 @@ public:
 
   //! Calls the analyzer's cleanup routine
   void cleanup(){myAnalyzer->cleanup();}
-  
+
   //! Decides whether or not to execute in execution circle given as argument
   bool shouldExecute(int nCircles){
     if(execution_period!=0) return (nCircles%execution_period==0);
-    else{ 
+    else{
       if(isFirstExecution) {isFirstExecution=false; return true;}
       else return false;
     }
@@ -162,7 +162,7 @@ class TaskManager::UpdaterObject{
 public:
   UpdaterObject(AbstractUpdater* u, unsigned int period)
     :myUpdater(u),execution_period(period),isFirstExecution(true){};
-    
+
   ~UpdaterObject(){delete myUpdater;};
 
   /**
@@ -181,12 +181,12 @@ public:
   //! Decides whether or not to execute in execution circle given as argument
   bool shouldExecute(int nCircles){
     if(execution_period!=0) return (nCircles%execution_period==0);
-    else{ 
+    else{
       if(isFirstExecution) {isFirstExecution=false; return true;}
       else return false;
-    }    
+    }
   }
-  
+
 private:
   AbstractUpdater* myUpdater;
   unsigned int execution_period;

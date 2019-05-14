@@ -3,8 +3,8 @@
 The abbreviation LeMonADE stands for 
 "**L**attice-based **e**xtensible **Mon**te-Carlo **A**lgorithm and **D**evelopment **E**nvironment".
 
-The aim of the LeMonaDE-project is an open source implementation of the 
-bond-fluctuation-model [1] [BFM1] [2] [BFM2] for simulating polymeric systems using generic
+The aim of the LeMonADE-project is an open source implementation of the 
+bond-fluctuation-model ([BFM1], [BFM2]) for simulating polymeric systems using generic
 template metaprogramming in C++. 
 
 [BFM1]: http://dx.doi.org/10.1021/ma00187a030  "I. Carmesin, K. Kremer; Macromolecules 21, 2819-2823 (1988)"
@@ -86,7 +86,31 @@ This can be found in the documentation.
     cmake ..
     make docs
 ```
-    
+
+
+## Contributions
+
+* Any contributions making the programm better are welcome
+* Every contribution should be made by following the guidelines made by the [gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
+
+
+## Authors
+
+Find the information about active developers, former contributors and people who contributed in the [AUTHORS](AUTHORS.md) file.
+
+## References
+
+This library has been used in the following publications (without guarantee for completeness)
+* C. Jentzsch, J.-U. Sommer; [J. Chem. Phys. 10, 104908 (2014)](http://dx.doi.org/10.1063/1.4895555)    
+* H. Rabbel, M. Werner, J.-U. Sommer; [Macromolecules 48, 4724-4732 (2015)](http://dx.doi.org/10.1021/acs.macromol.5b00720)
+* M. Lang, M. Werner, R. Dockhorn, T. Kreer; [Macromolecules 49, 5190-5201 (2016)](http://dx.doi.org/10.1021/acs.macromol.6b00761)
+* M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 49, 9215-9227 (2016)](http://dx.doi.org/10.1021/acs.macromol.6b01712)
+* C. Jentzsch, R. Dockhorn, J.-U. Sommer; [Parallel Processing and Applied Mathematics. Lecture Notes in Computer Science, vol 9574. pp 301-311](http://dx.doi.org/10.1007/978-3-319-32152-3_28)
+
 ## License
 
-See the LICENSE in the root directory.
+See the [LICENSE](LICENSE) in the root directory.
+
+## Changelog
+
+Major changes are mentioned in the [CHANGELOG](CHANGELOG.md) file.

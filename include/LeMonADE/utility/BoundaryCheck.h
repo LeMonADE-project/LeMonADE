@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -49,10 +49,10 @@ struct IndexOutOfBoundsException : public std::out_of_range
 	  strm << "Index out of bounds, accessing array with key " << idx << " \n";
 	  msg = strm.str();
 	}
-	
+
  	virtual ~IndexOutOfBoundsException() throw() {}
  	const char* what() const throw()
- 	{ 
+ 	{
 	  return std::string(msg + std::string(out_of_range::what())).c_str();
 	}
 };
@@ -63,11 +63,11 @@ struct IndexOutOfBoundsException : public std::out_of_range
  *
  * @todo do we use this for DEBUG?
  **/
-class CheckDynamicBounds 
+class CheckDynamicBounds
 {
 public:
   ///@brief Checks, if the array boundaries of "array" are respected by "key" and throws IndexOutOfBoundsException, if not.
-  template < class Array, class KeyType > 
+  template < class Array, class KeyType >
   static void isValidIdx( const Array& array, const KeyType& key)
   {
 	if ( size_t ( key ) >= array.size() )
@@ -86,11 +86,11 @@ public:
  * @todo do we use this for DEBUG?
  **/
 template < uint size, bool verbose = false >
-class CheckStaticBounds 
+class CheckStaticBounds
 {
 public:
   //! Checks, if the array boundaries of "array" are respected by "key" and throws std::out_of_range, if not.
-  template < class Array, class KeyType > 
+  template < class Array, class KeyType >
   static void isValidIdx( const Array& array, const KeyType& key)
   {
 	if ( size_t ( key ) >= size )
@@ -113,7 +113,7 @@ class DontCheckBounds
 {
 public:
   ///@brief Empty function to fulfill the policy of having an isValidIdx() method. No boundaries are checked.
-  template < class Array, class RefType > 
+  template < class Array, class RefType >
   static void isValidIdx( const Array& a, const RefType& r){ }
 };
 

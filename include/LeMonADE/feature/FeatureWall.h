@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -44,39 +44,39 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * @brief Enable arbitrary walls in the simulation box by the FeatureWall
- * @details For the \b sc-BFM this feature can hold an arbitrary 
+ * @details For the \b sc-BFM this feature can hold an arbitrary
  * number of walls with normal vectors (1,0,0), (0,1,0) and (0,0,1) being the
  * unit vectors along the principal lattice directions.
- * 
+ *
  * @todo Enable this feature for the \b bcc-BFM.
  * */
 
 /**
  * @class Wall
- * @brief class providing a single wall with definitions, setter and getter functions 
+ * @brief class providing a single wall with definitions, setter and getter functions
  * */
 class Wall
 {
-    
+
 public:
     //! standard constructor creating an empty wall
     Wall(): base(), normal() {}
-    
+
     //! getter function for the base vector of the wall
     const VectorInt3 getBase() const {
         return base;
     }
-    
+
     //! setter function for the base vector of the wall
     VectorInt3 setBase(uint32_t baseX_, uint32_t baseY_, uint32_t baseZ_) {
         base.setAllCoordinates(baseX_,baseY_,baseZ_);
     }
-    
+
     //! getter function for the normal vector of the wall
     const VectorInt3 getNormal() const {
         return normal;
     }
-    
+
     //! setter function for the normal vector of the wall
     VectorInt3 setNormal(uint32_t norX_, uint32_t norY_, uint32_t norZ_) {
       VectorInt3 test(norX_, norY_, norZ_);
@@ -86,58 +86,58 @@ public:
 	throw std::runtime_error("normal vector should be P(1,0,0)");
       }
     }
-    
+
 private:
-    
+
     //! base vector of the wall: arbitrary position somewhere on the wall to provide a well defined wall
     VectorInt3 base;
-    
+
     //! normal vector of the wall: vector perpendiculat to the walls surface
     VectorInt3 normal;
-    
+
 };
 
 
 /**
  * @class FeatureWall
- * @brief Feature holding a vector of walls. 
+ * @brief Feature holding a vector of walls.
  * */
 class FeatureWall: public Feature
 {
 public:
-    
+
     //! standard constructor
     FeatureWall() {}
-    
+
     //! standard destructor
     virtual ~FeatureWall(){}
-    
+
     //! read walls from bfm file
-    template<class IngredientsType> 
-    void exportRead(FileImport<IngredientsType>& fileReader);
-    
-    //! write walls to bfm file
-    template<class IngredientsType> 
-    void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
-    
-    //! check move function for local sc move
-    template<class IngredientsType> 
-    bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move);
-    
-    //! check move function for add sc move
     template<class IngredientsType>
-    bool checkMove(const IngredientsType& ingredients,MoveAddMonomerSc& addmove); 
-    
+    void exportRead(FileImport<IngredientsType>& fileReader);
+
+    //! write walls to bfm file
+    template<class IngredientsType>
+    void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
+
+    //! check move function for local sc move
+    template<class IngredientsType>
+    bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move);
+
+    //! check move function for add sc move
+    template<class IngredientsType, class TagType>
+    bool checkMove(const IngredientsType& ingredients,MoveAddMonomerSc<TagType>& addmove);
+
     //! implemantation of synchronize
     template<class IngredientsType>
     void synchronize(const IngredientsType& ingredients);
-    
+
     //! getter function for the walls container
     std::vector<Wall> getWalls() const{
         return walls;
     }
-    
-    /** 
+
+    /**
      * @brief add function to add a wall to the walls container
      * @throw <std::runtime_error> monomer occupies a position on the walls
      **/
@@ -147,17 +147,17 @@ public:
       else
 	throw std::runtime_error("wall is not well defined: normal vector has length 0");
     }
-    
+
     //! empty walls container
     void clearAllWalls(){
         walls.clear();
     }
-    
-    
+
+
 private:
     //! walls container
     std::vector<Wall> walls;
-        
+
 };
 
 
@@ -172,12 +172,12 @@ template <class IngredientsType>
 class WriteWall: public AbstractWrite<IngredientsType>
 {
     public:
-        
+
         WriteWall(const IngredientsType& src):AbstractWrite<IngredientsType>(src){this->setHeaderOnly(true);}
-  
+
         void writeStream(std::ostream& strm){
             const IngredientsType& ingredients=(this->getSource());
-            
+
             for (size_t i=0; i<ingredients.getWalls().size(); i++) {
                 strm << "#!wall: " << ingredients.getWalls()[i].getBase().getX() << " " << ingredients.getWalls()[i].getBase().getY() << " " << ingredients.getWalls()[i].getBase().getZ() << "\t" << ingredients.getWalls()[i].getNormal().getX() << " " << ingredients.getWalls()[i].getNormal().getY() << " " << ingredients.getWalls()[i].getNormal().getZ() << "\n";
             }
@@ -197,7 +197,7 @@ template < class IngredientsType >
 class ReadWall : public ReadToDestination < IngredientsType >
 {
     public:
-        
+
         ReadWall(IngredientsType& destination):ReadToDestination< IngredientsType > (destination){}
 
         void execute();
@@ -211,17 +211,17 @@ class ReadWall : public ReadToDestination < IngredientsType >
  * @param [in] move local sc move
  */
 template<class IngredientsType>
-bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) 
-{	
+bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveLocalSc& move)
+{
     uint32_t counter(0);
-    
+
 	for (size_t i = 0; i < ingredients.getWalls().size(); i++) { //check all walls in the system
-        
+
 		uint8_t direction;
         VectorInt3 unitX(1,0,0);
         VectorInt3 unitY(0,1,0);
         VectorInt3 unitZ(0,0,1);
-		
+
 		if (ingredients.getWalls()[i].getNormal() == unitX) { direction = 0; } //points direction of normal and sets variable direction to look only on this part of the new position vector later
 		if (ingredients.getWalls()[i].getNormal() == unitY) { direction = 1; }
 		if (ingredients.getWalls()[i].getNormal() == unitZ) { direction = 2; }
@@ -230,9 +230,9 @@ bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveLocalSc& mov
 			counter++;
 		}
 	}
-	
+
 	if (counter == ingredients.getWalls().size()) {return true;}
-	
+
 	return false;
 }
 
@@ -242,18 +242,18 @@ bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveLocalSc& mov
  * @param [in] ingredients A reference to the IngredientsType - mainly the system
  * @param [in] addmove move to add sc monomer
  */
-template<class IngredientsType>
-bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddMonomerSc& addmove)
-{	
+template<class IngredientsType, class TagType>
+bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddMonomerSc<TagType>& addmove)
+{
     uint32_t counter(0);
-    
+
 	for (size_t i = 0; i < ingredients.getWalls().size(); i++) { //check all walls in the system
-        
+
 		uint8_t direction;
         VectorInt3 unitX(1,0,0);
         VectorInt3 unitY(0,1,0);
         VectorInt3 unitZ(0,0,1);
-		
+
 		if (ingredients.getWalls()[i].getNormal() == unitX) { direction = 0; } //points direction of normal and sets variable direction to look only on this part of the new position vector later
 		if (ingredients.getWalls()[i].getNormal() == unitY) { direction = 1; }
 		if (ingredients.getWalls()[i].getNormal() == unitZ) { direction = 2; }
@@ -262,9 +262,9 @@ bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddMonomerSc
 			counter++;
 		}
 	}
-	
+
 	if (counter == ingredients.getWalls().size()) {return true;}
-	
+
 	return false;
 }
 
@@ -272,7 +272,7 @@ bool FeatureWall::checkMove(const IngredientsType& ingredients, MoveAddMonomerSc
  * @brief Synchronize this feature with the system given as argument
  *
  * @details checking all monomer positions to be not in conflict with one of the walls
- * 
+ *
  * @throw <std::runtime_error> monomer occupies a position on the walls
  * @param [in] ingredients a reference to the IngredientsType - mainly the system
  **/
@@ -283,15 +283,15 @@ void FeatureWall::synchronize(const IngredientsType& ingredients)
     VectorInt3 unitX(1,0,0);
     VectorInt3 unitY(0,1,0);
     VectorInt3 unitZ(0,0,1);
-        
+
     for (size_t i=0; i<ingredients.getMolecules().size(); i++) {
-		
+
         for (size_t w = 0; w < ingredients.getWalls().size(); w++) {
-                
+
             if (ingredients.getWalls()[w].getNormal() == unitX) { direction = 0; }
             if (ingredients.getWalls()[w].getNormal() == unitY) { direction = 1; }
-            if (ingredients.getWalls()[w].getNormal() == unitZ) { direction = 2; }            
-            
+            if (ingredients.getWalls()[w].getNormal() == unitZ) { direction = 2; }
+
             if (ingredients.getMolecules()[i].getCoordinate(direction) == ingredients.getWalls()[w].getBase().getCoordinate(direction)-1) {
                 std::ostringstream errorMessage;
                 errorMessage << "FeatureWall::synchronize(const IngredientsType& ingredients): Invalid monomer position of monomer " << i << " at " << ingredients.getMolecules()[i] << " in wall: normal: " << ingredients.getWalls()[w].getNormal().getX() << ingredients.getWalls()[w].getNormal().getY() << ingredients.getWalls()[w].getNormal().getZ() << ", base: " << ingredients.getWalls()[w].getBase().getCoordinate(direction)-1 << ".\n";
@@ -311,19 +311,19 @@ template < class IngredientsType >
 void ReadWall<IngredientsType>::execute()
 {
     std::cout << "reading #!wall...";
-    
-  
+
+
     uint32_t baseX, baseY, baseZ, normalX, normalY, normalZ;
-    
+
     this->getInputStream() >> baseX >> baseY >> baseZ >> normalX >> normalY >> normalZ;
-    
+
     if(!this->getInputStream().fail())
-    { 
+    {
         Wall wall;
         wall.setBase(baseX,baseY,baseZ);
         wall.setNormal(normalX,normalY,normalZ);
         this->getDestination().addWall(wall);
-        
+
         std::cout << "Base: " << baseX << " " << baseY << " " << baseZ << ", Normal: " << normalX << " " << normalY << " " << normalZ << std::endl;
     }
     else

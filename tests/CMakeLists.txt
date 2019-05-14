@@ -29,7 +29,7 @@ set_property(TARGET ${GTEST_LIBRARY} PROPERTY IMPORTED_LOCATION
                 ${GTEST_LIBRARY_PATH} )
 add_dependencies(${GTEST_LIBRARY} googletest)
 
-# copy all .test to build directory 
+# copy all .test to build directory
 configure_file(attributesTest.test tests/attributesTest.test COPYONLY)
 configure_file(featureBondsetTest.test tests/featureBondsetTest.test COPYONLY)
 configure_file(featureBoxTest.test tests/featureBoxTest.test COPYONLY)
@@ -40,6 +40,7 @@ configure_file(molecules.test tests/molecules.test COPYONLY)
 configure_file(parserTest.test tests/parserTest.test COPYONLY)
 configure_file(readbfmfile.test tests/readbfmfile.test COPYONLY)
 configure_file(sc64CorruptedBfm.test tests/sc64CorruptedBfm.test COPYONLY)
+configure_file(WriteReadAdditionalBondsTest.bfm tests/WriteReadAdditionalBondsTest.bfm COPYONLY)
 #configure_file(tmpSolventTest.sol tests/tmpSolventTest.sol COPYONLY)
 
 # build and run LeMonaDE-tests

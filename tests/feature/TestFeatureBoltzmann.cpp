@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * @brief Tests for the class FeatureBoltzmann
- * 
+ *
  * @author Martin
  * @date 07.07.2014
  * */
@@ -53,9 +53,27 @@ using namespace std;
  * */
 /*****************************************************************************/
 class FeatureBoltzmannTest: public ::testing::Test{
-  
-  /* suppress cout output for better readability -->un/comment here:*/    
+
 public:
+
+  //dummy move class used to check response to unknown move type
+  class UnknownMove:public MoveBase
+  {
+	  public:
+		template<class IngredientsType> bool check(IngredientsType& ingredients) const
+		{
+		return ingredients.checkMove(ingredients,*this);
+		}
+
+		template<class IngredientsType> void apply(IngredientsType& ingredients)
+		{
+		ingredients.applyMove(ingredients,*this);
+		}
+
+		template <class IngredientsType> void init(const IngredientsType& ingredients){};
+  };
+
+  /* suppress cout output for better readability -->un/comment here:*/
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=cout.rdbuf();
@@ -79,14 +97,14 @@ private:
 /*****************************************************************************/
 TEST_F(FeatureBoltzmannTest, CheckMove)
 {
-  MoveBase testmove;
+  UnknownMove testmove;
   FeatureBoltzmann feature;
   //setting move probability to one and try several times if checkMove returns true as expected
   testmove.resetProbability();
   EXPECT_TRUE(testmove.check(feature));
   EXPECT_TRUE(testmove.check(feature));
   EXPECT_TRUE(testmove.check(feature));
-  
+
   //setting move probability to zero and try several times if checkMove returns false as expected
   testmove.multiplyProbability(0.0);
   EXPECT_FALSE(testmove.check(feature));

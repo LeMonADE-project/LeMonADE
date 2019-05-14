@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -69,7 +69,7 @@ public:
 
 	FeatureLatticeBase();
 	virtual ~FeatureLatticeBase();
-	
+
 	FeatureLatticeBase(const FeatureLatticeBase& copyFeatureLatticeBase);
 
  	FeatureLatticeBase& operator= (const FeatureLatticeBase &FeatureLatticeBaseSource);
@@ -105,10 +105,10 @@ public:
 
 	//! Set lattice entries to 0
 	void clearLattice();
-    
+
 	//delocate memory
         void deleteLattice();
-	
+
 protected:
 
 	//! Hold the value of lattice size in X
@@ -128,7 +128,7 @@ protected:
 
 	//! Hold the value of lattice size in Z subtracting one for folding
 	uint32_t boxZm1;
-	
+
 	//! Hold the value of for indexing the lattice (FeatureLattice: boxX; FeatureLatticePowerOfTwo: log(boxX,2))
 	uint32_t xPro;
 
@@ -208,12 +208,12 @@ FeatureLatticeBase<SpecializedClass<ValueType> >::FeatureLatticeBase(const Featu
 template<template<typename> class SpecializedClass, typename ValueType>
 FeatureLatticeBase<SpecializedClass<ValueType> >&  FeatureLatticeBase<SpecializedClass<ValueType> >::operator = (const FeatureLatticeBase<SpecializedClass<ValueType> > &FeatureLatticeBaseSource)
 {
-    
+
     // check for self-assignment by comparing the address of the
     // implicit object and the parameter
     if (this == &FeatureLatticeBaseSource)
         return *this;
-    
+
     uint64_t oldSize = _boxX*_boxY*_boxZ;
     uint64_t newSize = FeatureLatticeBaseSource._boxX*FeatureLatticeBaseSource._boxY*FeatureLatticeBaseSource._boxZ;
 
@@ -233,8 +233,8 @@ FeatureLatticeBase<SpecializedClass<ValueType> >&  FeatureLatticeBase<Specialize
         this->deleteLattice();
         lattice = new ValueType[_boxX*_boxY*_boxZ];
     }
-    
-    // do the copy  
+
+    // do the copy
     // return the existing object
     return *this;
 }
@@ -335,7 +335,7 @@ inline void FeatureLatticeBase<SpecializedClass<ValueType> >::setLatticeEntry(co
  * @param ing a reference to the IngredientsType - mainly the system
  **/
 template<template<typename> class SpecializedClass, typename ValueType>
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureLatticeBase<SpecializedClass<ValueType> >::synchronize(IngredientsType& val)
 {
 	static_cast<const SpecializedClass<ValueType>* >(this)->synchronize(val);
@@ -355,7 +355,7 @@ void FeatureLatticeBase<SpecializedClass<ValueType> >::setupLattice()
 	// Allocate memory
 	lattice = new ValueType[_boxX*_boxY*_boxZ];
 
-	for(int i = 0; i < _boxX*_boxY*_boxZ; i++)
+	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
 		lattice[i]=ValueType();
 
 	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(ValueType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(ValueType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
@@ -392,7 +392,7 @@ void FeatureLatticeBase<SpecializedClass<ValueType> >::setupLattice(uint32_t box
 	// Allocate memory
 	lattice = new ValueType[_boxX*_boxY*_boxZ];
 
-	for(int i = 0; i < _boxX*_boxY*_boxZ; i++)
+	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
 		lattice[i]=ValueType();
 
 	std::cout<<"done with size " << (_boxX*_boxY*_boxZ*sizeof(ValueType)) << " bytes = " << (_boxX*_boxY*_boxZ*sizeof(ValueType)/(1024.0*1024.0)) << " MB for lattice" <<std::endl;
@@ -407,9 +407,9 @@ void FeatureLatticeBase<SpecializedClass<ValueType> >::setupLattice(uint32_t box
 template<template<typename> class SpecializedClass, typename ValueType>
 void FeatureLatticeBase<SpecializedClass<ValueType> >::clearLattice()
 {
-	
+
 	// initialize to native value (=0)
-	for(int i = 0; i < _boxX*_boxY*_boxZ; i++)
+	for(uint32_t i = 0; i < _boxX*_boxY*_boxZ; i++)
 		lattice[i]=ValueType();
 }
 

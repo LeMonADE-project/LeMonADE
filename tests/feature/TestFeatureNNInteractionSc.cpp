@@ -15,7 +15,7 @@
 using namespace std;
 
 class NNInteractionScTest: public ::testing::Test{
-  /* suppress cout output for better readability -->un-/comment here:*/    
+  /* suppress cout output for better readability -->un-/comment here:*/
 public:
   //redirect cout output
   virtual void SetUp(){
@@ -2152,7 +2152,7 @@ TEST_F(NNInteractionScTest,getSetInteraction)
     EXPECT_THROW(myIngredients.getNNInteraction(1,0),std::runtime_error);
     EXPECT_THROW(myIngredients.getNNInteraction(0,256),std::runtime_error);
     EXPECT_THROW(myIngredients.getNNInteraction(256,0),std::runtime_error);
-    
+
     //set interaction between types 1,2
     myIngredients.setNNInteraction(1,2,0.8);
     EXPECT_DOUBLE_EQ(myIngredients.getNNInteraction(1,2),0.8);
@@ -2318,31 +2318,31 @@ TEST_F(NNInteractionScTest,ApplyMoveAddMonomerSc)
     myIngredients1.setPeriodicZ(1);
 
     myIngredients1.synchronize();
-    
+
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
-    
-    MoveAddMonomerSc addMonomer;
-    
+
+    MoveAddMonomerSc<> addMonomer;
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(256);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(0);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(-1);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(2);
     addMonomer.apply(myIngredients1);
-    
+
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,6,7));
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(6,6,7));
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,7,7));
@@ -2351,12 +2351,12 @@ TEST_F(NNInteractionScTest,ApplyMoveAddMonomerSc)
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(6,6,8));
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,7,8));
     EXPECT_EQ(2,myIngredients1.getLatticeEntry(6,7,8));
-    
+
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
     addMonomer.setTag(255);
     addMonomer.apply(myIngredients1);
-    
+
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,6,7)));
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(6,6,7)));
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,7,7)));
@@ -2365,6 +2365,6 @@ TEST_F(NNInteractionScTest,ApplyMoveAddMonomerSc)
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(6,6,8)));
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,7,8)));
     EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(6,7,8)));
-    
-    
+
+
 }

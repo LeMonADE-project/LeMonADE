@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -47,7 +47,7 @@ public:
 
 	FeatureLatticePowerOfTwo(){};
 	virtual ~FeatureLatticePowerOfTwo(){};
-	
+
 	//! Move the value on the lattice to a new position. Delete the Value on the old position
 	void moveOnLattice(const VectorInt3& oldPos, const VectorInt3& newPos);
 
@@ -227,7 +227,7 @@ inline uint32_t FeatureLatticePowerOfTwo<ValueType>::foldBackZ(int value) const{
  * @param val a reference to the IngredientsType - mainly the system
  **/
 template<class ValueType>
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureLatticePowerOfTwo<ValueType>::synchronize(IngredientsType& val) {
 
 	//if the lattice is already initialized, free the memory first
@@ -266,11 +266,11 @@ void FeatureLatticePowerOfTwo<ValueType>::synchronize(IngredientsType& val) {
 		}
 		this->proXY=resultshift;
 
-		std::cout << "use bit shift for boxX: (1 << "<< this->xPro << " ) = " << (1 << this->xPro) << " = " << (this->_boxX) << std::endl;
-		std::cout << "use bit shift for boxX*boxY: (1 << "<< this->proXY << " ) = " << (1 << this->proXY) << " = " << (this->_boxX*this->_boxY) << std::endl;
+		std::cout << "use bit shift for boxX: (1 << "<< this->xPro << " ) = " << (1u << this->xPro) << " = " << (this->_boxX) << std::endl;
+		std::cout << "use bit shift for boxX*boxY: (1 << "<< this->proXY << " ) = " << (1u << this->proXY) << " = " << (this->_boxX*this->_boxY) << std::endl;
 
 		// check if shift is correct
-		if ( (this->_boxX != (1 << this->xPro)) || ((this->_boxX*this->_boxY) != (1 << this->proXY)) )
+		if ( (this->_boxX != (1u << this->xPro)) || ((this->_boxX*this->_boxY) != (1u << this->proXY)) )
 		{
 			throw  std::runtime_error("Could not determine value for bit shift. Sure your box size is a power of 2?\nl Use feature FeatureLattice instead of FeatureLatticePowerOfTwo\n");
 		}

@@ -2,14 +2,14 @@
 // The Loki Library
 // Copyright (c) 2001 by Andrei Alexandrescu
 // This code accompanies the book:
-// Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design 
+// Alexandrescu, Andrei. "Modern C++ Design: Generic Programming and Design
 //     Patterns Applied". Copyright (c) 2001. Addison-Wesley.
-// Permission to use, copy, modify, distribute and sell this software for any 
-//     purpose is hereby granted without fee, provided that the above copyright 
-//     notice appear in all copies and that both that copyright notice and this 
+// Permission to use, copy, modify, distribute and sell this software for any
+//     purpose is hereby granted without fee, provided that the above copyright
+//     notice appear in all copies and that both that copyright notice and this
 //     permission notice appear in supporting documentation.
-// The author or Addison-Welsey Longman make no representations about the 
-//     suitability of this software for any purpose. It is provided "as is" 
+// The author or Addison-Welsey Longman make no representations about the
+//     suitability of this software for any purpose. It is provided "as is"
 //     without express or implied warranty.
 ////////////////////////////////////////////////////////////////////////////////
 #ifndef LOKI_TYPELISTMACROS_INC_
@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // macros LOKI_TYPELIST_1, LOKI_TYPELIST_2, ... LOKI_TYPELIST_50
 // Each takes a number of arguments equal to its numeric suffix
-// The arguments are type names. LOKI_TYPELIST_NN generates a typelist containing 
+// The arguments are type names. LOKI_TYPELIST_NN generates a typelist containing
 //     all types passed as arguments, in that order.
 // Example: LOKI_TYPELIST_2(char, int) generates a type containing char and int.
 ////////////////////////////////////////////////////////////////////////////////

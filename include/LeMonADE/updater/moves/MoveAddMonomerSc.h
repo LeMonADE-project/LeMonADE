@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2016 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2016 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -31,21 +31,23 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerBase.h>
 
+
 /**
  * @file
- * 
+ *
  * @author Martin
  * @class MoveAddMonomerSc
  *
  * @brief Standard local bfm-move on simple cubic lattice for the scBFM to add a vertex/monomer
  *
  **/
-class MoveAddMonomerSc : public MoveAddMonomerBase<MoveAddMonomerSc>
+template<class TagType=int32_t>
+class MoveAddMonomerSc : public MoveAddMonomerBase<MoveAddMonomerSc<TagType>, TagType>
 {
 public:
   MoveAddMonomerSc(){};
   virtual ~MoveAddMonomerSc(){};
-  
+
   //! Reset the probability
   template <class IngredientsType> void init(const IngredientsType& ing);
 
@@ -54,7 +56,7 @@ public:
 
   //! Apply the move to the system given as argument
   template< class IngredientsType> void apply(IngredientsType& ing);
-  
+
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -64,8 +66,9 @@ public:
 /**
  * @brief reset the probability
  */
+template <class TagType>
 template <class IngredientsType>
-void MoveAddMonomerSc::init(const IngredientsType& ing)
+void MoveAddMonomerSc<TagType>::init(const IngredientsType& ing)
 {
     this->resetProbability();
     this->setMonomerIndex(ing.getMolecules().size());
@@ -75,25 +78,27 @@ void MoveAddMonomerSc::init(const IngredientsType& ing)
 /**
  * @brief check if the move is allowed by the system given as argument.
  */
+template <class TagType>
 template <class IngredientsType>
-bool MoveAddMonomerSc::check(IngredientsType& ing)
+bool MoveAddMonomerSc<TagType>::check(IngredientsType& ing)
 {
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
 }
-  
+
 /*****************************************************************************/
 /**
  * @brief apply the move to the system given as argument
  */
-template< class IngredientsType>
-void MoveAddMonomerSc::apply(IngredientsType& ing)
+template <class TagType>
+template <class IngredientsType>
+void MoveAddMonomerSc<TagType>::apply(IngredientsType& ing)
 {
   //FIRST add the new monomer at the desired position. this is because
   //some features may want to do things with it
   ing.modifyMolecules().addMonomer(this->getPosition().getX(),this->getPosition().getY(),this->getPosition().getZ());
   this->setMonomerIndex(ing.getMolecules().size()-1);
-  
+
   //now apply it to the features so that the features can make alterations,
   //for example set the attribute tag, if the FeatureAttributes is used
   ing.applyMove(ing,*this);
