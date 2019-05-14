@@ -94,6 +94,10 @@ This can be found in the documentation.
 * Every contribution should be made by following the guidelines made by the [gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
 
+## Authors
+
+Find the information about active developers, former contributors and people who contributed in the [AUTHORS](AUTHORS.md) file.
+
 ## References
 
 This library has been used in the following publications (without guarantee for completeness)
@@ -105,4 +109,8 @@ This library has been used in the following publications (without guarantee for 
 
 ## License
 
-See the LICENSE in the root directory.
+See the [LICENSE](LICENSE) in the root directory.
+
+## Changelog
+
+Major changes are mentioned in the [CHANGELOG](CHANGELOG.md) file.
