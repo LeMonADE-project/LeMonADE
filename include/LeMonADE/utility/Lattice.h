@@ -32,6 +32,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @class Lattice 
  * @brief is a simple multidimensional lattice with value type
+ * @details This lattice works also for non power of 2 dimensions.
  * @todo add the copying of the values of the lattice in the  copy and assign constructor
  */
 

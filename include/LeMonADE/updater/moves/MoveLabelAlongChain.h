@@ -60,15 +60,14 @@ private:
    * @brief Array that holds the 6 possible move directions
    *
    * @details The label should stay along the chains and has the possibility to either go to the left(-1) or right(1).
-
    */
+public:
   //! define an enum for the directions
   enum DIRECTIONS{
     LEFT=-1,       
     RIGHT=1,      
     UNDEFINED=0
   };
-  int32_t dir;
 };
 
 
@@ -97,7 +96,7 @@ void MoveLabelAlongChain::init(const IngredientsType& ing)
   int32_t randomDir=1-2*(this->randomNumbers.r250_rand32() % 2);
   this->setDir(randomDir);
   
-  this->setConnectedLabel(ing.getLabelPartner(this->getIndex()));
+  this->setConnectedLabel(ing.getLabelPartner(this->getIndex()+1));
 }
 
 /*****************************************************************************/
@@ -124,7 +123,7 @@ void MoveLabelAlongChain::init(const IngredientsType& ing, uint32_t index)
   int32_t randomDir=1-2*(this->randomNumbers.r250_rand32() % 2);
   this->setDir(randomDir);
   
-  this->setConnectedLabel(ing.getLabelPartner(index));
+  this->setConnectedLabel(ing.getLabelPartner(index+1));
 }
 
 /*****************************************************************************/
@@ -155,7 +154,7 @@ void MoveLabelAlongChain::init(const IngredientsType& ing, uint32_t index, int32
   else
     throw std::runtime_error("MoveLabelAlongChain::init(ing, index, dir): direction is not valid!");
   
-  this->setConnectedLabel(ing.getLabelPartner(index));
+  this->setConnectedLabel(ing.getLabelPartner(index+1));
 }
 
 /*****************************************************************************/
@@ -195,8 +194,8 @@ void MoveLabelAlongChain::apply(IngredientsType& ing)
 	//if connected to another ring we need to check if the resultign new bond is valid
 	if( this->getConnectedLabel() != 0 )
 	{
-	  ing.modifyMolecules().disconnect(this->getConnectedLabel()-1, this->getIndex()               );
-	  ing.modifyMolecules().connect   (this->getConnectedLabel()-1, this->getIndex()+this->getDir());
+	  ing.modifyMolecules().disconnect(this->getConnectedLabel()-1, this->getIndex()                );
+	  ing.modifyMolecules().connect   (this->getConnectedLabel()-1, this->getIndex()+this->getDir() );
 	}
 	ing.modifyMolecules()[this->getIndex()+this->getDir()].setLabel(ing.getMolecules()[this->getIndex()].getLabel());
 	ing.modifyMolecules()[this->getIndex()].setLabel(0);

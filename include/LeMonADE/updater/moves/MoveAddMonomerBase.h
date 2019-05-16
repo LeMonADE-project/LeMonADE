@@ -91,7 +91,7 @@ public:
   bool isReactive() const {return reactivity;}
   //! getter function for the maximum number of links the monomer should have 
   uint32_t getNumMaxLinks() const {return numMaxLinks;}
-  //!
+  //! getter function for the label 
   uint32_t getLabel() const {return label;}
   
 protected:

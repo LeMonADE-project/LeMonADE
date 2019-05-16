@@ -228,7 +228,7 @@ class FeatureBondset : public Feature
           uint32_t MonID=move.getIndex();
 	  uint32_t ID=move.getConnectedLabel();
           const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
-	  if (ID ==0 ) return true; 
+	  if (ID == 0 ) return true; 
 	  ID--;
 	  if (!bondset.isValidStrongCheck(molecules[MonID]-molecules[ID])) return false;
           return true;
