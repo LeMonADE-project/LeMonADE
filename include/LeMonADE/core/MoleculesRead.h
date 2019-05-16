@@ -106,7 +106,7 @@ class ReadBonds: public ReadToDestination < IngredientsType >
 template < class IngredientsType >
 void ReadBonds<IngredientsType>::execute()
 {
-  std::cout << "ReadBonds:execute() : updating " <<std::endl;
+
   int a,b;
   int nBonds=0;
 
@@ -150,7 +150,6 @@ void ReadBonds<IngredientsType>::execute()
     getline(this->getInputStream(),line);
   }
 
-  std::cout << "ReadBonds:execute() : done " <<std::endl;
 }
 
 /***********************************************************************/
@@ -179,7 +178,6 @@ class ReadRemoveBonds: public ReadToDestination < IngredientsType >
 template < class IngredientsType >
 void ReadRemoveBonds<IngredientsType>::execute()
 {
-  std::cout << "ReadRemoveBonds:execute() : updating " <<std::endl;
   int a,b;
   int nBreaks=0;
   
@@ -222,8 +220,7 @@ void ReadRemoveBonds<IngredientsType>::execute()
     //read next line from file
     getline(this->getInputStream(),line);
   }
-  
-  std::cout << "ReadRemoveBonds:execute() : done " <<std::endl;
+
 }
 
 /***********************************************************************/
