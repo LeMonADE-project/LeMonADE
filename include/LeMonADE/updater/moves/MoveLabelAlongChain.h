@@ -96,7 +96,7 @@ void MoveLabelAlongChain::init(const IngredientsType& ing)
   int32_t randomDir=1-2*(this->randomNumbers.r250_rand32() % 2);
   this->setDir(randomDir);
   
-  this->setConnectedLabel(ing.getLabelPartner(this->getIndex()+1));
+  this->setConnectedLabel(ing.getLabelPartner(this->getIndex()));
 }
 
 /*****************************************************************************/
@@ -123,7 +123,7 @@ void MoveLabelAlongChain::init(const IngredientsType& ing, uint32_t index)
   int32_t randomDir=1-2*(this->randomNumbers.r250_rand32() % 2);
   this->setDir(randomDir);
   
-  this->setConnectedLabel(ing.getLabelPartner(index+1));
+  this->setConnectedLabel(ing.getLabelPartner(index));
 }
 
 /*****************************************************************************/
@@ -154,7 +154,7 @@ void MoveLabelAlongChain::init(const IngredientsType& ing, uint32_t index, int32
   else
     throw std::runtime_error("MoveLabelAlongChain::init(ing, index, dir): direction is not valid!");
   
-  this->setConnectedLabel(ing.getLabelPartner(index+1));
+  this->setConnectedLabel(ing.getLabelPartner(index));
 }
 
 /*****************************************************************************/

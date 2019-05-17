@@ -57,6 +57,7 @@ public:
   // overload initialise function to be able to set the moves index and direction if neccessary
   template <class IngredientsType> void init(const IngredientsType& ing);
   template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
+  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t partner);
   template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir );
 
   template <class IngredientsType> bool check(IngredientsType& ing);
@@ -133,6 +134,34 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
   this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
   
 }
+
+/*****************************************************************************/
+/**
+ * @brief Initialize the move with a given monomer index.
+ *
+ * @details Resets the move probability to unity. Dice a new random direction.
+ *
+ * @param ing A reference to the IngredientsType - mainly the system
+ * @param index index of the monomer to be connected
+ * @param partner index of the monomer to which index is connected
+ **/
+template <class IngredientsType>
+void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t partner)
+{
+  this->resetProbability();
+
+  //set index
+  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+    this->setIndex( index );
+  else
+    throw std::runtime_error("MoveConnectSc::init(ing, index): index out of range!");
+
+  //draw direction
+  this->setDir(ing.getMolecules()[partner].getVector3D()-ing.getMolecules()[index].getVector3D());
+  this->setPartner(partner);
+  
+}
+
 
 /*****************************************************************************/
 /**

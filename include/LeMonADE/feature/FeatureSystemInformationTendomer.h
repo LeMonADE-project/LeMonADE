@@ -83,7 +83,7 @@ public:
 	//!
 	void setNumLabelsPerTendomerArm(uint32_t nLabelsPerTendomerArm_){nLabelsPerTendomerArm=nLabelsPerTendomerArm_;}
 	
-private:
+protected:
 	uint32_t nTendomers;
 	uint32_t nCrossLinkers;
 	uint32_t nMonomersPerChain;

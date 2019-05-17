@@ -117,14 +117,16 @@ public:
 //Implementation of the members below					///////
 ///////////////////////////////////////////////////////////////////////////////
 
-class FeatureLabel : public Feature {
+// class FeatureLabel : public Feature {
+class FeatureLabel : public FeatureSystemInformationTendomer {
   
+  typedef FeatureSystemInformationTendomer BaseClass;
 public:
 	//! This Feature requires a monomer_extensions.
 	typedef LOKI_TYPELIST_1(MonomerLabel) monomer_extensions;
-	typedef LOKI_TYPELIST_1(FeatureSystemInformationTendomer) required_features_back;
+
 	//constructor
-	FeatureLabel() :latticeFilledUp(false)
+	FeatureLabel() :latticeFilledUp(false),nArms(2)
 	{labelLattice.setupLattice();}
 	
 	/**
@@ -167,9 +169,13 @@ public:
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveLabelAlongChain& move) const ;
 	
-	//! check bas connect move - always true 
+	//! check add move is always true 
 	template<class IngredientsType, class TagType, class SpecializedMove>
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<SpecializedMove,TagType >& move) const{};
+	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<SpecializedMove,TagType >& move) const{return true;};
+
+	//! check connection move is always true 
+	template<class IngredientsType, class SpecializedMove>
+	bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<SpecializedMove >& move) const{return true;};
 	
 	//! apply move for basic moves - does nothing
 	template<class IngredientsType>
@@ -183,14 +189,18 @@ public:
 	template<class IngredientsType, class TagType, class SpecializedMove>
 	void applyMove(IngredientsType& ing, const MoveAddMonomerBase<SpecializedMove, TagType >& move);
 	
+	//!apply move for the all AddMoves
+	template<class IngredientsType, class SpecializedMove>
+	void applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove >& move);
+	
 	//! Synchronize with system: Fill the lattice with 1 (occupied) and 0 (free).
 	template<class IngredientsType>
 	void synchronize(IngredientsType& ingredients);
 	
-	//getter for the label connected to another label. the return value starts at 1! 
+	//getter for the label connected to another label. the return value starts at 1! but the ID starts at 0 
 	inline uint32_t getLabelPartner(uint32_t ID) const 
 	{
-	  auto pair(ConnectedLabel.find(ID)); 
+	  auto pair(ConnectedLabel.find(ID+1)); 
 	  if ( pair != ConnectedLabel.end() ) return pair->second;
 	  else return 0;
 	}
@@ -206,7 +216,14 @@ protected:
 	//!
 	Lattice<uint32_t> labelLattice;
 	
-	//! get the lattice coordinates from the id 
+private:
+	using BaseClass::nTendomers;
+	using BaseClass::nCrossLinkers;
+	using BaseClass::nMonomersPerChain;
+	using BaseClass::nLabelsPerTendomerArm;
+	uint32_t nArms;
+
+  	//! get the lattice coordinates from the id 
 	std::map<uint32_t,VectorInt3> IDToCoordiantes;
 	
 	//! key:ID (starting from one) value: neighbor(starting from 1, if 0 = no neighbor) 
@@ -260,16 +277,19 @@ void FeatureLabel::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWrit
 template<class IngredientsType> 
 bool FeatureLabel::checkMove(const IngredientsType& ingredients, const MoveLabelAlongChain& move) const
 {
-  	if (!latticeFilledUp)
-	    throw std::runtime_error("*****FeatureLabel::checkMove....lattice is not populated. Run synchronize!\n");
-	uint32_t ID(move.getIndex());
-	//check if the monomer has a label
-	if(ingredients.getMolecules()[ID].getLabel()==0) return false;
-	//either the chain ends are reached or the monomer is already occupied 
-	if ( labelLattice.getLatticeEntry( IDToCoordiantes.at(ID)+VectorInt3(0,0,move.getDir()) ) > 0 ) return false; 
-	
-	//if still here, then the two monomers are allowed to connect 
-	return true;
+  if (!latticeFilledUp)
+      throw std::runtime_error("*****FeatureLabel::checkMove....lattice is not populated. Run synchronize!\n");
+  uint32_t ID(move.getIndex());
+  //check if the monomer has a label
+  std::cout << "Label = " << ingredients.getMolecules()[ID].getLabel() << std::endl;
+  if(ingredients.getMolecules()[ID].getLabel()==0) return false;
+  std::cout << "lattice entry = " << labelLattice.getLatticeEntry( IDToCoordiantes.at(ID)+VectorInt3(0,0,move.getDir()) ) << std::endl;
+  //either the chain ends are reached or the monomer is already occupied 
+  std::cout << "coord " << IDToCoordiantes.at(ID)+VectorInt3(0,0,move.getDir()) <<std::endl;
+  if ( labelLattice.getLatticeEntry( IDToCoordiantes.at(ID)+VectorInt3(0,0,move.getDir()) ) > 0 ) return false; 
+  std::cout << "Seems to be true!"<<std::endl; 
+  //if still here, then the two monomers are allowed to connect 
+  return true;
 }
 /******************************************************************************/
 /**
@@ -286,25 +306,20 @@ void FeatureLabel::applyMove(IngredientsType& ing,const MoveLabelAlongChain& mov
   uint32_t NewID(MonID+move.getDir());
   //update lattice 
   labelLattice.moveOnLattice(IDToCoordiantes.at(MonID),IDToCoordiantes.at(NewID));
-  uint32_t OtherLabel(getLabelPartner(MonID+1)); 
+  uint32_t OtherLabel(getLabelPartner(MonID)); 
   if (OtherLabel>0){
     MonID++;NewID++;
     //update ConnectionTable
     ConnectedLabel.at(MonID)=0;
     ConnectedLabel.at(OtherLabel)=NewID;
-    
     auto it = ConnectedLabel.lower_bound(NewID);
-    if (it != ConnectedLabel.end() && it->first == NewID) 
-    {
+    if (it != ConnectedLabel.end() && it->first == NewID) {
       //key already exists
       ConnectedLabel.at(NewID)=OtherLabel;
-    } else 
-    {
+    } else {
       ConnectedLabel.emplace_hint(it, NewID, OtherLabel);
     }
-
   }
-  
 }
 /******************************************************************************/
 /**
@@ -318,16 +333,39 @@ template<class IngredientsType, class TagType, class SpecializedMove>
 void FeatureLabel  ::applyMove(IngredientsType& ing,const MoveAddMonomerBase<SpecializedMove, TagType >& move)
 {
   uint32_t MonID(move.getMonomerIndex()); 
-  VectorInt3 pos=ing.getMolecules()[MonID];
   if ( move.getLabel() != 0 ) 
   {
+    ing.modifyMolecules()[MonID].setLabel(move.getLabel());
+    uint32_t tendomerID(floor(MonID/(1.0*nArms*nMonomersPerChain)));
+    uint32_t IdOnTendomer(MonID%(nArms*nMonomersPerChain));
+    uint32_t ArmID(floor(IdOnTendomer/(1.0*nMonomersPerChain)));
+    uint32_t SegmentalID(IdOnTendomer%nMonomersPerChain);
+    VectorInt3 pos(IdOnTendomer,ArmID,SegmentalID+1);
     labelLattice.setLatticeEntry(pos,move.getLabel());
+  }
+}
+/******************************************************************************/
+/**
+ * @fn void FeatureLabel ::applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove >& move)
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move General move for connection 
+ */
+/******************************************************************************/
+template<class IngredientsType, class SpecializedMove>
+void FeatureLabel  ::applyMove(IngredientsType& ing,const MoveConnectBase<SpecializedMove >& move)
+{
+  uint32_t MonID(move.getIndex()); 
+  if ( ing.getMolecules()[MonID].getLabel() != 0 ) 
+  {
     for(size_t j =0; j < ing.getMolecules().getNumLinks(MonID);j++)
     {
       uint32_t Neighbor(ing.getMolecules().getNeighborIdx(MonID,j));
       uint32_t NeighborLabel(ing.getMolecules()[Neighbor].getLabel());
+      
       if( (NeighborLabel>0) && (NeighborLabel != ing.getMolecules()[MonID].getLabel()) )
       {
+	std::cout << "Connected Labels are : " << MonID << " " << Neighbor <<std::endl;
 	ConnectedLabel[MonID+1]=Neighbor+1;
 	ConnectedLabel[Neighbor+1]=MonID+1; 
       }
@@ -351,23 +389,24 @@ void FeatureLabel  ::synchronize(IngredientsType& ingredients)
   fillLattice(ingredients);
   std::cout << "done\n";
   std::cout << "FeatureLabel::synchronizing ConnectedLabel occupation...\n";
+  ConnectedLabel.clear();
   for (size_t i =0; i < ingredients.getMolecules().size();i++)
   {
-    
-//     if(ingredients.getMolecules().getNumLinks(i)>2 )
-      if (ingredients.getMolecules()[i].getLabel()>0)
+    uint32_t MonLabel(ingredients.getMolecules()[i].getLabel());
+    if (MonLabel>0)
+    {
+      for(size_t j =0; j < ingredients.getMolecules().getNumLinks(i);j++)
       {
-	for(size_t j =0; j < ingredients.getMolecules().getNumLinks(i);j++)
+	uint32_t Neighbor(ingredients.getMolecules().getNeighborIdx(i,j));
+	uint32_t NeighborLabel(ingredients.getMolecules()[Neighbor].getLabel());
+	if( (NeighborLabel>0) && (NeighborLabel != MonLabel)  &&  (Neighbor>i))
 	{
-	  uint32_t Neighbor(ingredients.getMolecules().getNeighborIdx(i,j));
-	  uint32_t NeighborLabel(ingredients.getMolecules()[Neighbor].getLabel());
-	  if( (NeighborLabel>0) && (NeighborLabel != ingredients.getMolecules()[i].getLabel())  &&  (Neighbor>i))
-	  {
-	    ConnectedLabel[i+1]=Neighbor+1;
-	    ConnectedLabel[Neighbor+1]=i+1; 
-	  }
+	  std::cout <<"Add " << i << " and " << Neighbor << " to ConnectedLabel\n";
+	  ConnectedLabel[i+1]=Neighbor+1;
+	  ConnectedLabel[Neighbor+1]=i+1; 
 	}
       }
+    }
   }
   std::cout << "done\n";
 }
@@ -385,12 +424,7 @@ void FeatureLabel  ::synchronize(IngredientsType& ingredients)
 template<class IngredientsType>
 void FeatureLabel::fillLattice(IngredientsType& ingredients)
 {
-  
-
-  uint32_t nMonsPerArm(ingredients.getNumMonomersPerChain());
-  uint32_t nTendomers(ingredients.getNumTendomers());
-  uint32_t nArms(2);
-  labelLattice.setupLattice(nTendomers,nArms,2+nMonsPerArm);
+  labelLattice.setupLattice(nTendomers,nArms,2+nMonomersPerChain);
   const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
   //copy the lattice occupation from the monomer coordinates
   //number of tendomers 
@@ -398,16 +432,20 @@ void FeatureLabel::fillLattice(IngredientsType& ingredients)
     //number of arms
     for(uint32_t a=0;a<nArms;a++)
       //number of monomers per arm
-      for(uint32_t m=0;m<nMonsPerArm+2;m++)
+      for(uint32_t m=0;m<nMonomersPerChain+2;m++)
       {
 	  VectorInt3 pos(n,a,m);
 	  //marks the chain ends and cannot be occupied 
-	  if(m==0 || m == nMonsPerArm+1)
+	  if(m==0 || m == nMonomersPerChain+1)
 	    labelLattice.setLatticeEntry(pos,1);
 	  else
 	  {
-	    uint32_t ID(m+n*nMonsPerArm*nArms+a*nMonsPerArm-1);
-	    int32_t label=molecules[ID].getLabel();
+	    uint32_t ID(m+n*nMonomersPerChain*nArms+a*nMonomersPerChain-1);
+	    int32_t label;
+	    if(ID <molecules.size())
+	      label=molecules[ID].getLabel();
+	    else 
+	      label=0;
 	    if( labelLattice.getLatticeEntry(pos)!=0 )
 	    {
 		    throw std::runtime_error("********** FeatureLabel::fillLattice: multiple lattice occupation ******************");
@@ -511,16 +549,37 @@ void ReadLabel<IngredientsType>::execute()
     
     //read the value of the label 
     stream>>label2;
+    
     //if extraction worked, save the labels
     if(!stream.fail())
     {
 
-      for(auto i=0;i<sequence1.length();i++,index++)
+      for(auto i=0;i<sequence1.length();i++,index++){
 	if (sequence1.compare(i,1,"1") == 0 )
-	  molecules[index].setLabel(label1);	  
-      for(auto i=0;i<sequence2.length();i++,index++)
+	  molecules[index].setLabel(label1);
+	else if (sequence1.compare(i,1,"0") == 0 )
+	  molecules[index].setLabel(0);
+	else {
+	  std::stringstream messagestream;
+	  messagestream<<"ReadLabel<IngredientsType>::execute()\n"
+                   <<"Could not read if monomer is occupied or not\n"
+		   <<"with label at position"<< i <<"\n";
+	  throw std::runtime_error(messagestream.str());
+	}
+      }
+      for(auto i=0;i<sequence2.length();i++,index++){
 	if (sequence2.compare(i,1,"1") == 0 )
 	  molecules[index].setLabel(label2);
+	else if (sequence2.compare(i,1,"0") == 0 )
+	  molecules[index].setLabel(0);
+	else {
+	  std::stringstream messagestream;
+	  messagestream<<"ReadLabel<IngredientsType>::execute()\n"
+                   <<"Could not read if monomer is occupied or not\n"
+		   <<"with label at position"<< i <<"\n";
+	  throw std::runtime_error(messagestream.str());
+	}
+      }
 
       nGroupLabels++;
       getline((source),line);
@@ -569,7 +628,6 @@ void WriteLabel<IngredientsType>::writeStream(std::ostream& strm)
       n++;
     }
     strm<<":"<<groupLabel<<"-";
-//     strm<<n%this->getSource().getNumMonomersPerChain()<<"-";
     for(uint32_t i=0; i < this->getSource().getNumMonomersPerChain();i++)
     {
       if(molecules[n].getLabel() > 0 )

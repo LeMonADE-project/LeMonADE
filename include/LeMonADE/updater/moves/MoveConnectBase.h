@@ -72,6 +72,7 @@ class MoveConnectBase:public MoveBase
 	//here come the functions that are implemented by the specialization
 	template <class IngredientsType> void init(const IngredientsType& ingredients);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
+	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t partner);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
 
 	template <class IngredientsType> void check(const IngredientsType& ingredients);

@@ -56,15 +56,15 @@ public:
   const IngredientsType& getIngredients() const {return ingredients;}
 
   //redirect cout output
-//   virtual void SetUp(){
-//     originalBuffer=std::cout.rdbuf();
-//     std::cout.rdbuf(tempStream.rdbuf());
-//   };
-// 
-//   //restore original output
-//   virtual void TearDown(){
-//     std::cout.rdbuf(originalBuffer);
-//   };
+  virtual void SetUp(){
+    originalBuffer=std::cout.rdbuf();
+    std::cout.rdbuf(tempStream.rdbuf());
+  };
+
+  //restore original output
+  virtual void TearDown(){
+    std::cout.rdbuf(originalBuffer);
+  };
 
 private:
   std::streambuf* originalBuffer;
