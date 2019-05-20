@@ -95,7 +95,7 @@ class WriteLabel:public AbstractWrite<IngredientsType>
 public:
 	//! Only writes \b !label into the header of the bfm-file.
   WriteLabel(const IngredientsType& i)
-    :AbstractWrite<IngredientsType>(i){this->setHeaderOnly(true);}
+    :AbstractWrite<IngredientsType>(i){this->setHeaderOnly(false);}
   virtual ~WriteLabel(){}
   virtual void writeStream(std::ostream& strm);
 };
@@ -247,6 +247,7 @@ private:
 template<class IngredientsType>
 void FeatureLabel::exportRead(FileImport< IngredientsType >& fileReader)
 {
+  BaseClass::exportRead(fileReader);
   fileReader.registerRead("!label",new ReadLabel<IngredientsType>(fileReader.getDestination()));
 }
 /**
@@ -261,6 +262,7 @@ void FeatureLabel::exportRead(FileImport< IngredientsType >& fileReader)
 template<class IngredientsType>
 void FeatureLabel::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
+  BaseClass::exportWrite(fileWriter);
   fileWriter.registerWrite("!label",new WriteLabel<IngredientsType>(fileWriter.getIngredients_()));
 }
 /******************************************************************************/
@@ -281,13 +283,9 @@ bool FeatureLabel::checkMove(const IngredientsType& ingredients, const MoveLabel
       throw std::runtime_error("*****FeatureLabel::checkMove....lattice is not populated. Run synchronize!\n");
   uint32_t ID(move.getIndex());
   //check if the monomer has a label
-  std::cout << "Label = " << ingredients.getMolecules()[ID].getLabel() << std::endl;
   if(ingredients.getMolecules()[ID].getLabel()==0) return false;
-  std::cout << "lattice entry = " << labelLattice.getLatticeEntry( IDToCoordiantes.at(ID)+VectorInt3(0,0,move.getDir()) ) << std::endl;
   //either the chain ends are reached or the monomer is already occupied 
-  std::cout << "coord " << IDToCoordiantes.at(ID)+VectorInt3(0,0,move.getDir()) <<std::endl;
   if ( labelLattice.getLatticeEntry( IDToCoordiantes.at(ID)+VectorInt3(0,0,move.getDir()) ) > 0 ) return false; 
-  std::cout << "Seems to be true!"<<std::endl; 
   //if still here, then the two monomers are allowed to connect 
   return true;
 }
@@ -365,7 +363,7 @@ void FeatureLabel  ::applyMove(IngredientsType& ing,const MoveConnectBase<Specia
       
       if( (NeighborLabel>0) && (NeighborLabel != ing.getMolecules()[MonID].getLabel()) )
       {
-	std::cout << "Connected Labels are : " << MonID << " " << Neighbor <<std::endl;
+// 	std::cout << "Connected Labels are : " << MonID << " " << Neighbor <<std::endl;
 	ConnectedLabel[MonID+1]=Neighbor+1;
 	ConnectedLabel[Neighbor+1]=MonID+1; 
       }
@@ -401,7 +399,7 @@ void FeatureLabel  ::synchronize(IngredientsType& ingredients)
 	uint32_t NeighborLabel(ingredients.getMolecules()[Neighbor].getLabel());
 	if( (NeighborLabel>0) && (NeighborLabel != MonLabel)  &&  (Neighbor>i))
 	{
-	  std::cout <<"Add " << i << " and " << Neighbor << " to ConnectedLabel\n";
+// 	  std::cout <<"Add " << i << " and " << Neighbor << " to ConnectedLabel\n";
 	  ConnectedLabel[i+1]=Neighbor+1;
 	  ConnectedLabel[Neighbor+1]=i+1; 
 	}
@@ -463,6 +461,7 @@ void FeatureLabel::fillLattice(IngredientsType& ingredients)
 		    labelLattice.setLatticeEntry(pos,label);
 	    }
 	    IDToCoordiantes[ID]=pos;
+// 	    std::cout << ID << " " << IDToCoordiantes[ID] << " " << label <<std::endl; 
 	  }
 // 	  std::cout << "labelLattice["<<n<<","<<a<<","<<m<<"]="<<labelLattice.getLatticeEntry(n,a,m)<<std::endl;
       }

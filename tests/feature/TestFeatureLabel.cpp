@@ -175,7 +175,7 @@ TEST_F(TestFeatureLabel,ReadLabelPartner)
     EXPECT_EQ(0,ingredients.getMolecules()[i].getLabel());
 
 }
-TEST_F(TestFeatureLabel, WriteReactivity)
+TEST_F(TestFeatureLabel, WriteLabelPartner)
 {
   Ing ingredients;
   WriteLabel<Ing> write(ingredients);
