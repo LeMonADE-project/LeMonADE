@@ -476,7 +476,7 @@ void FeatureLabel::fillLattice(IngredientsType& ingredients)
 template < class IngredientsType >
 void ReadLabel<IngredientsType>::execute()
 {
-    std::cout<<"reading labels of monomers ...";
+    std::cout<<"reading labels of monomers ...\n";
   //some variables used during reading
   //counts the number of attribute lines in the file
   int nGroupLabels=0;
