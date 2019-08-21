@@ -11,6 +11,16 @@
 #include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 
 using namespace std;
+/*****************************************************************************/
+/**
+ * @file
+ * @brief Tests for the class FeatureBendingPotential
+ *
+ * @author Ankush Checkervarty
+ * @date 01.08.2019
+ * */
+/*****************************************************************************/
+
 
 class BendingPotentialTest: public ::testing::Test{
 

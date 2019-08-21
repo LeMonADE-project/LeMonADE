@@ -28,7 +28,10 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /*****************************************************************************/
 /**
  * @file
- * @brief Tests for UpdaterLipidsCreator
+ * @brief Tests for the class UpdaterLipidsCreator
+ *
+ * @author Ankush Checkervarty
+ * @date 01.08.2019
  * */
 /*****************************************************************************/
 
