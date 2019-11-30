@@ -661,13 +661,16 @@ void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm)
   while(n<nMonomers){
     if(molecules[n].getMonomerReactivity()!=reactivity)
     {
-      strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
+      if( reactivity.isReactive() == true )
+	strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
       reactivity=molecules[n].getMonomerReactivity();
       startIndex=n;
     }
     n++;
   }
   //write final reactivity
-  strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl<<std::endl;
+  if( reactivity.isReactive() == true )
+    strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl;
+  strm<<std::endl;
 }
 #endif

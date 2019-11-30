@@ -41,6 +41,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
 #include <LeMonADE/updater/moves/MoveConnectBase.h>
+#include <LeMonADE/updater/moves/MoveLabelBase.h>
 
 
 
@@ -179,7 +180,7 @@ class FeatureBondset : public Feature
           const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 
           for (size_t j=0; j< molecules.getNumLinks(monoIndex); ++j){
-              if (!bondset.isValidStrongCheck(molecules[molecules.getNeighborIdx(monoIndex,j)]-(molecules[monoIndex]+move.getDir()))) return false;
+              if (!bondset.isValidStrongCheck(molecules[molecules.getNeighborIdx(monoIndex,j)].getVector3D()-(molecules[monoIndex].getVector3D()+move.getDir()))) return false;
           }
 
           return true;
@@ -201,13 +202,39 @@ class FeatureBondset : public Feature
 
 	  //get the number of bond partners of the particle to be moved
           uint32_t MonID=move.getIndex();
-	  uint32_t partnerID=move.getPartner();
-          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+          uint32_t partnerID=move.getPartner();
+	  const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 
 	  if (!bondset.isValidStrongCheck(molecules[MonID]-molecules[partnerID])) return false;
+  
+	  return true;
+  }
+  
+  /**
+   * @brief Overloaded for MoveLabelBase. 
+   *
+   * @details Checks if the new bond for this move of type ConnectMoveType is valid.
+   * Returns if move is allowed (\a true ) or rejected (\a false ).
+   *
+   * @param [in] ingredients A reference to the IngredientsType - mainly the system.
+   * @param [in] move A reference to ConnectMoveType.
+   * @return if move is allowed (true) or rejected (false).
+   */
+  template<class IngredientsType,class MoveLabelType>
+  bool checkMove(const IngredientsType& ingredients, const MoveLabelBase<MoveLabelType>& move) const
+  {
 
+	  //get the number of bond partners of the particle to be moved
+          int32_t MonID=move.getIndex()+move.getDir();
+	  if ( MonID == -1 ) return false;
+	  uint32_t ID=move.getConnectedLabel();
+          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+	  if (ID == 0 ) return true; 
+	  ID--;
+	  if (!bondset.isValidStrongCheck(molecules[MonID].getVector3D()-molecules[ID].getVector3D())) return false;
           return true;
   }
+  
   /**
    * @brief Updates the bond-set lookup table if necessary
    *
@@ -227,10 +254,10 @@ class FeatureBondset : public Feature
      for (size_t j=0; j< molecules.getNumLinks(i); ++j){
 
 	 uint n = molecules.getNeighborIdx(i,j);
-	 if (!bondset.isValidStrongCheck(molecules[n]-molecules[i]))
+	 if (!bondset.isValidStrongCheck(molecules[n].getVector3D()-molecules[i].getVector3D()))
 	{
 	  std::ostringstream errorMessage;
-	  errorMessage << "FeatureBondset::synchronize(): Invalid bond vector between monomer " << i << " at " << molecules[i] << " and " << n << " at " <<  molecules[n] <<  ".\n";throw std::runtime_error(errorMessage.str());
+	  errorMessage << "FeatureBondset::synchronize(): Invalid bond vector between monomer " << i << " at " << molecules[i].getVector3D() << " and " << n << " at " <<  molecules[n].getVector3D() <<  ".\n";throw std::runtime_error(errorMessage.str());
 	}
     }
     }

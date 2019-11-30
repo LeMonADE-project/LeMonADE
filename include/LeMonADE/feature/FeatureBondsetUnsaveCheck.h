@@ -86,7 +86,7 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
 
           return true;
   }
-  
+
 //   using FeatureBondset<BondSetType>::checkMove;
   /**
    * @brief Updates the bond-set lookup table if necessary
@@ -110,7 +110,12 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
 	 if (!bondset.isValid(molecules[n]-molecules[i]))
 	{
 	  std::ostringstream errorMessage;
-	  errorMessage << "FeatureBondsetUnsaveCheck::synchronize(): Invalid bond vector between monomer " << i << " at " << molecules[i] << " and " << n << " at " <<  molecules[n] <<  ".\n";throw std::runtime_error(errorMessage.str());
+	  errorMessage << "FeatureBondsetUnsaveCheck::synchronize(): Invalid bond vector between monomer " 
+	  << i << " at " << molecules[i].getVector3D() 
+	  << " and " 
+	  << n << " at " << molecules[n].getVector3D() 
+	  <<  ".\n";
+	  throw std::runtime_error(errorMessage.str());
 	}
 
     }

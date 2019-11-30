@@ -220,7 +220,7 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
   ingredients.modifyMolecules()[0].modifyVector3D().setAllCoordinates(0,0,0);
   ingredients.modifyMolecules()[1].modifyVector3D().setAllCoordinates(13,8,9);
   
-  for(uint32_t i=0;i<100;i++){
+  for(uint32_t i=0;i<200;i++){
     scmovediag.init(ingredients);
     if(scmovediag.check(ingredients)){
       scmovediag.apply(ingredients);

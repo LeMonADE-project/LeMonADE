@@ -33,6 +33,9 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 // #include <ostream>
 #include <LeMonADE/utility/ResultFormattingTools.h>
 /****************************************************************************/
+/**
+ * @brief convinience class to track (all) connections (or breaks )
+ */
 template<class T=uint32_t >
 class TrackLinks
 {
@@ -62,7 +65,7 @@ public:
   uint32_t getInformationSize(){ return InformationSize;} 
   
   //! getter function for the connection size 
-  const uint32_t getConnectionSize() const {return Connection.size();}
+  uint32_t getConnectionSize() const {return Connection.size();}
 
   //! dumps the data of the connection process into a file 
   void dumpReactions();  
@@ -74,7 +77,7 @@ public:
   void setFilename(std::string filename_){filename=filename_;}
   
   //! getter function for the buffer size 
-  const uint32_t getBufferSize() const {return bufferSize;}
+  uint32_t getBufferSize() const {return bufferSize;}
   
   //! setter function for the buffer size
   void setBufferSize(uint32_t bufferSize_){bufferSize=bufferSize_;}

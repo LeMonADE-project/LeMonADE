@@ -25,40 +25,31 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
-#define LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
-#include <limits>
-#include <LeMonADE/updater/moves/MoveConnectBase.h>
+#ifndef LEMONADE_UPDATER_MOVES_MOVELABELALONGCHAING_H
+#define LEMONADE_UPDATER_MOVES_MOVELABELALONGCHAING_H
+
+#include "MoveLabelBase.h"
 
 /*****************************************************************************/
 /**
  * @file
  *
- * @class MoveConnectSc
+ * @class MoveLabelAlongChain
  *
  * @brief Standard local bfm-move on simple cubic lattice for the scBFM.
  *
  * @details The class is a specialization of MoveLocalBase using the (CRTP) to avoid virtual functions.
  **/
 /*****************************************************************************/
-
-class MoveConnectSc:public MoveConnectBase<MoveConnectSc>
+class MoveLabelAlongChain:public MoveLabelBase<MoveLabelAlongChain>
 {
 public:
-  MoveConnectSc(){
-    shellPositions[0]=VectorInt3( 2, 0, 0);
-    shellPositions[1]=VectorInt3(-2, 0, 0);
-    shellPositions[2]=VectorInt3( 0, 2, 0);
-    shellPositions[3]=VectorInt3( 0,-2, 0);
-    shellPositions[4]=VectorInt3( 0, 0, 2);
-    shellPositions[5]=VectorInt3( 0, 0,-2);
-  }
+  MoveLabelAlongChain(){}
 
   // overload initialise function to be able to set the moves index and direction if neccessary
   template <class IngredientsType> void init(const IngredientsType& ing);
   template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
-  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t partner);
-  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir );
+  template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, int32_t dir);
 
   template <class IngredientsType> bool check(IngredientsType& ing);
   template< class IngredientsType> void apply(IngredientsType& ing);
@@ -68,16 +59,15 @@ private:
   /**
    * @brief Array that holds the 6 possible move directions
    *
-   * @details 
-   * * shellPositions   = (dx, dy, dz)
-   * * shellPositions[0]= ( 2,  0,  0);
-   * * shellPositions[1]= (-2,  0,  0);
-   * * shellPositions[2]= ( 0,  2,  0);
-   * * shellPositions[3]= ( 0, -2,  0);
-   * * shellPositions[4]= ( 0,  0,  2);
-   * * shellPositions[5]= ( 0,  0, -2);
+   * @details The label should stay along the chains and has the possibility to either go to the left(-1) or right(1).
    */
-  VectorInt3 shellPositions[6];
+public:
+  //! define an enum for the directions
+  enum DIRECTIONS{
+    LEFT=-1,       
+    RIGHT=1,      
+    UNDEFINED=0
+  };
 };
 
 
@@ -95,44 +85,18 @@ private:
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing)
+void MoveLabelAlongChain::init(const IngredientsType& ing)
 {
   this->resetProbability();
 
   //draw index
   this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-
-  //draw direction
-  VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
-  this->setDir(randomDir);
-  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir) );
-}
-
-/*****************************************************************************/
-/**
- * @brief Initialize the move with a given monomer index.
- *
- * @details Resets the move probability to unity. Dice a new random direction.
- *
- * @param ing A reference to the IngredientsType - mainly the system
- * @param index index of the monomer to be connected
- **/
-template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
-{
-  this->resetProbability();
-
-  //set index
-  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
-    this->setIndex( index );
-  else
-    throw std::runtime_error("MoveConnectSc::init(ing, index): index out of range!");
-
-  //draw direction
-  VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
-  this->setDir(randomDir);
-  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
   
+  //draw direction
+  int32_t randomDir=1-2*(this->randomNumbers.r250_rand32() % 2);
+  this->setDir(randomDir);
+  
+  this->setConnectedLabel(ing.getLabelPartner(this->getIndex()));
 }
 
 /*****************************************************************************/
@@ -142,11 +106,10 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
  * @details Resets the move probability to unity. Dice a new random direction.
  *
  * @param ing A reference to the IngredientsType - mainly the system
- * @param index index of the monomer to be connected
- * @param partner index of the monomer to which index is connected
+ * @param index index of the monomer to be moved
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t partner)
+void MoveLabelAlongChain::init(const IngredientsType& ing, uint32_t index)
 {
   this->resetProbability();
 
@@ -154,27 +117,27 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t pa
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
-    throw std::runtime_error("MoveConnectSc::init(ing, index): index out of range!");
+    throw std::runtime_error("MoveLabelAlongChain::init(ing, index): index out of range!");
 
   //draw direction
-  this->setDir(ing.getMolecules()[partner].getVector3D()-ing.getMolecules()[index].getVector3D());
-  this->setPartner(partner);
+  int32_t randomDir=1-2*(this->randomNumbers.r250_rand32() % 2);
+  this->setDir(randomDir);
   
+  this->setConnectedLabel(ing.getLabelPartner(index));
 }
-
 
 /*****************************************************************************/
 /**
- * @brief Initialize the move with a given monomer index.
+ * @brief Initialize the move with a given monomer index and a given direction.
  *
- * @details Resets the move probability to unity. Dice a new random direction.
+ * @details Resets the move probability to unity and set the move properties index and direction.
  *
  * @param ing A reference to the IngredientsType - mainly the system
- * @param index index of the monomer to be connected
- * @param bondpartner index of the monomer to connect to 
+ * @param index index of the monomer to be moved
+ * @param dir Diretion given by and integer left(-1)-LEFT,right(1)-RIGHT.
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir )
+void MoveLabelAlongChain::init(const IngredientsType& ing, uint32_t index, int32_t dir)
 {
   this->resetProbability();
 
@@ -182,19 +145,16 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 
   if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
     this->setIndex( index );
   else
-    throw std::runtime_error("MoveConnectSc::init(ing, index, bondpartner): index out of range!");
+    throw std::runtime_error("MoveLabelAlongChain::init(ing, index, dir): index out of range!");
 
   //set direction
-  if(dir==shellPositions[0] ||
-    dir==shellPositions[1] ||
-    dir==shellPositions[2] ||
-    dir==shellPositions[3] ||
-    dir==shellPositions[4] ||
-    dir==shellPositions[5]  )
+  if(dir==LEFT ||
+     dir==RIGHT )
     this->setDir(dir);
   else
-    throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
-  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+dir));
+    throw std::runtime_error("MoveLabelAlongChain::init(ing, index, dir): direction is not valid!");
+  
+  this->setConnectedLabel(ing.getLabelPartner(index));
 }
 
 /*****************************************************************************/
@@ -207,12 +167,9 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 
  * @return True if move is valid. False, otherwise.
  **/
 template <class IngredientsType>
-bool MoveConnectSc::check(IngredientsType& ing)
+bool MoveLabelAlongChain::check(IngredientsType& ing)
 {
-  /**
-   * @todo Think about this approach. Maybe we can put this statement somewhere else? 
-   */
-  if (std::numeric_limits<uint32_t>::max() == this->getPartner() ) return false ; 
+  
   //send the move to the Features to be checked
   return ing.checkMove(ing,*this);
 }
@@ -227,21 +184,21 @@ bool MoveConnectSc::check(IngredientsType& ing)
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template< class IngredientsType>
-void MoveConnectSc::apply(IngredientsType& ing)
+void MoveLabelAlongChain::apply(IngredientsType& ing)
 {
 	///@todo Think about the applying of move. Esp. make this independent of the order to avoid confusion!!
-	///@todo check if it makes any difference in this case?!
 
-	//FIRST bond is inserted 
-	ing.modifyMolecules().connect(this->getIndex(),this->getPartner());
+	//move FIRST is applied to the features
+	ing.applyMove(ing,*this);
 	
-	//THEN all features are applied 
-  	ing.applyMove(ing,*this);
-	
-	
-	//the next line can produce a lot of output
-	//thus use only if needed:
-	//std::cout << " Connect: " << this->getIndex() << " to " << this->getPartner() << " at ("<<ing.modifyMolecules()[this->getIndex()] << ") - ("<< ing.modifyMolecules()[this->getPartner()] <<")"<< std::endl;
+	//if connected to another ring we need to check if the resultign new bond is valid
+	if( this->getConnectedLabel() != 0 )
+	{
+	  ing.modifyMolecules().disconnect(this->getConnectedLabel()-1, this->getIndex()                );
+	  ing.modifyMolecules().connect   (this->getConnectedLabel()-1, this->getIndex()+this->getDir() );
+	}
+	ing.modifyMolecules()[this->getIndex()+this->getDir()].setLabel(ing.getMolecules()[this->getIndex()].getLabel());
+	ing.modifyMolecules()[this->getIndex()].setLabel(0);
 }
 
 #endif
