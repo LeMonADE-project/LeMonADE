@@ -161,7 +161,6 @@ Lattice< LatticeType >::Lattice(const Lattice& LatticeSource)
 	xPro = LatticeSource.xPro;
 	proXY = LatticeSource.proXY;
 	
-	deleteLattice();
 	lattice = new LatticeType[_boxX*_boxY*_boxZ];
 }
 
@@ -190,7 +189,7 @@ Lattice< LatticeType >&  Lattice< LatticeType >::operator = (const Lattice< Latt
 
     if ( oldSize != newSize )
     {
-	deleteLattice();
+        deleteLattice();
         lattice = new LatticeType[_boxX*_boxY*_boxZ];
     }
 
