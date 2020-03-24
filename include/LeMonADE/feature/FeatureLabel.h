@@ -116,17 +116,14 @@ public:
 //DEFINITION OF THE CLASS TEMPLATE   	                                ///////
 //Implementation of the members below					///////
 ///////////////////////////////////////////////////////////////////////////////
-
-// class FeatureLabel : public Feature {
-class FeatureLabel : public FeatureSystemInformationTendomer {
+class FeatureLabel : public Feature {
   
-  typedef FeatureSystemInformationTendomer BaseClass;
 public:
 	//! This Feature requires a monomer_extensions.
 	typedef LOKI_TYPELIST_1(MonomerLabel) monomer_extensions;
-
+	typedef LOKI_TYPELIST_1(FeatureSystemInformationTendomer) required_features_front;
 	//constructor
-	FeatureLabel() :latticeFilledUp(false),nArms(2)
+	FeatureLabel() :latticeFilledUp(false),nArms(2),nTendomers(0), nMonomersPerChain(0)
 	{labelLattice.setupLattice();}
 	
 	/**
@@ -217,11 +214,7 @@ protected:
 	Lattice<uint32_t> labelLattice;
 	
 private:
-	using BaseClass::nTendomers;
-	using BaseClass::nCrossLinkers;
-	using BaseClass::nMonomersPerChain;
-	using BaseClass::nLabelsPerTendomerArm;
-	uint32_t nArms;
+	uint32_t nArms, nTendomers, nMonomersPerChain;
 
   	//! get the lattice coordinates from the id 
 	std::map<uint32_t,VectorInt3> IDToCoordiantes;
@@ -247,7 +240,6 @@ private:
 template<class IngredientsType>
 void FeatureLabel::exportRead(FileImport< IngredientsType >& fileReader)
 {
-  BaseClass::exportRead(fileReader);
   fileReader.registerRead("!label",new ReadLabel<IngredientsType>(fileReader.getDestination()));
 }
 /**
@@ -262,7 +254,6 @@ void FeatureLabel::exportRead(FileImport< IngredientsType >& fileReader)
 template<class IngredientsType>
 void FeatureLabel::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
 {
-  BaseClass::exportWrite(fileWriter);
   fileWriter.registerWrite("!label",new WriteLabel<IngredientsType>(fileWriter.getIngredients_()));
 }
 /******************************************************************************/
@@ -383,6 +374,9 @@ template<class IngredientsType>
 void FeatureLabel  ::synchronize(IngredientsType& ingredients)
 {
 
+  nTendomers = ingredients.getNumTendomers();
+  nMonomersPerChain = ingredients.getNumMonomersPerChain();
+  
   std::cout << "FeatureLabel::synchronizing lattice occupation...\n";
   fillLattice(ingredients);
   std::cout << "done\n";
