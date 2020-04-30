@@ -124,13 +124,13 @@ public:
       freeColor--;
       nMolecules=freeColor;
       std::vector<std::vector<uint32_t> > ColoredGraphIDs(freeColor+1,std::vector<uint32_t>(0));
-      std::cout << "UpdaterSwellBox::execute(): Cluste Size is "<< ColoredGraphIDs.size() << std::endl; 
-      std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol0 "<< ColoredGraphIDs[0].size() << std::endl;
-      std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol1 "<< ColoredGraphIDs[1].size() << std::endl;
+//       std::cout << "UpdaterSwellBox::execute(): Cluste Size is "<< ColoredGraphIDs.size() << std::endl; 
+//       std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol0 "<< ColoredGraphIDs[0].size() << std::endl;
+//       std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol1 "<< ColoredGraphIDs[1].size() << std::endl;
       for (auto i=0 ; i < nMonomers;i++)
       {
         uint32_t atti(getMolies[i].getAttributeTag());
-        std::cout << "UpdaterSwellBox::execute(): ID="<<i << " color="  <<atti << std::endl; 
+//         std::cout << "UpdaterSwellBox::execute(): ID="<<i << " color="  <<atti << std::endl; 
         if (atti==0 )//this should never happen because all monomers should be covered above and colored 
         {
           std::stringstream error_message;
@@ -139,9 +139,9 @@ public:
         }
         ColoredGraphIDs[atti].push_back(i);
       }
-      std::cout << "UpdaterSwellBox::execute(): Cluste Size is "<< ColoredGraphIDs.size() << std::endl; 
-      std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol0 "<< ColoredGraphIDs[0].size() << std::endl;
-      std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol1 "<< ColoredGraphIDs[1].size() << std::endl;
+//       std::cout << "UpdaterSwellBox::execute(): Cluste Size is "<< ColoredGraphIDs.size() << std::endl; 
+//       std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol0 "<< ColoredGraphIDs[0].size() << std::endl;
+//       std::cout << "UpdaterSwellBox::execute(): Cluste Size is Mol1 "<< ColoredGraphIDs[1].size() << std::endl;
       auto biggestClusterID(0);
       auto biggestClusterSize(ColoredGraphIDs[biggestClusterID].size());
       for (auto i=0; i < freeColor+1 ; i++)
@@ -177,7 +177,7 @@ public:
       }
       if (increaseBoxSize)
       {
-        std::cout << "UpdaterSwellBox::execute() Set the box to the size:  "<<  BoxX+step << std::endl;
+//         std::cout << "UpdaterSwellBox::execute() Set the box to the size:  "<<  BoxX+step << std::endl;
         ingredients.setBoxX(BoxX+step);
         ingredients.setBoxY(BoxY+step);
         ingredients.setBoxZ(BoxZ+step);

@@ -91,12 +91,15 @@ public:
 	//! set the comment stringstream
 	void setComment(std::string commentTimeSeries_){commentTimeSeries=commentTimeSeries_;}
 	//! get the comment stringstream
-// 	std::stringstream getComment(){return commentTimeSeries;}
+	std::string getComment(){return commentTimeSeries;}
 	//! set the number of columns 
 	void setNumberOfColumns(uint32_t NColumns_){NColumns=NColumns_;resizeData();}
 	//! get the number of colums
 	uint32_t getNumberOfColumns(){ return NColumns; }
-
+	//! set the buffer size for dumping data 
+	void setBufferSize(uint32_t bufferSize_){ bufferSize=bufferSize_;}
+        //! get the buffer size
+        uint32_t getBufferSize(){return bufferSize;}
 };
 
 /*************************************************************************
