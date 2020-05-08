@@ -1,3 +1,3 @@
 add_subdirectory(SimpleSimulator)
-
+add_subdirectory(AnalyzeMonomerMSD)
 add_subdirectory(Examples)
