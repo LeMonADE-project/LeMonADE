@@ -28,9 +28,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 #include <exception>
-
-#include <boost/program_options.hpp> // for the command line handling / options
-using namespace boost::program_options;
+#include <cstring>
 
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
@@ -54,24 +52,24 @@ int main (int argc, char* argv[])
   std::string input,output;
   try
   {
-    options_description desc{"Analyze an equilibrated melt of chains in the BFM file format.\nAllowed options"};
-    desc.add_options()
-      ("help,h"      ,                                                          "produce help message")
-      ("input,i"     , value<std::string>(&input)->default_value("config.bfm"), "input"               )
-      ("output,o"    , value<std::string>(&output)->default_value("output")   , "prefix for the output"              );
-    variables_map options_map;
-    store(parse_command_line(argc, argv, desc), options_map);
-    notify(options_map); 
-    
-    // help option
-    if (options_map.count("help")) 
+    if(!(argc==3) || (argc==2 && strcmp(argv[1],"--help")==0 ))
     {
-      std::cout << desc << "\n";
-      return 1;
+            std::string errormessage;
+            errormessage="usage: ./AnalyzerMonomerMSD input_filename output_prefix\n";
+            errormessage+="Features used: FeatureMoleculesIO \n";
+            errormessage+="Updaters used: UpdaterReadBfmFile \n";
+            errormessage+="Analyzers used: AnalyzerMonomerMSD, AnalyzerSystemMSD\n";
+            throw std::runtime_error(errormessage);
+    }
+    else
+    {
+            input=argv[1];
+            output=argv[2];
     }
   }
   catch(std::exception& e ){std::cerr<<"Error:\n" << e.what()<< std::endl;}
   catch(...){std::cerr<<"Error: unknown exception\n";}
+  
   typedef LOKI_TYPELIST_1(FeatureMoleculesIO) Features; 
   typedef ConfigureSystem<VectorInt3,Features, 7> Config;
   typedef Ingredients<Config> Ing;

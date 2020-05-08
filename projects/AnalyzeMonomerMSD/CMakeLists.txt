@@ -13,5 +13,5 @@ link_directories (${LEMONADE_LIBRARY_DIR})
 
 add_executable(AnalyzeMonomerMSD AnalyzeMonomerMSD.cpp)
 
-target_link_libraries(AnalyzeMonomerMSD LeMonADE ${Boost_LIBRARIES} )
+target_link_libraries(AnalyzeMonomerMSD LeMonADE )
 
