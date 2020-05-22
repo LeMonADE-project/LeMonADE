@@ -231,7 +231,8 @@ class FeatureBondset : public Feature
           const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
 	  if (ID == 0 ) return true; 
 	  ID--;
-	  if (!bondset.isValidStrongCheck(molecules[MonID].getVector3D()-molecules[ID].getVector3D())) return false;
+          auto bond(molecules[MonID].getVector3D()-molecules[ID].getVector3D());
+	  if (!bondset.isValidStrongCheck( bond ) && bond.getLength<3.) return false; // otherwise I could get xtraps 
           return true;
   }
   
