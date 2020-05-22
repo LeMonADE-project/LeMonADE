@@ -54,13 +54,6 @@ public:
   template <class IngredientsType> bool check(IngredientsType& ing);
   template< class IngredientsType> void apply(IngredientsType& ing);
 
-private:
-  // holds the possible move directions
-  /**
-   * @brief Array that holds the 6 possible move directions
-   *
-   * @details The label should stay along the chains and has the possibility to either go to the left(-1) or right(1).
-   */
 public:
   //! define an enum for the directions
   enum DIRECTIONS{
