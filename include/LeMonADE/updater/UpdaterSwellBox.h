@@ -193,6 +193,11 @@ public:
                                                           ,translateCoordinate(oldPos.getZ(), BoxZ, newBoxZ)
                                                         );
         }
+        std::cout << "UpdaterSwellBox::initialize-> execute:  increase box size to \n"
+                  << " x-Box: " << ingredients.getBoxX() <<"\n"
+                  << " y-Box: " << ingredients.getBoxY() <<"\n"
+                  << " z-Box: " << ingredients.getBoxZ() <<"\n"
+                  << "\n";
         ingredients.synchronize();
       }
       isExecuted=true;
