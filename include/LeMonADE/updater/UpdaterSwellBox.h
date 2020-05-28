@@ -146,6 +146,7 @@ public:
       auto biggestClusterSize(ColoredGraphIDs[biggestClusterID].size());
       for (auto i=0; i < freeColor+1 ; i++)
       {
+        std::cout << "ClusterID  "  << i << " cluster size  " << ColoredGraphIDs[i].size() << std::endl; 
         if ( biggestClusterSize < ColoredGraphIDs[i].size() )
         { 
           biggestClusterSize=ColoredGraphIDs[i].size();
