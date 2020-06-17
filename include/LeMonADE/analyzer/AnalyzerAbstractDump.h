@@ -167,8 +167,6 @@ void AnalyzerAbstractDump<IngredientsType, T >::dumpTimeSeries()
     if (Data[0].size() > bufferSize || isCleanup ){
 	if ( NColumns != Data.size() || NColumns == 0 )
 	    throw std::runtime_error("[AnalyzerAbstractDump]::dumpTimeSeries() Did not set up NColumns!");
-	for (size_t i = 0; i < Data.size(); ++i)
-	  std::cout << i << " " << Data[i].size() << " " << MCSTimes.size() << "\n"; 
 	//fist make a single vector<vector<T> > for writing the results
 	std::vector<std::vector<T> > resultsTimeseries(Data);
 	resultsTimeseries.insert(resultsTimeseries.begin(),MCSTimes);

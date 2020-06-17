@@ -59,15 +59,15 @@ public:
   typename IngredientsType::molecules_type& setMolies = ingredients.modifyMolecules(); 
   const typename IngredientsType::molecules_type& getMolies = ingredients.getMolecules(); 
   //redirect cout output
-//   virtual void SetUp(){
-//     originalBuffer=std::cout.rdbuf();
-//     std::cout.rdbuf(tempStream.rdbuf());
-//   };
-// 
-//   //restore original output
-//   virtual void TearDown(){
-//     std::cout.rdbuf(originalBuffer);
-//   };
+  virtual void SetUp(){
+    originalBuffer=std::cout.rdbuf();
+    std::cout.rdbuf(tempStream.rdbuf());
+  };
+
+  //restore original output
+  virtual void TearDown(){
+    std::cout.rdbuf(originalBuffer);
+  };
   void setConfig()
   {
     ingredients.setBoxX(16);
