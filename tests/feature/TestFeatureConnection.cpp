@@ -38,6 +38,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureConnectionSc.h>
 #include <LeMonADE/utility/Vector3D.h>
 
+#include <LeMonADE/updater/moves/MoveBreak.h>
+
 class TestFeatureConnectionSc : public ::testing::Test
 {
 public:
@@ -297,4 +299,34 @@ TEST_F(TestFeatureConnectionSc,MoveLocalSc)
     EXPECT_TRUE(move.check(ingredients));
     move.apply(ingredients);
     EXPECT_EQ(std::numeric_limits<uint32_t>::max(),ingredients.getIdFromLattice(2,1,0));
+}
+
+TEST_F(TestFeatureConnectionSc, MoveBreakBad)
+{
+    ingredients.setBoxX(12);
+    ingredients.setBoxY(12);
+    ingredients.setBoxZ(12);
+    ingredients.setPeriodicX(1);
+    ingredients.setPeriodicY(1);
+    ingredients.setPeriodicZ(1);
+    ingredients.modifyMolecules().resize(2);
+    ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
+    ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
+    ingredients.modifyMolecules()[0].setReactive(true);
+    ingredients.modifyMolecules()[1].setReactive(false);
+    ingredients.modifyMolecules()[0].setNumMaxLinks(1);
+    ingredients.modifyMolecules()[1].setNumMaxLinks(17);
+    ingredients.modifyMolecules().connect(0,1);
+    ingredients.modifyBondset().addBond(2,0,0,77);
+    ingredients.modifyBondset().addBond(-2,0,0,75);
+    ingredients.synchronize(ingredients);
+    
+    MoveBreak breakbad;
+    EXPECT_EQ(std::numeric_limits<uint32_t>::max(),ingredients.getIdFromLattice(0,0,0));    
+    EXPECT_EQ(std::numeric_limits<uint32_t>::max(),ingredients.getIdFromLattice(2,0,0));    
+    breakbad.init(ingredients);
+//     EXPECT_FALSE(breakbad.check(ingredients)); // feature FeatureBreak is not included and thus it makes no sense t ocheck this 
+    breakbad.apply(ingredients);
+    EXPECT_EQ(0,ingredients.getIdFromLattice(0,0,0));    
+    EXPECT_EQ(std::numeric_limits<uint32_t>::max(),ingredients.getIdFromLattice(2,0,0));     
 }

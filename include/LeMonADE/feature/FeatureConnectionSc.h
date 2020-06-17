@@ -37,6 +37,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveLocalBcc.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
 #include <LeMonADE/updater/moves/MoveLocalScDiag.h>
+#include <LeMonADE/updater/moves/MoveBreakBase.h>
+#include <LeMonADE/updater/moves/MoveBreak.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerBcc.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerSc.h>
 #include <LeMonADE/utility/Lattice.h>
@@ -257,6 +259,9 @@ public:
 	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveLocalScDiag& move) const {return true;};
 	
+	//! check bas connect move - always true 
+	template<class IngredientsType, class SpecializedMove >
+	bool checkMove(const IngredientsType& ingredients, const MoveBreakBase<SpecializedMove>& move) const {return true;};
 	
 	//! check bas connect move - always true 
 	template<class IngredientsType>
@@ -286,6 +291,10 @@ public:
 	template<class IngredientsType>
 	void applyMove(IngredientsType& ing, const MoveLocalScDiag& move);	
 
+        //!
+	template<class IngredientsType, class TagType>
+	void applyMove(IngredientsType& ing, const MoveBreakBase<TagType>& move);
+        
 	//!
 	template<class IngredientsType, class TagType>
 	void applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move);	
@@ -443,6 +452,26 @@ void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveLocalScDiag
   VectorInt3 direction=move.getDir();
   VectorInt3 oldPlusDir=oldPos+direction;
   connectionLattice.moveOnLattice(oldPos,oldPlusDir);
+}
+/******************************************************************************/
+/**
+ * @fn void FeatureConnectionSc ::applyMove(IngredientsType& ing, const MoveAddMonomerSc<TagType>& move)
+ *
+ * @param [in] ingredients A reference to the IngredientsType - mainly the system
+ * @param [in] move General move other than MoveLocalSc or MoveLocalBcc.
+ */
+/******************************************************************************/
+template<class IngredientsType, class SpecializedMove>
+void FeatureConnectionSc  ::applyMove(IngredientsType& ing,const MoveBreakBase<SpecializedMove>& move)
+{
+  uint32_t MonID1(move.getIndex()); 
+  uint32_t MonID2(move.getPartner());
+  VectorInt3 pos1=ing.getMolecules()[MonID1];
+  VectorInt3 pos2=ing.getMolecules()[MonID2];
+  if (ing.getMolecules()[MonID1].isReactive()) 
+    connectionLattice.setLatticeEntry(pos1,MonID1+1 );
+  if (ing.getMolecules()[MonID2].isReactive()) 
+    connectionLattice.setLatticeEntry(pos2,MonID2+1 );
 }
 /******************************************************************************/
 /**
