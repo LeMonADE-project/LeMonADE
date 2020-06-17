@@ -260,7 +260,7 @@ private:
   template <class T >
   inline T translateCoordinate(T pos, uint32_t oldBox, uint32_t newBox)
   {
-    return (newBox+oldBox)/2-pos;
+    return (newBox-oldBox)/2+pos;
   }
 };
 
