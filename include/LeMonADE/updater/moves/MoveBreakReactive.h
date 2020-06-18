@@ -25,16 +25,17 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_UPDATER_MOVES_MOVEBREAK_H
-#define LEMONADE_UPDATER_MOVES_MOVEBREAK_H
+#ifndef LEMONADE_UPDATER_MOVES_MOVEBREAKREACTIVE_H
+#define LEMONADE_UPDATER_MOVES_MOVEBREAKREACTIVE_H
 #include <limits>
+#include <vector>
 #include "./MoveBreakBase.h"
 
 /*****************************************************************************/
 /**
  * @file
  *
- * @class MoveBreak
+ * @class MoveBreakReactive
  *
  * @brief Standard local bfm-move on simple cubic lattice for the scBFM.
  *
@@ -42,10 +43,10 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  **/
 /*****************************************************************************/
 
-class MoveBreak:public MoveBreakBase<MoveBreak>
+class MoveBreakReactive:public MoveBreakBase<MoveBreakReactive>
 {
 public:
-  MoveBreak(){};
+  MoveBreakReactive(){};
 
   // overload initialise function to be able to set the moves index and direction if neccessary
   template <class IngredientsType> void init(const IngredientsType& ing);
@@ -55,12 +56,7 @@ public:
   template <class IngredientsType> bool check(IngredientsType& ing);
   template< class IngredientsType> void apply(IngredientsType& ing);
 
-private:
-
 };
-
-
-
 /////////////////////////////////////////////////////////////////////////////
 /////////// implementation of the members ///////////////////////////////////
 
@@ -68,26 +64,23 @@ private:
 /**
  * @brief Initialize the move.
  *
- * @details Resets the move probability to unity. Dice a new random direction and
- * Vertex (monomer) index inside the graph.
- *
+ * @details Resets the move probability to unity. Get a random bond vector from 
+ * the feature FeatureReactiveBonds and set the corresponding IDs. 
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template <class IngredientsType>
-void MoveBreak::init(const IngredientsType& ing)
+void MoveBreakReactive::init(const IngredientsType& ing)
 {
   this->resetProbability();
 
   //draw index
-  this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-  //draw bond partner 
-  auto nNeighbors(ing.getMolecules().getNumLinks(this->getIndex()));
-  if ( nNeighbors == 0 ) 
-    this->setPartner(std::numeric_limits<uint32_t>::max());
-  else {
-    auto bondID(this->randomNumbers.r250_rand32() %  ing.getMolecules().getNumLinks(this->getIndex()));
-    this->setPartner( ing.getMolecules().getNeighborIdx(this->getIndex(), bondID) );
-  }
+  auto index(this->randomNumbers.r250_rand32() % (ing.getNReactedBonds()));
+  auto it(ing.getBondedMonomers().begin());
+  std::advance( it, index);
+  auto BondPair(it->first);
+  this->setIndex(BondPair.first);
+  this->setPartner(BondPair.second);
+
 }
 
 /*****************************************************************************/
@@ -100,7 +93,7 @@ void MoveBreak::init(const IngredientsType& ing)
  * @param index index of the monomer to be connected
  **/
 template <class IngredientsType>
-void MoveBreak::init(const IngredientsType& ing, uint32_t index)
+void MoveBreakReactive::init(const IngredientsType& ing, uint32_t index)
 {
   this->resetProbability();
 
@@ -108,16 +101,25 @@ void MoveBreak::init(const IngredientsType& ing, uint32_t index)
   if( (index >= 0) && (index < ing.getMolecules().size() ) )
     this->setIndex( index );
   else
-    throw std::runtime_error("MoveBreak::init(ing, index): index out of range!");
+    throw std::runtime_error("MoveBreakReactive::init(ing, index): index out of range !");
 
-  //draw bond partner 
-  auto nNeighbors(ing.getMolecules().getNumLinks(this->getIndex()));
-  if ( nNeighbors == 0 ) 
-    this->setPartner(std::numeric_limits<uint32_t>::max());
-  else {
-    auto bondID(this->randomNumbers.r250_rand32() %  ing.getMolecules().getNumLinks(this->getIndex()));
-    this->setPartner( ing.getMolecules().getNeighborIdx(this->getIndex(), bondID) );
+
+  std::vector<uint32_t> neighborIdx;
+  for (auto i =0 ; i < ing.getMolecules().getNumLinks(this->getIndex() );i++ ) 
+  { 
+    auto neighbor(ing.getMolecules().getNeighborIdx(this->getIndex(), i));
+    if (ing.getMolecules()[neighbor].isReactive()) 
+      neighborIdx.push_back(neighbor);
   }
+  auto nNeighbor(neighborIdx.size());
+  if ( nNeighbor == 0  )
+  {
+    this->setPartner(std::numeric_limits<uint32_t>::max());
+//     throw std::runtime_error("MoveBreakReactive::init(ing, index): index does not have a reactive bond partner!");
+  }else 
+    this->setPartner(neighborIdx[ this->randomNumbers.r250_rand32() % nNeighbor ] );
+  if (!  ing.getMolecules()[index].isReactive())
+    this->setPartner(std::numeric_limits<uint32_t>::max());
 }
 
 /*****************************************************************************/
@@ -131,27 +133,21 @@ void MoveBreak::init(const IngredientsType& ing, uint32_t index)
  * @param partner index of the monomer to which index is connected
  **/
 template <class IngredientsType>
-void MoveBreak::init(const IngredientsType& ing, uint32_t index, uint32_t partner)
+void MoveBreakReactive::init(const IngredientsType& ing, uint32_t index, uint32_t partner)
 {
   this->resetProbability();
-
-  //set index
-  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
-    this->setIndex( index );
-  else
-    throw std::runtime_error("MoveBreak::init(ing, index, partner): index out of range!");
-
-  //draw bond partner 
-  if( (partner >= 0) && (partner <= (ing.getMolecules().size()-1)) )
+  if ( ing.checkReactiveBondExists(index,partner) ) 
   {
-      this->setPartner(partner);
+    this->setIndex( index );
+    this->setPartner(partner);
   }
-  else
-    throw std::runtime_error("MoveBreak::init(ing, index, partner): partner out of range!");
-  
-  if ( ! ing.getMolecules().areConnected(index,partner  ) )
-    this->setPartner(std::numeric_limits<uint32_t>::max());
-//     throw std::runtime_error("MoveBreak::init(ing, index, partner): not connected!");
+  else 
+  {
+    this->setIndex( index );
+    this->setPartner(std::numeric_limits<uint32_t>::max()) ;
+//     throw std::runtime_error("MoveBreakReactive::init(ing, index, partner): index/partner out of range, not reactive or have no connection!");
+  }
+
 }
 /*****************************************************************************/
 /**
@@ -163,7 +159,7 @@ void MoveBreak::init(const IngredientsType& ing, uint32_t index, uint32_t partne
  * @return True if move is valid. False, otherwise.
  **/
 template <class IngredientsType>
-bool MoveBreak::check(IngredientsType& ing)
+bool MoveBreakReactive::check(IngredientsType& ing)
 {
   if (std::numeric_limits<uint32_t>::max() == this->getPartner() ) return false ; 
   //send the move to the Features to be checked
@@ -179,7 +175,7 @@ bool MoveBreak::check(IngredientsType& ing)
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template< class IngredientsType>
-void MoveBreak::apply(IngredientsType& ing)
+void MoveBreakReactive::apply(IngredientsType& ing)
 {
 	///@todo Think about the applying of move. Esp. make this independent of the order to avoid confusion!!
 	///@todo check if it makes any difference in this case?! 
