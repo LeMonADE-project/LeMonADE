@@ -253,7 +253,10 @@ public:
 	template<class IngredientsType>
 	void synchronize(IngredientsType& ingredients);
     
-    uint32_t getNReactedBonds() const {return nReactedBonds;};
+    uint32_t getNReactedBonds() const {
+//         return nReactedBonds;
+        return BondedReactiveMonomers.size();
+    };
     uint32_t getNReactiveSites() const {return nReactiveSites;};
     //!returns the bond table of the reacted reactive monomers.
     std::map<BondPair,edge_type> getBondedMonomers()const {return BondedReactiveMonomers;};
@@ -454,8 +457,9 @@ void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveBreakBase<
 template<class IngredientsType>
 void FeatureReactiveBonds::synchronize(IngredientsType& ingredients)
 {
-
 	std::cout << "FeatureReactiveBonds::synchronizing ...\n";
+    nReactedBonds=0;
+    nReactiveSites=0;
     for(size_t i = 0 ; i < ingredients.getMolecules().size(); i++ )
 	{
 		if ( ingredients.getMolecules()[i].isReactive() )
@@ -481,20 +485,22 @@ void FeatureReactiveBonds::synchronize(IngredientsType& ingredients)
               << "Number of reactive sites: " << nReactiveSites<<"\n"
               << "Extent of reaction      : " << getConversion()
               <<std::endl;
-	if ( nReactiveSites == 0  )
-	{
-	  std::stringstream errormessage;
-	  errormessage << "FeatureReactiveBonds::synchronize(): The number of possible reactive sites is zero. \n"
-		       << "Check if the system is correctly setup with reactivity!";
-	  throw std::runtime_error(errormessage.str());
-	} 
+// 	if ( nReactiveSites == 0  )
+// 	{
+// 	  std::stringstream errormessage;
+// 	  errormessage << "FeatureReactiveBonds::synchronize(): The number of possible reactive sites is zero. \n"
+// 		       << "Check if the system is correctly setup with reactivity!";
+// 	  throw std::runtime_error(errormessage.str());
+// 	} 
+    if (nReactiveSites != 0 ){
 	BondedReactiveMonomers.clear();
-    auto edges=ingredients.getMolecules().getEdges();
-    for(auto it=edges.begin();it!=edges.end();++it){
-      auto MonID1(it->first.first);
-      auto MonID2(it->first.second);
-      if(ingredients.getMolecules()[MonID1].isReactive() && ingredients.getMolecules()[MonID2].isReactive())
-        addBondedPair(MonID1,MonID2,ingredients.getMolecules().getAge());
+        auto edges=ingredients.getMolecules().getEdges();
+        for(auto it=edges.begin();it!=edges.end();++it){
+        auto MonID1(it->first.first);
+        auto MonID2(it->first.second);
+        if(ingredients.getMolecules()[MonID1].isReactive() && ingredients.getMolecules()[MonID2].isReactive())
+            addBondedPair(MonID1,MonID2,ingredients.getMolecules().getAge());
+        }
     }
 	std::cout << "done\n";
 }
