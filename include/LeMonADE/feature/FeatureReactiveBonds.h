@@ -255,20 +255,34 @@ public:
     
     uint32_t getNReactedBonds() const {return nReactedBonds;};
     uint32_t getNReactiveSites() const {return nReactiveSites;};
-    //returns the bond table of the reacted reactive monomers.
-    std::map<BondPair,edge_type> getBondedMonomers()const {return BondedReactiveMonomers;}
+    //!returns the bond table of the reacted reactive monomers.
+    std::map<BondPair,edge_type> getBondedMonomers()const {return BondedReactiveMonomers;};
     //! returns false if the bond does not exist
     bool checkReactiveBondExists(uint32_t Mon1, uint32_t Mon2) const 
     {
       BondPair edge_key(std::min(Mon1,Mon2),std::max(Mon1,Mon2));
       return (BondedReactiveMonomers.find(edge_key) != BondedReactiveMonomers.end()); 
     }
+    //!
+    std::map<uint32_t,uint32_t> getUnreactiveMonomers() const {return UnbondedReactiveMonomers;};
+    //!
+    uint32_t getNUnreactedMonomers()const{return UnbondedReactiveMonomers.size();}
+    //!
+    bool checkCapableFormingBonds(uint32_t MonID )const { return (UnbondedReactiveMonomers.find(MonID) != UnbondedReactiveMonomers.end()); }
+    //!get extent of reaction 
     double getConversion() const {return (double(nReactedBonds*2))/(double(nReactiveSites));}
     
 private: 
   uint32_t nReactedBonds, nReactiveSites;
   //! holds all bonded reactive monomers during simulation
   std::map<BondPair, edge_type> BondedReactiveMonomers;
+  //! holds the ids of all reactive monomers which can have another bonds
+  std::map<uint32_t,uint32_t> UnbondedReactiveMonomers; 
+  //!
+//   void addReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers.emplace(MonID,value);} // adds a new entry if the 
+  void addReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers[MonID]=value;} // adds a new entry if the 
+  //! 
+  void eraseReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers.erase(UnbondedReactiveMonomers.find(MonID));}
   //!add a bond to the container BondedReactiveMonomers
   void addBondedPair(uint32_t Monomer1, uint32_t Monomer2, uint32_t attribute=0){
     BondPair edge_key(std::min(Monomer1,Monomer2),std::max(Monomer1,Monomer2));
@@ -281,6 +295,7 @@ private:
     it=BondedReactiveMonomers.find(edge_key);
     BondedReactiveMonomers.erase(it);
   }
+  
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -399,7 +414,14 @@ template<class IngredientsType, class SpecializedMove>
 void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove>& move)
 {
   nReactedBonds++;
-  addBondedPair(move.getIndex(),move.getPartner(),ing.getMolecules().getAge());
+  auto MonID(move.getIndex()); 
+  auto Partner(move.getPartner());
+  addBondedPair(MonID,Partner,ing.getMolecules().getAge());
+  if (ing.getMolecules()[MonID].getNumMaxLinks()==ing.getMolecules().getNumLinks(MonID) )
+    eraseReactiveMonomer(MonID);
+  if (ing.getMolecules()[Partner].getNumMaxLinks()==ing.getMolecules().getNumLinks(Partner) )
+    eraseReactiveMonomer(Partner);
+  
 }
 /******************************************************************************/
 /**
@@ -414,7 +436,12 @@ template<class IngredientsType, class SpecializedMove>
 void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveBreakBase<SpecializedMove>& move)
 {
   nReactedBonds--;
-  eraseBondedPair(move.getIndex(),move.getPartner());
+  auto MonID(move.getIndex()); 
+  auto Partner(move.getPartner());
+  eraseBondedPair(MonID,Partner);
+  addReactiveMonomer(MonID,ing.getMolecules().getAge());
+  addReactiveMonomer(Partner,ing.getMolecules().getAge());
+  
 }
 /******************************************************************************/
 /**
@@ -433,6 +460,7 @@ void FeatureReactiveBonds::synchronize(IngredientsType& ingredients)
 	{
 		if ( ingredients.getMolecules()[i].isReactive() )
 		{
+            addReactiveMonomer(i,ingredients.getMolecules().getAge());
 			uint32_t NLinks(ingredients.getMolecules().getNumLinks(i));
 			uint32_t nIrreversibleBonds=0;
 			for (uint32_t n = 0 ; n < NLinks ;n++)
@@ -443,6 +471,8 @@ void FeatureReactiveBonds::synchronize(IngredientsType& ingredients)
 				else
 					nIrreversibleBonds++;
 			}
+			if(ingredients.getMolecules()[i].getNumMaxLinks()-ingredients.getMolecules().getNumLinks(i) != 0)
+              addReactiveMonomer(i,ingredients.getMolecules().getAge());
 			nReactiveSites+=(ingredients.getMolecules()[i].getNumMaxLinks()-nIrreversibleBonds);
 		}
 	}
