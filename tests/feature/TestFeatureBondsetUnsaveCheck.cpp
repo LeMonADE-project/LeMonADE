@@ -215,14 +215,6 @@ TEST_F(FeatureBondsetTestUnsaveCheck,checkConnectmMoveSc)
 	ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
 	ingredients.modifyMolecules()[1].setAllCoordinates(18,0,0);
 
-	ingredients.modifyMolecules()[0].setReactive(true);
-	ingredients.modifyMolecules()[1].setReactive(true);
-	ingredients.modifyMolecules()[0].setNumMaxLinks(1);
-	ingredients.modifyMolecules()[1].setNumMaxLinks(1);
-	EXPECT_TRUE (ingredients.getMolecules()[0].isReactive() );
-	EXPECT_TRUE(ingredients.getMolecules()[1].isReactive() );
-	EXPECT_EQ(ingredients.getMolecules()[0].getNumMaxLinks(),1);
-	EXPECT_EQ(ingredients.getMolecules()[1].getNumMaxLinks(),1);
 
 	ingredients.modifyBondset().addBond(2,0,0,17);
 	ingredients.modifyBondset().addBond(-2,0,0,20);
