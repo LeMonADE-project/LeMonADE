@@ -232,8 +232,9 @@ class FeatureBondset : public Feature
 	  if (ID == 0 ) return true; 
 	  ID--;
           auto bond(molecules[MonID].getVector3D()-molecules[ID].getVector3D());
-	  if (!bondset.isValidStrongCheck( bond ) && bond.getLength()<3.) return false; // otherwise I could get xtraps 
-          return true;
+	  if (!bondset.isValidStrongCheck( bond ) ) return false; 
+      if ( bond.getLength()>3.) return false; // otherwise I could get xtraps 
+      return true;
   }
   
   /**
