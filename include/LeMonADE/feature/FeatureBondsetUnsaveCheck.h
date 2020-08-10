@@ -63,6 +63,32 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
   // this is neccessary because we overwrite one checkMove in the following and 
   // therefore we need to explicitly load the other (overloaded ) checkMove-function.
   using FeatureBondset<BondSetType>::checkMove;
+
+   /**
+   * @brief Overloaded for MoveLocalBase. See MoveLocalSc and MoveLocalBcc
+   *
+   * @details Checks if the new bond for this move of type LocalMoveType is valid but no detailed check maybe across the boundary.
+   * Returns if move is allowed (\a true ) or rejected (\a false ).
+   *
+   * @param [in] ingredients A reference to the IngredientsType - mainly the system.
+   * @param [in] move A reference to LocalMoveType.
+   * @return if move is allowed (true) or rejected (false).
+   */
+  template<class IngredientsType,class LocalMoveType>
+  bool checkMove(const IngredientsType& ingredients, const MoveLocalBase<LocalMoveType>& move) const
+  {
+
+      //get the number of bond partners of the particle to be moved
+          uint32_t monoIndex=move.getIndex();
+          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+
+          for (size_t j=0; j< molecules.getNumLinks(monoIndex); ++j){
+              if (!bondset.isValid(molecules[molecules.getNeighborIdx(monoIndex,j)].getVector3D()-(molecules[monoIndex].getVector3D()+move.getDir()))) return false;
+          }
+
+          return true;
+  }
+  
   /**
    * @brief Overloaded for MoveConnectBase. 
    *
