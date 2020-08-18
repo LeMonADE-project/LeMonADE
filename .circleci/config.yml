@@ -1,9 +1,9 @@
-version: 2.1
+version: 2
 
 jobs:
   build:
     docker:
-      - image: cimg/base:stable
+      - image: "ubuntu:bionic"
     environment:
       TEST_RESULTS: /tmp/test-results/LeMonADE
     steps:
