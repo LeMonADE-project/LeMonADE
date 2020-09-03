@@ -155,14 +155,14 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 template<class IngredientsType,class MoveType, class ConnectionMoveType>
 void  UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::initialize()
 {
-	std::cout << "Conversion at time " << ingredients.getMolecules().getAge() << " is "<< ingredients.getConversion()<<std::endl;
+// 	std::cout << "Conversion at time " << ingredients.getMolecules().getAge() << " is "<< ingredients.getConversion()<<std::endl;
 
-	if ( ingredients.getNReactiveSites() == 0  )
+	/*if ( ingredients.getNReactiveSites() == 0  )
 	{
 	  std::stringstream errormessage;
 	  errormessage << "UpdaterSimpleConnection::initialize(): The number of possible reactive sites is zero. \n"
 		       << "Check if the system is correctly setup with reactivity!";
 	  throw std::runtime_error(errormessage.str());
-	} 
+	}*/ 
 };
 #endif 	/*LEMONADE_UPDATER_UPDATERSIMPLECONNECTION_H*/

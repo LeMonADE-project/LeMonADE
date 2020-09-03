@@ -161,7 +161,7 @@ protected:
 	//!
 	Lattice<uint32_t> connectionLattice;
     
-    uint32_t maxConnectivity;
+        uint32_t maxConnectivity;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
