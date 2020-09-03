@@ -111,7 +111,7 @@ TEST_F(TestUpdaterSimpleConnectionSc, Conversion)
   UpdaterSimpleConnection<IngredientsType,MoveLocalSc,MoveConnectSc> update(ingredients,10);
   update.initialize();
   // double getConversion(){return (1.*NReactedSites)/(1.*NReactiveSites);}; // NReactedSites=4, NReactiveSites=8
-  EXPECT_EQ( 0.5,update.getConversion());
+  EXPECT_EQ( 0.5,ingredients.getConversion());
   
   
 }

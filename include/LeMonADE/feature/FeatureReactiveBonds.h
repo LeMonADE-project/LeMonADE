@@ -191,9 +191,10 @@ public:
  * @author Toni
  *
  * @class FeatureReactiveBonds
- * @brief This Feature add new bonds between monomers.
+ * @brief This Feature add new bonds between reactive monomers.
  *
- * @details Works only in combination with an excluded volume feature
+ * @details Works only in combination with an excluded volume feature. 
+ * Considers only reactive monomers which are able to form a new bond.
  *
  * @tparam 
  * */
