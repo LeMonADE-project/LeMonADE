@@ -63,7 +63,7 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
   // this is neccessary because we overwrite one checkMove in the following and 
   // therefore we need to explicitly load the other (overloaded ) checkMove-function.
   using FeatureBondset<BondSetType>::checkMove;
-  
+
    /**
    * @brief Overloaded for MoveLocalBase. See MoveLocalSc and MoveLocalBcc
    *
@@ -88,7 +88,6 @@ class FeatureBondsetUnsaveCheck : public FeatureBondset<BondSetType>
 
           return true;
   }
- 
   
   /**
    * @brief Overloaded for MoveConnectBase. 
