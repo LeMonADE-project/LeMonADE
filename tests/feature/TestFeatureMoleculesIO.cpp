@@ -45,6 +45,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/core/ConfigureSystem.h>
 #include <LeMonADE/feature/FeatureMoleculesIO.h>
+#include <LeMonADE/feature/FeatureMoleculesIOUnsaveCheck.h>
 
 using namespace std;
 
@@ -693,6 +694,37 @@ UpdaterReadBfmFile<MyIngredients> inputFile4(filename,testIngredients4,UpdaterRe
    EXPECT_EQ(0,remove(filename.c_str()));
   
   
+}
+
+TEST_F(FeatureMoleculesIOTest,WriteAdditionalBondsAcrossPeriodicBoundaries)
+{
+  typedef LOKI_TYPELIST_1(FeatureMoleculesIOUnsaveCheck) Features;
+  typedef ConfigureSystem<VectorInt3,Features,4> Config;
+  typedef Ingredients < Config> Gin;
+  
+  Gin Tonic;
+  //Load start config
+  UpdaterReadBfmFile<Gin> inputFileStart("tests/WriteReadAdditionalBondsTest.bfm",Tonic,UpdaterReadBfmFile<Gin>::READ_LAST_CONFIG_SAVE);
+  inputFileStart.initialize();
+  inputFileStart.execute();
+  inputFileStart.cleanup();
+  
+  Tonic.modifyMolecules()[1].modifyVector3D()+=VectorInt3(128,128,128);
+  
+  //now create file with the information of the start config
+  string filename("tests/tmpMoleculesAddRemoveOVERWRITE.bfm");
+  AnalyzerWriteBfmFile<Gin> outputFile(filename,Tonic,AnalyzerWriteBfmFile<Gin>::OVERWRITE);
+  outputFile.initialize();
+  outputFile.execute();
+  
+  Gin Fizz;
+  UpdaterReadBfmFile<Gin> inputFile(filename,Fizz,UpdaterReadBfmFile<Gin>::READ_LAST_CONFIG_SAVE);
+  inputFile.initialize();
+  inputFile.execute();
+  EXPECT_EQ(130,Fizz.getMolecules()[1].getVector3D().getX());
+  
+  
+  EXPECT_EQ(0,remove(filename.c_str()));
 }
 
 TEST_F(FeatureMoleculesIOTest,CompressedSolventLowDensity)

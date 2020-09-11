@@ -111,51 +111,63 @@ void WriteMcs<IngredientsType>::writeStream(std::ostream& strm)
 
 	//write command and age
 	contents<<"\n!mcs="<< molecules.getAge();
-
-	//write monomers, bonds,solvents
-	for(size_t n=0;n< molecules.size();n++)
-	{
-		//if next monomer is solvent, write solvent block
-		if(itCompressedIndices!=compressedIndices.end())
-		{
-			if(itCompressedIndices->first==n)
-			{
-				contents<<writeSolventBlock(*itCompressedIndices);
-				n=itCompressedIndices->second+1;
-				itCompressedIndices++;
-				if(n>=molecules.size()) break;
-			}
-		}
-
-		//write position of next non-solvent
-		if(molecules.getNumLinks(n)==0)
-		{
-			contents<<"\n";
-			contents << molecules[n].getVector3D();
-		}
-		else if(n==0)
-		{
-			contents<<"\n";
-			contents << molecules[n].getVector3D();
-			contents<<" ";
-		}
-		//if the actual monomer is a chainstart, start a new subchain in !mcs Read
-		else if (!molecules.areConnected(n,n-1)){
-			contents<<"\n";
-			contents << molecules[n].getVector3D();
-			contents << " ";
-		}
-		//otherwise write the bond
-		else
-		{
-			contents<<char(this->getSource().getBondset().getBondIdentifier(
-				(molecules[n].getX())-(molecules[n-1].getX()),
-				(molecules[n].getY())-(molecules[n-1].getY()),
-				(molecules[n].getZ())-(molecules[n-1].getZ()) ) );
-
-			contents.flush();
-		}
-	}
+	if (molecules.size() != 0)
+    {
+      VectorInt3  dummyPosition(molecules[0]);
+      //write monomers, bonds,solvents
+      for(auto n=0 ;n< molecules.size();n++)
+      {
+          //if next monomer is solvent, write solvent block
+          if(itCompressedIndices!=compressedIndices.end())
+          {
+              if(itCompressedIndices->first==n)
+              {
+                  contents<<writeSolventBlock(*itCompressedIndices);
+                  n=itCompressedIndices->second+1;
+                  itCompressedIndices++;
+                  if(n>=molecules.size()) break;
+              }
+          }
+          //write position of next non-solvent
+          if(molecules.getNumLinks(n)==0)
+          {
+              contents<<"\n";
+              contents << molecules[n].getVector3D();
+          }
+          else if(n==0)
+          {
+              contents<<"\n";
+              contents << molecules[n].getVector3D();
+              contents<<" ";
+          }
+          //if the actual monomer is a chainstart, start a new subchain in !mcs Read
+          else if (!molecules.areConnected(n,n-1) )
+          {
+              contents<<"\n";
+              contents << molecules[n].getVector3D();
+              contents << " ";
+              if(n != molecules.size()-1 ) dummyPosition=molecules[n+1];
+          }
+          //connections across periodic boundaries cannot be written in one line
+          else if ( (dummyPosition-molecules[n])*(dummyPosition-molecules[n]) >10 )
+          {
+              contents<<"\n";
+              contents << molecules[n].getVector3D();
+              contents << " ";
+              dummyPosition=molecules[n];
+          }
+          //otherwise write the bond
+          else
+          {
+              contents<<char(this->getSource().getBondset().getBondIdentifier(
+                  (molecules[n].getX())-(molecules[n-1].getX()),
+                  (molecules[n].getY())-(molecules[n-1].getY()),
+                  (molecules[n].getZ())-(molecules[n-1].getZ()) ) );
+              dummyPosition=molecules[n];
+              contents.flush();
+          }
+      }
+    }
 
 	contents<<"\n\n";
 	contents.flush();
@@ -396,9 +408,7 @@ public:
 private:
   	  
 	typedef typename IngredientsType::molecules_type::edge_type edge_type;
-	//! Storage for added bonds
-// 	std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds;
-	
+
 	//!Storage for a copy of ingredients of the last time step
 	IngredientsType old_ingredients;
 	
@@ -438,7 +448,6 @@ void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 			  strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
 		}
 		strm<<"\n";
-		
 		old_ingredients=this->getSource();
 		break;}
 	  case C_OVERWRITE: {break;} 
@@ -467,7 +476,8 @@ public:
 	WriteRemoveBonds(const IngredientsType& ingredients, int writeType=C_APPEND):
 	AbstractWrite<IngredientsType>(ingredients),
 	myWriteType(writeType),
-	old_ingredients(ingredients)
+	old_ingredients(ingredients),
+    isFirstExecution(true)
 	{this->setHeaderOnly(false);}
 	
 
@@ -486,6 +496,9 @@ private:
 	
 	//! ENUM-type BFM_WRITE_TYPE specify the write-out
 	int myWriteType;
+    
+    //! bool to decide the first execution 
+    bool isFirstExecution;
 
 };
 /**********************implementation of members    *******************/
@@ -494,35 +507,36 @@ template <class IngredientsType>
 void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
 	switch(myWriteType)
 	{ case C_APPNOFILE:
-	  case C_NEWFILE: 
+	  case C_NEWFILE: if (isFirstExecution) {isFirstExecution=false;old_ingredients=this->getSource();break;}
 	  case C_APPEND: {
-	  
-	      //get a map containing the removed bonds
-	      std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=old_ingredients.getMolecules().getEdges();
-	      //get a map containing the added bond	
-	      std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=this->getSource().getMolecules().getEdges();
-	      
-	      //erases all bond parnters from the map which are unchanged
-	      //the rest of RemovedBonds contains only bonds which are removed during
-	      //the last simulation step, in contrast the rest of the map AddBonds 
-	      //contains only bonds which are newly formed during the last simulation
-	      //step
-	      typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
-	      for(it=AddBonds.begin();it!=AddBonds.end();++it){
-		      if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
-			RemovedBonds.erase(RemovedBonds.find(it->first));
-		      }
-	      }
-	      
-	      //write only the breaks that were removed since the last update
-	      strm<<"!remove_bonds\n";
-	      for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
-		      strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
-	      }
-	      strm<<"\n";
-	      
-	      old_ingredients=this->getSource();
-	      break;}
+
+            //get a map containing the removed bonds
+            std::map<std::pair<uint32_t,uint32_t>,edge_type> RemovedBonds=old_ingredients.getMolecules().getEdges();
+            //get a map containing the added bond	
+            std::map<std::pair<uint32_t,uint32_t>,edge_type> AddBonds=this->getSource().getMolecules().getEdges();
+            
+            //erases all bond parnters from the map which are unchanged
+            //the rest of RemovedBonds contains only bonds which are removed during
+            //the last simulation step, in contrast the rest of the map AddBonds 
+            //contains only bonds which are newly formed during the last simulation
+            //step
+            typename std::map<std::pair<uint32_t,uint32_t>, edge_type>::iterator it;
+            for(it=AddBonds.begin();it!=AddBonds.end();++it){
+                if(RemovedBonds.find(it->first)!=RemovedBonds.end()){
+              RemovedBonds.erase(RemovedBonds.find(it->first));
+                }
+            }
+            
+            //write only the breaks that were removed since the last update
+            strm<<"!remove_bonds\n";
+            for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
+                strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+            }
+            strm<<"\n";
+            
+            old_ingredients=this->getSource();
+	      break;  
+      }
 	  case C_OVERWRITE: {break;} 
 	}
 
