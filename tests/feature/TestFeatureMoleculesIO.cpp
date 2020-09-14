@@ -709,10 +709,10 @@ TEST_F(FeatureMoleculesIOTest,WriteAdditionalBondsAcrossPeriodicBoundaries)
   inputFileStart.execute();
   inputFileStart.cleanup();
   
-  Tonic.modifyMolecules()[1].modifyVector3D()+=VectorInt3(128,128,128);
+  Tonic.modifyMolecules()[5].modifyVector3D()+=VectorInt3(128,128,128);
   
   //now create file with the information of the start config
-  string filename("tests/tmpMoleculesAddRemoveOVERWRITE.bfm");
+  string filename("tests/tmpMoleculesAddRemoveAcrossBoundaries.bfm");
   AnalyzerWriteBfmFile<Gin> outputFile(filename,Tonic,AnalyzerWriteBfmFile<Gin>::OVERWRITE);
   outputFile.initialize();
   outputFile.execute();
@@ -721,7 +721,7 @@ TEST_F(FeatureMoleculesIOTest,WriteAdditionalBondsAcrossPeriodicBoundaries)
   UpdaterReadBfmFile<Gin> inputFile(filename,Fizz,UpdaterReadBfmFile<Gin>::READ_LAST_CONFIG_SAVE);
   inputFile.initialize();
   inputFile.execute();
-  EXPECT_EQ(130,Fizz.getMolecules()[1].getVector3D().getX());
+  EXPECT_EQ(131,Fizz.getMolecules()[5].getVector3D().getX());
   
   
   EXPECT_EQ(0,remove(filename.c_str()));
