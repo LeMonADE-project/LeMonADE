@@ -32,6 +32,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @class Lattice 
  * @brief is a simple multidimensional lattice with value type
+ * @details This lattice works also for non power of 2 dimensions.
  * @todo add the copying of the values of the lattice in the  copy and assign constructor
  */
 
@@ -159,7 +160,7 @@ Lattice< LatticeType >::Lattice(const Lattice& LatticeSource)
 
 	xPro = LatticeSource.xPro;
 	proXY = LatticeSource.proXY;
-
+	
 	lattice = new LatticeType[_boxX*_boxY*_boxZ];
 }
 
@@ -188,7 +189,7 @@ Lattice< LatticeType >&  Lattice< LatticeType >::operator = (const Lattice< Latt
 
     if ( oldSize != newSize )
     {
-         deleteLattice();
+        deleteLattice();
         lattice = new LatticeType[_boxX*_boxY*_boxZ];
     }
 
@@ -202,7 +203,7 @@ Lattice< LatticeType >&  Lattice< LatticeType >::operator = (const Lattice< Latt
 template <class LatticeType>
 void Lattice< LatticeType >::setupLattice()
 {
-
+	deleteLattice();
 	std::cout<<"setting up lattice...";
 
 	// Allocate memory
@@ -221,7 +222,7 @@ void Lattice< LatticeType >::setupLattice()
 template <class LatticeType>
 void Lattice< LatticeType >::setupLattice(uint32_t boxX, uint32_t boxY,uint32_t boxZ )
 {
-
+	deleteLattice();
 	_boxX = boxX;
 	_boxY = boxY;
 	_boxZ = boxZ;

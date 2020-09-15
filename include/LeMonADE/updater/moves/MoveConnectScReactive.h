@@ -25,8 +25,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
-#define LEMONADE_UPDATER_MOVES_MOVECONNECTSC_H
+#ifndef LEMONADE_UPDATER_MOVES_MOVECONNECTSCREACTIVE_H
+#define LEMONADE_UPDATER_MOVES_MOVECONNECTSCREACTIVE_H
 #include <limits>
 #include <LeMonADE/updater/moves/MoveConnectBase.h>
 
@@ -34,7 +34,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  *
- * @class MoveConnectSc
+ * @class MoveConnectScReactive
  *
  * @brief Standard local bfm-move on simple cubic lattice for the scBFM.
  *
@@ -42,10 +42,10 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  **/
 /*****************************************************************************/
 
-class MoveConnectSc:public MoveConnectBase<MoveConnectSc>
+class MoveConnectScReactive:public MoveConnectBase<MoveConnectScReactive>
 {
 public:
-  MoveConnectSc(){
+  MoveConnectScReactive(){
     shellPositions[0]=VectorInt3( 2, 0, 0);
     shellPositions[1]=VectorInt3(-2, 0, 0);
     shellPositions[2]=VectorInt3( 0, 2, 0);
@@ -95,13 +95,15 @@ private:
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing)
+void MoveConnectScReactive::init(const IngredientsType& ing)
 {
   this->resetProbability();
 
   //draw index
-  this->setIndex( (this->randomNumbers.r250_rand32()) %(ing.getMolecules().size()) );
-
+  auto index(this->randomNumbers.r250_rand32() % (ing.getNUnreactedMonomers()));
+  auto it(ing.getUnreactiveMonomers().begin());
+  std::advance( it, index);
+  this->setIndex(it->first);
   //draw direction
   VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
   this->setDir(randomDir);
@@ -118,21 +120,27 @@ void MoveConnectSc::init(const IngredientsType& ing)
  * @param index index of the monomer to be connected
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
+void MoveConnectScReactive::init(const IngredientsType& ing, uint32_t index)
 {
   this->resetProbability();
 
-  //set index
-  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
-    this->setIndex( index );
-  else
-    throw std::runtime_error("MoveConnectSc::init(ing, index): index out of range!");
-
-  //draw direction
-  VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
-  this->setDir(randomDir);
-  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
-  
+  if ( !ing.checkCapableFormingBonds(index) )
+  {
+      this->setIndex( index );
+      this->setDir(shellPositions[0]);
+      this->setPartner(std::numeric_limits<uint32_t>::max());
+  }else{
+    //set index
+    if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+      this->setIndex( index );
+    else
+      throw std::runtime_error("MoveConnectScReactive::init(ing, index): index out of range!");
+      
+    //draw direction
+    VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
+    this->setDir(randomDir);
+    this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
+  }
 }
 
 /*****************************************************************************/
@@ -146,20 +154,26 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index)
  * @param partner index of the monomer to which index is connected
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t partner)
+void MoveConnectScReactive::init(const IngredientsType& ing, uint32_t index, uint32_t partner)
 {
   this->resetProbability();
-
-  //set index
-  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+  if ( !ing.checkCapableFormingBonds(index) )
+  {
     this->setIndex( index );
-  else
-    throw std::runtime_error("MoveConnectSc::init(ing, index): index out of range!");
-
-  //draw direction
-  this->setDir(ing.getMolecules()[partner].getVector3D()-ing.getMolecules()[index].getVector3D());
-  this->setPartner(partner);
+    this->setDir(shellPositions[0]);
+    this->setPartner(std::numeric_limits<uint32_t>::max());
+  }else{
   
+    //set index
+    if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+      this->setIndex( index );
+    else
+      throw std::runtime_error("MoveConnectScReactive::init(ing, index): index out of range!");
+
+    //draw direction
+    this->setDir(ing.getMolecules()[partner].getVector3D()-ing.getMolecules()[index].getVector3D());
+    this->setPartner(partner);
+  }
 }
 
 
@@ -174,27 +188,33 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, uint32_t pa
  * @param bondpartner index of the monomer to connect to 
  **/
 template <class IngredientsType>
-void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir )
+void MoveConnectScReactive::init(const IngredientsType& ing, uint32_t index, VectorInt3 dir )
 {
   this->resetProbability();
+  if ( !ing.checkCapableFormingBonds(index) )
+  {
+      this->setIndex( index );
+      this->setDir(shellPositions[0]);
+      this->setPartner(std::numeric_limits<uint32_t>::max());
+  }else{
+    //set index
+    if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
+      this->setIndex( index );
+    else
+      throw std::runtime_error("MoveConnectScReactive::init(ing, index, bondpartner): index out of range!");
 
-  //set index
-  if( (index >= 0) && (index <= (ing.getMolecules().size()-1)) )
-    this->setIndex( index );
-  else
-    throw std::runtime_error("MoveConnectSc::init(ing, index, bondpartner): index out of range!");
-
-  //set direction
-  if(dir==shellPositions[0] ||
-    dir==shellPositions[1] ||
-    dir==shellPositions[2] ||
-    dir==shellPositions[3] ||
-    dir==shellPositions[4] ||
-    dir==shellPositions[5]  )
-    this->setDir(dir);
-  else
-    throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
-  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+dir));
+    //set direction
+    if(dir==shellPositions[0] ||
+      dir==shellPositions[1] ||
+      dir==shellPositions[2] ||
+      dir==shellPositions[3] ||
+      dir==shellPositions[4] ||
+      dir==shellPositions[5]  )
+      this->setDir(dir);
+    else
+      throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
+    this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+dir));
+  }
 }
 
 /*****************************************************************************/
@@ -207,7 +227,7 @@ void MoveConnectSc::init(const IngredientsType& ing, uint32_t index, VectorInt3 
  * @return True if move is valid. False, otherwise.
  **/
 template <class IngredientsType>
-bool MoveConnectSc::check(IngredientsType& ing)
+bool MoveConnectScReactive::check(IngredientsType& ing)
 {
   /**
    * @todo Think about this approach. Maybe we can put this statement somewhere else? 
@@ -227,7 +247,7 @@ bool MoveConnectSc::check(IngredientsType& ing)
  * @param ing A reference to the IngredientsType - mainly the system
  **/
 template< class IngredientsType>
-void MoveConnectSc::apply(IngredientsType& ing)
+void MoveConnectScReactive::apply(IngredientsType& ing)
 {
 	///@todo Think about the applying of move. Esp. make this independent of the order to avoid confusion!!
 	///@todo check if it makes any difference in this case?!
