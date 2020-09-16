@@ -25,8 +25,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-#ifndef LEMONADE_UPDATER_MOVES_MOVECONNECTBASE_H
-#define LEMONADE_UPDATER_MOVES_MOVECONNECTBASE_H
+#ifndef LEMONADE_UPDATER_MOVES_MOVELABELBASE_H
+#define LEMONADE_UPDATER_MOVES_MOVELABELBASE_H
 
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/utility/Vector3D.h>
@@ -36,19 +36,19 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  *
- * @class MoveConnectBase
+ * @class MoveLabelBase
  *
- * @brief Base class for all simple local bfm-moves. Specialized versions are MoveLocalSc and MoveLocalBcc.
+ * @brief Base class for all simple local bfm-moves. Specialized versions is MoveLabelAlongChain.
  *
  * @details This class provides a base for local bfm-moves. The implementation
- * details (i.e. MoveLocalSc, MoveLocalBcc, optimized versions,etc.) are given by the template parameter.
+ * details (i.e. MoveLabelAlongChain,  optimized versions,etc.) are given by the template parameter.
  * This way, using the "Curiously Recurring Template Pattern (CRTP) to avoid virtual functions
  * but still providing their functionality. A specialized local
  * move type derived from this class must then be constructed in the following
- * way: "class MySpecialMove:public MoveConnectBase<MySpecialMove>".
+ * way: "class MySpecialMove:public MoveLabelBase<MySpecialMove>".
  * It must implement the functions init,check and apply. Calls to the corresponding
  * functions in this base class are then redirected to the specialized implementation.
- * See for an example the class MoveLocalSc.
+ * See for an example the class MoveLabelAlongChain.
  * Since this class simply serves as a common base, the functions apply(), check(), and init() don't do
  * anything particular.
  *
@@ -57,24 +57,22 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-class MoveConnectBase:public MoveBase
+class MoveLabelBase:public MoveBase
 {
  public:
-	//! Returns the index of the Vertex (monomer) in the graph which searches for a partner
+	//! Returns the index of the Vertex (monomer) in the graph which should be moved
 	uint32_t getIndex() const {return index;}
+	
+	//! Returns the direction of the Vertex (monomer) either right or left 
+	const int32_t& getDir() const { return dir;}
+	
+	//!
+	uint32_t getConnectedLabel() const {return connectedLabel;}
 
-	//! Returns the direction of the Vertex (monomer) in the graph which should be moved
-	const VectorInt3& getDir() const { return direction;}
-	
-	//! Returns the index of the Vertex (monomer) in the graph which searches for a partner
-	uint32_t getPartner() const {return bondpartern;}
-	
 	//here come the functions that are implemented by the specialization
 	template <class IngredientsType> void init(const IngredientsType& ingredients);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
-	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, uint32_t partner);
-	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
-
+	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, int32_t dir);
 	template <class IngredientsType> void check(const IngredientsType& ingredients);
 	template <class IngredientsType> void apply(IngredientsType& ingredients);
 
@@ -85,42 +83,35 @@ class MoveConnectBase:public MoveBase
 	 */
 	void setIndex(uint32_t i) {index=i;}
 
-	//! potential bond partner 
-	void setPartner(uint32_t i) {bondpartern=i;}
-
 	/**
 	 * @brief Set the move direction of the Vertex (monomer) which should be moved
 	 * @param dir The displacement in direction on the Cartesian-space.
 	 */
-	void setDir(const VectorInt3& dir) {direction=dir;}
-
+	void setDir(const int32_t& dir_) {dir=dir_;}
+	
 	/**
-	 * @brief Set the move direction of the Vertex (monomer) which should be moved
-	 *
-	 * @param dx The displacement in x-direction in the Cartesian space
-	 * @param dy The displacement in y-direction in the Cartesian space
-	 * @param dz The displacement in z-direction in the Cartesian space
+	 * 
 	 */
-	void setDir(const int32_t dx, const int32_t dy, const int32_t dz)
-	{
-		direction.setAllCoordinates(dx,dy,dz);
-	}
+	void setConnectedLabel(uint32_t connectedLabel_) { connectedLabel=connectedLabel_;}
+
+
 	//! Random Number Generator (RNG)
 	RandomNumberGenerators randomNumbers;
 
 
  private:
 
-	//! Index of the Vertex (monomer) in the graph which searches for a partner
+	//! Index of the Vertex (monomer) in the graph which should be moved
 	uint32_t index;
 
 	//! Direction for the move
-	VectorInt3 direction;
+	int32_t dir;
 	
-	//!
-	uint32_t bondpartern;
-	
+	//!starting from 1 
+	uint32_t connectedLabel;
 };
+
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // implementation of the members
@@ -137,7 +128,7 @@ class MoveConnectBase:public MoveBase
 /*****************************************************************************/
 template <class SpecializedMove>
 template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients)
+void MoveLabelBase<SpecializedMove>::init(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients);
 }
@@ -154,14 +145,14 @@ void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients)
 /*****************************************************************************/
 template <class SpecializedMove>
 template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index)
+void MoveLabelBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients, index);
 }
 
 /*****************************************************************************/
 /**
- * @brief Initialize the move with a given monomer index and bond partner. Done by the SpecializedMove.
+ * @brief Initialize the move with a given monomer index and direction. Done by the SpecializedMove.
  *
  * @details Here, this is only redirected to the implementation
  * given in the template parameter
@@ -171,11 +162,10 @@ void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, 
 /*****************************************************************************/
 template <class SpecializedMove>
 template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, VectorInt3 dir)
+void MoveLabelBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, int32_t dir)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients, index, dir);
 }
-
 /*****************************************************************************/
 /**
  * @brief Check if the move is accepted by the system. Done by the SpecializedMove.
@@ -188,7 +178,7 @@ void MoveConnectBase<SpecializedMove>::init(const IngredientsType& ingredients, 
 /*****************************************************************************/
 template <class SpecializedMove>
 template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::check(const IngredientsType& ingredients)
+void MoveLabelBase<SpecializedMove>::check(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->check(ingredients);
 }
@@ -205,7 +195,7 @@ void MoveConnectBase<SpecializedMove>::check(const IngredientsType& ingredients)
 /*****************************************************************************/
 template <class SpecializedMove>
 template <class IngredientsType>
-void MoveConnectBase<SpecializedMove>::apply(IngredientsType& ingredients)
+void MoveLabelBase<SpecializedMove>::apply(IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->apply(ingredients);
 }

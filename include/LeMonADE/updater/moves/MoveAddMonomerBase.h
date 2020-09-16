@@ -79,6 +79,8 @@ public:
   void setReactive(bool reactivity_){reactivity=reactivity_;}
   //! setter function for the maximum number of links the monomer should have 
   void setNumMaxLinks(uint32_t numMaxLinks_){numMaxLinks=numMaxLinks_;}
+  //! setter function for the label 
+  void setLabel(uint32_t label_){label=label_;}
   //! getter function for the monomerTag of the new monomer
   TagType getTag() const{return monomerTag;}
   //! getter function for the position of the new monomer returning a VectorInt3
@@ -89,6 +91,8 @@ public:
   bool isReactive() const {return reactivity;}
   //! getter function for the maximum number of links the monomer should have 
   uint32_t getNumMaxLinks() const {return numMaxLinks;}
+  //! getter function for the label 
+  uint32_t getLabel() const {return label;}
   
 protected:
   void setMonomerIndex(size_t index){monomerIndex=index;}
@@ -107,6 +111,8 @@ private:
   bool reactivity;
   //! the maximum number of links the monomer should have mainly used in feature FeatureConnectionSc
   uint32_t numMaxLinks;
+  //! label for the FeatureLabel
+  uint32_t label;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -25,28 +25,31 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-/**
- * @class Lattice
- * @author Toni Mueller
- * @brief class provides a general lattice 
- */
 
 #include "gtest/gtest.h"
 #include <cstdio>
 #include <sstream>
-#include <LeMonADE/utility/Lattice.h>
+#include <LeMonADE/core/Ingredients.h>
+#include <LeMonADE/core/ConfigureSystem.h>
+#include <LeMonADE/feature/FeatureBondset.h>
+#include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
+#include <LeMonADE/feature/FeatureMoleculesIO.h>
+#include <LeMonADE/feature/FeatureBox.h>
+#include <LeMonADE/feature/FeatureBreak.h>
+#include <LeMonADE/utility/Vector3D.h>
 
+#include <LeMonADE/updater/moves/MoveBreak.h>
+#include <LeMonADE/updater/moves/MoveConnectSc.h>
 
-class TestLattice: public ::testing::Test{
+class TestFeatureBreak : public ::testing::Test
+{
 public:
-//   typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes<>, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
-//   typedef ConfigureSystem<VectorInt3,Features> Config;
-//   typedef Ingredients<Config> IngredientsType;
-// 
-//   IngredientsType ingredients;
-//   const IngredientsType& getIngredients() const {return ingredients;}
+  typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBreak, FeatureExcludedVolumeSc<> ) Features;
+  typedef ConfigureSystem<VectorInt3,Features,17> Config; 
+  typedef Ingredients<Config> Ing;
+  Ing ingredients;
 
-  //redirect cout output
+    //redirect cout output
   virtual void SetUp(){
     originalBuffer=std::cout.rdbuf();
     std::cout.rdbuf(tempStream.rdbuf());
@@ -61,31 +64,29 @@ private:
   std::streambuf* originalBuffer;
   std::ostringstream tempStream;
 };
-TEST_F(TestLattice, Constructor)
-{
-  Lattice<> MyLattice;
-  MyLattice.setupLattice(4,4,4);
-  MyLattice.setLatticeEntry(3,7,12,17);
-  Lattice<> MyLattice2(MyLattice);
-  MyLattice2.setupLattice();
-//   EXPECT_EQ(MyLattice2.getLatticeEntry(3,7,12),0);
-}
-TEST_F(TestLattice, Functionality)
-{
 
-  Lattice<> MyLattice;
-  MyLattice.setupLattice(4,4,4);
-  EXPECT_EQ(MyLattice.getLatticeEntry(0,2,0),0);
-  EXPECT_EQ(MyLattice.getLatticeEntry(0,6,0),0);
-  MyLattice.setLatticeEntry(0,2,0,17);
-  EXPECT_EQ(MyLattice.getLatticeEntry(0,2,0),17);
-  EXPECT_EQ(MyLattice.getLatticeEntry(0,6,0),17);
-  VectorInt3 Pos(0,2,0);
-  EXPECT_EQ(MyLattice.getLatticeEntry(Pos),17);
-  VectorInt3 NewPos(12,23,19);
-  MyLattice.moveOnLattice(Pos,NewPos);
-  EXPECT_EQ(MyLattice.getLatticeEntry(NewPos),17);
-  MyLattice.clearLattice();
-  EXPECT_EQ(MyLattice.getLatticeEntry(NewPos),0);
- 
+
+TEST_F(TestFeatureBreak, MoveBreakBad)
+{
+    ingredients.setBoxX(12);
+    ingredients.setBoxY(12);
+    ingredients.setBoxZ(12);
+    ingredients.setPeriodicX(1);
+    ingredients.setPeriodicY(1);
+    ingredients.setPeriodicZ(1);
+    ingredients.modifyMolecules().resize(2);
+    ingredients.modifyMolecules()[0].setAllCoordinates(0,0,0);
+    ingredients.modifyMolecules()[1].setAllCoordinates(2,0,0);
+    ingredients.modifyMolecules().connect(0,1);
+    ingredients.modifyBondset().addBond(2,0,0,77);
+    ingredients.modifyBondset().addBond(-2,0,0,75);
+    ingredients.synchronize(ingredients);
+    
+    MoveBreak breakbad;
+    breakbad.init(ingredients);
+    EXPECT_TRUE(breakbad.check(ingredients)); 
+    breakbad.apply(ingredients);
+    
+    breakbad.init(ingredients,0,1);
+    EXPECT_FALSE(breakbad.check(ingredients));
 }

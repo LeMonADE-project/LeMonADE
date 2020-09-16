@@ -25,18 +25,17 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 --------------------------------------------------------------------------------*/
 
-
 /*****************************************************************************/
 /**
  * @file
- * @brief Tests for UpdaterAbstractCreate
+ * @brief Tests for the class MoveConnectSc
+ * @author Toni 
  * */
 /*****************************************************************************/
 
-#include "gtest/gtest.h"
+#include <limits>
 
-#include <cstdio>
-#include <sstream>
+#include "gtest/gtest.h"
 
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/core/Ingredients.h>
@@ -44,19 +43,19 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureConnectionSc.h>
 #include <LeMonADE/feature/FeatureReactiveBonds.h>
-#include <LeMonADE/updater/moves/MoveConnectSc.h>
-#include <LeMonADE/updater/moves/MoveLocalSc.h>
-#include <LeMonADE/updater/UpdaterSimpleConnection.h>
 
-class TestUpdaterSimpleConnectionSc: public ::testing::Test{
+#include <LeMonADE/updater/moves/MoveBreak.h>
+
+
+class TestmoveBreak: public ::testing::Test{
 public:
-
-  typedef LOKI_TYPELIST_4(FeatureMoleculesIO,FeatureReactiveBonds, FeatureConnectionSc, FeatureExcludedVolumeSc< FeatureLatticePowerOfTwo <uint8_t> >) Features;
-  typedef ConfigureSystem<VectorInt3,Features> Config;
+  typedef LOKI_TYPELIST_2( FeatureMoleculesIO, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
+  typedef ConfigureSystem<VectorInt3,Features,3> Config;
   typedef Ingredients<Config> IngredientsType;
-  
+
   IngredientsType ingredients;
-  
+  const IngredientsType& getIngredients() const {return ingredients;}
+
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=std::cout.rdbuf();
@@ -71,10 +70,10 @@ public:
 private:
   std::streambuf* originalBuffer;
   std::ostringstream tempStream;
-
 };
 
-TEST_F(TestUpdaterSimpleConnectionSc, Conversion)
+
+TEST_F(TestmoveBreak, checkAll)
 {
   ingredients.setBoxX(16);
   ingredients.setBoxY(16);
@@ -85,33 +84,17 @@ TEST_F(TestUpdaterSimpleConnectionSc, Conversion)
   ingredients.modifyBondset().addBFMclassicBondset();
   ingredients.modifyMolecules().addMonomer(8,8,8);
   ingredients.modifyMolecules().addMonomer(10,8,8);
-  ingredients.modifyMolecules().addMonomer(10,10,8);
-  ingredients.modifyMolecules().addMonomer(8,4,8);
-  ingredients.modifyMolecules().addMonomer(8,6,8);
+  ingredients.modifyMolecules().addMonomer(8,10,8);
   ingredients.modifyMolecules().connect(0,1);
-  ingredients.modifyMolecules().connect(1,2);
-  ingredients.modifyMolecules().connect(3,4);
-
-  ingredients.modifyMolecules()[0].setReactive(true);
-  ingredients.modifyMolecules()[0].setNumMaxLinks(4);
-  
-  ingredients.modifyMolecules()[1].setReactive(true);
-  ingredients.modifyMolecules()[1].setNumMaxLinks(2);
-  
-  ingredients.modifyMolecules()[2].setReactive(false);
-  ingredients.modifyMolecules()[2].setNumMaxLinks(2);
-  
-  ingredients.modifyMolecules()[3].setReactive(true);
-  ingredients.modifyMolecules()[3].setNumMaxLinks(2);
-  
-  ingredients.modifyMolecules()[4].setReactive(true);
-  ingredients.modifyMolecules()[4].setNumMaxLinks(1);
   EXPECT_NO_THROW(ingredients.synchronize());
+  EXPECT_EQ(3,ingredients.getMolecules().size());
+  EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
+  MoveBreak move;
   
-  UpdaterSimpleConnection<IngredientsType,MoveLocalSc,MoveConnectSc> update(ingredients,10);
-  update.initialize();
-  // double getConversion(){return (1.*NReactedSites)/(1.*NReactiveSites);}; // NReactedSites=4, NReactiveSites=8
-  EXPECT_EQ( 0.5,ingredients.getConversion());
-  
-  
+  move.init(ingredients,2);
+  EXPECT_FALSE(move.check(ingredients));
+  move.init(ingredients,0);
+  EXPECT_TRUE(move.check(ingredients));
+  move.apply(ingredients);
+  EXPECT_FALSE(ingredients.getMolecules().areConnected(0,1));
 }

@@ -60,7 +60,7 @@ public:
    * @param steps MCS per cycle to performed by execute()
    */
   UpdaterSimpleConnection(IngredientsType& ing,uint32_t steps = 1 )
-  :ingredients(ing),nsteps(steps),NReactedSites(0),NReactiveSites(0){}
+  :ingredients(ing),nsteps(steps){}
 
   
  
@@ -92,21 +92,11 @@ public:
    *
    **/
   virtual void cleanup(){};
-
-  
-  //! get conversion of the reaction process
-  double getConversion(){return (double(NReactedSites))/(double(NReactiveSites));};
   
 protected:
   
   //! A reference to the IngredientsType - mainly the system
   IngredientsType& ingredients;
-  
-  //! number of monomers which could have a reaction bond
-  uint32_t NReactiveSites;
-
-  //! number of already reacted monomers
-  uint32_t NReactedSites;
   
   //! Specialized move to be used for the movement of the monomers 
   MoveType move;
@@ -135,39 +125,27 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 
 	for(int n=0;n<nsteps;n++)
 	{
-		// std::vector<uint32_t> TagedMonomers;
-
-		for(size_t m=0;m<ingredients.getMolecules().size();m++)
-		{
-			// if( ingredients.getMolecules()[m].isReactive() )
-			//	 TagedMonomers.push_back(m);
-
-			move.init(ingredients);
-
-			if(move.check(ingredients)==true)
-			{
-				move.apply(ingredients);
-			}
-			else // move is reject due to e.g. excluded volume, bond length, Metropolis etc
-			{
-				// as we connect as face-to-face colliding algorithm
-				// use the move direction in previous check as destination direction
-				if( ingredients.getMolecules()[move.getIndex()].isReactive() )
-				{
-					// collision reaction
-					connectionMove.init(ingredients,move.getIndex(), 2*move.getDir());
-
-					if ( connectionMove.check(ingredients) )
-					{
-						connectionMove.apply(ingredients);
-						NReactedSites+=2; // to check
-					}
-				}
-			}
-		}
-
-		ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+1);
-	}
+      // spacial move
+      for(size_t m=0;m<ingredients.getMolecules().size();m++)
+      {
+        move.init(ingredients);
+        if(move.check(ingredients)==true)
+        {
+            move.apply(ingredients);
+        }
+      }
+      //connection move
+      for(size_t m=0;m<ingredients.getMolecules().size();m++)
+      {
+        connectionMove.init(ingredients);
+        if ( connectionMove.check(ingredients) )
+        {
+            connectionMove.apply(ingredients);
+        }
+      }
+      //increase time 
+      ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+1);
+    }
 // 	std::cout <<"Conversion at "<<ingredients.getMolecules().getAge() << " is " << getConversion()  << std::endl;
 // 	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " with " << (((1.0*nsteps)*ingredients.getMolecules().size())/(difftime(time(NULL), startTimer)) ) << " [attempted connections/s]" <<std::endl;
 // 	std::cout<<"connection mcs "<<ingredients.getMolecules().getAge() << " passed time " << ((difftime(time(NULL), startTimer)) ) << " with " << nsteps << "connection MCS "<<std::endl;
@@ -177,32 +155,14 @@ bool UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::execu
 template<class IngredientsType,class MoveType, class ConnectionMoveType>
 void  UpdaterSimpleConnection<IngredientsType,MoveType,ConnectionMoveType>::initialize()
 {
-	for(size_t i = 0 ; i < ingredients.getMolecules().size(); i++ )
-	{
-		if ( ingredients.getMolecules()[i].isReactive() )
-		{
-			uint32_t NLinks(ingredients.getMolecules().getNumLinks(i));
-			uint32_t nIrreversibleBonds=0;
-			for (uint32_t n = 0 ; n < NLinks ;n++)
-			{
-				uint32_t neighbor(ingredients.getMolecules().getNeighborIdx(i,n));
-				if( ingredients.getMolecules()[neighbor].isReactive() )
-					NReactedSites++;
-				else
-					nIrreversibleBonds++;
-			}
-			NReactiveSites+=(ingredients.getMolecules()[i].getNumMaxLinks()-nIrreversibleBonds);
-		}
-	}
+// 	std::cout << "Conversion at time " << ingredients.getMolecules().getAge() << " is "<< ingredients.getConversion()<<std::endl;
 
-	std::cout << NReactedSites <<" "<<NReactiveSites<<" "<<getConversion()<<std::endl;
-
-	if ( NReactiveSites == 0  )
+	/*if ( ingredients.getNReactiveSites() == 0  )
 	{
 	  std::stringstream errormessage;
 	  errormessage << "UpdaterSimpleConnection::initialize(): The number of possible reactive sites is zero. \n"
 		       << "Check if the system is correctly setup with reactivity!";
 	  throw std::runtime_error(errormessage.str());
-	} 
+	}*/ 
 };
 #endif 	/*LEMONADE_UPDATER_UPDATERSIMPLECONNECTION_H*/
