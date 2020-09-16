@@ -107,6 +107,7 @@ This library has been used in the following publications (without guarantee for 
 * M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 49, 9215-9227 (2016)](http://dx.doi.org/10.1021/acs.macromol.6b01712)
 * C. Jentzsch, R. Dockhorn, J.-U. Sommer; [Parallel Processing and Applied Mathematics. Lecture Notes in Computer Science, vol 9574. pp 301-311 (2016)](http://dx.doi.org/10.1007/978-3-319-32152-3_28)
 * M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 52, 2616–2626 (2019)](https://doi.org/10.1021/acs.macromol.9b00010)
+* T. Müller, J.-U. Sommer, M. Lang; [Soft Matter, 15, 3671-3679  (2019)](https://doi.org/10.1039/C9SM00292H)
 
 ## License
 
