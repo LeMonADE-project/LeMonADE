@@ -18,3 +18,10 @@ LeMonADE 2.1
 * modify FeatureAttribute: now uses a template parameter `FeatureAttribute<>`, default=`int32_t`
 * improvement of utilities: DistanceCalculation
 * introduce continuous integration: CircleCi
+
+LeMonADE 2.2
+* add moveable Tags
+* add an updater for a swelling box
+* add analyzers for the calculation of the mean-square displacement
+* add various features and moves to enable reactive and reversible bonds
+
