@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -45,20 +45,18 @@ SlowBondset::SlowBondset():bondsetLookup(0),lookupOffset(0){}
  * @param copyBondSet
  */
 SlowBondset::SlowBondset(const SlowBondset& copyBondSet):
-  lookupOffset(copyBondSet.lookupOffset)
+  FastBondset(), lookupOffset(copyBondSet.lookupOffset)
 	    {
 #ifdef DEBUG
-		// check call of copy constructor 
+		// check call of copy constructor
 	        std::cout << "Bondset copy constructor" << std::endl;
 #endif /*DEBUG*/
 		//copy bondset
 		this->BondVectors=copyBondSet.BondVectors;
-		
+
 	        // perform the lookup update
 		  // set manually field pointer to 0 to avoid memory leak
 		this->bondsetLookup=NULL;
-		  // set synchronized bool to false to refresh lookup
-		this->lookupSynchronized=false;
 		  // perform the reset
 		this->updateLookupTable();
 	    }
@@ -94,10 +92,10 @@ void SlowBondset::addBond(VectorInt3 _bondVector, int32_t _identifier)
 
   bool vectorExists=false;
   bool idExists=false;
-  
+
   //check if bondvector already exists in the set
   for(iterator it=BondVectors.begin();it!=BondVectors.end();++it){
-    
+
     if(it->second==_bondVector){
       vectorExists=(it->second==_bondVector);
       break;
@@ -107,24 +105,24 @@ void SlowBondset::addBond(VectorInt3 _bondVector, int32_t _identifier)
       break;
     }
   }
-    
+
   //add the bond, if it does not exist already, throw exception otherwise
   if(!(idExists||vectorExists)){
     std::cout<<" accepted bond with id "<<_identifier<<std::endl;
     BondVectors[_identifier]=_bondVector;
   }
   else{
-    
+
     std::stringstream errormessage;
-    
+
     errormessage<<"SlowBondset::addBond(VectorInt3 bondVector):\n"
 	<<"bond vector with components "
 	<<_bondVector.getX()<<" "<<_bondVector.getY()<<" "<<_bondVector.getZ()
 	<<"\n or identifier "<<_identifier<<" already existent";
-	
+
     throw std::runtime_error(errormessage.str());
   }
-  
+
   //lookup table is now out of sync
   lookupSynchronized=false;
 }
@@ -162,9 +160,9 @@ void SlowBondset::updateLookupTable()
   //execute only if out of sync
   if(!lookupSynchronized){
     resetLookupTable();
-    
+
     std::cout<<"setting up bondset lookup\n";
-    
+
     //if no bonds are set, the lookup holds only a dummy value at 0,0,0
     if(size()==0){
       bondsetLookup=new bool**;
@@ -193,20 +191,20 @@ void SlowBondset::updateLookupTable()
       int32_t lookupSize=2*(lookupOffset)+1;
       //now allocate memory for bondsetLookup and set all vectors to false
       bondsetLookup=new bool**[lookupSize];
-      
+
       for(int32_t i=0;i<lookupSize;++i){
 	bondsetLookup[i]=new bool*[lookupSize];
-	
+
 	for(int32_t j=0;j<lookupSize;++j){
 	  bondsetLookup[i][j]=new bool[lookupSize];
-	  
+
 	  for(int32_t k=0;k<lookupSize;++k){
 	    bondsetLookup[i][j][k]=false;
 	  }
 	}
-	
+
       }
-      
+
       //now set the existing vectors true
       for(it=begin();it!=end();++it){
 	bondsetLookup[it->second.getX()+lookupOffset]
@@ -216,7 +214,7 @@ void SlowBondset::updateLookupTable()
     }
     //lookup table is now synchronized with set of bondvectors
     lookupSynchronized=true;
-  }  
+  }
 }
 
 // Deletes the look-up table
@@ -254,7 +252,7 @@ bool SlowBondset::isValid(const VectorInt3& bondVector ) const
   uint32_t x=bondVector.getX()+lookupOffset;
   uint32_t y=bondVector.getY()+lookupOffset;
   uint32_t z=bondVector.getZ()+lookupOffset;
-  
+
   //if bondvectors are within coordinate range of lookup, see if they are valid
   //lookup offset cannot be negative, so conversion is save
   if(x<=2*uint32_t(lookupOffset) && y<=2*uint32_t(lookupOffset) && z<=2*uint32_t(lookupOffset))

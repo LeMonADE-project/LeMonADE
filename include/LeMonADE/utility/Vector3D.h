@@ -502,11 +502,18 @@ public:
 	  return *this;
 	}
 
-	//! Returns the Vector3D itself
-	Vector3D& getVector3D()
+	//! Returns the const Vector3D itself
+	const Vector3D& getVector3D() const 
 	{
 		  return *this;
 	}
+	
+	//! Returns the modifiable Vector3D itself
+	Vector3D& modifyVector3D() 
+	{
+		  return *this;
+	}
+
 };
 
 /**

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -76,7 +76,9 @@ TEST(Vector3DTest, getterAndSetter) {
 	EXPECT_EQ( 9, vec2A.getVector3D().getY());
 	EXPECT_EQ(-3, vec2A.getVector3D().getZ());
 	EXPECT_EQ(26, vec2A.getVector3D()*vecC.getVector3D());
-
+	
+	EXPECT_NO_THROW(vec2A.modifyVector3D().setX(34));
+	EXPECT_EQ( 34, vec2A.getVector3D().getX());
 
 #ifdef DEBUG
 	EXPECT_ANY_THROW(vec[5] = int(4));
@@ -95,9 +97,9 @@ TEST(Vector3DTest, Constructors) {
 // 	EXPECT_EQ(1, vecI.getX());
 // 	EXPECT_EQ(1, vecI.getY());
 // 	EXPECT_EQ(1, vecI.getZ());
-// 
+//
 // 	Vector3D<double> vecD(2.2);
-// 
+//
 // 	Vector3D<int> vecId(vecD);
 // 	EXPECT_EQ(2, vecId.getX());
 // 	EXPECT_EQ(2, vecId.getY());
@@ -126,10 +128,10 @@ TEST(Vector3DTest, Operators) {
 	EXPECT_EQ(4, vecAssign.getZ());
 
 
-  
+
 //    	Vector3D<int> vec3Crazy(short(2), double(4.4), bool(true));
  	VectorInt3 vec3Crazy(11,22,33);
-	
+
 	VectorFloat3 vecFloat = vec3Crazy;
 	EXPECT_DOUBLE_EQ(11.0, vecFloat.getX());
 	EXPECT_DOUBLE_EQ(22.0, vecFloat.getY());
@@ -142,17 +144,17 @@ TEST(Vector3DTest, Operators) {
 	EXPECT_EQ(4, vecInt.getZ());
 
 	VectorDouble3 vecDouble(1.1, 2.2, int(4) );
-		
+
 	EXPECT_DOUBLE_EQ(27.3, vecInt * vecDouble + 2.5 );
-	
+
 	EXPECT_DOUBLE_EQ(39.7, vecInt*(1.5*vecDouble) + 2.5 );
-	
+
 	VectorFloat3 offset(0.5f,0.5f,0.5f);
-	
+
 	EXPECT_DOUBLE_EQ(21.5, (vecInt - offset)*(vecInt - offset) + offset*offset);
-	
+
 	EXPECT_FLOAT_EQ(27.3, vecInt * VectorFloat3 ( float ( vecDouble.getX() ), float ( vecDouble.getY() ), float ( vecDouble.getZ() ) ) + 2.5 );
-	
+
 	EXPECT_EQ( typeid ( NumericResultTypes < VectorInt3   , VectorDouble3 > ::product_type ), typeid( double ) );
 	EXPECT_EQ( typeid ( NumericResultTypes < VectorFloat3 , VectorDouble3 > ::product_type ), typeid( double ) );
 	EXPECT_EQ( typeid ( NumericResultTypes < VectorLong3  , VectorFloat3  > ::product_type ), typeid( float ) );
@@ -170,7 +172,7 @@ TEST(Vector3DTest, Operators) {
   	EXPECT_EQ( typeid ( NumericResultTypes < VectorUlong3 , VectorInt3    > ::stronger_type ), typeid( VectorLong3 ) );
  	EXPECT_EQ( typeid ( NumericResultTypes < VectorChar3 ,  VectorUlong3  > ::stronger_type ), typeid( VectorLong3 ) );
   	EXPECT_EQ( typeid ( NumericResultTypes < VectorUshort3 ,VectorFloat3  > ::stronger_type ), typeid( VectorFloat3 ) );
-	
+
 }
 
 TEST(Vector3DTest, Normalize) {
@@ -178,10 +180,10 @@ TEST(Vector3DTest, Normalize) {
 	VectorDouble3 b(0.0,0.0,0.0);
 	VectorDouble3 c(std::numeric_limits<double>::infinity(),0.0,0.0);
 	VectorDouble3 d(-1.0*std::numeric_limits<double>::infinity(),0.0,0.0);
-	
+
 	EXPECT_NO_THROW(a.normalize());
 	EXPECT_EQ(a.getLength(),1.0);
-	
+
 	EXPECT_THROW(b.normalize(),std::runtime_error);
 	EXPECT_THROW(c.normalize(),std::runtime_error);
 	EXPECT_THROW(d.normalize(),std::runtime_error);

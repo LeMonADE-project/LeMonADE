@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -47,24 +47,24 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 class TestMoveAddMonomerSc: public ::testing::Test{
 public:
-  typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
+  typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureFixedMonomers,FeatureAttributes<>, FeatureExcludedVolumeSc<FeatureLatticePowerOfTwo<bool> >) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients<Config> IngredientsType;
-  
+
   IngredientsType ingredients;
   const IngredientsType& getIngredients() const {return ingredients;}
-  
+
   //redirect cout output
   virtual void SetUp(){
     originalBuffer=std::cout.rdbuf();
     std::cout.rdbuf(tempStream.rdbuf());
   };
-  
+
   //restore original output
   virtual void TearDown(){
     std::cout.rdbuf(originalBuffer);
   };
-  
+
 private:
   std::streambuf* originalBuffer;
   std::ostringstream tempStream;
@@ -81,14 +81,14 @@ TEST_F(TestMoveAddMonomerSc, initialiseSetterGetter)
   ingredients.setPeriodicZ(true);
   ingredients.modifyBondset().addBFMclassicBondset();
   ingredients.modifyMolecules().addMonomer(8,8,8);
-  
+
   EXPECT_NO_THROW(ingredients.synchronize());
-  
-  MoveAddMonomerSc addmove;
-  
+
+  MoveAddMonomerSc<> addmove;
+
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
-  
+
   //check particle index
   EXPECT_EQ(1,addmove.getMonomerIndex());
   //check probability
@@ -98,33 +98,33 @@ TEST_F(TestMoveAddMonomerSc, initialiseSetterGetter)
   EXPECT_DOUBLE_EQ(0.5,addmove.getProbability());
   addmove.resetProbability();
   EXPECT_DOUBLE_EQ(1.0,addmove.getProbability());
-  
+
   //check setter/getter for type
   addmove.setTag(3);
   EXPECT_EQ(3,addmove.getTag());
-  
+
   //check overwriting of type
   addmove.setTag(9);
   EXPECT_EQ(9,addmove.getTag());
-  
+
   //check setter/getter of position VectorInt3
   VectorInt3 position(0,8,8);
   addmove.setPosition(position);
   EXPECT_EQ(position, addmove.getPosition());
-  
+
   //check overwriting of position VectorInt3
   position.setAllCoordinates(8,8,0);
   addmove.setPosition(position);
   EXPECT_EQ(position, addmove.getPosition());
-  
+
   //check setter/getter of position (int, int, int)
   addmove.setPosition(8,0,8);
   EXPECT_EQ(VectorInt3(8,0,8),addmove.getPosition());
-  
+
   //check overwriting of position (int, int, int)
   addmove.setPosition(0,0,8);
   EXPECT_EQ(VectorInt3(0,0,8),addmove.getPosition());
-  
+
 }
 
 TEST_F(TestMoveAddMonomerSc, checkAndApply)
@@ -138,16 +138,16 @@ TEST_F(TestMoveAddMonomerSc, checkAndApply)
   ingredients.setPeriodicZ(false);
   ingredients.modifyBondset().addBFMclassicBondset();
   ingredients.modifyMolecules().addMonomer(8,8,8);
-  
+
   EXPECT_NO_THROW(ingredients.synchronize());
-  
-  MoveAddMonomerSc addmove;
-  
+
+  MoveAddMonomerSc<> addmove;
+
   // init: set particle index to size()+1, set probability to 0
   addmove.init(ingredients);
   addmove.setTag(5);
   addmove.setPosition(8,8,8);
-  
+
   //check FeatureExcludedVolumeSc (all lattice positions of monomer 0)
   addmove.setPosition(8,8,8);
   EXPECT_FALSE(addmove.check(ingredients));
@@ -177,7 +177,7 @@ TEST_F(TestMoveAddMonomerSc, checkAndApply)
   EXPECT_FALSE(addmove.check(ingredients));
   addmove.setPosition(7,7,7);
   EXPECT_FALSE(addmove.check(ingredients));
-  
+
   //check some free positions
   addmove.setPosition(8,8,6);
   EXPECT_TRUE(addmove.check(ingredients));
@@ -189,7 +189,7 @@ TEST_F(TestMoveAddMonomerSc, checkAndApply)
   EXPECT_TRUE(addmove.check(ingredients));
   addmove.setPosition(9,6,8);
   EXPECT_TRUE(addmove.check(ingredients));
-  
+
   //check box boundaries
   addmove.setPosition(0,0,15);
   EXPECT_FALSE(addmove.check(ingredients));
@@ -203,11 +203,11 @@ TEST_F(TestMoveAddMonomerSc, checkAndApply)
   EXPECT_FALSE(addmove.check(ingredients));
   addmove.setPosition(15,15,15);
   EXPECT_FALSE(addmove.check(ingredients));
-  
+
   // check corner position
   addmove.setPosition(0,0,0);
   EXPECT_TRUE(addmove.check(ingredients));
-  
+
   //apply a move and check consistency
   addmove.apply(ingredients);
   EXPECT_NO_THROW(ingredients.synchronize());

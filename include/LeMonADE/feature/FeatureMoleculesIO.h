@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -52,19 +52,19 @@ class FeatureMoleculesIO:public Feature
 {
 public:
 	typedef LOKI_TYPELIST_2(FeatureBox,FeatureBondset< >) required_features_back;
-	
+
 	FeatureMoleculesIO():numberOfMonomers(0),maxConnectivity(0){}
 	//! Export the relevant functionality for reading bfm-files to the responsible reader object
-	template<class IngredientsType> 
+	template<class IngredientsType>
 	void exportRead(FileImport<IngredientsType>& fileReader);
-	
+
 	//! Export the relevant functionality for writing bfm-files to the responsible writer object
-	template<class IngredientsType> 
+	template<class IngredientsType>
 	void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
 
-	template<class IngredientsType> 
+	template<class IngredientsType>
 	void synchronize(IngredientsType& ingredients);
-	
+
 	/**
 	* @brief Overloaded function to stream all metadata to an output stream
 	* @details Gives the number of vertices (monomers), and maximum connectivity
@@ -75,13 +75,13 @@ public:
 		streamOut << "\tNumber of monomers: " << numberOfMonomers << std::endl;
 		streamOut << "\tmax connectivity: " << maxConnectivity << std::endl;
 	}
-	
+
 	//! add a range of particle indices to be written in compressed (solvent) format
 	void setCompressedOutputIndices(size_t startIdx, size_t stopIdx)
 	{
 		solventIndices[startIdx]=stopIdx;
 	}
-	
+
 	//! add a range of particle indices to be written in compressed (solvent) format
 		void clearCompressedOutputIndices()
 		{
@@ -100,7 +100,7 @@ private:
 	uint numberOfMonomers,maxConnectivity;
 	//monomers to be compressed
 	std::map<size_t,size_t> solventIndices;
-	
+
 };
 
 
@@ -109,13 +109,14 @@ private:
 
 
 /**
-* The function is called by the Ingredients class when an object of type Ingredients 
+* The function is called by the Ingredients class when an object of type Ingredients
 * is associated with an object of type FileImport. The export of the Reads is thus
 * taken care automatically when it becomes necessary.\n
 * Registered Read-In Commands:
 * * !number_of_monomers
 * * !bonds
 * * !add_bonds
+* * !remove_bonds
 * * !mcs
 *
 * @param fileReader File importer for the bfm-file
@@ -129,17 +130,20 @@ void FeatureMoleculesIO::exportRead(FileImport<IngredientsType>& fileReader)
 	fileReader.registerRead("!number_of_monomers", new  ReadNrOfMonomers< IngredientsType > (destination) );
 	fileReader.registerRead("!bonds", new  ReadBonds< IngredientsType > (destination) );
 	fileReader.registerRead("!add_bonds", new  ReadBonds< IngredientsType > (destination) );
+	fileReader.registerRead("!remove_bonds", new  ReadRemoveBonds< IngredientsType > (destination) );
 	fileReader.registerRead("!mcs", new  ReadMcs< IngredientsType > (destination) );
 }
 
 
 /**
-* The function is called by the Ingredients class when an object of type Ingredients 
+* The function is called by the Ingredients class when an object of type Ingredients
 * is associated with an object of type AnalyzerWriteBfmFile. The export of the Writes is thus
 * taken care automatically when it becomes necessary.\n
 * Registered Write-Out Commands:
 * * !number_of_monomers
 * * !bonds
+* * !add_bonds
+* * !remove_bonds
 * * !mcs
 *
 * @param fileWriter File writer for the bfm-file.
@@ -151,6 +155,8 @@ void FeatureMoleculesIO::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& file
 	const IngredientsType& source=fileWriter.getIngredients_();
 	fileWriter.registerWrite("!number_of_monomers", new WriteNrOfMonomers <IngredientsType> (source));
 	fileWriter.registerWrite("!bonds", new WriteBonds <IngredientsType> (source));
+	fileWriter.registerWrite("!add_bonds", new WriteAddBonds<IngredientsType> (source,fileWriter.getCommandType()));
+	fileWriter.registerWrite("!remove_bonds", new WriteRemoveBonds<IngredientsType> (source,fileWriter.getCommandType()));
 	fileWriter.registerWrite("!mcs", new WriteMcs <IngredientsType> (source));
 }
 
@@ -158,7 +164,7 @@ void FeatureMoleculesIO::exportWrite(AnalyzerWriteBfmFile<IngredientsType>& file
 
 
 
-template<class IngredientsType> 
+template<class IngredientsType>
 void FeatureMoleculesIO::synchronize(IngredientsType& ingredients)
 {
 	numberOfMonomers=ingredients.getMolecules().size();

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -76,11 +76,11 @@ TEST_F(FileImportTest,Initialization)
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients < Config> MyIngredients;
   MyIngredients ingredients;
-  
-  
+
+
   //try to open a non-existent file, which should result in an exception
   EXPECT_THROW(FileImport<MyIngredients> nonExistentFile("nofile.bfm",ingredients) ,std::runtime_error );
-  
+
   //Import the file using the class FileImport
   FileImport<MyIngredients> file("tests/fileImportTest.test",ingredients);
 
@@ -91,12 +91,12 @@ TEST_F(FileImportTest,Initialization)
   EXPECT_EQ(&ingredients, &file.getDestination());
   //check if the ingredients got the correct name
   EXPECT_EQ("tests/fileImportTest.test",ingredients.getName());
-  
+
   //check if header and connections were read correctly on initializing the FileImport
-  
+
   //check number of monomers
   EXPECT_EQ(10,ingredients.getMolecules().size());
-  
+
   //check some bond information:
   //number of bonds
   EXPECT_EQ(2, ingredients.getMolecules().getNumLinks(0));
@@ -114,15 +114,15 @@ TEST_F(FileImportTest,Initialization)
   EXPECT_TRUE(ingredients.isPeriodicX());
   EXPECT_FALSE(ingredients.isPeriodicY());
   EXPECT_TRUE(ingredients.isPeriodicZ());
-  
-  
 
-  
+
+
+
 
 }
 
 /* *******************************************
- * in this test the function read() is tested. 
+ * in this test the function read() is tested.
  * *******************************************/
 
 TEST_F(FileImportTest, ReadNextMcs)
@@ -132,7 +132,7 @@ TEST_F(FileImportTest, ReadNextMcs)
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients < Config> MyIngredients;
   MyIngredients ingredients;
-  
+
   //Import the file using the class FileImport
   FileImport<MyIngredients> file("tests/fileImportTest.test",ingredients);
 
@@ -142,15 +142,15 @@ TEST_F(FileImportTest, ReadNextMcs)
   //read fist mcs. the read function should return true, because the file
   //has not reached the end
   EXPECT_TRUE(file.read());
-  
-  //check some positions 
+
+  //check some positions
   VectorInt3 position2; position2.setAllCoordinates(5,5,5);
   VectorInt3 position3; position3.setAllCoordinates(3,5,4);
   VectorInt3 position4; position4.setAllCoordinates(5,7,5);
   EXPECT_EQ(position2,ingredients.getMolecules()[2]);
   EXPECT_EQ(position3,ingredients.getMolecules()[3]);
   EXPECT_EQ(position4,ingredients.getMolecules()[4]);
-  
+
   EXPECT_TRUE(file.read());
   EXPECT_TRUE(file.read());
   //check positions and age again
@@ -162,13 +162,13 @@ TEST_F(FileImportTest, ReadNextMcs)
   EXPECT_EQ(position9,ingredients.getMolecules()[9]);
   //now there is no mcs left and the function should return false
   EXPECT_FALSE(file.read());
-  
+
 }
 
 /* *******************************************
  * test the function registerRead()
- * for this case, make a dummy command that reads a word 
- * from a the in put stream. on the way, the test also 
+ * for this case, make a dummy command that reads a word
+ * from a the in put stream. on the way, the test also
  * checks if the interface close() works.
  * ********************************************/
 
@@ -187,8 +187,8 @@ public:
 };
 
 
-//now define three dummy features, that register 
-//the dummy command. 
+//now define three dummy features, that register
+//the dummy command.
 //the first one registers only one command
 class DummyFeature1:public Feature
 {
@@ -222,7 +222,7 @@ public:
    void addComment(std::string comment){return;}
 };
 
-//the third one tries to register two commands with the same name, 
+//the third one tries to register two commands with the same name,
 //which should fail
 class DummyFeature3:public Feature
 {
@@ -249,19 +249,19 @@ TEST_F(FileImportTest, RegisterRead)
   typedef LOKI_TYPELIST_3(FeatureBox,FeatureBondset<>,DummyFeature1) Features1;
   typedef ConfigureSystem<VectorInt3,Features1> Config1;
   typedef Ingredients<Config1> MyIngredients1;
-  MyIngredients1 ingredients1;	
+  MyIngredients1 ingredients1;
 
   typedef LOKI_TYPELIST_3(FeatureBox,FeatureBondset<>,DummyFeature2) Features2;
   typedef ConfigureSystem<VectorInt3,Features2> Config2;
   typedef Ingredients<Config2> MyIngredients2;
   MyIngredients2 ingredients2;
-  
+
   typedef LOKI_TYPELIST_3(FeatureBox,FeatureBondset<>,DummyFeature3) Features3;
   typedef ConfigureSystem<VectorInt3,Features3> Config3;
   typedef Ingredients<Config3> MyIngredients3;
   MyIngredients3 ingredients3;
-  
- 
+
+
   //Import the file using the class FileImport
   //here we use the first ingredients class, that only knows the command
   // !firstCommand
@@ -273,7 +273,7 @@ TEST_F(FileImportTest, RegisterRead)
 
   EXPECT_EQ("fresh",ingredients1.contents);
   file1.close();
-  
+
   //here we use the second ingredients class, which knows both of the commands
   //used in the testfile
   FileImport<MyIngredients2> file2("tests/fileImportTest2.test",ingredients2);
@@ -284,7 +284,7 @@ TEST_F(FileImportTest, RegisterRead)
 
   EXPECT_EQ("freshLemonade",ingredients2.contents);
   file1.close();
-  
+
   //here we use the third ingredients class, which tries to register two commands
   //with the same command string.
   EXPECT_THROW(FileImport<MyIngredients3> file3("tests/fileImportTest2.test",ingredients3),
@@ -304,21 +304,21 @@ TEST_F(FileImportTest, gotoMcs)
 	MyIngredients ingredients2;
 	//Import the file using the class FileImport
 	FileImport<MyIngredients> file("tests/fileImportTest3.test",ingredients);
-  
+
 	//scan file for !mcs and read-in first frame
 	file.initialize();
 
 	//save the first conformation (mcs=1000), the last conformation(mcs=2000000)
 	//and conformations at mcs=64000 and 236000
-	
+
 	MyIngredients::molecules_type mol1000; 		// first conformation
 	MyIngredients::molecules_type mol2000; 		// second conformation
 	MyIngredients::molecules_type mol64000;		// 32nd conformation
 	MyIngredients::molecules_type mol236000;	// 118th conformation
 	MyIngredients::molecules_type mol2000000;	// 1000th conformation
-	
-	
-	
+
+
+
 	for(size_t n=0;n<=1000;n++)
 	{
 		file.read();
@@ -328,13 +328,13 @@ TEST_F(FileImportTest, gotoMcs)
 		if(n==118) mol236000=ingredients.getMolecules();
 		if(n==1000) mol2000000=ingredients.getMolecules();
 	}
-	
+
 	file.close();
-	
-	
+
+
 	//now read the same file into ingredients2 and use the goto routines
 	FileImport<MyIngredients> file2("tests/fileImportTest3.test",ingredients2);
-	
+
 	//scan file for !mcs and read-in first frame
 	file2.initialize();
 
@@ -345,65 +345,65 @@ TEST_F(FileImportTest, gotoMcs)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol236000[n]);
 	}
-	
+
  	file2.gotoMcs(1000);
  	EXPECT_EQ(ingredients2.getMolecules().getAge(),1000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol1000[n]);
 	}
-	
+
 	file2.read();
 	EXPECT_EQ(ingredients2.getMolecules().getAge(),2000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol2000[n]);
 	}
-// 	
+//
  	file2.gotoMcs(2000000);
  	EXPECT_EQ(ingredients2.getMolecules().getAge(),2000000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol2000000[n]);
 	}
-	
+
  	file2.gotoMcs(64000);
  	EXPECT_EQ(ingredients2.getMolecules().getAge(),64000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol64000[n]);
 	}
-	
+
  	file2.gotoMcs(236001);
  	EXPECT_EQ(ingredients2.getMolecules().getAge(),238000);
-	
+
  	file2.gotoMcs(0);
  	EXPECT_EQ(ingredients2.getMolecules().getAge(),1000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol1000[n]);
 	}
-	
+
  	file2.gotoMcs(3000000);
  	EXPECT_EQ(ingredients2.getMolecules().getAge(),2000000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol2000000[n]);
 	}
-	
+
 	file2.gotoStart();
 	EXPECT_EQ(ingredients2.getMolecules().getAge(),1000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol1000[n]);
 	}
-	
+
 	file2.gotoEnd();
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol2000000[n]);
 	}
-	
+
 	file2.gotoStart();
 	EXPECT_EQ(ingredients2.getMolecules().getAge(),1000);
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
@@ -426,27 +426,27 @@ TEST_F(FileImportTest, gotoMcsSave)
 	MyIngredients ingredients2;
 	//Import the file using the class FileImport
 	FileImport<MyIngredients> file("tests/fileImportTest3.test",ingredients);
-  
+
 	//scan file for !mcs and read-in first frame
 	file.initialize();
 
-	
-	
+
+
 	//save the last configuration in the file. go there step by step
 	MyIngredients::molecules_type mol2000000;	// 1000th conformation
-	
+
 	for(size_t n=0;n<=1000;n++)
 	{
 		file.read();
 		if(n==1000) mol2000000=ingredients.getMolecules();
 	}
-	
+
 	file.close();
-	
-	
+
+
 	//now read the same file into ingredients2 and use the gotoEndSave
 	FileImport<MyIngredients> file2("tests/fileImportTest3.test",ingredients2);
-	
+
 	//scan file for !mcs and read-in first frame
 	file2.initialize();
 
@@ -457,11 +457,11 @@ TEST_F(FileImportTest, gotoMcsSave)
 	{
 		EXPECT_EQ(ingredients2.getMolecules()[n],mol2000000[n]);
 	}
-	
+
 	//also check all bonds in this case
 	for(size_t n=0;n<ingredients2.getMolecules().size();n++)
 	{
-		 
+
 		EXPECT_EQ(ingredients2.getMolecules().getNumLinks(n),mol2000000.getNumLinks(n));
 		for(size_t m=0;m<n;m++)
 		{

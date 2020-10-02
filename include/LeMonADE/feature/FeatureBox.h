@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -43,11 +43,12 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalBase.h>
 #include <LeMonADE/updater/moves/MoveAddMonomerBase.h>
-
+#include <LeMonADE/updater/moves/MoveConnectBase.h>
+#include <LeMonADE/updater/moves/MoveConnectSc.h>
 
 /*****************************************************************/
 /**
- * 
+ *
  * @file
  * @class FeatureBox
  *
@@ -66,16 +67,16 @@ class FeatureBox : public Feature
 {
 
 public:
-	
+
 	//! Default constructor. Set Length=Width=Height=0 and P.B.C. as false (hard walls)
 	FeatureBox();
-	
+
 	//! Default destructor (empty)
 	virtual ~FeatureBox() {};
-	
+
 	//! Returns the number of all possible lattice entries - the volume of the box.
 	uint64_t getNumberOfLatticeSites() const ;
-	
+
 	/**
 	 * @brief Synchronize this feature with the system given as argument
 	 *
@@ -89,7 +90,7 @@ public:
 		assertPeriodicitySet();
 		assertParticlesInBox(ing.getMolecules());
 	};
-	
+
 	/**
 	 * @brief Set the Cartesian x-component of the box (Length).
 	 *
@@ -203,22 +204,22 @@ public:
 	void exportRead(FileImport <IngredientsType>& fileReader)
 	{
 	//  ModelFeature provides an empty exportRead(), which is overwritten here.
-	
+
 	fileReader.registerRead("!box_x",new ReadBoxX <FeatureBox> (*this));
 	fileReader.registerRead("!box_y",new ReadBoxY <FeatureBox> (*this));
 	fileReader.registerRead("!box_z",new ReadBoxZ <FeatureBox> (*this));
 	fileReader.registerRead("!periodic_x",new ReadPeriodicX <FeatureBox> (*this));
 	fileReader.registerRead("!periodic_y",new ReadPeriodicY <FeatureBox> (*this));
 	fileReader.registerRead("!periodic_z",new ReadPeriodicZ <FeatureBox> (*this));
-	
+
 	// EmptyModelFeature is used as the "dead end" of a the genareted class using Loki-typelist
-	// See  GenerateContextType in GenericMonteCarlo.h. 
+	// See  GenerateContextType in GenericMonteCarlo.h.
 	// The call of other independent Feature::exportReads can be handled by using an actual Feature "Holder"
-	// such as ModelFeatureHolder GenerateContextType ... , which triggers function calls 
+	// such as ModelFeatureHolder GenerateContextType ... , which triggers function calls
 	// of the Features and their precedors.
 
 	};
-  
+
 	/**
 	 * @brief Export the relevant functionality for writing bfm-files to the responsible writer object
 	 *
@@ -244,7 +245,7 @@ public:
 	fileWriter.registerWrite("!periodic_y",new WritePeriodicY<FeatureBox>(*this));
 	fileWriter.registerWrite("!periodic_z",new WritePeriodicZ<FeatureBox>(*this));
 	}
-  
+
 	/**
 	 * @brief For all unknown moves: this does nothing
 	 *
@@ -255,13 +256,13 @@ public:
 	 * @param [in] move General move other than MoveLocalBase.
 	 * @return true Always!
 	 */
-	template<class IngredientsType> 
+	template<class IngredientsType>
 	bool checkMove(const IngredientsType& ingredients, const MoveBase& move) const
 	{
 		//accept unknown moves
 		return true;
 	}
-	
+
 
 	//for moves of type MoveLocalBase check periodicity
 
@@ -280,7 +281,7 @@ public:
 	 *
 	 * @todo This implementation of "walls" maybe slow down the algorithm. Discuss a new FeatureWall
 	 */
-	template<class IngredientsType,class LocalMoveType> 
+	template<class IngredientsType,class LocalMoveType>
 	bool checkMove(const IngredientsType& ingredients, const MoveLocalBase<LocalMoveType>& move) const
 	{
 		typename IngredientsType::molecules_type::vertex_type pos=ingredients.getMolecules()[move.getIndex()];
@@ -288,14 +289,43 @@ public:
 		if(	(periodicX || (pos.getX()<(getBoxX()-1) && pos.getX()>=0) ) &&
 			(periodicY || (pos.getY()<(getBoxY()-1) && pos.getY()>=0) ) &&
 			(periodicZ || (pos.getZ()<(getBoxZ()-1) && pos.getZ()>=0) )
-		) 
+		)
 			return true;
 		else
 			return false;
-			
+
 	}
-	
-	
+
+	/**
+	 * @brief Overloaded for MoveConnectSc
+	 *
+	 * @details Returns true if the moves doesn´t violate the p.b.c. esp. the new link is not created of walls.
+	 * The periodicity is set to \a false ,
+	 * the faces of rectangular cuboid behave like hard walls. In fact, the new position \a pos of the monomer can not exceed
+	 * the limit in Length [pos.getX()<(getBoxX()-1)], Width [pos.getY()<(getBoxY()-1)] or Height [pos.getZ()<(getBoxZ()-1)]
+	 * or be smaller than 0 in the corresponding directions. \n
+	 * If the periodicity is set to \a true , the Move is not limited to the (virtual) simulation box.
+	 *
+	 * @param [in] ingredients A reference to the IngredientsType - mainly the system
+	 * @param [in] move General move other than MoveConnectSc.
+	 * @return True if move is allowed with p.b.c. or rejected (false).
+	 *
+	 * @todo This implementation of "walls" maybe slow down the algorithm. Discuss a new FeatureWall
+	 */
+	template<class IngredientsType>
+	bool checkMove(const IngredientsType& ingredients, const MoveConnectSc& move) const
+	{
+		typename IngredientsType::molecules_type::vertex_type targetedPos=ingredients.getMolecules()[move.getIndex()];
+		targetedPos+=move.getDir(); // // pos += P+-(2,0,0)
+		if(	(periodicX || (targetedPos.getX()<(getBoxX()-1) && targetedPos.getX()>=0) ) &&
+			(periodicY || (targetedPos.getY()<(getBoxY()-1) && targetedPos.getY()>=0) ) &&
+			(periodicZ || (targetedPos.getZ()<(getBoxZ()-1) && targetedPos.getZ()>=0) )
+		)
+			return true;
+		else
+			return false;
+
+	}
 
 	/**
 	 * @brief Overloaded for MoveAddMonomerBase(MoveAddMonomerSc and MoveAddMonomerBcc)
@@ -311,24 +341,24 @@ public:
 	 * @return True if move is allowed with p.b.c. or rejected (false).
 	 *
 	 */
-	template<class IngredientsType,class AddMoveType> 
-	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType>& addmove) const
+	template<class IngredientsType,class AddMoveType, class TagType>
+	bool checkMove(const IngredientsType& ingredients, const MoveAddMonomerBase<AddMoveType, TagType>& addmove) const
 	{
 		VectorInt3 pos=addmove.getPosition();
-		
+
 		if(	(periodicX || (pos.getX()<(getBoxX()-1) && pos.getX()>=0) ) &&
 			(periodicY || (pos.getY()<(getBoxY()-1) && pos.getY()>=0) ) &&
 			(periodicZ || (pos.getZ()<(getBoxZ()-1) && pos.getZ()>=0) )
-		) 
+		)
 			return true;
 		else
 			return false;
-			
+
 	}
-	
-	
+
+
 private:
- 
+
   //! Function for asserting then variables \a boxX (Length) has not been set.
   void assertBoxSizeSetX() const ;
 
@@ -337,7 +367,7 @@ private:
 
   //! Function for asserting then variables \a boxZ (Height) has not been set.
   void assertBoxSizeSetZ() const ;
-  
+
   //! Function for asserting then variables \a boxX (Length), \a boxY (Width), \a boxZ (Height) has not been set.
   void assertBoxSizeSet() const ;
 
@@ -349,13 +379,13 @@ private:
 
   //! Function for asserting then variables \a periodicZ (p.b.c in z-direction) has not been set.
   void assertPeriodicitySetZ() const ;
-  
+
   //! Function for asserting then variables \a periodicX, \a periodicY, and \a periodicZ has not been set.
   void assertPeriodicitySet() const ;
-  
+
   template<class MoleculesType>
   void assertParticlesInBox(const MoleculesType& molecules);
-  
+
   //! Holding the information about the Length of simulation box (rectangular cuboid)
   int32_t boxX;
 
@@ -383,7 +413,7 @@ private:
   //! Holding the information if periodicity in z-direction was initialized (false-not set; true-set)
   bool periodicInitZ;
 
-  
+
 };
 
 /**
@@ -393,18 +423,18 @@ private:
  *
  * @param molecules Reference to all Molecules in the system.
  */
-template<class MoleculesType> 
+template<class MoleculesType>
 void FeatureBox::assertParticlesInBox(const MoleculesType& molecules)
 {
-	
-	if( (!isPeriodicX()) || (!isPeriodicY()) || (!isPeriodicZ()) ) 
-	{			
+
+	if( (!isPeriodicX()) || (!isPeriodicY()) || (!isPeriodicZ()) )
+	{
 		for (size_t n=0;n<molecules.size();++n)
 		{
 			if ( ( (!periodicX) && (molecules[n].getX()>=(boxX-1) || molecules[n].getX()<0) )||
 				 ( (!periodicY) && (molecules[n].getY()>=(boxY-1) || molecules[n].getY()<0) )||
 				 ( (!periodicZ) && (molecules[n].getZ()>=(boxZ-1) || molecules[n].getZ()<0) )
-			) 
+			)
 			{
 				std::stringstream errormessage;
 				errormessage<<"**** FeatureBox::synchronize(): particle position of monomer "<<n<< " ("<< molecules[n].getX() <<"," << molecules[n].getY() << "," << molecules[n].getZ() << ") " <<" outside box ***\n";
@@ -412,6 +442,6 @@ void FeatureBox::assertParticlesInBox(const MoleculesType& molecules)
 			}
 		}
 	}
-	
+
 }
 #endif

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -54,15 +54,15 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 class FastBondset
 {
 private:
-	
+
 	//! Look-up table telling if a certain bond-vector is valid.
 	bool bondsetLookup[512];
 
 	//! Translates bond-vector to index in the (fast) look-up table (bondsetLookup).
 	uint32_t bondVectorToIndex(const VectorInt3& bondVector) const;
-	
+
 protected:
-	
+
 	//! Each bond-vector is represented by a std::map <int32_t, VectorInt3>, where the identifier is stored as int32_t
 	std::map < int32_t , VectorInt3> BondVectors;
 
@@ -82,29 +82,29 @@ public:
 
 	//! Standard iterator for map of BondVectors
 	typedef std::map <int32_t, VectorInt3>::const_iterator iterator;
-	
+
 	//! Get identifier by the given bond.
 	int32_t getBondIdentifier(int32_t x,int32_t y,int32_t z) const;
 
 	//! Get bond by its identifier (character)
 	const VectorInt3 getBondVector(int32_t identifier) const;
-	
+
 	//! Adding bond to the allowed set
 	void addBond(VectorInt3 bondVector, int32_t identifier);
 
 	//! Adding bond to the allowed set
 	void addBond(int32_t x, int32_t y, int32_t z, int32_t identifier);
-	
+
 
 	//! Updates the look-up table of bond-vectors
 	void updateLookupTable();
 
 	//! Resets/delete the look-up table of bond-vectors
 	void resetLookupTable();
-	
+
 	//! Check if a vector is a valid bond-vector (i.e. part of the set)
 	bool isValid(const VectorInt3& bondVector) const;
-	
+
 	//! Check if a vector is a valid bond-vector (i.e. part of the set)
 	bool isValidStrongCheck(const VectorInt3& bondVector) const;
 
@@ -121,13 +121,13 @@ public:
 
 	//! Getting the size of the map from outside
 	size_t size() const {return BondVectors.size();}
-	
+
 	//! Adding the predefined set of \b bccBFM-bond-vectors to the map
 	void addBccBFMclassicBondset();
 
 	//! Adding the predefined set of \b scBFM-bond-vectors to the map
 	void addBFMclassicBondset();
-  
+
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ inline bool FastBondset::isValidStrongCheck(const VectorInt3& bondVector) const
  */
 inline uint32_t FastBondset::bondVectorToIndex(const VectorInt3& bondVector) const
 {
-	return (bondVector.getX() & 7) + ((bondVector.getY() &7) << 3) + ((bondVector.getZ() &7) << 6);	
+	return (bondVector.getX() & 7) + ((bondVector.getY() &7) << 3) + ((bondVector.getZ() &7) << 6);
 }
 
 #endif /* LEMONADE_UTILITY_FASTBONDSET_H */

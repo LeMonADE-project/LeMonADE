@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -48,7 +48,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * way: "class MySpecialMove:public MoveLocalBase<MySpecialMove>".
  * It must implement the functions init,check and apply. Calls to the corresponding
  * functions in this base class are then redirected to the specialized implementation.
- * See for an example the class MoveLocalSc. 
+ * See for an example the class MoveLocalSc.
  * Since this class simply serves as a common base, the functions apply(), check(), and init() don't do
  * anything particular.
  *
@@ -56,7 +56,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 /*****************************************************************************/
-template <class SpecializedMove> 
+template <class SpecializedMove>
 class MoveLocalBase:public MoveBase
 {
  public:
@@ -65,7 +65,7 @@ class MoveLocalBase:public MoveBase
 
 	//! Returns the direction of the Vertex (monomer) in the graph which should be moved
 	const VectorInt3& getDir() const { return direction;}
-	
+
 	//here come the functions that are implemented by the specialization
 	template <class IngredientsType> void init(const IngredientsType& ingredients);
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index);
@@ -73,7 +73,7 @@ class MoveLocalBase:public MoveBase
 	template <class IngredientsType> void init(const IngredientsType& ing, uint32_t index, VectorInt3 dir);
 	template <class IngredientsType> void check(const IngredientsType& ingredients);
 	template <class IngredientsType> void apply(IngredientsType& ingredients);
-	
+
  protected:
 	/**
 	 * @brief Set the index of the Vertex (monomer) in the graph which should be moved
@@ -101,15 +101,15 @@ class MoveLocalBase:public MoveBase
 
 	//! Random Number Generator (RNG)
 	RandomNumberGenerators randomNumbers;
-	
-	
+
+
  private:
 
 	//! Index of the Vertex (monomer) in the graph which should be moved
 	uint32_t index;
 
 	//! Direction for the move
-	VectorInt3 direction;  
+	VectorInt3 direction;
 };
 
 
@@ -128,7 +128,7 @@ class MoveLocalBase:public MoveBase
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients);
@@ -145,7 +145,7 @@ void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients)
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients, index);
@@ -162,7 +162,7 @@ void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, ui
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, VectorInt3 dir)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients, dir);
@@ -179,7 +179,7 @@ void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, Ve
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, uint32_t index, VectorInt3 dir)
 {
   static_cast<SpecializedMove*>(this)->init(ingredients, index, dir);
@@ -195,7 +195,7 @@ void MoveLocalBase<SpecializedMove>::init(const IngredientsType& ingredients, ui
  **/
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveLocalBase<SpecializedMove>::check(const IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->check(ingredients);
@@ -212,7 +212,7 @@ void MoveLocalBase<SpecializedMove>::check(const IngredientsType& ingredients)
  * */
 /*****************************************************************************/
 template <class SpecializedMove>
-template <class IngredientsType> 
+template <class IngredientsType>
 void MoveLocalBase<SpecializedMove>::apply(IngredientsType& ingredients)
 {
   static_cast<SpecializedMove*>(this)->apply(ingredients);

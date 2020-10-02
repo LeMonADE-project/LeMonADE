@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -29,7 +29,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * @brief Tests for the classes AnalyzerWriteBfmFile
- * 
+ *
  * @author Martin
  * @date 18.06.2014
  * */
@@ -57,10 +57,10 @@ using namespace std;
 /*****************************************************************************/
 /**
  * @class WriteBfmFileTest
- * @brief prepare system and check functions for AnalyzerWriteBfmFile Analyzer Test 
- * @details when using TEST_F(WriteBfmFileTest, -testname-), an instance of 
- * Ingredients (ingredients) with features Box, Bondset and Attributes is prepared. 
- * To check constructor, GoogleTest needs void functions, that are also provided 
+ * @brief prepare system and check functions for AnalyzerWriteBfmFile Analyzer Test
+ * @details when using TEST_F(WriteBfmFileTest, -testname-), an instance of
+ * Ingredients (ingredients) with features Box, Bondset and Attributes is prepared.
+ * To check constructor, GoogleTest needs void functions, that are also provided
  * in this class \n
  * for large/less output just comment/uncomment the depending parts of the test classes
  * @todo: check FeatureJumps ()?, FeatureSolvent and !add_bonds command
@@ -68,7 +68,7 @@ using namespace std;
 /*****************************************************************************/
 class WriteBfmFileTest: public ::testing::Test{
 protected:
-  //void functions to check constructor(not possible to make explicit contructur assertion 
+  //void functions to check constructor(not possible to make explicit contructur assertion
   void checkflags(string _filename){
     AnalyzerWriteBfmFile<MyIngredients>BfmWriter(_filename, ingredients,4);
     BfmWriter.initialize();
@@ -81,14 +81,14 @@ protected:
     AnalyzerWriteBfmFile<MyIngredients>BfmWriter(_filename, ingredients, AnalyzerWriteBfmFile<MyIngredients>::APPEND);
     BfmWriter.initialize();
   }
-    
+
   //define system
-  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes) Features;
+  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureAttributes<>) Features;
   typedef ConfigureSystem<VectorInt3,Features> Config;
   typedef Ingredients < Config> MyIngredients;
   MyIngredients ingredients;
-  
-  /* suppress cout output for better readability -->un/comment here:*/    
+
+  /* suppress cout output for better readability -->un/comment here:*/
 public:
   //redirect cout output
   virtual void SetUp(){
@@ -128,7 +128,7 @@ TEST_F(WriteBfmFileTest, CheckConstructor)
   ingredients.setPeriodicX(true);
   ingredients.setPeriodicY(true);
   ingredients.setPeriodicZ(false);
-  
+
   ingredients.synchronize(ingredients);
 
   //produce some output
@@ -137,16 +137,16 @@ TEST_F(WriteBfmFileTest, CheckConstructor)
   BfmWriter.initialize();
   BfmWriter.execute();
   BfmWriter.cleanup();
-  
+
   //check if Flags are read correctly (eigther APPEND=0 or NEWFILE=1)
   EXPECT_THROW(checkflags(filename), std::runtime_error);
-  
+
   // check if writer finds existing files correctly
   EXPECT_THROW(checkexistingfile(filename), std::runtime_error);
-  
-  // check fileopener 
+
+  // check fileopener
   EXPECT_NO_THROW(checkfileopener(filename));
-  
+
   remove(filename.c_str());
 }
 
@@ -190,13 +190,13 @@ TEST_F(WriteBfmFileTest, CheckOutput)
   ingredients.modifyMolecules()[1].setAttributeTag(11);
   ingredients.modifyMolecules()[2].setAttributeTag(11);
   ingredients.modifyMolecules()[3].setAttributeTag(22);
-  
+
   ingredients.synchronize(ingredients);
 
   //prepare output file
   string filename("tests/writebfmfile.test");
 
-  /* using explicit definition and execution of writer and reader. 
+  /* using explicit definition and execution of writer and reader.
    * taskmanager not possible: wrong order of writer and reader  */
   AnalyzerWriteBfmFile<MyIngredients> BfmWriter(filename, ingredients, AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
   BfmWriter.initialize();
@@ -240,6 +240,6 @@ TEST_F(WriteBfmFileTest, CheckOutput)
   EXPECT_EQ(11,iningredients.getMolecules()[1].getAttributeTag());
   EXPECT_EQ(11,iningredients.getMolecules()[2].getAttributeTag());
   EXPECT_EQ(22,iningredients.getMolecules()[3].getAttributeTag());
-  
+
   remove(filename.c_str());
 }

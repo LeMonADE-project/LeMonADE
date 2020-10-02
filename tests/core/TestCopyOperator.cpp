@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -28,7 +28,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * @brief Tests for copy constructors
- * 
+ *
  * @author Martin
  * @date 10.05.2015
  * */
@@ -47,7 +47,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 using namespace std;
 
 class CopyOperatorTest: public ::testing::Test{
-  /* suppress cout output for better readability -->un-/comment here: */   
+  /* suppress cout output for better readability -->un-/comment here: */
 public:
   //redirect cout output
   virtual void SetUp(){
@@ -79,13 +79,13 @@ TEST_F(CopyOperatorTest,Molecules)
     ingredients.setPeriodicX(1);
     ingredients.setPeriodicY(1);
     ingredients.setPeriodicZ(0);
-    
+
     //bondset
     //ingredients.modifyBondset().addBFMclassicBondset();
     ingredients.modifyBondset().addBond(2,1,0,23);
     ingredients.modifyBondset().addBond(-2,-1,0,32);
     ingredients.synchronize(ingredients);
-    
+
     //molecules: size, positions, maxConnectivity and connections
     ingredients.modifyMolecules().resize(10);
     for(uint32_t i=0;i<10;i++){
@@ -98,16 +98,16 @@ TEST_F(CopyOperatorTest,Molecules)
     //ingredients.setCompressedOutputIndices(6,9);
     //set age
     ingredients.modifyMolecules().setAge(42);
-    
+
     std::cout<< "preparation of ingredients finished\n";
     ingredients.synchronize(ingredients);
     std::cout<< "synchronization of ingredients finished\n";
-    
-    
+
+
     Ing1 copyOfIngredients(ingredients);
     Ing1 assignedIngredients;
     assignedIngredients=ingredients;
-    
+
     //check size of molecules
     EXPECT_EQ(ingredients.getMolecules().size(),copyOfIngredients.getMolecules().size());
     EXPECT_EQ(ingredients.getMolecules().size(),assignedIngredients.getMolecules().size());
@@ -147,7 +147,7 @@ TEST_F(CopyOperatorTest,Molecules)
 	}
       }
     }
-    
+
     //check box
     EXPECT_EQ(ingredients.getBoxX(),copyOfIngredients.getBoxX());
     EXPECT_EQ(ingredients.getBoxY(),copyOfIngredients.getBoxY());
@@ -167,7 +167,7 @@ TEST_F(CopyOperatorTest,Molecules)
     EXPECT_EQ(ingredients.getBondset().getBondVector(23),assignedIngredients.getBondset().getBondVector(23));
     EXPECT_EQ(ingredients.getBondset().getBondVector(32),copyOfIngredients.getBondset().getBondVector(32));
     EXPECT_EQ(ingredients.getBondset().getBondVector(32),assignedIngredients.getBondset().getBondVector(32));
-    
+
 }
 
 
@@ -185,21 +185,21 @@ TEST_F(CopyOperatorTest,FeatureExcludedVolumeSc)
     ingredients.setPeriodicX(1);
     ingredients.setPeriodicY(1);
     ingredients.setPeriodicZ(1);
-    
+
     //bondset
     //ingredients.modifyBondset().addBond(2,1,0,23);
     //ingredients.synchronize(ingredients);
-    
+
     ingredients.modifyMolecules().resize(4);
     for(uint32_t i=0;i<4;i++){
       ingredients.modifyMolecules()[i].setAllCoordinates(2*i+1,i+1,1);
     }
     ingredients.synchronize(ingredients);
-    
+
     Ing1 copyOfIngredients(ingredients);
     Ing1 assignedIngredients;
     assignedIngredients=ingredients;
-    
+
     for(uint i=0;i<16;i++){
       for(uint j=0;j<16;j++){
 	for(uint k=0;k<16;k++){
@@ -221,11 +221,11 @@ TEST_F(CopyOperatorTest,FeatureExcludedVolumeSc)
 
 TEST_F(CopyOperatorTest,FeatureAttributes)
 {
-    typedef LOKI_TYPELIST_2(FeatureMoleculesIO,FeatureAttributes) Features1;
+    typedef LOKI_TYPELIST_2(FeatureMoleculesIO,FeatureAttributes<>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 ingredients;
-    
+
     //prepare ingredients
     ingredients.setBoxX(16);
     ingredients.setBoxY(16);
@@ -233,21 +233,21 @@ TEST_F(CopyOperatorTest,FeatureAttributes)
     ingredients.setPeriodicX(1);
     ingredients.setPeriodicY(1);
     ingredients.setPeriodicZ(1);
-    
+
     ingredients.modifyMolecules().resize(4);
     for(uint32_t i=0;i<4;i++){
       ingredients.modifyMolecules()[i].setAllCoordinates(2*i+1,i+1,1);
       ingredients.modifyMolecules()[i].setAttributeTag(i+2*i);
     }
     ingredients.synchronize(ingredients);
-    
+
     Ing1 copyOfIngredients(ingredients);
     Ing1 assignedIngredients;
     assignedIngredients=ingredients;
-    
+
     for(uint32_t i=0;i<4;i++){
       EXPECT_EQ(ingredients.getMolecules()[i].getAttributeTag(),copyOfIngredients.getMolecules()[i].getAttributeTag());
       EXPECT_EQ(ingredients.getMolecules()[i].getAttributeTag(),assignedIngredients.getMolecules()[i].getAttributeTag());
     }
-    
+
 }

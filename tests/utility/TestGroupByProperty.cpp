@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -40,9 +40,9 @@ using namespace std;
 TEST(GroupByPropertyTest,CreateGroups)
 {
   Molecules<VectorInt3> molecules;
-  
+
   molecules.resize(20);
-  
+
   //create a tree of monomers
   molecules.connect(0,1);
   molecules.connect(1,2);
@@ -53,7 +53,7 @@ TEST(GroupByPropertyTest,CreateGroups)
   molecules.connect(6,7);
   molecules.connect(6,8);
   molecules.connect(6,9);
-  
+
   //create a second tree of the same structure
   molecules.connect(10,11);
   molecules.connect(11,12);
@@ -64,9 +64,9 @@ TEST(GroupByPropertyTest,CreateGroups)
   molecules.connect(16,17);
   molecules.connect(16,18);
   molecules.connect(16,19);
-  
+
   //set positions
-  
+
   molecules[0].setAllCoordinates(0,0,0);
   molecules[1].setAllCoordinates(2,0,0);
   molecules[2].setAllCoordinates(3,-3,0);
@@ -88,25 +88,25 @@ TEST(GroupByPropertyTest,CreateGroups)
   molecules[17].setAllCoordinates(4,6,10);
   molecules[18].setAllCoordinates(6,3,10);
   molecules[19].setAllCoordinates(4,0,10);
-  
+
   //now group monomers using group_by_property
   //first group into groups with equal number of bonds
   //here, the base type for a group is simply a list of int,
   //while the groups are stored in a std::vector
-  
-  std::vector< list < int32_t > > connectivityGroups;  
+
+  std::vector< list < int32_t > > connectivityGroups;
   group_by_property(molecules,connectivityGroups,list <int32_t>(),NumberOfNeighbors());
-  
+
   //now sort the monomers into groups with respect to their z-coordinate
   //this time use a vector of MonomerGroup objects for the grouping
-  //to demonstrate that this works just as well. 
-  
+  //to demonstrate that this works just as well.
+
   std::vector<MonomerGroup < Molecules <VectorInt3> > > zCoordinateGroups;
   group_by_property(molecules,zCoordinateGroups,MonomerGroup<Molecules<VectorInt3> >(molecules),ZCoordinate());
-  
+
   //now check if the monomers are correctly sorted into groups
   //start with the connectivityGroups
-  
+
   //there should be monomers with 1,3 and 4 bonds, thus 3 groups
   EXPECT_EQ(connectivityGroups.size(),3);
   //in the first group there should fourteen monomers with one connection
@@ -121,9 +121,9 @@ TEST(GroupByPropertyTest,CreateGroups)
   EXPECT_EQ(connectivityGroups[2].size(),4);
   monoIndex=*(connectivityGroups[2].begin());
   EXPECT_EQ(4,molecules.getNumLinks(monoIndex));
-  
+
   //now check the zCoordinateGroups
-  
+
   //there should be two different groups, each containing one of the trees
   EXPECT_EQ(zCoordinateGroups.size(),2);
   //the x and y coordinates should be the same, the z coordinate shifted by 10

@@ -3,9 +3,9 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by 
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
-    ooo                        | 
+    ooo                        |
 ----------------------------------------------------------------------------------
 
 This file is part of LeMonADE.
@@ -48,14 +48,14 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @class FeatureNNInteractionSc
  * @brief Provides interaction of monomers on distances d<=sqrt(6) for standard BFM
  *
- * @tparam FeatureLatticeType Underlying lattice feature, e.g. FeatureLattice or 
+ * @tparam FeatureLatticeType Underlying lattice feature, e.g. FeatureLattice or
  * FeatureLatticePowerOfTwo (template template parameter)
  *
  * @details
  * The interaction energy can be set for pairs of monomer-types A,B, where
- * the type can be any integer between 1 and 255. 
+ * the type can be any integer between 1 and 255.
  * The feature automatically adds FeatureExcludedVolumeSc<FeatureLatticeType<uint8_t>
- * to the system. Given an energy E in kT between  two types, the interaction potential 
+ * to the system. Given an energy E in kT between  two types, the interaction potential
  * as a function of the distance d is:
  * - inf d<2 (implicitly through excluded volume)
  * - 4*E d=2
@@ -78,15 +78,15 @@ private:
   //! Type for the underlying lattice, used as template parameter for FeatureLatticeType<...>
   typedef uint8_t lattice_value_type;
 
-  //! Interaction energies between monomer types. Max. type=255 given by max(uint8_t)=255 
+  //! Interaction energies between monomer types. Max. type=255 given by max(uint8_t)=255
   double interactionTable[256][256];
-  
+
   //! Lookup table for exp(-interactionTable[a][b])
   double probabilityLookup[256][256];
 
   //! Returns this feature's factor for the acceptance probability for the given Monte Carlo move
   template<class IngredientsType>
-  double calculateAcceptanceProbability(const IngredientsType& ingredients, 
+  double calculateAcceptanceProbability(const IngredientsType& ingredients,
 					const MoveLocalSc& move) const;
 
   //! Occupies the lattice with the attribute tags of all monomers
@@ -102,7 +102,7 @@ public:
   FeatureNNInteractionSc();
   ~FeatureNNInteractionSc(){}
 
-    
+
   //This feature adds interaction energies, so it requires FeatureBoltzmann
   typedef LOKI_TYPELIST_1(FeatureBoltzmann) required_features_back;
 
@@ -111,8 +111,8 @@ public:
   //FeatureAttributes needs to be in front, because when a monomer is added to the system
   //by a MoveAddMonomerSc, its attribute has to be set before it is written to the lattice.
   typedef LOKI_TYPELIST_2(
-      FeatureAttributes,
-      FeatureExcludedVolumeSc<FeatureLatticeType<lattice_value_type> >) 
+      FeatureAttributes<int32_t>,
+      FeatureExcludedVolumeSc<FeatureLatticeType<lattice_value_type> >)
     required_features_front;
 
 
@@ -138,9 +138,9 @@ public:
 
   //! apply function for adding a monomer in sc-BFM
   template<class IngredientsType>
-    void applyMove(IngredientsType& ing, const MoveAddMonomerSc& move);
+    void applyMove(IngredientsType& ing, const MoveAddMonomerSc<int32_t>& move);
 
-  //note: apply function for sc-BFM local move is not necessary, because 
+  //note: apply function for sc-BFM local move is not necessary, because
   //job of moving lattice entries is done by the underlying FeatureLatticeType
 
   //! guarantees that the lattice is properly occupied with monomer attributes
@@ -192,7 +192,7 @@ FeatureNNInteractionSc<LatticeClassType>::FeatureNNInteractionSc()
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients,
 							 const MoveBase& move) const
 {
     return true;
@@ -208,7 +208,7 @@ bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& 
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients,
 							 MoveLocalSc& move) const
 {
   //add the probability factor coming from this feature, then return true,
@@ -230,7 +230,7 @@ bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& 
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients, 
+bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& ingredients,
 							 const MoveLocalBcc& move) const
 {
   //throw exception in case someone accidentaly uses a bcc-BFM move with this feature
@@ -254,8 +254,8 @@ bool FeatureNNInteractionSc<LatticeClassType>::checkMove(const IngredientsType& 
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing, 
-							 const MoveAddMonomerSc& move)
+void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing,
+							 const MoveAddMonomerSc<int32_t>& move)
 {
     //get the position and attribute tag of the monomer to be inserted
     VectorInt3 pos=move.getPosition();
@@ -273,7 +273,7 @@ void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing,
 	errormessage<<"Trying to add monomer with type "<<int32_t(type)<<">maxType=255\n";
 	throw std::runtime_error(errormessage.str());
       }
-    
+
     //update lattice
     ing.setLatticeEntry(pos,type);
     ing.setLatticeEntry(pos+dx,type);
@@ -296,7 +296,7 @@ void FeatureNNInteractionSc<LatticeClassType>::applyMove(IngredientsType& ing,
  **/
 template<template<typename> class LatticeClassType>
 template<class IngredientsType>
-void FeatureNNInteractionSc<LatticeClassType>::applyMove(const IngredientsType& ing, 
+void FeatureNNInteractionSc<LatticeClassType>::applyMove(const IngredientsType& ing,
 							 const MoveLocalBcc& move)
 {
   //throw exception in case someone accidentaly uses a bcc-BFM move with this feature
@@ -325,7 +325,7 @@ void FeatureNNInteractionSc<LatticeClassType>::synchronize(IngredientsType& ingr
 
 /**
  * @details If not compiled with DEBUG flag this function only returns the content
- * of the lookup table probabilityLookup. If compiled with DEBUG flag it checks 
+ * of the lookup table probabilityLookup. If compiled with DEBUG flag it checks
  * that the attribute tags typeA, typeB are within the allowed range.
  * @param typeA monomer attribute type in range [1,255]
  * @param typeB monomer attribute type in range [1,255]
@@ -449,7 +449,7 @@ double FeatureNNInteractionSc<LatticeClassType>::calculateAcceptanceProbability(
     const IngredientsType& ingredients,
     const MoveLocalSc& move) const
 {
-    
+
     VectorInt3 oldPos=ingredients.getMolecules()[move.getIndex()];
     VectorInt3 direction=move.getDir();
 
