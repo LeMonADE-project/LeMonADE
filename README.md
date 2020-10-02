@@ -4,8 +4,8 @@ The abbreviation LeMonADE stands for
 "**L**attice-based **e**xtensible **Mon**te-Carlo **A**lgorithm and **D**evelopment **E**nvironment".
 
 The aim of the LeMonADE-project is an open source implementation of the 
-bond-fluctuation-model ([BFM1], [BFM2]) for simulating polymeric systems using generic
-template metaprogramming in C++. 
+[bond fluctuation model](https://en.wikipedia.org/wiki/Bond_fluctuation_model) ([BFM1], [BFM2]) for simulating polymeric systems using generic
+template metaprogramming in `C++`. 
 
 [BFM1]: http://dx.doi.org/10.1021/ma00187a030  "I. Carmesin, K. Kremer; Macromolecules 21, 2819-2823 (1988)"
  
@@ -36,16 +36,16 @@ template metaprogramming in C++.
     make install #only if you want to install the software after build
 ````
 
-* The options -DINSTALLDIR_LEMONADE and -DBUILDDIR for the configure script are 
-  optional. The build directory defaults to ./build, the install directory defaults
-  to /usr/local/ . The same goes for the option -DINSTALLDIR_LEMONADE when invoking 
+* The options `-DINSTALLDIR_LEMONADE` and `-DBUILDDIR` for the configure script are 
+  optional. The build directory defaults to `./build`, the install directory defaults
+  to `/usr/local/` . The same goes for the option `-DINSTALLDIR_LEMONADE` when invoking 
   cmake (the second compilation and installation way).
-* When installing using 'make install', the library is installed to
-  /given/installation/path/lib/LeMonADE/, or if no path was specified to
-  /usr/local/lib/LeMonADE/. Similar for the header files, which go to
-  /given/installation/path/include/LeMonADE/ or /usr/local/include/LeMonADE/.
+* When installing using `make install`, the library is installed to
+  `/given/installation/path/lib/LeMonADE/`, or if no path was specified to
+  `/usr/local/lib/LeMonADE/`. Similar for the header files, which go to
+  `/given/installation/path/include/LeMonADE/` or `/usr/local/include/LeMonADE/`.
 * For uninstalling simply remove the files created in the installation step.
-* If you do not specify the install directory, and the default /usr/local/ is used,
+* If you do not specify the install directory, and the default `/usr/local/` is used,
   you need root access when installing. In this case
 
 ````sh
@@ -54,9 +54,9 @@ template metaprogramming in C++.
 ````
 * If you also want to compile and run the tests, there is another option, which can be
   passed to either the configure script (first build method), or to cmake (second build method)
-  This option is -DLEMONADE_TESTS=ON . You need internet access, because the process will
+  This option is `-DLEMONADE_TESTS=ON` . You need internet access, because the process will
   download the googletest library
-* Another option that can be passed is -DCMAKE_BUILD_TYPE=Release/Debug. The default value 
+* Another option that can be passed is `-DCMAKE_BUILD_TYPE=Release/Debug`. The default value 
   is Release, which uses compiler flags for optimization. If the option "Debug" is chosen,
   no compiler optimizations are used, compiler warnings are enabled by -Wall, and 
   debugging information is compiled into the binary with -g. Other flags then "Release",
@@ -78,6 +78,7 @@ This can be found in the documentation.
     make docs
 ````
 
+or
 
 ```sh
     # generates the docs
@@ -90,13 +91,13 @@ This can be found in the documentation.
 
 ## Contributions
 
-* Any contributions making the programm better are welcome
+* Any contributions/suggestions making the program become better are welcome
 * Every contribution should be made by following the guidelines made by the [gitflow workflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow)
 
 
 ## Authors
 
-Find the information about active developers, former contributors and people who contributed in the [AUTHORS](AUTHORS.md) file.
+Find the information about active developers, former contributors, and people who contributed in the [AUTHORS](AUTHORS.md) file.
 
 ## References
 
