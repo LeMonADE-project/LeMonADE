@@ -102,16 +102,16 @@ Find the information about active developers, former contributors, and people wh
 ## References
 
 This library has been used in the following publications (without guarantee for completeness)
-* *Polyolefins Formed by Chain Walking Catalysis—A Matter of Branching Density Only?* R. Dockhorn, Laura Plüschke, Martin Geisler, Johanna Zessin, Peter Lindner, Robert Mundil, Jan Merna, Jens-Uwe Sommer, Albena Lederer [J. Am. Chem. Soc. 141, 15586–15596 (2019)](https://pubs.acs.org/doi/10.1021/jacs.9b06785)
-* *Tendomers – force sensitive bis-rotaxanes with jump-like deformation behavior* T. Müller, J.-U. Sommer, M. Lang; [Soft Matter, 15, 3671-3679  (2019)](https://doi.org/10.1039/C9SM00292H)
-* *Dendrimers in Solution of Linear Polymers: Crowding Effects* M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 52, 2616–2626 (2019)](https://doi.org/10.1021/acs.macromol.9b00010)
-* *Testing the physics of knots with a Feringa nanoengine* M. Lang, C. Schuster, R. Dockhorn, M. Wengenmayr, J.-U. Sommer [Phys. Rev. E 98, 052501 (2018)](https://doi.org/10.1103/PhysRevE.98.052501)
-* *Formation and stabilization of pores in bilayer membranes by peptide-like amphiphilic polymers*  A. Checkervarty, M. Werner and J.-U. Sommer [Soft Matter 14, 2526-2534 (2018)](https://doi.org/10.1039/C7SM02404E)
-* *Swelling Behavior of Single-Chain Polymer Nanoparticles: Theory and Simulation* H. Rabbel, P. Breier, J.-U. Sommer [Macromolecules 50, 7410–7418 (2017)](https://doi.org/10.1021/acs.macromol.7b01379)
-* *A Highly Parallelizable Bond Fluctuation Model on the Body-Centered Cubic Lattice* C. Jentzsch, R. Dockhorn, J.-U. Sommer; [Parallel Processing and Applied Mathematics. Lecture Notes in Computer Science, vol 9574. pp 301-311 (2016)](http://dx.doi.org/10.1007/978-3-319-32152-3_28)
-* *Multicore Unimolecular Structure Formation in Single Dendritic–Linear Copolymers under Selective Solvent Conditions* M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 49, 9215-9227 (2016)](http://dx.doi.org/10.1021/acs.macromol.6b01712)
-* *Interactions of Amphiphilic Triblock Copolymers with Lipid Membranes: Modes of Interaction and Effect on Permeability Examined by Generic Monte Carlo Simulations* H. Rabbel, M. Werner, J.-U. Sommer; [Macromolecules 48, 4724-4732 (2015)](http://dx.doi.org/10.1021/acs.macromol.5b00720)
-* *Polymer brushes in explicit poor solvents studied using a new variant of the bond fluctuation model* C. Jentzsch, J.-U. Sommer; [J. Chem. Phys. 10, 104908 (2014)](http://dx.doi.org/10.1063/1.4895555)    
+* *"Polyolefins Formed by Chain Walking Catalysis—A Matter of Branching Density Only?"*; R. Dockhorn, L. Pl&uuml;schke, M. Geisler, J. Zessin, P. Lindner, R. Mundil, J. Merna, J.-U. Sommer, A. Lederer; [J. Am. Chem. Soc. 141, 15586–15596 (2019)](https://pubs.acs.org/doi/10.1021/jacs.9b06785)
+* *"Tendomers – force sensitive bis-rotaxanes with jump-like deformation behavior"*; T. M&uuml;ller, J.-U. Sommer, M. Lang; [Soft Matter, 15, 3671-3679  (2019)](https://doi.org/10.1039/C9SM00292H)
+* *"Dendrimers in Solution of Linear Polymers: Crowding Effects"*; M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 52, 2616–2626 (2019)](https://doi.org/10.1021/acs.macromol.9b00010)
+* *"Testing the physics of knots with a Feringa nanoengine"*; M. Lang, C. Schuster, R. Dockhorn, M. Wengenmayr, J.-U. Sommer; [Phys. Rev. E 98, 052501 (2018)](https://doi.org/10.1103/PhysRevE.98.052501)
+* *"Formation and stabilization of pores in bilayer membranes by peptide-like amphiphilic polymers"*;  A. Checkervarty, M. Werner and J.-U. Sommer; [Soft Matter 14, 2526-2534 (2018)](https://doi.org/10.1039/C7SM02404E)
+* *"Swelling Behavior of Single-Chain Polymer Nanoparticles: Theory and Simulation"*; H. Rabbel, P. Breier, J.-U. Sommer; [Macromolecules 50, 7410–7418 (2017)](https://doi.org/10.1021/acs.macromol.7b01379)
+* *"A Highly Parallelizable Bond Fluctuation Model on the Body-Centered Cubic Lattice"*; C. Jentzsch, R. Dockhorn, J.-U. Sommer; [Parallel Processing and Applied Mathematics. Lecture Notes in Computer Science, vol 9574. pp 301-311 (2016)](http://dx.doi.org/10.1007/978-3-319-32152-3_28)
+* *"Multicore Unimolecular Structure Formation in Single Dendritic–Linear Copolymers under Selective Solvent Conditions"*; M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 49, 9215-9227 (2016)](http://dx.doi.org/10.1021/acs.macromol.6b01712)
+* *"Interactions of Amphiphilic Triblock Copolymers with Lipid Membranes: Modes of Interaction and Effect on Permeability Examined by Generic Monte Carlo Simulations"*; H. Rabbel, M. Werner, J.-U. Sommer; [Macromolecules 48, 4724-4732 (2015)](http://dx.doi.org/10.1021/acs.macromol.5b00720)
+* *"Polymer brushes in explicit poor solvents studied using a new variant of the bond fluctuation model"*; C. Jentzsch, J.-U. Sommer; [J. Chem. Phys. 10, 104908 (2014)](http://dx.doi.org/10.1063/1.4895555)    
 
 
 ## License
