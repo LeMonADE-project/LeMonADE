@@ -3,7 +3,7 @@
 #   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
 #  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 # oo---0---oo  A   lgorithm and  |
-#  o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+#  o/./|\.\o   D   evelopment    | Copyright (C) 2013-2020 by
 #   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
 #     ooo                        |
 # ---------------------------------------------------------------------------------
@@ -35,9 +35,6 @@ SET (APPLICATION_COPYRIGHT_YEARS "2013-2020")
 SET (APPLICATION_VERSION_MAJOR "2")
 SET (APPLICATION_VERSION_MINOR "2")
 SET (APPLICATION_VERSION_PATCH "0")
-SET (APPLICATION_VERSION_TYPE "RELEASE")
-SET (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-(C)${APPLICATION_COPYRIGHT_YEARS}-${APPLICATION_VERSION_TYPE}")
-SET (APPLICATION_ID "${APPLICATION_NAME}.${PROJECT_NAME}")
 
 
 #
@@ -87,6 +84,9 @@ SET (LEMONADE_LIBRARY_DIR ${LIBRARY_OUTPUT_PATH})
 #
 # Configure and replace Version.h with updated cmake info
 #
+SET (APPLICATION_VERSION_TYPE "${CMAKE_BUILD_TYPE}")
+SET (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-(C)${APPLICATION_COPYRIGHT_YEARS}-${APPLICATION_VERSION_TYPE}")
+SET (APPLICATION_ID "${APPLICATION_NAME}.${PROJECT_NAME}")
 configure_file( ${LEMONADE_DIR}/include/LeMonADE/Version.h.in ${LEMONADE_DIR}/include/LeMonADE/Version.h @ONLY)
 
 
