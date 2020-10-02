@@ -12,6 +12,7 @@
 #include <LeMonADE/utility/TaskManager.h>
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
 #include <LeMonADE/updater/UpdaterSimpleSimulator.h>
+#include <LeMonADE/Version.h>
 
 int main(int argc, char* argv[])
 {
@@ -46,6 +47,22 @@ int main(int argc, char* argv[])
 		if(argc==5) outfile=argv[4];
 		else outfile=argv[1];
 	}
+	  
+	std::cout << APPLICATION_NAME " is free software: you can redistribute it and/or modify" << std::endl
+              << "it under the terms of the GNU General Public License as published by" << std::endl
+              << "the Free Software Foundation, either version 3 of the License, or" << std::endl
+              << "(at your option) any later version." << std::endl
+              << APPLICATION_NAME " is distributed in the hope that it will be useful," << std::endl
+              << "but WITHOUT ANY WARRANTY; without even the implied warranty of" << std::endl
+              << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the" << std::endl
+              << "GNU General Public License for more details." << std::endl
+              << "You should have received a copy of the GNU General Public License" << std::endl
+              << "along with " << APPLICATION_NAME << ". If not, see <http://www.gnu.org/licenses/>." << std::endl << std::endl;
+             
+    	std::cout << APPLICATION_NAME << " " << APPLICATION_VERSION_STRING << std::endl
+              << "Copyright (C) " << APPLICATION_COPYRIGHT_YEARS << std::endl
+              << "LeMonADE Version " <<  LEMONADE_VERSION << std::endl << std::endl;
+
 
 	//seed the globally available random number generators
 	RandomNumberGenerators rng;
