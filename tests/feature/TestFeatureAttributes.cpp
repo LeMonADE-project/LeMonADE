@@ -80,9 +80,9 @@ public:
     cout.rdbuf(originalBuffer);
   };
 
-private:
-  std::streambuf* originalBuffer;
-  std::ostringstream tempStream;
+  private:
+    std::streambuf* originalBuffer;
+    std::ostringstream tempStream;
 };
 
 TEST_F(FeatureAttributesTest,MonomerAttributeTag)
@@ -248,16 +248,19 @@ TEST_F(FeatureAttributesTest,MonomerLabel)
   typedef MyIngredientsTags::molecules_type MyMolecules1;
   MyMolecules1 molecules9;
 
-  //check if attributes are copied corriectly by copy constructor
+  //check if attributes are copied correctly by copy constructor
   molecules9.resize(3);
+
   //if it runs throught then there is no error in the assign constructor
   molecules9[0].setAttributeTag(MonomerLabel(1,23,45));
+
   EXPECT_EQ( molecules9[0].getAttributeTag().getchainID(), 1);
   EXPECT_EQ( molecules9[0].getAttributeTag().getnLabels(),23);
   EXPECT_EQ( molecules9[0].getAttributeTag().getlabelID(),45);
+
   molecules9[1].setAttributeTag(MonomerLabel(3,2,4));
 
-  //negative falues do not make much sense
+  //negative values do not make much sense
   EXPECT_THROW(molecules9[2].setAttributeTag(MonomerLabel(12,5,-1)), std::runtime_error);
   EXPECT_THROW(molecules9[2].setAttributeTag(MonomerLabel(12,-5,1)), std::runtime_error);
   EXPECT_THROW(molecules9[2].setAttributeTag(MonomerLabel(-12,5,1)), std::runtime_error);
@@ -306,7 +309,6 @@ TEST_F(FeatureAttributesTest,ReadAttributesClassForMonomerLabels)
   read.setInputStream(&stream5);
   stream5<<"\n1-5:c\n";
   EXPECT_THROW(read.execute(),std::runtime_error);
-
 
 }
 
