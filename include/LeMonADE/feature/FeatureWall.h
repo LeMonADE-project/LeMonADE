@@ -68,7 +68,7 @@ public:
     }
 
     //! setter function for the base vector of the wall
-    VectorInt3 setBase(uint32_t baseX_, uint32_t baseY_, uint32_t baseZ_) {
+    void setBase(uint32_t baseX_, uint32_t baseY_, uint32_t baseZ_) {
         base.setAllCoordinates(baseX_,baseY_,baseZ_);
     }
 
@@ -78,7 +78,7 @@ public:
     }
 
     //! setter function for the normal vector of the wall
-    VectorInt3 setNormal(uint32_t norX_, uint32_t norY_, uint32_t norZ_) {
+    void setNormal(uint32_t norX_, uint32_t norY_, uint32_t norZ_) {
       VectorInt3 test(norX_, norY_, norZ_);
       if(test==VectorInt3(1,0,0) || test==VectorInt3(0,1,0) || test==VectorInt3(0,0,1) ){
         normal.setAllCoordinates(norX_,norY_,norZ_);

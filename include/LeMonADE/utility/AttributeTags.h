@@ -102,7 +102,7 @@ public:
   /**
   * @brief assignment operator
   */
-  MonomerLabel& operator= ( const MonomerLabel &Label )
+  void operator= ( const MonomerLabel &Label )
   { 
     chainID = Label.chainID;
     nLabels = Label.nLabels;
@@ -132,17 +132,17 @@ public:
   //! set the chain ID the Label belongs to 
   void     setchainID(const uint32_t chainID_){chainID=chainID_ ;}
   //! get the chain ID the Label belongs to
-  const uint32_t& getchainID(		       ) const { return chainID  ;}
+  const uint32_t getchainID(		       ) const { return chainID  ;}
   
   //! set the number of labels sitting on the monomer 
   void     setnLabels(const uint32_t nLabels_){nLabels=nLabels_ ;}
   //! get the number of labels sitting on the monomer 
-  const uint32_t& getnLabels(		       ) const { return nLabels  ;}
+  const uint32_t getnLabels(		       ) const { return nLabels  ;}
   
   //! set the ID of the label(s) on the monomer
   void     setlabelID(const uint32_t labelID_){labelID=labelID_ ;}
   //! get the ID of the label(s) on the monomer
-  const uint32_t& getlabelID(		       ) const { return labelID  ;}
+  const uint32_t getlabelID(		       ) const { return labelID  ;}
   
   //! set the chain ID, number of labels and label id 
   void     setAll(const uint32_t chainID_,const uint32_t nLabels_,const uint32_t labelID_)

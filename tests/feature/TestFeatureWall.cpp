@@ -92,6 +92,7 @@ TEST(TestFeatureWall,Moves)
 
     //build wall in y-z-plane at x=2 -> x=1 should be forbidden
     Wall wall1;
+
     wall1.setBase(2,0,0);
     // check forbidden nomal vector: must be a unit vector! P(1,0,0)
     EXPECT_ANY_THROW(wall1.setNormal(2,0,0));
