@@ -1,4 +1,5 @@
 [![Build Status(CircleCI)](https://circleci.com/gh/LeMonADE-project/LeMonADE.svg?style=svg)](https://circleci.com/gh/LeMonADE-project/LeMonADE)
+[![DOI](https://zenodo.org/badge/47562779.svg)](https://zenodo.org/badge/latestdoi/47562779)
 # LeMonADE 
 The abbreviation LeMonADE stands for 
 "**L**attice-based **e**xtensible **Mon**te-Carlo **A**lgorithm and **D**evelopment **E**nvironment".
