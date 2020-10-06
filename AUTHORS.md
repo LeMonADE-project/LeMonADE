@@ -4,18 +4,15 @@
 Following people have long-term contributed to LeMonADE
 and considered as principal developers (in alphabetical order):
 
-## Principal active developers:
+## Principal developers:
 ---------------------
 * [Ron Dockhorn](https://github.com/Bondoki), Germany
-* [Martin Wengenmayr](https://github.com/MartinWenge), Germany
+* Christoph Jentzsch, Germany
 * [Toni Müller](https://github.com/tonimueller), Germany
 * [Hauke Rabbel](https://github.com/hrabbel), Germany
+* [Martin Wengenmayr](https://github.com/MartinWenge), Germany
+* [Marco Werner](https://github.com/mcwerner), Germany
 
-
-### Early day developers:
----------------------
-* Christoph Jentzsch, Germany
-* Marco Werner, Germany
 
 ### Other contributors:
 --------------------
