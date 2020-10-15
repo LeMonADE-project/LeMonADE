@@ -48,10 +48,8 @@ class FeatureSystemInformationRingMelt:public Feature
 {
 public:
 
-	FeatureSystemInformationRingMelt(){
-	  nRings=0;
-          nMonomersPerRing=0;
-	};
+	FeatureSystemInformationRingMelt():nRings(0), nMonomersPerRing(0) {};
+	
 	virtual ~FeatureSystemInformationRingMelt(){};
 	
 	//! For all unknown moves: this does nothing
