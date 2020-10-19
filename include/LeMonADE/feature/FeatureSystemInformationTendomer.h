@@ -39,12 +39,8 @@ class FeatureSystemInformationTendomer:public Feature
 {
 public:
 
-	FeatureSystemInformationTendomer(){
-	  nTendomers=0;
-	  nCrossLinkers=0;
-	  nMonomersPerChain=0;
-	  nLabelsPerTendomerArm=0;
-	};
+	FeatureSystemInformationTendomer():	nTendomers(0), nCrossLinkers(0), nMonomersPerChain(0),nLabelsPerTendomerArm(0){};
+
 	virtual ~FeatureSystemInformationTendomer(){};
 	
 	//! For all unknown moves: this does nothing

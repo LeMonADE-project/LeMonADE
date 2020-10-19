@@ -48,7 +48,26 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-TEST(IngredientsTest, Constructors){
+class IngredientsTest: public ::testing::Test{
+  
+public:
+  //redirect cout output
+  virtual void SetUp(){
+    originalBuffer=cout.rdbuf();
+    cout.rdbuf(tempStream.rdbuf());
+  };
+
+  //restore original output
+  virtual void TearDown(){
+    cout.rdbuf(originalBuffer);
+  };
+
+  private:
+    std::streambuf* originalBuffer;
+    std::ostringstream tempStream;
+};
+
+TEST_F(IngredientsTest, Constructors){
 
 	typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features;
 	typedef ConfigureSystem<VectorInt3,Features,3> Config;
@@ -61,7 +80,7 @@ TEST(IngredientsTest, Constructors){
 	EXPECT_STREQ("new_lemonade" ,ingredientsWithOutName.getName().c_str());
 }
 
-TEST(IngredientsTest, GetterAndSetter){
+TEST_F(IngredientsTest, GetterAndSetter){
 
 		typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features;
 		typedef ConfigureSystem<VectorInt3,Features,3> Config;
@@ -82,7 +101,7 @@ TEST(IngredientsTest, GetterAndSetter){
 
 }
 
-TEST(IngredientsTest, printMetaData){
+TEST_F(IngredientsTest, printMetaData){
 	typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features;
 	typedef ConfigureSystem<VectorInt3,Features,3> Config;
 	typedef Ingredients < Config> MyIngredients;
@@ -100,7 +119,7 @@ TEST(IngredientsTest, printMetaData){
 }
 
 
-TEST(IngredientsTest, synchronize_noargument){
+TEST_F(IngredientsTest, synchronize_noargument){
 	typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features1;
 	typedef ConfigureSystem<VectorInt3,Features1,3> Config1;
 	typedef Ingredients < Config1> MyIngredients1;
@@ -185,7 +204,7 @@ TEST(IngredientsTest, synchronize_noargument){
 	EXPECT_NO_THROW(ingredients2.synchronize());
 }
 
-TEST(IngredientsTest, synchronize_withargument){
+TEST_F(IngredientsTest, synchronize_withargument){
 	typedef LOKI_TYPELIST_2(FeatureBox, FeatureBondset<>) Features1;
 	typedef ConfigureSystem<VectorInt3,Features1,3> Config1;
 	typedef Ingredients < Config1> MyIngredients1;

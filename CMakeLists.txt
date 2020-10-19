@@ -3,7 +3,7 @@
 #   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
 #  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 # oo---0---oo  A   lgorithm and  |
-#  o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+#  o/./|\.\o   D   evelopment    | Copyright (C) 2013-2020 by
 #   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
 #     ooo                        |
 # ---------------------------------------------------------------------------------
@@ -31,13 +31,10 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.6.2)
 PROJECT (LeMonADE)
 SET (APPLICATION_NAME "LeMonADE")
 SET (APPLICATION_CODENAME "${PROJECT_NAME}")
-SET (APPLICATION_COPYRIGHT_YEARS "2019")
-SET (APPLICATION_VERSION_MAJOR 2)
-SET (APPLICATION_VERSION_MINOR 1)
-SET (APPLICATION_VERSION_PATCH 0)
-SET (APPLICATION_VERSION_TYPE SNAPSHOT)
-SET (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-${APPLICATION_VERSION_TYPE}")
-SET (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
+SET (APPLICATION_COPYRIGHT_YEARS "2013-2020")
+SET (APPLICATION_VERSION_MAJOR "2")
+SET (APPLICATION_VERSION_MINOR "2")
+SET (APPLICATION_VERSION_PATCH "1")
 
 
 #
@@ -45,11 +42,11 @@ SET (APPLICATION_ID "${APPLICATION_VENDOR_ID}.${PROJECT_NAME}")
 #
 
 #define possible flags
-SET (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse2 -mssse3 -std=c++11 -fexpensive-optimizations ")
-SET (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse2 -mssse3 -std=c++11 -fexpensive-optimizations ")
+SET (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -msse2 -mssse3 -std=c++11 -fexpensive-optimizations -Wno-error=narrowing")
+SET (CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O3 -msse2 -mssse3 -std=c++11 -fexpensive-optimizations -Wno-error=narrowing")
 
-SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -std=c++11 -Wall -Wextra -DDEBUG ")
-SET (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -std=c++11 -Wall -Wextra -DDEBUG ")
+SET (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -std=c++11 -Wall -Wextra -DDEBUG -Wno-error=narrowing")
+SET (CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -std=c++11 -Wall -Wextra -DDEBUG -Wno-error=narrowing")
 
 #define value of CMAKE_BUILD_TYPE depending on input
 IF(NOT CMAKE_BUILD_TYPE)
@@ -85,11 +82,19 @@ SET (LEMONADE_INCLUDE_DIR "${LEMONADE_DIR}/include")
 SET (LEMONADE_LIBRARY_DIR ${LIBRARY_OUTPUT_PATH})
 
 #
+# Configure and replace Version.h with updated cmake info
+#
+SET (APPLICATION_VERSION_TYPE "${CMAKE_BUILD_TYPE}")
+SET (APPLICATION_VERSION_STRING "${APPLICATION_VERSION_MAJOR}.${APPLICATION_VERSION_MINOR}.${APPLICATION_VERSION_PATCH}-(C)${APPLICATION_COPYRIGHT_YEARS}-${APPLICATION_VERSION_TYPE}")
+SET (APPLICATION_ID "${APPLICATION_NAME}.${PROJECT_NAME}")
+configure_file( ${LEMONADE_DIR}/include/LeMonADE/Version.h.in ${LEMONADE_DIR}/include/LeMonADE/Version.h @ONLY)
+
+
+#
 # Project Search Paths
 #
 LIST (APPEND CMAKE_PREFIX_PATH "${LEMONADE_DIR}")
 INCLUDE_DIRECTORIES("${LEMONADE_DIR}/include")
-
 
 
 #
