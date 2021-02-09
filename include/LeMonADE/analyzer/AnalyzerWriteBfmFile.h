@@ -134,6 +134,11 @@ public:
    *
    **/
   virtual void cleanup(){};
+protected: 
+
+  //! set the name of the file for output which only works for the overwrite case 
+  void setFilename(std::string filename){_filename=filename;}
+
 private:
   //! Write Writes that only need to be in the header
   void writeHeader();
