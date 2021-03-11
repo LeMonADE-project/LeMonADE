@@ -47,7 +47,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
 #include <LeMonADE/updater/UpdaterLipidsCreator.h>
-#include "TesterFunctions.h"
+#include "TesterHelperFunctionsLipids.h"
     
 using namespace std;
 

@@ -102,7 +102,7 @@ ADD_SUBDIRECTORY(projects)
 #
 # Add option for building tests
 #
-option(LEMONADE_TESTS "Build the test" OFF)
+option(LEMONADE_TESTS "Build the test" ON)
 if(LEMONADE_TESTS)
     add_subdirectory(tests)
 endif(LEMONADE_TESTS)
