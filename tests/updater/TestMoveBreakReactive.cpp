@@ -56,16 +56,16 @@ public:
 
   IngredientsType ingredients;
 
-//   //redirect cout output
-//   virtual void SetUp(){
-//     originalBuffer=std::cout.rdbuf();
-//     std::cout.rdbuf(tempStream.rdbuf());
-//   };
-// 
-//   //restore original output
-//   virtual void TearDown(){
-//     std::cout.rdbuf(originalBuffer);
-//   };
+  //redirect cout output
+  virtual void SetUp(){
+    originalBuffer=std::cout.rdbuf();
+    std::cout.rdbuf(tempStream.rdbuf());
+  };
+
+  //restore original output
+  virtual void TearDown(){
+    std::cout.rdbuf(originalBuffer);
+  };
 
 private:
   std::streambuf* originalBuffer;
