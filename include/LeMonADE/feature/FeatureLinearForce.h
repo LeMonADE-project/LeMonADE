@@ -31,6 +31,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/Feature.h>
 #include <LeMonADE/updater/moves/MoveBase.h>
 #include <LeMonADE/updater/moves/MoveLocalSc.h>
+#include <LeMonADE/updater/moves/MoveLocalScDiag.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
 #include <LeMonADE/feature/FeatureBoltzmann.h>
 #include <LeMonADE/io/FileImport.h>
@@ -65,12 +66,19 @@ public:
 	template<class IngredientsType> 
 	bool checkMove(const IngredientsType& ingredients,const MoveBase& move) const{return true;};
 	
-	//! Overloaded for moves of type MoveScMonomer to check for sinusoidal movement
+	//! check for a MoveLocalSc 
 	template<class IngredientsType> 
 	bool checkMove(const IngredientsType& ingredients,MoveLocalSc& move) const;
+
+    //! check for a MoveLocalScDiag
+	template<class IngredientsType> 
+	bool checkMove(const IngredientsType& ingredients,MoveLocalScDiag& move) const;
 	
 	//! set the strength of the force 
-	void setAmplitudeForce(double amplitudeForce){Amplitude_Force = amplitudeForce;}
+	void setAmplitudeForce(double amplitudeForce){
+        Amplitude_Force = amplitudeForce;
+        prob=exp(-Amplitude_Force);
+    }
 
 	//! set force on or off
 	void setForceOn(bool forceOn){ForceOn = forceOn;}
@@ -94,6 +102,8 @@ private:
 	bool ForceOn; 
 	//! force in x direction 
 	double Amplitude_Force; 
+    //!probability
+    double prob;
 	
 };
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,24 +112,50 @@ private:
 template<class IngredientsType>
 bool FeatureLinearForce::checkMove(const IngredientsType& ingredients, MoveLocalSc& move) const
 {
-	if(ForceOn)
-	{
-	  uint32_t monoIndex=move.getIndex();
-	  int32_t attributeTagMoveObject= ingredients.getMolecules()[monoIndex].getAttributeTag();
-	  if(attributeTagMoveObject == 4 || attributeTagMoveObject == 5 )
-	  {
-		double total_Force = Amplitude_Force*(double)(move.getDir().getX());
-		//Metropolis: zeta = exp (-dV)
-		//dV=f*dr
-		// positive force applied on attribute 4 and negative force on attribute 5
-		attributeTagMoveObject == 4  ? total_Force*=1 : total_Force*=(-1);
-		move.multiplyProbability(exp(total_Force));
-	  }
+	if(ForceOn){
+        
+	    const uint32_t monoIndex(move.getIndex());
+        const int32_t tag(ingredients.getMolecules()[monoIndex].getAttributeTag());
+        const int32_t dx(move.getDir().getX());
+        std::cout   << "MonID=" <<monoIndex  << " "
+                    << "tag=" <<tag << " "
+                    << "dx=" <<dx << " "
+                    <<std::endl;
+        //Metropolis: zeta = exp (-dV)
+        //dV=f*dr
+        // positive force applied on attribute 4 and negative force on attribute 5
+        if( ( tag == 4 ) && ( dx  == 1 ) ){
+            move.multiplyProbability(prob);
+            return true; 
+        }
+        if( ( tag == 5 ) && ( dx  == -1 ) ){
+            move.multiplyProbability(prob);
+            return true; 
+        }
 	}
-
 	return true;
 }
-
+template<class IngredientsType>
+bool FeatureLinearForce::checkMove(const IngredientsType& ingredients, MoveLocalScDiag& move) const
+{
+	if(ForceOn){
+	    const uint32_t monoIndex(move.getIndex());
+        const int32_t tag(ingredients.getMolecules()[monoIndex].getAttributeTag());
+        const int32_t dx(move.getDir().getX());
+        //Metropolis: zeta = exp (-dV)
+        //dV=f*dr
+        // positive force applied on attribute 4 and negative force on attribute 5
+        if( ( tag == 4 ) && ( dx  == 1 ) ){
+            move.multiplyProbability(prob);
+            return true; 
+        }
+        if( ( tag == 5 ) && ( dx  == -1 ) ){
+            move.multiplyProbability(prob);
+            return true; 
+        }
+	}
+	return true;
+}
 
 /*****************************************************************/
 /**
