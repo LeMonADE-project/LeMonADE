@@ -223,17 +223,15 @@ class FeatureBondset : public Feature
   template<class IngredientsType,class MoveLabelType>
   bool checkMove(const IngredientsType& ingredients, const MoveLabelBase<MoveLabelType>& move) const
   {
-
-	  //get the number of bond partners of the particle to be moved
-          int32_t MonID=move.getIndex()+move.getDir();
-	  if ( MonID == -1 ) return false;
-	  uint32_t ID=move.getConnectedLabel();
-          const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
-	  if (ID == 0 ) return true; 
-	  ID--;
-          auto bond(molecules[MonID].getVector3D()-molecules[ID].getVector3D());
-	  if (!bondset.isValidStrongCheck( bond ) ) return false; 
-      if ( bond.getLength()>3.) return false; // otherwise I could get xtraps 
+      //get the number of bond partners of the particle to be moved
+      int32_t MonID=move.getIndex()+move.getDir();
+      if ( MonID == -1 ) return false;
+      uint32_t ID=move.getConnectedLabel();
+      const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+      if (ID == 0 ) return true; 
+      ID--;
+      auto bond(molecules[MonID].getVector3D()-molecules[ID].getVector3D());
+      if (!bondset.isValidStrongCheck( bond ) ) return false; 
       return true;
   }
   

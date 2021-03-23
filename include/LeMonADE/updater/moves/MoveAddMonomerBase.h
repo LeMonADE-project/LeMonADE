@@ -60,7 +60,7 @@ template<class SpecializedMove, class TagType>
 class MoveAddMonomerBase:public MoveBase
 {
 public:
-  MoveAddMonomerBase():monomerTag(TagType()),reactivity(false), numMaxLinks(0){};
+  MoveAddMonomerBase():monomerTag(TagType()),reactivity(false), numMaxLinks(0), label(0){};
   //here come the functions that are implemented by the specialization
   //! Reset the probability
   template <class IngredientsType> void init(const IngredientsType& ingredients);

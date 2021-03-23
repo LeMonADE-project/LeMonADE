@@ -75,16 +75,16 @@ public:
 	steps[16]=VectorInt3(-1,1,0);
 	steps[17]=VectorInt3(-1,-1,0); 
     }
-    // //redirect cout output
-    // virtual void SetUp(){
-    //     originalBuffer=std::cout.rdbuf();
-    //     std::cout.rdbuf(tempStream.rdbuf());
-    // };
+    //redirect cout output
+    virtual void SetUp(){
+        originalBuffer=std::cout.rdbuf();
+        std::cout.rdbuf(tempStream.rdbuf());
+    };
 
-    // //restore original output
-    // virtual void TearDown(){
-    //     std::cout.rdbuf(originalBuffer);
-    // };
+    //restore original output
+    virtual void TearDown(){
+        std::cout.rdbuf(originalBuffer);
+    };
     VectorInt3 steps[18];
 private:
     std::streambuf* originalBuffer;
