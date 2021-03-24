@@ -117,10 +117,6 @@ bool FeatureLinearForce::checkMove(const IngredientsType& ingredients, MoveLocal
 	    const uint32_t monoIndex(move.getIndex());
         const int32_t tag(ingredients.getMolecules()[monoIndex].getAttributeTag());
         const int32_t dx(move.getDir().getX());
-        std::cout   << "MonID=" <<monoIndex  << " "
-                    << "tag=" <<tag << " "
-                    << "dx=" <<dx << " "
-                    <<std::endl;
         //Metropolis: zeta = exp (-dV)
         //dV=f*dr
         // positive force applied on attribute 4 and negative force on attribute 5
