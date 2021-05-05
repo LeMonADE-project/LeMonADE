@@ -125,7 +125,7 @@ TEST_F(IngredientsTest, synchronize_noargument){
 	typedef Ingredients < Config1> MyIngredients1;
 
 	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolumeSc<>) Features2;
-	typedef ConfigureSystem<VectorInt3,Features1,3> Config2;
+	typedef ConfigureSystem<VectorInt3,Features2,3> Config2;
 	typedef Ingredients < Config2> MyIngredients2;
 
 
@@ -210,7 +210,7 @@ TEST_F(IngredientsTest, synchronize_withargument){
 	typedef Ingredients < Config1> MyIngredients1;
 
 	typedef LOKI_TYPELIST_3(FeatureBox, FeatureBondset<>,FeatureExcludedVolumeSc<>) Features2;
-	typedef ConfigureSystem<VectorInt3,Features1,3> Config2;
+	typedef ConfigureSystem<VectorInt3,Features2,3> Config2;
 	typedef Ingredients < Config2> MyIngredients2;
 
 
