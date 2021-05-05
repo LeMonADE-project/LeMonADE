@@ -80,7 +80,9 @@ void MoveBreakReactive::init(const IngredientsType& ing)
     this->setPartner(std::numeric_limits<uint32_t>::max());    
   }else {
     auto index(this->randomNumbers.r250_rand32() % nReactiveBonds);
-    auto it(ing.getBondedMonomers().begin());
+    // auto it(ing.getBondedMonomers().begin());
+    auto it(ing.getBondedMonomers().cbegin());
+    
     std::advance( it, index);
     auto BondPair(it->first);
     this->setIndex(BondPair.first);
