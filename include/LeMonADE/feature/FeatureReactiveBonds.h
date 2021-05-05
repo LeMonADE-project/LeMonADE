@@ -60,10 +60,10 @@ class MonomerReactivity
 	MonomerReactivity():reactivity(false),numMaxLinks(0){}
 
 	//! Getting the reactivity of the monomer.
-	const bool isReactive() const {return reactivity;}
+	 bool isReactive() const {return reactivity;}
 	
 	//! Getting the number of maximum possible bonds for the monomer.
-	const uint32_t getNumMaxLinks() const {return numMaxLinks;};
+	 uint32_t getNumMaxLinks() const {return numMaxLinks;};
 
 	MonomerReactivity& operator= (const MonomerReactivity source)
 	{
@@ -79,13 +79,13 @@ class MonomerReactivity
 	  numMaxLinks = react.getNumMaxLinks();
 	  /// \todo There should be a check in the function to test against the "default" maximum connectivity for consistency reason.
 	}
-	const bool operator == (const MonomerReactivity &react) const 
+	 bool operator == (const MonomerReactivity &react) const 
 	{
 	  if ( react.getNumMaxLinks() != numMaxLinks  ) return false;
 	  if ( react.isReactive()   != reactivity ) return false;
 	  return true;
 	}
-	const bool operator!= (const MonomerReactivity &react) const 
+	 bool operator!= (const MonomerReactivity &react) const 
 	{ 
 	  return !(*this == react);
 	}

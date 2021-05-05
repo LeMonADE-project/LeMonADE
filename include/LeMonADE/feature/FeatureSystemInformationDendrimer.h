@@ -56,22 +56,22 @@ public:
 	void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& filewriter) const;
 
 	//! getter function for dendrimer generation
-	const uint32_t getGeneration() const {return generation;} 
+	uint32_t getGeneration() const {return generation;} 
 	//! setter function for dendrimer generation
 	void setGeneration(uint32_t generation_){generation=generation_;}
 
 	//! getter function for dendrimer spacer length
-	const uint32_t getSpacerLength() const { return spacerLength;}
+	uint32_t getSpacerLength() const { return spacerLength;}
 	//! setter function for dendrimer spacer length
 	void setSpacerLength(uint32_t spacerLength_){spacerLength=spacerLength_;}
 	
 	//! getter function for the functionality of branching of the dendrimer focal point
-	const uint32_t getCoreFunctionality() const { return coreFunctionality;}
+	uint32_t getCoreFunctionality() const { return coreFunctionality;}
 	//! setter function for the functionality of branching of the dendrimer focal point
 	void setCoreFunctionality(uint32_t coreFunctionality_){coreFunctionality=coreFunctionality_;}
 	
 	//! getter function for the branching functionality of the dendrimer branching points except the focal point
-	const uint32_t getBranchingPointFunctionality() const { return branchingPointFunctionality;}
+	uint32_t getBranchingPointFunctionality() const { return branchingPointFunctionality;}
 	//! setter function for the branching functionality of the dendrimer branching points except the focal point
 	void setBranchingPointFunctionality(uint32_t branchingPointFunctionality_){branchingPointFunctionality=branchingPointFunctionality_;}
 	

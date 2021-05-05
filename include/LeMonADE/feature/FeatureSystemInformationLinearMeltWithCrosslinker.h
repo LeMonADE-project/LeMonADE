@@ -65,57 +65,35 @@ public:
 	template <class IngredientsType>
 	void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& filewriter) const;
 
-	//!
-	const uint32_t getNumberofChains() const {
-	  
-	  return nChains;
-	  
-	} 
+	//!return the number of chains 
+	uint32_t getNumberofChains() const { return nChains; } 
 	
-	//!Should be used carefully!!
+	//!set the number of chains 
 	void setNumberofChains(uint32_t nChains_){nChains=nChains_;}
 
-	//!
-	const uint32_t getNumberofCrossLinkers() const {
-	  
-	  return nCrossLinkers;
-	  
-	}
+	//! return the number of cross linkers 
+	uint32_t getNumberofCrossLinkers() const { return nCrossLinkers; }
 	
-	//!Should be used carefully!!
+	//!set the number of cross linekrs 
 	void setNumberofCrossLinkers(uint32_t nCrossLinkers_){nCrossLinkers=nCrossLinkers_;}
 	
-	//!
-	const uint32_t getChainLength() const {
-	  
-	  return chainLength;
-	  
-	}
+	//! returns the chain lenght 
+	const uint32_t getChainLength() const {return chainLength; }
 	
-	//!Should be used carefully!!
+	//!set the chain length 
 	void setChainLength(uint32_t chainLength_){chainLength=chainLength_;}
 	
-	//!
-	const uint32_t getFunctionality() const {
-	  
-	  return functionality;
-	  
-	}
+	//! get the functionality of the cross linker 
+	uint32_t getFunctionality() const {return functionality;}
 	
-	//!Should be used carefully!!
+	//!set the functionality of cross linker
 	void setFunctionality(uint32_t functionality_){functionality=functionality_;}
 	
-	//!
-	const uint32_t getNMonomersPerCrossLink() const {
-	  
-	  return nMonomersPerCrossLink;
-	  
-	}
+	//!get the number of monomres per cross link
+	uint32_t getNMonomersPerCrossLink() const { return nMonomersPerCrossLink;}
 	
-	//!Should be used carefully!!
+	//!set the number of monomers per cross linker 
 	void setNMonomersPerCrossLink(uint32_t nMonomersPerCrossLink_){nMonomersPerCrossLink=nMonomersPerCrossLink_;}
-	
-	
 	
 private:
 	uint32_t nChains;

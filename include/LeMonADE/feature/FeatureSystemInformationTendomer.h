@@ -60,22 +60,22 @@ public:
 	void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& filewriter) const;
 
 	//!
-	const uint32_t getNumTendomers() const {return nTendomers;} 
+	uint32_t getNumTendomers() const {return nTendomers;} 
 	//!
 	void setNumTendomers(uint32_t nTendomers_){nTendomers=nTendomers_;}
 
 	//!
-	const uint32_t getNumCrossLinkers() const { return nCrossLinkers;}
+	uint32_t getNumCrossLinkers() const { return nCrossLinkers;}
 	//!
 	void setNumCrossLinkers(uint32_t nCrossLinkers_){nCrossLinkers=nCrossLinkers_;}
 	
 	//!
-	const uint32_t getNumMonomersPerChain() const { return nMonomersPerChain;}
+	uint32_t getNumMonomersPerChain() const { return nMonomersPerChain;}
 	//!
 	void setNumMonomersPerChain(uint32_t nMonomersPerChain_){nMonomersPerChain=nMonomersPerChain_;}
 	
 	//!
-	const uint32_t getNumLabelsPerTendomerArm() const { return nLabelsPerTendomerArm;}
+	uint32_t getNumLabelsPerTendomerArm() const { return nLabelsPerTendomerArm;}
 	//!
 	void setNumLabelsPerTendomerArm(uint32_t nLabelsPerTendomerArm_){nLabelsPerTendomerArm=nLabelsPerTendomerArm_;}
 	
