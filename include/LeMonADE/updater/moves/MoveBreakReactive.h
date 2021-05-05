@@ -74,13 +74,18 @@ void MoveBreakReactive::init(const IngredientsType& ing)
   this->resetProbability();
 
   //draw index
-  auto index(this->randomNumbers.r250_rand32() % (ing.getNReactedBonds()));
-  auto it(ing.getBondedMonomers().begin());
-  std::advance( it, index);
-  auto BondPair(it->first);
-  this->setIndex(BondPair.first);
-  this->setPartner(BondPair.second);
-
+  auto nReactiveBonds(ing.getNReactedBonds()); 
+  if (nReactiveBonds==0) {
+    this->setIndex(0);
+    this->setPartner(std::numeric_limits<uint32_t>::max());    
+  }else {
+    auto index(this->randomNumbers.r250_rand32() % nReactiveBonds);
+    auto it(ing.getBondedMonomers().begin());
+    std::advance( it, index);
+    auto BondPair(it->first);
+    this->setIndex(BondPair.first);
+    this->setPartner(BondPair.second);
+  }
 }
 
 /*****************************************************************************/
