@@ -107,7 +107,6 @@ void MoveConnectScReactive::init(const IngredientsType& ing)
   }
   else {
     auto index(this->randomNumbers.r250_rand32() % nUnreactedMonomers);
-    // auto it(ing.getUnreactiveMonomers().begin());
     auto it (ing.getUnreactiveMonomers().cbegin());
     std::advance( it, index);
     this->setIndex(it->first);

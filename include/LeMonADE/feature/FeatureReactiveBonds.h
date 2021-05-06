@@ -260,7 +260,7 @@ public:
     };
     uint32_t getNReactiveSites() const {return nReactiveSites;};
     //!returns the bond table of the reacted reactive monomers.
-    std::map<BondPair,edge_type> getBondedMonomers()const {return BondedReactiveMonomers;};
+    const std::map<BondPair,edge_type>& getBondedMonomers()const {return BondedReactiveMonomers;};
     //! returns false if the bond does not exist
     bool checkReactiveBondExists(uint32_t Mon1, uint32_t Mon2) const 
     {
@@ -268,7 +268,7 @@ public:
       return (BondedReactiveMonomers.find(edge_key) != BondedReactiveMonomers.end()); 
     }
     //!
-    std::map<uint32_t,uint32_t> getUnreactiveMonomers() const {return UnbondedReactiveMonomers;};
+    const std::map<uint32_t,uint32_t>& getUnreactiveMonomers() const {return UnbondedReactiveMonomers;};
     //!
     uint32_t getNUnreactedMonomers()const{return UnbondedReactiveMonomers.size();}
     //!
