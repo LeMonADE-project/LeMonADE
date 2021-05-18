@@ -437,12 +437,13 @@ void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveBreakBase<
 /******************************************************************************/
 template<class IngredientsType>
 void FeatureReactiveBonds::synchronize(IngredientsType& ingredients){
+	BondedReactiveMonomers.clear();
+	UnbondedReactiveMonomers.clear();
     std::cout << "FeatureReactiveBonds::synchronizing ...\n";
     nReactedBonds=0;
     nReactiveSites=0;
     for(size_t i = 0 ; i < ingredients.getMolecules().size(); i++ ){
         if ( ingredients.getMolecules()[i].isReactive() ){
-            addReactiveMonomer(i,ingredients.getMolecules().getAge());
 			uint32_t NLinks(ingredients.getMolecules().getNumLinks(i));
 			uint32_t nIrreversibleBonds=0;
 			for (uint32_t n = 0 ; n < NLinks ;n++){
