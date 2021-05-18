@@ -205,103 +205,113 @@ public:
 ///////////////////////////////////////////////////////////////////////////////
 
 class FeatureReactiveBonds : public Feature {
-  typedef std::pair < uint32_t, uint32_t > BondPair;
-  typedef uint32_t edge_type;
+    typedef std::pair < uint32_t, uint32_t > BondPair;
+    typedef uint32_t edge_type;
 public:
-	//! This Feature requires a monomer_extensions.
-	typedef LOKI_TYPELIST_1(MonomerReactivity) monomer_extensions;
-    typedef LOKI_TYPELIST_2(FeatureBreak, FeatureConnectionSc) required_features_back;
-    
-    FeatureReactiveBonds():nReactedBonds(0),nReactiveSites(0){};
-    
-	//! Export the relevant functionality for reading bfm-files to the responsible reader object
-	template<class IngredientsType>
-	void exportRead(FileImport<IngredientsType>& fileReader); 
+    //! This Feature requires a monomer_extensions.
+    typedef LOKI_TYPELIST_1(MonomerReactivity) monomer_extensions;
+      typedef LOKI_TYPELIST_2(FeatureBreak, FeatureConnectionSc) required_features_back;
+      
+      FeatureReactiveBonds():nReactedBonds(0),nReactiveSites(0){};
+      
+    //! Export the relevant functionality for reading bfm-files to the responsible reader object
+    template<class IngredientsType>
+    void exportRead(FileImport<IngredientsType>& fileReader); 
 
-	//! Export the relevant functionality for writing bfm-files to the responsible writer object
-	template<class IngredientsType>
-	void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
-	
-    //! check base move - always true 
-	template<class IngredientsType> 
-	bool checkMove(const IngredientsType& ingredients, const MoveBase& move) const{return true;};
+    //! Export the relevant functionality for writing bfm-files to the responsible writer object
+    template<class IngredientsType>
+    void exportWrite(AnalyzerWriteBfmFile<IngredientsType>& fileWriter) const;
     
-	//! check base connection move  
-	template<class IngredientsType, class SpecializedMove> 
-	bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<SpecializedMove>& move) const;
+      //! check base move - always true 
+    template<class IngredientsType> 
+    bool checkMove(const IngredientsType& ingredients, const MoveBase& move) const{return true;};
+      
+    //! check base connection move  
+    template<class IngredientsType, class SpecializedMove> 
+    bool checkMove(const IngredientsType& ingredients, const MoveConnectBase<SpecializedMove>& move) const;
 
-    //! check base break move 
-	template<class IngredientsType, class SpecializedMove >
-	bool checkMove(const IngredientsType& ingredients, const MoveBreakBase<SpecializedMove>& move) const ;
+      //! check base break move 
+    template<class IngredientsType, class SpecializedMove >
+    bool checkMove(const IngredientsType& ingredients, const MoveBreakBase<SpecializedMove>& move) const ;
+      
+      //! check movebreakreactive
+    template<class IngredientsType >
+    bool checkMove(const IngredientsType& ingredients, const MoveBreakReactive& move) const {return true;};
+      
+      //!apply move for the connection moves 
+    template<class IngredientsType >
+    void applyMove(IngredientsType& ing, const MoveBase& move){};	
+      
+      //!apply move for the connection moves 
+    template<class IngredientsType, class SpecializedMove>
+    void applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove>& move);	
+      
+      //!apply move for the breaking moves 
+    template<class IngredientsType, class SpecializedMove>
+    void applyMove(IngredientsType& ing, const MoveBreakBase<SpecializedMove>& move);	
+      
+    //! Synchronize, count the number of reactive sites and reacted bonds 
+    template<class IngredientsType>
+    void synchronize(IngredientsType& ingredients);
     
-    //! check movebreakreactive
-	template<class IngredientsType >
-	bool checkMove(const IngredientsType& ingredients, const MoveBreakReactive& move) const ;
-    
-    //!apply move for the connection moves 
-	template<class IngredientsType >
-	void applyMove(IngredientsType& ing, const MoveBase& move){};	
-    
-    //!apply move for the connection moves 
-	template<class IngredientsType, class SpecializedMove>
-	void applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove>& move);	
-    
-    //!apply move for the breaking moves 
-	template<class IngredientsType, class SpecializedMove>
-	void applyMove(IngredientsType& ing, const MoveBreakBase<SpecializedMove>& move);	
-    
-	//! Synchronize, count the number of reactive sites and reacted bonds 
-	template<class IngredientsType>
-	void synchronize(IngredientsType& ingredients);
-    
-    uint32_t getNReactedBonds() const {
-//         return nReactedBonds;
-        return BondedReactiveMonomers.size();
-    };
+    //!returns the number of bond made of two reactive monomers 
+    uint32_t getNReactedBonds() const { return BondedReactiveMonomers.size(); };
+
+    //!returns the total number of reactive monomers capable to form a bond
     uint32_t getNReactiveSites() const {return nReactiveSites;};
+
     //!returns the bond table of the reacted reactive monomers.
     const std::map<BondPair,edge_type>& getBondedMonomers()const {return BondedReactiveMonomers;};
+
     //! returns false if the bond does not exist
     bool checkReactiveBondExists(uint32_t Mon1, uint32_t Mon2) const 
     {
       BondPair edge_key(std::min(Mon1,Mon2),std::max(Mon1,Mon2));
       return (BondedReactiveMonomers.find(edge_key) != BondedReactiveMonomers.end()); 
     }
-    //!
+
+    //! returns the map of unreacted monomers 
     const std::map<uint32_t,uint32_t>& getUnreactiveMonomers() const {return UnbondedReactiveMonomers;};
-    //!
+
+    //!returns the number of reactive monomers capable to form a bond 
     uint32_t getNUnreactedMonomers()const{return UnbondedReactiveMonomers.size();}
-    //!
+
+    //!returns true if the monomer can be connected to another monomer
     bool checkCapableFormingBonds(uint32_t MonID )const { return (UnbondedReactiveMonomers.find(MonID) != UnbondedReactiveMonomers.end()); }
+
     //!get extent of reaction 
     double getConversion() const {return (double(nReactedBonds*2))/(double(nReactiveSites));}
     
 private: 
-  uint32_t nReactedBonds, nReactiveSites;
-  //! holds all bonded reactive monomers during simulation
-  std::map<BondPair, edge_type> BondedReactiveMonomers;
-  //! holds the ids of all reactive monomers which can have another bonds
-  std::map<uint32_t,uint32_t> UnbondedReactiveMonomers; 
-  //!
-//   void addReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers.emplace(MonID,value);} // adds a new entry if the 
-  void addReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers[MonID]=value;} // adds a new entry if the 
-  //! 
-  void eraseReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers.erase(UnbondedReactiveMonomers.find(MonID));}
-  //!add a bond to the container BondedReactiveMonomers
-  void addBondedPair(uint32_t Monomer1, uint32_t Monomer2, uint32_t attribute=0){
-    BondPair edge_key(std::min(Monomer1,Monomer2),std::max(Monomer1,Monomer2));
-    BondedReactiveMonomers[edge_key]=attribute;
-  }
-  //!erase a bond from the container BondedReactiveMonomers
-  void eraseBondedPair(uint32_t Monomer1, uint32_t Monomer2, uint32_t attribute=0){
-    BondPair edge_key(std::min(Monomer1,Monomer2),std::max(Monomer1,Monomer2));
-    typename std::map<BondPair, edge_type>::iterator it;
-    it=BondedReactiveMonomers.find(edge_key);
-    BondedReactiveMonomers.erase(it);
-  }
-  
-};
+    //!number of bonds from reactive monomers and the total number of reactive monomers 
+    uint32_t nReactedBonds, nReactiveSites;
 
+    //! holds all bonded reactive monomers during simulation
+    std::map<BondPair, edge_type> BondedReactiveMonomers;
+
+    //! holds the ids of all reactive monomers which can have another bonds
+    std::map<uint32_t,uint32_t> UnbondedReactiveMonomers; 
+
+    //! adds the monomer to the map of unreacted monomers
+    void addReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers[MonID]=value;} // adds a new entry if the 
+
+    //! erase the monomer ID from the map of unreacted monomers 
+    void eraseReactiveMonomer(uint32_t MonID, uint32_t value=0){UnbondedReactiveMonomers.erase(UnbondedReactiveMonomers.find(MonID));}
+
+    //!add a bond to the container BondedReactiveMonomers
+    void addBondedPair(uint32_t Monomer1, uint32_t Monomer2, uint32_t attribute=0){
+      BondPair edge_key(std::min(Monomer1,Monomer2),std::max(Monomer1,Monomer2));
+      BondedReactiveMonomers[edge_key]=attribute;
+    }
+
+    //!erase a bond from the container BondedReactiveMonomers
+    void eraseBondedPair(uint32_t Monomer1, uint32_t Monomer2, uint32_t attribute=0){
+      BondPair edge_key(std::min(Monomer1,Monomer2),std::max(Monomer1,Monomer2));
+      typename std::map<BondPair, edge_type>::iterator it;
+      it=BondedReactiveMonomers.find(edge_key);
+      BondedReactiveMonomers.erase(it);
+    }
+};
 ///////////////////////////////////////////////////////////////////////////////
 ////////////////////////// member definitions /////////////////////////////////
 /**
@@ -310,15 +320,13 @@ private:
  * taken care automatically when it becomes necessary.\n
  * Registered Read-In Commands:
  * * !reactivity
- *
  * @param fileReader File importer for the bfm-file
  * @param destination List of Feature to write-in from the read values.
  * @tparam IngredientsType Features used in the system. See Ingredients.
  **/
 template<class IngredientsType>
-void FeatureReactiveBonds::exportRead(FileImport< IngredientsType >& fileReader)
-{
-  fileReader.registerRead("!reactivity",new ReadReactivity<IngredientsType>(fileReader.getDestination()));
+void FeatureReactiveBonds::exportRead(FileImport< IngredientsType >& fileReader) {
+    fileReader.registerRead("!reactivity",new ReadReactivity<IngredientsType>(fileReader.getDestination()));
 }
 /**
  * The function is called by the Ingredients class when an object of type Ingredients
@@ -326,13 +334,11 @@ void FeatureReactiveBonds::exportRead(FileImport< IngredientsType >& fileReader)
  * taken care automatically when it becomes necessary.\n
  * Registered Write-Out Commands:
  * * !reactivity
- *
  * @param fileWriter File writer for the bfm-file.
  */
 template<class IngredientsType>
-void FeatureReactiveBonds::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const
-{
-  fileWriter.registerWrite("!reactivity",new WriteReactivity<IngredientsType>(fileWriter.getIngredients_()));
+void FeatureReactiveBonds::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& fileWriter) const{
+    fileWriter.registerWrite("!reactivity",new WriteReactivity<IngredientsType>(fileWriter.getIngredients_()));
 }
 /******************************************************************************/
 /**
@@ -346,24 +352,18 @@ void FeatureReactiveBonds::exportWrite(AnalyzerWriteBfmFile< IngredientsType >& 
  */
 /******************************************************************************/
 template<class IngredientsType, class SpecializedMove> 
-bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const MoveConnectBase<SpecializedMove>& move) const
-{
-	uint32_t ID(move.getIndex());
-	const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
-
-	//check for maximum number of bonds for the first monomer
-	if ( molecules.getNumLinks(ID) >=  molecules[ID].getNumMaxLinks()) return false;
-
-	uint32_t Neighbor(move.getPartner());
-
-	//check if neighbor is reactive 
-	if ( !molecules[Neighbor].isReactive() ) return false;
-	
-	//check for maximum number of bonds for the second monomer
-	if ( molecules.getNumLinks(Neighbor) >= molecules[Neighbor].getNumMaxLinks() ) return false;
-
-	//if still here, then the two monomers are allowed to connect 
-	return true;
+bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const MoveConnectBase<SpecializedMove>& move) const {
+    uint32_t ID(move.getIndex());
+    const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
+    //check for maximum number of bonds for the first monomer
+    if ( molecules.getNumLinks(ID) >=  molecules[ID].getNumMaxLinks()) return false;
+    uint32_t Neighbor(move.getPartner());
+    //check if neighbor is reactive 
+    if ( !molecules[Neighbor].isReactive() ) return false;
+    //check for maximum number of bonds for the second monomer
+    if ( molecules.getNumLinks(Neighbor) >= molecules[Neighbor].getNumMaxLinks() ) return false;
+    //if still here, then the two monomers are allowed to connect 
+    return true;
 }
 /******************************************************************************/
 /**
@@ -377,33 +377,16 @@ bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const 
  */
 /******************************************************************************/
 template<class IngredientsType, class SpecializedMove> 
-bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const MoveBreakBase<SpecializedMove>& move) const
-{
+bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const MoveBreakBase<SpecializedMove>& move) const {
     const typename IngredientsType::molecules_type& molecules=ingredients.getMolecules();
     //check if neighbor is reactive 
-	uint32_t ID(move.getIndex());
-	if ( !molecules[ID].isReactive() ) return false;
+    uint32_t ID(move.getIndex());
+    if ( !molecules[ID].isReactive() ) return false;
     //check if neighbor is reactive 
     uint32_t Neighbor(move.getPartner());
-	if ( !molecules[Neighbor].isReactive() ) return false;
-	//if still here, then the two monomers are allowed to connect 
-	return true;
-}
-/******************************************************************************/
-/**
- * @fn bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const MoveBreakBase<SpecializedMove>& move) const
- * @brief Returns true for all moves other than the ones that have specialized versions of this function.
- * This dummy function is implemented for generality.
- * @details  it might make a difference for the speed if the order of statements is switched for different systems parameters
- * @param [in] ingredients A reference to the IngredientsType - mainly the system
- * @param [in] move MoveBreakReactive chooses only reactie monomers 
- * @return true Always!
- */
-/******************************************************************************/
-template<class IngredientsType> 
-bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const MoveBreakReactive& move) const
-{
-	return true;
+    if ( !molecules[Neighbor].isReactive() ) return false;
+    //if still here, then the two monomers are allowed to connect 
+    return true;
 }
 /******************************************************************************/
 /**
@@ -415,17 +398,15 @@ bool FeatureReactiveBonds ::checkMove(const IngredientsType& ingredients, const 
  */
 /******************************************************************************/
 template<class IngredientsType, class SpecializedMove>
-void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove>& move)
-{
-  nReactedBonds++;
-  auto MonID(move.getIndex()); 
-  auto Partner(move.getPartner());
-  addBondedPair(MonID,Partner,ing.getMolecules().getAge());
-  if (ing.getMolecules()[MonID].getNumMaxLinks()==ing.getMolecules().getNumLinks(MonID) )
-    eraseReactiveMonomer(MonID);
-  if (ing.getMolecules()[Partner].getNumMaxLinks()==ing.getMolecules().getNumLinks(Partner) )
-    eraseReactiveMonomer(Partner);
-  
+void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveConnectBase<SpecializedMove>& move) {
+    nReactedBonds++;
+    auto MonID(move.getIndex()); 
+    auto Partner(move.getPartner());
+    addBondedPair(MonID,Partner,ing.getMolecules().getAge());
+    if (ing.getMolecules()[MonID].getNumMaxLinks()==ing.getMolecules().getNumLinks(MonID) )
+      eraseReactiveMonomer(MonID);
+    if (ing.getMolecules()[Partner].getNumMaxLinks()==ing.getMolecules().getNumLinks(Partner) )
+      eraseReactiveMonomer(Partner);
 }
 /******************************************************************************/
 /**
@@ -437,14 +418,13 @@ void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveConnectBas
  */
 /******************************************************************************/
 template<class IngredientsType, class SpecializedMove>
-void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveBreakBase<SpecializedMove>& move)
-{
-  nReactedBonds--;
-  auto MonID(move.getIndex()); 
-  auto Partner(move.getPartner());
-  eraseBondedPair(MonID,Partner);
-  addReactiveMonomer(MonID,ing.getMolecules().getAge());
-  addReactiveMonomer(Partner,ing.getMolecules().getAge());
+void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveBreakBase<SpecializedMove>& move) {
+    nReactedBonds--;
+    auto MonID(move.getIndex()); 
+    auto Partner(move.getPartner());
+    eraseBondedPair(MonID,Partner);
+    addReactiveMonomer(MonID,ing.getMolecules().getAge());
+    addReactiveMonomer(Partner,ing.getMolecules().getAge());
   
 }
 /******************************************************************************/
@@ -456,54 +436,44 @@ void FeatureReactiveBonds ::applyMove(IngredientsType& ing, const MoveBreakBase<
  */
 /******************************************************************************/
 template<class IngredientsType>
-void FeatureReactiveBonds::synchronize(IngredientsType& ingredients)
-{
-	std::cout << "FeatureReactiveBonds::synchronizing ...\n";
+void FeatureReactiveBonds::synchronize(IngredientsType& ingredients){
+	BondedReactiveMonomers.clear();
+	UnbondedReactiveMonomers.clear();
+    std::cout << "FeatureReactiveBonds::synchronizing ...\n";
     nReactedBonds=0;
     nReactiveSites=0;
-    for(size_t i = 0 ; i < ingredients.getMolecules().size(); i++ )
-	{
-		if ( ingredients.getMolecules()[i].isReactive() )
-		{
-            addReactiveMonomer(i,ingredients.getMolecules().getAge());
+    for(size_t i = 0 ; i < ingredients.getMolecules().size(); i++ ){
+        if ( ingredients.getMolecules()[i].isReactive() ){
 			uint32_t NLinks(ingredients.getMolecules().getNumLinks(i));
 			uint32_t nIrreversibleBonds=0;
-			for (uint32_t n = 0 ; n < NLinks ;n++)
-			{
+			for (uint32_t n = 0 ; n < NLinks ;n++){
 				uint32_t neighbor(ingredients.getMolecules().getNeighborIdx(i,n));
 				if( ingredients.getMolecules()[neighbor].isReactive() )
 					nReactedBonds++;
 				else
-					nIrreversibleBonds++;
+				nIrreversibleBonds++;
 			}
 			if(ingredients.getMolecules()[i].getNumMaxLinks()-ingredients.getMolecules().getNumLinks(i) != 0)
-              addReactiveMonomer(i,ingredients.getMolecules().getAge());
+				addReactiveMonomer(i,ingredients.getMolecules().getAge());
 			nReactiveSites+=(ingredients.getMolecules()[i].getNumMaxLinks()-nIrreversibleBonds);
-		}
-	}
-	nReactedBonds/=2; // they are counted twice: each monomer counts the bond, but essentially there is only one bond.
-    std::cout << "Number of reactive bonds: " << nReactedBonds <<"\n"
-              << "Number of reactive sites: " << nReactiveSites<<"\n"
-              << "Extent of reaction      : " << getConversion()
-              <<std::endl;
-// 	if ( nReactiveSites == 0  )
-// 	{
-// 	  std::stringstream errormessage;
-// 	  errormessage << "FeatureReactiveBonds::synchronize(): The number of possible reactive sites is zero. \n"
-// 		       << "Check if the system is correctly setup with reactivity!";
-// 	  throw std::runtime_error(errormessage.str());
-// 	} 
-    if (nReactiveSites != 0 ){
-	BondedReactiveMonomers.clear();
-        auto edges=ingredients.getMolecules().getEdges();
-        for(auto it=edges.begin();it!=edges.end();++it){
-        auto MonID1(it->first.first);
-        auto MonID2(it->first.second);
-        if(ingredients.getMolecules()[MonID1].isReactive() && ingredients.getMolecules()[MonID2].isReactive())
-            addBondedPair(MonID1,MonID2,ingredients.getMolecules().getAge());
-        }
+      }
     }
-	std::cout << "done\n";
+    nReactedBonds/=2; // they are counted twice: each monomer counts the bond, but essentially there is only one bond.
+	std::cout << "Number of reactive bonds: " << nReactedBonds <<"\n"
+				<< "Number of reactive sites: " << nReactiveSites<<"\n"
+				<< "Extent of reaction      : " << getConversion()
+				<<std::endl;
+	if (nReactiveSites != 0 ){
+    	BondedReactiveMonomers.clear();
+		auto edges=ingredients.getMolecules().getEdges();
+		for(auto it=edges.begin();it!=edges.end();++it){
+			auto MonID1(it->first.first);
+			auto MonID2(it->first.second);
+			if(ingredients.getMolecules()[MonID1].isReactive() && ingredients.getMolecules()[MonID2].isReactive())
+				addBondedPair(MonID1,MonID2,ingredients.getMolecules().getAge());
+		}
+      }
+    std::cout << "done\n";
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////// member definitions for output ///////////////////////////
@@ -517,155 +487,126 @@ void FeatureReactiveBonds::synchronize(IngredientsType& ingredients)
 template < class IngredientsType >
 void ReadReactivity<IngredientsType>::execute()
 {
-  //some variables used during reading
-  //counts the number of reactivity lines in the file
-  int nReactiveBlocks=0;
-  int startIndex,stopIndex;
-  MonomerReactivity reactivity;
-  //contains the latest line read from file
-  std::string line;
-  //used to reset the position of the get pointer after processing the command
-  std::streampos previous;
-  //for convenience: get the input stream
-  std::istream& source=this->getInputStream();
-  //for convenience: get the set of monomers
-  typename IngredientsType::molecules_type& molecules=this->getDestination().modifyMolecules();
+	//some variables used during reading
+	//counts the number of reactivity lines in the file
+	int nReactiveBlocks=0;
+	int startIndex,stopIndex;
+	MonomerReactivity reactivity;
+	//contains the latest line read from file
+	std::string line;
+	//used to reset the position of the get pointer after processing the command
+	std::streampos previous;
+	//for convenience: get the input stream
+	std::istream& source=this->getInputStream();
+	//for convenience: get the set of monomers
+	typename IngredientsType::molecules_type& molecules=this->getDestination().modifyMolecules();
+	//go to next line and save the position of the get pointer into streampos previous
+	getline(source,line);
+	previous=(source).tellg();
+	//read and process the lines containing the bond vector definition
+	getline(source,line);
 
-  //go to next line and save the position of the get pointer into streampos previous
-  getline(source,line);
-  previous=(source).tellg();
-
-  //read and process the lines containing the bond vector definition
-  getline(source,line);
-
-  while(!line.empty() && !((source).fail())){
-
-    //stop at next Read and set the get-pointer to the position before the Read
-    if(this->detectRead(line)){
-      (source).seekg(previous);
-      break;
-    }
-
-    //initialize stringstream with content for ease of processing
-    std::stringstream stream(line);
-
-    //read vector components
-    stream>>startIndex;
-
-    //throw exception, if extraction fails
-    if(stream.fail()){
-      std::stringstream messagestream;
-      messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Could not read first index in reactivity line "<<nReactiveBlocks+1;
-      throw std::runtime_error(messagestream.str());
-    }
-
-    //throw exception, if next character isnt "-"
-    if(!this->findSeparator(stream,'-')){
-
-    	std::stringstream messagestream;
-      messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Wrong definition of reactivity\nCould not find separator \"-\" "
-		   <<"in reactivity definition no "<<nReactiveBlocks+1;
-      throw std::runtime_error(messagestream.str());
-
-    }
-
-    //read bond identifier, throw exception if extraction fails
-    stream>>stopIndex;
-
-    //throw exception, if extraction fails
-    if(stream.fail()){
-    	std::stringstream messagestream;
-      messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Could not read second index in reactivity line "<<nReactiveBlocks+1;
-      throw std::runtime_error(messagestream.str());
-    }
-
-    //throw exception, if next character isnt ":"
-    if(!this->findSeparator(stream,':')){
-
-    	std::stringstream messagestream;
-      messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"Wrong definition of reactivity\nCould not find separator \":\" "
-		   <<"in reactivity definition no "<<nReactiveBlocks+1;
-      throw std::runtime_error(messagestream.str());
-
-    }
-    //read the attribute tag
-    stream>>reactivity;
-    //if extraction worked, save the attributes
-    if(!stream.fail()){
-
-      //save attributes
-      for(int n=startIndex;n<=stopIndex;n++)
-      {
-	//check if the number of maximum bonds is consistent with the maximum number of bonds given for ingredients
-	if ( this->getDestination().getMolecules().getMaxConnectivity() >= reactivity.getNumMaxLinks() ) 
-	{
-	    //use n-1 as index, because bfm-files start counting indices at 1 (not 0)
-	    molecules[n-1].setMonomerReactivity(reactivity);
-// 	    std::cout << "idx" << n-1 << " reactivity: " << reactivity.isReactive() << " numMaxBonds" << reactivity.getNumMaxLinks() << std::endl;
-	}else 
-	{
-    	std::stringstream messagestream;
-      messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
-		   <<"the numMaxBonds for the current monomer is exceeding the max number \n"
-		   <<"of allowed connectivity for ingredients in "<<nReactiveBlocks+1;
-      throw std::runtime_error(messagestream.str());
+	while(!line.empty() && !((source).fail())){
+		//stop at next Read and set the get-pointer to the position before the Read
+		if(this->detectRead(line)){
+			(source).seekg(previous);
+			break;
+		}
+		//initialize stringstream with content for ease of processing
+		std::stringstream stream(line);
+		//read vector components
+		stream>>startIndex;
+		//throw exception, if extraction fails
+		if(stream.fail()){
+			std::stringstream messagestream;
+			messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
+				<<"Could not read first index in reactivity line "<<nReactiveBlocks+1;
+			throw std::runtime_error(messagestream.str());
+		}
+		//throw exception, if next character isnt "-"
+		if(!this->findSeparator(stream,'-')){
+			std::stringstream messagestream;
+			messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
+				<<"Wrong definition of reactivity\nCould not find separator \"-\" "
+				<<"in reactivity definition no "<<nReactiveBlocks+1;
+			throw std::runtime_error(messagestream.str());
+		}
+		//read bond identifier, throw exception if extraction fails
+		stream>>stopIndex;
+		//throw exception, if extraction fails
+		if(stream.fail()){
+			std::stringstream messagestream;
+			messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
+				<<"Could not read second index in reactivity line "<<nReactiveBlocks+1;
+			throw std::runtime_error(messagestream.str());
+		}
+		//throw exception, if next character isnt ":"
+		if(!this->findSeparator(stream,':')){
+			std::stringstream messagestream;
+			messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
+				<<"Wrong definition of reactivity\nCould not find separator \":\" "
+				<<"in reactivity definition no "<<nReactiveBlocks+1;
+			throw std::runtime_error(messagestream.str());
+		}
+		//read the attribute tag
+		stream>>reactivity;
+		//if extraction worked, save the attributes
+		if(!stream.fail()){
+			//save attributes
+			for(int n=startIndex;n<=stopIndex;n++){
+				//check if the number of maximum bonds is consistent with the maximum number of bonds given for ingredients
+				if ( this->getDestination().getMolecules().getMaxConnectivity() >= reactivity.getNumMaxLinks() ) {
+					//use n-1 as index, because bfm-files start counting indices at 1 (not 0)
+					molecules[n-1].setMonomerReactivity(reactivity);
+				}else{
+					std::stringstream messagestream;
+					messagestream<<"ReadReactivity<IngredientsType>::execute()\n"
+						<<"the numMaxBonds for the current monomer is exceeding the max number \n"
+						<<"of allowed connectivity for ingredients in "<<nReactiveBlocks+1;
+					throw std::runtime_error(messagestream.str());
+				}
+			}
+			nReactiveBlocks++;
+			getline((source),line);
+		}else{//otherwise throw an exception
+			std::stringstream messagestream;
+			messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
+				<<"could not read reactivity information in reactivity definition no "<<nReactiveBlocks+1;
+			throw std::runtime_error(messagestream.str());
+		}
 	}
-      }
-      nReactiveBlocks++;
-      getline((source),line);
-
-    }
-    //otherwise throw an exception
-    else{
-
-    	std::stringstream messagestream;
-      messagestream<<"ReadAttributes<IngredientsType>::execute()\n"
-		   <<"could not read reactivity information in reactivity definition no "<<nReactiveBlocks+1;
-      throw std::runtime_error(messagestream.str());
-
-    }
-  }
 }
-
-
 //! Executes the routine to write \b !reactivity.
 template < class IngredientsType>
-void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm)
-{
-  //for all output the indices are increased by one, because the file-format
-  //starts counting indices at 1 (not 0)
+void WriteReactivity<IngredientsType>::writeStream(std::ostream& strm){
+	//for all output the indices are increased by one, because the file-format
+	//starts counting indices at 1 (not 0)
+	//write bfm command
+	strm<<"!reactivity\n";
+	//get reference to monomers
+	const typename IngredientsType::molecules_type& molecules=this->getSource().getMolecules();
 
-  //write bfm command
-  strm<<"!reactivity\n";
-  //get reference to monomers
-  const typename IngredientsType::molecules_type& molecules=this->getSource().getMolecules();
+	size_t nMonomers=molecules.size();
+	//reactivity blocks begin with startIndex
+	size_t startIndex=0;
+	//counter variable
+	size_t n=0;
+	//reactivity to be written (updated in loop below)
+	MonomerReactivity reactivity=molecules[0].getMonomerReactivity();
 
-  size_t nMonomers=molecules.size();
-  //reactivity blocks begin with startIndex
-  size_t startIndex=0;
-  //counter variable
-  size_t n=0;
-  //reactivity to be written (updated in loop below)
-  MonomerReactivity reactivity=molecules[0].getMonomerReactivity();
-
-  //write reactivity (blockwise)
-  while(n<nMonomers){
-    if(molecules[n].getMonomerReactivity()!=reactivity)
-    {
-      if( reactivity.isReactive() == true )
-	strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
-      reactivity=molecules[n].getMonomerReactivity();
-      startIndex=n;
-    }
-    n++;
-  }
-  //write final reactivity
-  if( reactivity.isReactive() == true )
-    strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl;
-  strm<<std::endl;
+	//write reactivity (blockwise)
+	while(n<nMonomers){
+		if(molecules[n].getMonomerReactivity()!=reactivity){
+			if( reactivity.isReactive() == true )
+				strm<<startIndex+1<<"-"<<n<<":"<<reactivity<<std::endl;
+			reactivity=molecules[n].getMonomerReactivity();
+			startIndex=n;
+		}
+		n++;
+	}
+	//write final reactivity
+	if( reactivity.isReactive() == true )
+		strm<<startIndex+1<<"-"<<nMonomers<<":"<<reactivity<<std::endl;
+	strm<<std::endl;
 }
 #endif
