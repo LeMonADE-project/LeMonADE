@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015,2021 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        |
 ----------------------------------------------------------------------------------
@@ -46,12 +46,72 @@ class MoveConnectScReactive:public MoveConnectBase<MoveConnectScReactive>
 {
 public:
   MoveConnectScReactive(){
-    shellPositions[0]=VectorInt3( 2, 0, 0);
+      // old implementation until May2021
+    /*shellPositions[0]=VectorInt3( 2, 0, 0);
     shellPositions[1]=VectorInt3(-2, 0, 0);
     shellPositions[2]=VectorInt3( 0, 2, 0);
     shellPositions[3]=VectorInt3( 0,-2, 0);
     shellPositions[4]=VectorInt3( 0, 0, 2);
     shellPositions[5]=VectorInt3( 0, 0,-2);
+     */
+    
+    shellPositions[0]  = VectorInt3(2,0,0);
+    shellPositions[1]  = VectorInt3(0,0,2);
+    shellPositions[2]  = VectorInt3(0,2,0);
+    shellPositions[3]  = VectorInt3(-2,0,0);
+    shellPositions[4]  = VectorInt3(0,0,-2);
+    shellPositions[5]  = VectorInt3(0,-2,0);
+
+    shellPositions[6]  = VectorInt3(2,1,0);
+    shellPositions[7]  = VectorInt3(1,0,2);
+    shellPositions[8]  = VectorInt3(0,2,1);
+    shellPositions[9]  = VectorInt3(-2,1,0);
+    shellPositions[10] = VectorInt3(1,0,-2);
+    shellPositions[11] = VectorInt3(0,-2,1);
+    shellPositions[12] = VectorInt3(2,-1,0);
+    shellPositions[13] = VectorInt3(-1,0,2);
+    shellPositions[14] = VectorInt3(0,2,-1);
+    shellPositions[15] = VectorInt3(-2,-1,0);
+    shellPositions[16] = VectorInt3(-1,0,-2);
+    shellPositions[17] = VectorInt3(0,-2,-1);
+    shellPositions[18] = VectorInt3(1,2,0);
+    shellPositions[19] = VectorInt3(2,0,1);
+    shellPositions[20] = VectorInt3(0,1,2);
+    shellPositions[21] = VectorInt3(-1,2,0);
+    shellPositions[22] = VectorInt3(2,0,-1);
+    shellPositions[23] = VectorInt3(0,-1,2);
+    shellPositions[24] = VectorInt3(1,-2,0);
+    shellPositions[25] = VectorInt3(-2,0,1);
+    shellPositions[26] = VectorInt3(0,1,-2);
+    shellPositions[27] = VectorInt3(-1,-2,0);
+    shellPositions[28] = VectorInt3(-2,0,-1);
+    shellPositions[29] = VectorInt3(0,-1,-2);
+
+    shellPositions[30] = VectorInt3(2,1,1);
+    shellPositions[31] = VectorInt3(1,1,2);
+    shellPositions[32] = VectorInt3(1,2,1);
+    shellPositions[33] = VectorInt3(-2,1,1);
+    shellPositions[34] = VectorInt3(1,1,-2);
+    shellPositions[35] = VectorInt3(1,-2,1);
+    shellPositions[36] = VectorInt3(2,-1,1);
+    shellPositions[37] = VectorInt3(-1,1,2);
+    shellPositions[38] = VectorInt3(1,2,-1);
+    shellPositions[39] = VectorInt3(-2,-1,1);
+    shellPositions[40] = VectorInt3(-1,1,-2);
+    shellPositions[41] = VectorInt3(1,-2,-1);
+    shellPositions[42] = VectorInt3(2,1,-1);
+    shellPositions[43] = VectorInt3(1,-1,2);
+    shellPositions[44] = VectorInt3(-1,2,1);
+    shellPositions[45] = VectorInt3(-2,1,-1);
+    shellPositions[46] = VectorInt3(1,-1,-2);
+    shellPositions[47] = VectorInt3(-1,-2,1);
+    shellPositions[48] = VectorInt3(2,-1,-1);
+    shellPositions[49] = VectorInt3(-1,-1,2);
+    shellPositions[50] = VectorInt3(-1,2,-1);
+    shellPositions[51] = VectorInt3(-2,-1,-1);
+    shellPositions[52] = VectorInt3(-1,-1,-2);
+    shellPositions[53] = VectorInt3(-1,-2,-1);
+    
   }
 
   // overload initialise function to be able to set the moves index and direction if neccessary
@@ -66,18 +126,22 @@ public:
 private:
   // holds the possible move directions
   /**
-   * @brief Array that holds the 6 possible move directions
+   * @brief Array that holds the 54 possible move directions
    *
    * @details 
    * * shellPositions   = (dx, dy, dz)
-   * * shellPositions[0]= ( 2,  0,  0);
-   * * shellPositions[1]= (-2,  0,  0);
-   * * shellPositions[2]= ( 0,  2,  0);
-   * * shellPositions[3]= ( 0, -2,  0);
-   * * shellPositions[4]= ( 0,  0,  2);
-   * * shellPositions[5]= ( 0,  0, -2);
+   * * shellPositions[..]=(+-2,  0,  0); //  6
+   * * shellPositions[..]=(+-2,+-1,  0); // 24
+   * * shellPositions[..]=(+-2,+-1,+-1); // 24
    */
-  VectorInt3 shellPositions[6];
+  VectorInt3 shellPositions[54];
+  const size_t shellPositionsEntries = 54;
+  
+  //! number of randomly choosen direction out of the shell
+  const size_t numRandomSelectedDirections = 1;
+  
+  //! contains the id of the reactive partner in the randomly selected shell direction
+  std::map<uint32_t, VectorInt3> IdReactivePartnerInShell;
 };
 
 
@@ -98,6 +162,9 @@ template <class IngredientsType>
 void MoveConnectScReactive::init(const IngredientsType& ing)
 {
   this->resetProbability();
+  
+  // clear the list of reactive partners in shell
+  IdReactivePartnerInShell.clear();
 
   //draw index
   auto nUnreactedMonomers(ing.getNUnreactedMonomers());
@@ -106,14 +173,48 @@ void MoveConnectScReactive::init(const IngredientsType& ing)
     this->setPartner(std::numeric_limits<uint32_t>::max() );
   }
   else {
+    // randomly select a monomer
     auto index(this->randomNumbers.r250_rand32() % nUnreactedMonomers);
     auto it (ing.getUnreactiveMonomers().cbegin());
     std::advance( it, index);
     this->setIndex(it->first);
-    //draw direction
-    VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
-    this->setDir(randomDir);
-    this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir) );
+    
+    // search the vicinity for reactive monomers
+    for(size_t test = 0; test < numRandomSelectedDirections; test++)
+    {
+        //draw direction
+        VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % shellPositionsEntries]);
+        
+        // Get the lattice value at a certain point - see FeatureConnectionSc
+        // return monomer index between (0; molecules.size()-1) if there's a monomer
+        // return uint32_t(-1)=4294967295 if place is empty
+        uint32_t idPartner=ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir);
+        
+        // check if selected position contains a partner
+        if ((std::numeric_limits<uint32_t>::max() != idPartner ) && ing.getMolecules()[idPartner].isReactive() )
+        {
+            IdReactivePartnerInShell[idPartner]=randomDir;
+        }
+    }
+    
+    // select a random partner and direction for connection move
+    if(IdReactivePartnerInShell.size() == 0)
+    {
+        // no partner at all - move will rejected anyway
+        this->setDir(shellPositions[0]); // it's arbitary 
+        this->setPartner(std::numeric_limits<uint32_t>::max() );
+    }
+    else
+    {   
+        // select a random reactive monomer from the list
+        auto idx(this->randomNumbers.r250_rand32() % IdReactivePartnerInShell.size());
+        auto itID (IdReactivePartnerInShell.cbegin());
+        std::advance( itID, idx);
+        
+        this->setDir(itID->second);
+        this->setPartner(itID->first);
+    }
+    
   }
 }
 
@@ -130,6 +231,9 @@ template <class IngredientsType>
 void MoveConnectScReactive::init(const IngredientsType& ing, uint32_t index)
 {
   this->resetProbability();
+  
+  // clear the list of reactive partners in shell
+  IdReactivePartnerInShell.clear();
 
   if ( !ing.checkCapableFormingBonds(index) )
   {
@@ -143,10 +247,41 @@ void MoveConnectScReactive::init(const IngredientsType& ing, uint32_t index)
     else
       throw std::runtime_error("MoveConnectScReactive::init(ing, index): index out of range!");
       
-    //draw direction
-    VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
-    this->setDir(randomDir);
-    this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir));
+    // search the vicinity for reactive monomers
+    for(size_t test = 0; test < numRandomSelectedDirections; test++)
+    {
+        //draw direction
+        VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % shellPositionsEntries]);
+        
+        // Get the lattice value at a certain point - see FeatureConnectionSc
+        // return monomer index between (0; molecules.size()-1) if there's a monomer
+        // return uint32_t(-1)=4294967295 if place is empty
+        uint32_t idPartner=ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir);
+        
+        // check if selected position contains a partner
+        if ((std::numeric_limits<uint32_t>::max() != idPartner ) && ing.getMolecules()[idPartner].isReactive() )
+        {
+            IdReactivePartnerInShell[idPartner]=randomDir;
+        }
+    }
+    
+    // select a random partner and direction for connection move
+    if(IdReactivePartnerInShell.size() == 0)
+    {
+        // no partner at all - move will rejected anyway
+        this->setDir(shellPositions[0]); // it's arbitary 
+        this->setPartner(std::numeric_limits<uint32_t>::max() );
+    }
+    else
+    {   
+        // select a random reactive monomer from the list
+        auto idx(this->randomNumbers.r250_rand32() % IdReactivePartnerInShell.size());
+        auto itID (IdReactivePartnerInShell.cbegin());
+        std::advance( itID, idx);
+        
+        this->setDir(itID->second);
+        this->setPartner(itID->first);
+    }
   }
 }
 
@@ -210,14 +345,11 @@ void MoveConnectScReactive::init(const IngredientsType& ing, uint32_t index, Vec
     else
       throw std::runtime_error("MoveConnectScReactive::init(ing, index, bondpartner): index out of range!");
 
-    //set direction
-    if(dir==shellPositions[0] ||
-      dir==shellPositions[1] ||
-      dir==shellPositions[2] ||
-      dir==shellPositions[3] ||
-      dir==shellPositions[4] ||
-      dir==shellPositions[5]  )
+    //set direction if applicable
+    if (std::find(std::begin(shellPositions), std::end(shellPositions), dir) != std::end(shellPositions))
+    {
       this->setDir(dir);
+    }
     else
       throw std::runtime_error("MoveLocalSc::init(ing, dir): direction vector out of range!");
     this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+dir));
