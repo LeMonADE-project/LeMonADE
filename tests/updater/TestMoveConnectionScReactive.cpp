@@ -111,7 +111,7 @@ TEST_F(TestMoveConnectionScReactive, checkAll)
   EXPECT_EQ(0, move.getIndex());
   EXPECT_TRUE((move.getIndex() >= 0) && (move.getIndex() <= 1)); // only 0 and 1 are reactive
   EXPECT_TRUE((move.getDir()*move.getDir() >= 4) && (move.getDir()*move.getDir() <= 6));
-  EXPECT_TRUE(((move.getPartner() == 0)) || (move.getPartner()==std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  EXPECT_TRUE(((move.getPartner() == 1)) || (move.getPartner()==std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
   EXPECT_FALSE((move.getPartner() >= 2) && (move.getPartner() < std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
   
 

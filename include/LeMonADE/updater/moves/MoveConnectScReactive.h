@@ -169,7 +169,7 @@ void MoveConnectScReactive::init(const IngredientsType& ing)
   //draw index
   auto nUnreactedMonomers(ing.getNUnreactedMonomers());
   if( nUnreactedMonomers ==0 ) {
-    this->setIndex(0);
+    this->setIndex(std::numeric_limits<uint32_t>::max());
     this->setPartner(std::numeric_limits<uint32_t>::max() );
   }
   else {
@@ -190,8 +190,8 @@ void MoveConnectScReactive::init(const IngredientsType& ing)
         // return uint32_t(-1)=4294967295 if place is empty
         uint32_t idPartner=ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir);
         
-        // check if selected position contains a partner
-        if ((std::numeric_limits<uint32_t>::max() != idPartner ) && ing.getMolecules()[idPartner].isReactive() )
+        // check if selected position contains a reactive partner with vaccant reaction site
+        if ((std::numeric_limits<uint32_t>::max() != idPartner ) && (ing.getMolecules()[idPartner].isReactive()) && (ing.getMolecules().getNumLinks(idPartner) < ing.getMolecules()[idPartner].getNumMaxLinks()) )
         {
             IdReactivePartnerInShell[idPartner]=randomDir;
         }
