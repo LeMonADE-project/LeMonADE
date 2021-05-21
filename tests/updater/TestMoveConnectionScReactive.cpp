@@ -146,11 +146,12 @@ TEST_F(TestMoveConnectionScReactive, checkAll)
   move.init(ingredients,0,1); //already occupied
   EXPECT_FALSE(move.check(ingredients));
   
-  //no reactive groups left
-  EXPECT_EQ(ingredients.getNUnreactedMonomers(), 0);
+  //one reactive group left (monomer id 1)
+  EXPECT_EQ(ingredients.getNUnreactedMonomers(), 1);
   move.init(ingredients);
-  EXPECT_EQ(move.getIndex(), 0 ); // default value for invalid move
-  EXPECT_TRUE(move.getPartner() == std::numeric_limits<uint32_t>::max());
+  EXPECT_EQ(move.getIndex(), 1 ); 
+  EXPECT_TRUE(move.getPartner() == std::numeric_limits<uint32_t>::max()); // default value for invalid move
+  EXPECT_TRUE((move.getDir()*move.getDir() == 4)); // default value for invalid move
   EXPECT_FALSE(move.check(ingredients));
   
 
