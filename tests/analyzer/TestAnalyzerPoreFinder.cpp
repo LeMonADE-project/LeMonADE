@@ -31,7 +31,8 @@
  * @brief Tests for the class AnalyzerPoreFinder
  *
  * @author Ankush Checkervarty
- * @date 09.08.2019
+ * @author Ron Dockhorn
+ * @date 31.05.2021
  * */
 /*****************************************************************************/
 
@@ -39,7 +40,8 @@
 
 #include <cstdio>
 #include <sstream>
-#include <string> 
+#include <string>
+#include <cstdlib>
 
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/core/Ingredients.h>
@@ -310,16 +312,29 @@ TEST_F(AnalyzerPoreFinderTest, ClusterAnalysisOnePore)
 
     for(int32_t y=0;y<16;y++)
         std::getline(file,linecontent);
-     
-    EXPECT_EQ(linecontent.substr(0,2),"16");
-    EXPECT_EQ(linecontent.substr(3,2),"16");
-    EXPECT_EQ(linecontent.substr(6,1),"1");
+    
+    std::string buf;                 // Have a buffer string
+    std::stringstream ss(linecontent);       // Insert the string into a stream
+    std::vector<std::string> tokens; // Create vector to hold our words
+
+    while (ss >> buf)
+        tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),1.0);
     
     std::getline(file,linecontent);
 
-    EXPECT_EQ(linecontent.substr(0,2),"16");
-    EXPECT_EQ(linecontent.substr(3,2),"17");
-    EXPECT_EQ(linecontent.substr(6,1),"1");
+    std::stringstream ss2(linecontent);       // Insert the string into a stream
+    tokens.clear();
+    
+    while (ss2 >> buf)
+        tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),17.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),1.0);
     
     file.close();
     remove("PoreCoordinates.dat");
@@ -397,10 +412,17 @@ TEST_F(AnalyzerPoreFinderTest, ClusterAnalysisTwoPoreandCopolymers)
         
     for(int32_t y=0;y<16;y++)
         std::getline(file,linecontent);
-     
-    EXPECT_EQ(linecontent.substr(0,2),"16");
-    EXPECT_EQ(linecontent.substr(3,2),"16");
-    EXPECT_EQ(linecontent.substr(6,1),"1");
+    
+    std::string buf;                 // Have a buffer string
+    std::stringstream ss(linecontent);       // Insert the string into a stream
+    std::vector<std::string> tokens; // Create vector to hold our words
+
+    while (ss >> buf)
+        tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),1.0);
     
     //If there are two pores, the analyzer
     //treats them like two pore events.
@@ -408,9 +430,17 @@ TEST_F(AnalyzerPoreFinderTest, ClusterAnalysisTwoPoreandCopolymers)
     for(int32_t y=16;y<16+4;y++)
         std::getline(file,linecontent);
     
-    EXPECT_EQ(linecontent.substr(0,2),"16");
-    EXPECT_EQ(linecontent.substr(3,2),"20");
-    EXPECT_EQ(linecontent.substr(6,3),"0.5");
+    ss.str(""); //clear stringstream
+    ss.clear();
+    ss.str(linecontent);       // Insert the string into a stream
+    tokens.clear();
+    
+    while (ss >> buf)
+      tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),20.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),0.5);
     
     file.close();
     
@@ -421,10 +451,18 @@ TEST_F(AnalyzerPoreFinderTest, ClusterAnalysisTwoPoreandCopolymers)
     
     linecontent = passComments(file1);
     
-    EXPECT_EQ(linecontent[0],'0');
-    EXPECT_EQ(linecontent[2],'0');
-    EXPECT_EQ(linecontent[4],'0');
-
+    ss.str(""); //clear stringstream
+    ss.clear();
+    ss.str(linecontent);       // Insert the string into a stream
+    tokens.clear();
+    
+    while (ss >> buf)
+      tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),0.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),0.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),0.0);
+    
     //For the first copolymer.
     for(int32_t x=0;x<16;x++)
         for(int32_t y=0;y<32;y++)
@@ -432,26 +470,50 @@ TEST_F(AnalyzerPoreFinderTest, ClusterAnalysisTwoPoreandCopolymers)
         
     for(int32_t y=0;y<16-9;y++)
         std::getline(file1,linecontent);
-        
-    EXPECT_EQ(linecontent.substr(0,2),"16");
-    EXPECT_EQ(linecontent.substr(3,1),"7");
-    EXPECT_EQ(linecontent.substr(5,3),"0.5");
+    
+    ss.str(""); //clear stringstream
+    ss.clear();
+    ss.str(linecontent);       // Insert the string into a stream
+    tokens.clear();
+    
+    while (ss >> buf)
+      tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),7.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),0.5);
     
     //second copolymer
     for(int32_t y=16-9;y<16-3;y++)
         std::getline(file1,linecontent);
-        
-    EXPECT_EQ(linecontent.substr(0,2),"16");
-    EXPECT_EQ(linecontent.substr(3,2),"13");
-    EXPECT_EQ(linecontent.substr(6,3),"0.5");
+    
+    ss.str(""); //clear stringstream
+    ss.clear();
+    ss.str(linecontent);       // Insert the string into a stream
+    tokens.clear();
+    
+    while (ss >> buf)
+      tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),13.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),0.5);
     
     //third copolymer
     for(int32_t y=16-3;y<16+3;y++)
         std::getline(file1,linecontent);
     
-    EXPECT_EQ(linecontent.substr(0,2),"16");
-    EXPECT_EQ(linecontent.substr(3,2),"19");
-    EXPECT_EQ(linecontent.substr(6,3),"0.5");
+    ss.str(""); //clear stringstream
+    ss.clear();
+    ss.str(linecontent);       // Insert the string into a stream
+    tokens.clear();
+    
+    while (ss >> buf)
+      tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),16.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),19.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),0.5);
     
     remove("PoreCoordinates.dat");
     remove("PolymerCoordinates.dat");
