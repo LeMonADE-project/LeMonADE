@@ -35,7 +35,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <map>
 #include <stdexcept>
-
+#include <limits>
+#include <iomanip>
 
 
 /**
@@ -120,6 +121,8 @@ void ResultFormattingTools::writeTable(std::ostream& stream,
 
 	for (size_t row = 0; row < results[0].size(); ++row) {
 		for (size_t column = 0; column < results.size(); ++column) {
+                        stream.precision(std::numeric_limits<typename ResultType::value_type::value_type>::max_digits10);
+                        stream.setf( std::ios::fixed, std:: ios::floatfield );
 			stream << results[column][row] << "\t";
 		}
 		stream << std::endl;
@@ -177,6 +180,8 @@ void ResultFormattingTools::appendToResultFile(std::string filename,ResultType& 
 	//write content
 	for (size_t row = 0; row < results[0].size(); ++row) {
 		for (size_t column = 0; column < results.size(); ++column) {
+                        file.precision(std::numeric_limits<typename ResultType::value_type::value_type>::max_digits10);
+                        file.setf( std::ios::fixed, std:: ios::floatfield );
 			file << results[column][row] << "\t";
 		}
 		file << std::endl;
