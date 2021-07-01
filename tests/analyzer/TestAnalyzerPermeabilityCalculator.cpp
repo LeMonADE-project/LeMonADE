@@ -31,7 +31,8 @@
  * @brief Tests for the class AnalyzerPermeabilityCalculator
  *
  * @author Ankush Checkervarty
- * @date 09.08.2019
+ * @author Ron Dockhorn
+ * @date 31.05.2021
  * */
 /*****************************************************************************/
 
@@ -39,6 +40,7 @@
 
 #include <cstdio>
 #include <sstream>
+#include <cstdlib>
 
 #include <LeMonADE/core/Molecules.h>
 #include <LeMonADE/core/Ingredients.h>
@@ -280,9 +282,16 @@ TEST_F(AnalyzerPermeabilityCalculatorTest, CheckFileDumpandMidplaneUpdate)
     EXPECT_TRUE(file.is_open());
     
     std::string linecontent = passComments(file);
-    EXPECT_EQ(linecontent[0],'0');
-    EXPECT_EQ(linecontent[2],'1');
-    EXPECT_EQ(linecontent[4],'1');
+    std::string buf;                 // Have a buffer string
+    std::stringstream ss(linecontent);       // Insert the string into a stream
+    std::vector<std::string> tokens; // Create vector to hold our words
+
+    while (ss >> buf)
+        tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),0.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),1.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),1.0);
     
     pmAnalyzer1.counterObjects=2;
     pmAnalyzer1.counterSolvent=3;
@@ -292,9 +301,15 @@ TEST_F(AnalyzerPermeabilityCalculatorTest, CheckFileDumpandMidplaneUpdate)
     pmAnalyzer1.execute();
     
     std::getline(file,linecontent);
-    EXPECT_EQ(linecontent[0],'1');
-    EXPECT_EQ(linecontent[2],'2');
-    EXPECT_EQ(linecontent[4],'3');
+    std::stringstream ss2(linecontent);       // Insert the string into a stream
+    tokens.clear();
+    
+    while (ss2 >> buf)
+        tokens.push_back(buf);
+    
+    EXPECT_EQ(atof(tokens[0].c_str()),1.0);
+    EXPECT_EQ(atof(tokens[1].c_str()),2.0);
+    EXPECT_EQ(atof(tokens[2].c_str()),3.0);
 
     remove("TestDump.dat");    
     //midplane update Check
@@ -343,7 +358,7 @@ TEST_F(AnalyzerPermeabilityCalculatorTest, CheckPoreUpdate)
     width=4;
     setConfig(midplane,width);
     
-    std::string outputFilename="TestDump.dat";
+    std::string outputFilename="TestDumpA.dat";
     PmAnalyzerDerived pmAnalyzer4(ingredients,objects,16,3,outputFilename,100,1,1);
 
     EXPECT_EQ(midplane, pmAnalyzer4.midplane[0][0]);
@@ -368,6 +383,6 @@ TEST_F(AnalyzerPermeabilityCalculatorTest, CheckPoreUpdate)
     EXPECT_EQ(midplane, pmAnalyzer4.midplane[2][1]);
     EXPECT_EQ(midplane, pmAnalyzer4.midplane[3][0]);
     EXPECT_EQ(midplane, pmAnalyzer4.midplane[3][1]);
-    remove("TestDump.dat");
+    remove("TestDumpA.dat");
         
 }
