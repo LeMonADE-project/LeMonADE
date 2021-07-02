@@ -6,7 +6,7 @@
 * only documentation of principal version changes in CHANGELOG
 
 LeMonADE 1.0
-* bare copy of LeMonADE library from ITP (Leibniz-Institute for Polymer Research IPF) with basic functinonalities
+* bare copy of LeMonADE library from ITP (Leibniz-Institute of Polymer Research Dresden IPF) with basic functionalities
 
 LeMonADE 2.0
 * adding abstract system setup Updater: UpdaterAbstractCreate
@@ -25,3 +25,7 @@ LeMonADE 2.2
 * add analyzers for the calculation of the mean-square displacement
 * add various features and moves to enable reactive and reversible bonds
 
+LeMonADE 2.2.2
+* HotFix for default R250 values
+* ColdFix for implementation of RNG Mersenne Twister 
+* ColdFix for ResultFormattingTools
