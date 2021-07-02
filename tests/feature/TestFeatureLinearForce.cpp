@@ -113,7 +113,12 @@ TEST_F(TestFeatureLinearForce,checkMoveLocalSc){
     ingredients.modifyMolecules()[0].setAttributeTag(1);
     ingredients.modifyMolecules()[1].setAttributeTag(4);
     ingredients.modifyMolecules()[2].setAttributeTag(5);
-    ingredients.synchronize();
+    EXPECT_NO_THROW(ingredients.synchronize());
+    
+    //seed/reset the globally available random number generators with default values
+	RandomNumberGenerators rng;
+	rng.seedDefaultValuesAll();
+   
     MoveLocalSc move; 
     //monomer without tag
     move.init(ingredients,0,VectorInt3(1,0,0)); 
@@ -183,7 +188,8 @@ TEST_F(TestFeatureLinearForce,checkMoveLocalSc){
     EXPECT_EQ(move.getProbability() , 1.0);
 
     move.init(ingredients,1,VectorInt3( 1,0,0)); 
-    EXPECT_TRUE(move.check(ingredients));
+    // as we seed with default R250, FeatureBoltzmann returns 0.721772 > 0.13533528
+    EXPECT_FALSE(move.check(ingredients));
     EXPECT_EQ(move.getProbability() , exp(-2));
     
     move.init(ingredients,2,VectorInt3(1,0,0)); 
@@ -191,7 +197,8 @@ TEST_F(TestFeatureLinearForce,checkMoveLocalSc){
     EXPECT_EQ(move.getProbability() , 1.0);
     
     move.init(ingredients,2,VectorInt3(-1,0,0)); 
-    EXPECT_TRUE(move.check(ingredients));
+    // as we seed with default R250, FeatureBoltzmann returns 0.983861 > 0.13533528
+    EXPECT_FALSE(move.check(ingredients));
     EXPECT_EQ(move.getProbability() , exp(-2));
     
 }

@@ -216,6 +216,14 @@ void RandomNumberGenerators::seedSTDRAND( uint32_t const seed )
     std::srand( seed );
 }
 
+void RandomNumberGenerators::seedDefaultValuesAll()
+{
+    r250Engine->loadDefaultState();
+#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
+	seedMT(1);
+#endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
+}
+
 
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 
