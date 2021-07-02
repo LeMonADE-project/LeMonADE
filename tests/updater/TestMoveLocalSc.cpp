@@ -318,3 +318,68 @@ TEST_F(TestMoveLocalSc, checkAndApply)
   EXPECT_EQ(VectorInt3(0,9,8),VectorInt3(ingredients.getMolecules()[1]));
 
 }
+
+
+
+TEST_F(TestMoveLocalSc, entangledRings)
+{
+    // starting here with a new instance of ingredients!
+    // class member lifetime is only one testcase!
+    ingredients.setBoxX(128);
+    ingredients.setBoxY(32);
+    ingredients.setBoxZ(32);
+    ingredients.setPeriodicX(false);
+    ingredients.setPeriodicY(false);
+    ingredients.setPeriodicZ(false);
+    ingredients.modifyBondset().addBFMclassicBondset();
+    
+    ingredients.modifyMolecules().addMonomer(4,8,8);
+    ingredients.modifyMolecules().addMonomer(7,9,8);
+    ingredients.modifyMolecules().addMonomer(6,12,8);
+    ingredients.modifyMolecules().addMonomer(3,11,8);
+    ingredients.modifyMolecules().connect(0,1);
+    ingredients.modifyMolecules().connect(1,2);
+    ingredients.modifyMolecules().connect(2,3);
+    ingredients.modifyMolecules().connect(3,0);
+
+    ingredients.modifyMolecules().addMonomer(5,10,8);
+    ingredients.modifyMolecules().addMonomer(3,9,10);
+    ingredients.modifyMolecules().addMonomer(1,10,8);
+    ingredients.modifyMolecules().addMonomer(3,9,6);
+    ingredients.modifyMolecules().connect(4,5);
+    ingredients.modifyMolecules().connect(5,6);
+    ingredients.modifyMolecules().connect(6,7);
+    ingredients.modifyMolecules().connect(7,4);
+    ingredients.synchronize();
+    MoveLocalSc move; 
+    // std::string filename("TestMoveLocalScEntangledRing.bfm");
+    // AnalyzerWriteBfmFile<IngredientsType> BfmWriter(filename, ingredients, AnalyzerWriteBfmFile<IngredientsType>::NEWFILE);
+    // BfmWriter.initialize();
+    for (uint32_t j=0; j < 100; j++){
+        for(uint32_t n=0;n<100;n++){
+            for(size_t m=0;m<ingredients.getMolecules().size();m++) {
+                move.init(ingredients);
+                if( move.getDir().getX() == -1 && move.getIndex() >=4 ) //prefer positive x direction
+                {
+                    move.multiplyProbability(0.2);
+                }
+                else if( move.getDir().getX() == 1 && move.getIndex() <4 ) //prefer positive x direction
+                {
+                    move.multiplyProbability(0.2);
+                }
+                if(move.check(ingredients)==true)
+                    move.apply(ingredients);
+            }
+            ingredients.modifyMolecules().setAge(ingredients.getMolecules().getAge()+100);
+        }
+        ingredients.synchronize();
+        // BfmWriter.execute();
+    }
+    // BfmWriter.cleanup();
+    EXPECT_EQ(ingredients.getMolecules()[0].getVector3D().getX()-ingredients.getMolecules()[4].getVector3D().getX(),-1 );
+    EXPECT_EQ(ingredients.getMolecules()[1].getVector3D().getX()-ingredients.getMolecules()[5].getVector3D().getX(), 4 );
+    EXPECT_EQ(ingredients.getMolecules()[2].getVector3D().getX()-ingredients.getMolecules()[6].getVector3D().getX(), 5 );
+    EXPECT_EQ(ingredients.getMolecules()[3].getVector3D().getX()-ingredients.getMolecules()[7].getVector3D().getX(), 0 );
+    
+    // remove(filename.c_str());
+}

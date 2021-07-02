@@ -37,12 +37,12 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 
 #define APPLICATION_NAME               "LeMonADE"
 #define APPLICATION_CODENAME           "LeMonADE"
-#define APPLICATION_COPYRIGHT_YEARS    "2013-2020"
+#define APPLICATION_COPYRIGHT_YEARS    "2013-2021"
 #define APPLICATION_VERSION_MAJOR      2
 #define APPLICATION_VERSION_MINOR      2
-#define APPLICATION_VERSION_PATCH      1
+#define APPLICATION_VERSION_PATCH      2
 #define APPLICATION_VERSION_TYPE       "Release"
-#define APPLICATION_VERSION_STRING     "2.2.1-(C)2013-2020-Release"
+#define APPLICATION_VERSION_STRING     "2.2.2-(C)2013-2021-Release"
 #define APPLICATION_ID                 "LeMonADE.LeMonADE"
 
 #ifndef APPLICATION_VERSION_MAJOR

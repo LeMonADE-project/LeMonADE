@@ -98,6 +98,7 @@ bool UpdaterLipidsRandomInitializer<IngredientsType>::execute()
     // and then create solvent.
      randomInitializer(move);
      solventCreator(move, rI=true);
+     return true;
 };
 
 /**

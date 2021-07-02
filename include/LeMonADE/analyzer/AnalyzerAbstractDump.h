@@ -15,8 +15,6 @@
 #include <LeMonADE/analyzer/AbstractAnalyzer.h>
 #include <LeMonADE/utility/Vector3D.h>
 #include <LeMonADE/utility/ResultFormattingTools.h>
-#include <LeMonADE/utility/MonomerGroup.h>
-#include <LeMonADE/utility/DistanceCalculation.h>
 
 /*************************************************************************
  * definition of AnalyzerAbstractDump class
@@ -98,8 +96,12 @@ public:
 	uint32_t getNumberOfColumns(){ return NColumns; }
 	//! set the buffer size for dumping data 
 	void setBufferSize(uint32_t bufferSize_){ bufferSize=bufferSize_;}
-        //! get the buffer size
-        uint32_t getBufferSize(){return bufferSize;}
+	//! get the buffer size
+	uint32_t getBufferSize(){return bufferSize;}
+	//! get the variable isFirstFileDump 
+	bool getIsFirstFileDump() const { return isFirstFileDump; }  
+	//! reset the variable isFirstFileDump to false (could be used if the filename changes in between data dumpings)
+	void resetIsFirstFileDump() {isFirstFileDump=true;}
 };
 
 /*************************************************************************

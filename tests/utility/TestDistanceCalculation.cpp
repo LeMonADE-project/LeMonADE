@@ -32,7 +32,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <LeMonADE/feature/FeatureBox.h>
 #include <LeMonADE/utility/DistanceCalculation.h>
 
-using namespace Lemonade;
+using namespace LemonadeDistCalcs;
 
 class TestDistanceCalculation: public ::testing::Test{
 public:

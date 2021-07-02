@@ -101,6 +101,9 @@ class RandomNumberGenerators
 		//! randomly seed std:rand()
 		void seedSTDRAND();
 		void seedSTDRAND( uint32_t seed );
+        
+        //! initializes all provided RNGs with default values
+		void seedDefaultValuesAll();
 
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 		//! randomly seed only Mersenne Twister from /dev/urandom

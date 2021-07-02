@@ -100,14 +100,21 @@ void MoveConnectScReactive::init(const IngredientsType& ing)
   this->resetProbability();
 
   //draw index
-  auto index(this->randomNumbers.r250_rand32() % (ing.getNUnreactedMonomers()));
-  auto it(ing.getUnreactiveMonomers().begin());
-  std::advance( it, index);
-  this->setIndex(it->first);
-  //draw direction
-  VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
-  this->setDir(randomDir);
-  this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir) );
+  auto nUnreactedMonomers(ing.getNUnreactedMonomers());
+  if( nUnreactedMonomers ==0 ) {
+    this->setIndex(0);
+    this->setPartner(std::numeric_limits<uint32_t>::max() );
+  }
+  else {
+    auto index(this->randomNumbers.r250_rand32() % nUnreactedMonomers);
+    auto it (ing.getUnreactiveMonomers().cbegin());
+    std::advance( it, index);
+    this->setIndex(it->first);
+    //draw direction
+    VectorInt3 randomDir(shellPositions[ this->randomNumbers.r250_rand32() % 6]);
+    this->setDir(randomDir);
+    this->setPartner(ing.getIdFromLattice(ing.getMolecules()[this->getIndex()]+randomDir) );
+  }
 }
 
 /*****************************************************************************/

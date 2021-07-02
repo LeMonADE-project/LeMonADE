@@ -55,7 +55,7 @@ class MonomerLabel
 	MonomerLabel():label(0){}
 
 	//! is labeled 
-	const uint32_t getLabel() const {return label;}
+	uint32_t getLabel() const {return label;}
 	//! set label on/off
 	void setLabel(uint32_t label_){ label=label_;}
 	
