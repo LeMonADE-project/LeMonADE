@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015,2021 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        |
 ----------------------------------------------------------------------------------
@@ -98,24 +98,60 @@ TEST_F(TestMoveConnectionScReactive, checkAll)
   
   MoveConnectScReactive move;
   
+  move.init(ingredients);
+  EXPECT_TRUE((move.getIndex() >= 0) && (move.getIndex() <= 1)); // only 0 and 1 are reactive
+  EXPECT_TRUE((move.getDir()*move.getDir() >= 4) && (move.getDir()*move.getDir() <= 6));
+  // will maybe fail as the direction is selected randomly hence the partner also
+  //EXPECT_TRUE((move.getPartner() >= 0) && (move.getPartner() <= 1)); // only 0 and 1 are reactive
+  EXPECT_TRUE(((move.getPartner() >= 0) && (move.getPartner() <= 1)) || (move.getPartner()==std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  EXPECT_FALSE((move.getPartner() >= 2) && (move.getPartner() < std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  
+  
   move.init(ingredients,0);
   EXPECT_EQ(0, move.getIndex());
+  EXPECT_TRUE((move.getIndex() >= 0) && (move.getIndex() <= 1)); // only 0 and 1 are reactive
+  EXPECT_TRUE((move.getDir()*move.getDir() >= 4) && (move.getDir()*move.getDir() <= 6));
+  EXPECT_TRUE(((move.getPartner() == 1)) || (move.getPartner()==std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  EXPECT_FALSE((move.getPartner() >= 2) && (move.getPartner() < std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  
 
   move.init(ingredients,1);
   EXPECT_EQ(1, move.getIndex());
+  EXPECT_TRUE((move.getIndex() >= 0) && (move.getIndex() <= 1)); // only 0 and 1 are reactive
+  EXPECT_TRUE((move.getDir()*move.getDir() >= 4) && (move.getDir()*move.getDir() <= 6));
+  EXPECT_TRUE(((move.getPartner() == 0)) || (move.getPartner()==std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  EXPECT_FALSE((move.getPartner() >= 2) && (move.getPartner() < std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  
   
   move.init(ingredients,1,2);
   EXPECT_EQ(move.getDir().getY(),2);
   EXPECT_FALSE(move.check(ingredients));
+  EXPECT_TRUE(move.getIndex() == 1); // only 0 and 1 are reactive
+  EXPECT_TRUE((move.getDir()*move.getDir() == 4));
+  EXPECT_TRUE((move.getPartner() == 2)); // only 0 and 1 are reactive
+  EXPECT_FALSE((move.getPartner() < 2) && (move.getPartner() < std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
+  
   
   move.init(ingredients,0,1);
   EXPECT_EQ(move.getDir().getX(),2);
+  EXPECT_TRUE(move.getIndex() == 0); // only 0 and 1 are reactive
+  EXPECT_TRUE((move.getDir()*move.getDir() == 4));
+  EXPECT_TRUE((move.getPartner() == 1)); // only 0 and 1 are reactive
+  EXPECT_FALSE((move.getPartner() < 1) && (move.getPartner() < std::numeric_limits<uint32_t>::max()) ); // only 0 and 1 are reactive
   EXPECT_TRUE(move.check(ingredients));
   move.apply(ingredients);
   
   EXPECT_TRUE(ingredients.getMolecules().areConnected(0,1));
   
   move.init(ingredients,0,1); //already occupied
+  EXPECT_FALSE(move.check(ingredients));
+  
+  //one reactive group left (monomer id 1)
+  EXPECT_EQ(ingredients.getNUnreactedMonomers(), 1);
+  move.init(ingredients);
+  EXPECT_EQ(move.getIndex(), 1 ); 
+  EXPECT_TRUE(move.getPartner() == std::numeric_limits<uint32_t>::max()); // default value for invalid move
+  EXPECT_TRUE((move.getDir()*move.getDir() == 4)); // default value for invalid move
   EXPECT_FALSE(move.check(ingredients));
   
 
