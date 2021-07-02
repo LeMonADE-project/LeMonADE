@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015,2021 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        |
 ----------------------------------------------------------------------------------
@@ -118,9 +118,9 @@ void R250::setState( uint32_t const * stateArray )
 /**
  * this resets the state array to a predefined value, so that a defined state
  * can always be obtained if needed. the numbers were generated from /dev/urandom
- * once and then simply copied here.
+ * once and then simply copied here. (replaced 2021 in Release 2.2.2)
  * The array can e.g. be generated with:
- *   head -c 1024 /dev/urandom | hexdump -v -e '4 4 "0x%08X, " "\n"'; echo
+ *   head -c 1024 /dev/urandom | hexdump -v -e '4 4 "%u, " "\n"'
  */
 void R250::loadDefaultState()
 {
@@ -216,4 +216,5 @@ void R250::printState()
 			 << std::setw(4)  << std::right << i << "] = "
 			 << std::setw(14) << std::right << array[i] << "; ";
 	}
+	std::cout << std::endl << std::endl;
 }
