@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015,2021 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        |
 ----------------------------------------------------------------------------------
@@ -36,6 +36,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <vector>
+#include <random>
 
 #include <LeMonADE/utility/R250.h>
 
@@ -100,6 +101,9 @@ class RandomNumberGenerators
 		//! randomly seed std:rand()
 		void seedSTDRAND();
 		void seedSTDRAND( uint32_t seed );
+        
+        //! initializes all provided RNGs with default values
+		void seedDefaultValuesAll();
 
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 		//! randomly seed only Mersenne Twister from /dev/urandom

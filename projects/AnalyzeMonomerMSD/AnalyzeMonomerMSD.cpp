@@ -29,11 +29,12 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <exception>
 #include <cstring>
+#include <stdlib.h>
 
 #include <LeMonADE/core/Ingredients.h>
 #include <LeMonADE/feature/FeatureAttributes.h>
 #include <LeMonADE/feature/FeatureExcludedVolumeSc.h>
-#include <LeMonADE/feature/FeatureMoleculesIO.h>
+#include <LeMonADE/feature/FeatureMoleculesIOUnsaveCheck.h>
 #include <LeMonADE/utility/RandomNumberGenerators.h>
 #include <LeMonADE/analyzer/AnalyzerWriteBfmFile.h>
 #include <LeMonADE/updater/UpdaterReadBfmFile.h>
@@ -50,12 +51,13 @@ int main (int argc, char* argv[])
 {
   //read arguments from the command line
   std::string input,output;
+  uint32_t eqMCS(0);
   try
   {
-    if(!(argc==3) || (argc==2 && strcmp(argv[1],"--help")==0 ))
+    if(!(argc==4) || (argc==2 && strcmp(argv[1],"--help")==0 ))
     {
             std::string errormessage;
-            errormessage="usage: ./AnalyzerMonomerMSD input_filename output_prefix\n";
+            errormessage="usage: ./AnalyzerMonomerMSD input_filename output_prefix eqMCS\n";
             errormessage+="Features used: FeatureMoleculesIO \n";
             errormessage+="Updaters used: UpdaterReadBfmFile \n";
             errormessage+="Analyzers used: AnalyzerMonomerMSD, AnalyzerSystemMSD\n";
@@ -65,12 +67,13 @@ int main (int argc, char* argv[])
     {
             input=argv[1];
             output=argv[2];
+            eqMCS=std::atoi(argv[3]);
     }
   }
   catch(std::exception& e ){std::cerr<<"Error:\n" << e.what()<< std::endl;}
   catch(...){std::cerr<<"Error: unknown exception\n";}
   
-  typedef LOKI_TYPELIST_1(FeatureMoleculesIO) Features; 
+  typedef LOKI_TYPELIST_1(FeatureMoleculesIOUnsaveCheck) Features; 
   typedef ConfigureSystem<VectorInt3,Features, 7> Config;
   typedef Ingredients<Config> Ing;
   Ing myIngredients;
@@ -78,8 +81,8 @@ int main (int argc, char* argv[])
   //set up the sytem parameters
   TaskManager taskmanager;
   taskmanager.addUpdater ( new UpdaterReadBfmFile      <Ing>(input,myIngredients, UpdaterReadBfmFile<Ing>::READ_STEPWISE) );
-  taskmanager.addAnalyzer( new AnalyzerMonomerMSD      <Ing>(myIngredients, 0, output) ) ;
-  taskmanager.addAnalyzer( new AnalyzerSystemMSD       <Ing>(myIngredients, 0, output) ) ;
+  taskmanager.addAnalyzer( new AnalyzerMonomerMSD      <Ing>(myIngredients, eqMCS, output) ) ;
+  taskmanager.addAnalyzer( new AnalyzerSystemMSD       <Ing>(myIngredients, eqMCS, output) ) ;
   
   taskmanager.initialize();
   taskmanager.run();

@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015,2021 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        |
 ----------------------------------------------------------------------------------
@@ -42,7 +42,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 R250* RandomNumberGenerators::r250Engine=0;
 
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
-std::mt19937* RandomNumberGenerator::mt19937Engine=0;
+std::mt19937* RandomNumberGenerators::mt19937Engine=0;
 #endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
 
 
@@ -199,7 +199,7 @@ void RandomNumberGenerators::seedSTDRAND()
 		std::ifstream in("/dev/urandom");
 		in.read((char*)seed,sizeof(seed));
 		std::srand(*seed);
-		std::cout<<"RandomNumberGenerators: random seed for std::rand() picked from /dev/urandom:"<<seed<<std::endl;
+		std::cout<<"RandomNumberGenerators: random seed for std::rand() picked from /dev/urandom:"<<seed<< " is "<<*seed <<std::endl;
 		urandom.close();
 	}
 	else
@@ -216,6 +216,14 @@ void RandomNumberGenerators::seedSTDRAND( uint32_t const seed )
     std::srand( seed );
 }
 
+void RandomNumberGenerators::seedDefaultValuesAll()
+{
+    r250Engine->loadDefaultState();
+#ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
+	seedMT(1);
+#endif /*RANDOMNUMBERGENERATOR_ENABLE_CPP11*/
+}
+
 
 #ifdef RANDOMNUMBERGENERATOR_ENABLE_CPP11
 
@@ -229,7 +237,8 @@ void RandomNumberGenerators::seedMT()
 		std::ifstream in("/dev/urandom");
 		in.read((char*)seed,sizeof(seed));
 		std::srand(*seed);
-		std::cout<<"RandomNumberGenerators: random seed for Mersenne Twister picked from /dev/urandom:"<<seed<<std::endl;
+        mt19937Engine->seed(*seed);
+		std::cout<<"RandomNumberGenerators: random seed for Mersenne Twister picked from /dev/urandom:"<<seed<< " is "<<*seed <<std::endl;
 		urandom.close();
 	}
 	else

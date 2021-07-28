@@ -65,57 +65,35 @@ public:
 	template <class IngredientsType>
 	void exportWrite(AnalyzerWriteBfmFile <IngredientsType>& filewriter) const;
 
-	//!
-	const uint32_t getNumberofChains() const {
-	  
-	  return nChains;
-	  
-	} 
+	//!return the number of chains 
+	uint32_t getNumOfChains() const { return nChains; } 
 	
-	//!Should be used carefully!!
-	void setNumberofChains(uint32_t nChains_){nChains=nChains_;}
+	//!set the number of chains 
+	void setNumOfChains(uint32_t nChains_){nChains=nChains_;}
 
-	//!
-	const uint32_t getNumberofCrossLinkers() const {
-	  
-	  return nCrossLinkers;
-	  
-	}
+	//! return the number of cross linkers 
+	uint32_t getNumOfCrosslinks() const { return nCrossLinkers; }
 	
-	//!Should be used carefully!!
-	void setNumberofCrossLinkers(uint32_t nCrossLinkers_){nCrossLinkers=nCrossLinkers_;}
+	//!set the number of cross linekrs 
+	void setNumOfCrosslinks(uint32_t nCrossLinkers_){nCrossLinkers=nCrossLinkers_;}
 	
-	//!
-	const uint32_t getChainLength() const {
-	  
-	  return chainLength;
-	  
-	}
+	//! returns the chain lenght 
+	const uint32_t getNumOfMonomersPerChain() const {return chainLength; }
 	
-	//!Should be used carefully!!
-	void setChainLength(uint32_t chainLength_){chainLength=chainLength_;}
+	//!set the chain length 
+	void setNumOfMonomersPerChain(uint32_t chainLength_){chainLength=chainLength_;}
 	
-	//!
-	const uint32_t getFunctionality() const {
-	  
-	  return functionality;
-	  
-	}
+	//! get the functionality of the cross linker 
+	uint32_t getFunctionality() const {return functionality;}
 	
-	//!Should be used carefully!!
+	//!set the functionality of cross linker
 	void setFunctionality(uint32_t functionality_){functionality=functionality_;}
 	
-	//!
-	const uint32_t getNMonomersPerCrossLink() const {
-	  
-	  return nMonomersPerCrossLink;
-	  
-	}
+	//!get the number of monomres per cross link
+	uint32_t getNumOfMonomersPerCrosslink() const { return nMonomersPerCrossLink;}
 	
-	//!Should be used carefully!!
-	void setNMonomersPerCrossLink(uint32_t nMonomersPerCrossLink_){nMonomersPerCrossLink=nMonomersPerCrossLink_;}
-	
-	
+	//!set the number of monomers per cross linker 
+	void setNumOfMonomersPerCrosslink(uint32_t nMonomersPerCrossLink_){nMonomersPerCrossLink=nMonomersPerCrossLink_;}
 	
 private:
 	uint32_t nChains;
@@ -156,7 +134,7 @@ void ReadLinearChains<IngredientsType>::execute()
 	Chains = atof(line.c_str());
 	std::cout << "#!number_of_linear_chains=" << (Chains) << std::endl;
 
-	ingredients.setNumberofChains(Chains);
+	ingredients.setNumOfChains(Chains);
 }
 /*****************************************************************/
 /**
@@ -188,7 +166,7 @@ void ReadCrossLinkerNumber<IngredientsType>::execute()
 	CrossLinkers = atof(line.c_str());
 	std::cout << "#!number_of_crosslinkers=" << (CrossLinkers) << std::endl;
 
-	ingredients.setNumberofCrossLinkers(CrossLinkers);
+	ingredients.setNumOfCrosslinks(CrossLinkers);
 }
 /*****************************************************************/
 /**
@@ -220,7 +198,7 @@ void ReadChainLength<IngredientsType>::execute()
 	chainLength = atof(line.c_str());
 	std::cout << "#!chainLength=" << (chainLength) << std::endl;
 
-	ingredients.setChainLength(chainLength);
+	ingredients.setNumOfMonomersPerChain(chainLength);
 }
 
 /*****************************************************************/
@@ -286,7 +264,7 @@ void ReadNMonomersPerCrossLink<IngredientsType>::execute()
 	crosslinkweight = atof(line.c_str());
 	std::cout << "#!nMonomersPerCrossLink=" << (crosslinkweight) << std::endl;
 
-	ingredients.setNMonomersPerCrossLink(crosslinkweight);
+	ingredients.setNumOfMonomersPerCrosslink(crosslinkweight);
 }
 
 /**
@@ -339,7 +317,7 @@ void WriterLinearChains<IngredientsType>::writeStream(std::ostream& stream)
 {
    //get reference to molecules
 
-	stream<<"#!number_of_linear_chains=" << (this->getSource().getNumberofChains()) << std::endl<< std::endl;
+	stream<<"#!number_of_linear_chains=" << (this->getSource().getNumOfChains()) << std::endl<< std::endl;
 }
 /*****************************************************************/
 /**
@@ -363,7 +341,7 @@ public:
 template<class IngredientsType>
 void WriterCrossLinkerNumber<IngredientsType>::writeStream(std::ostream& stream)
 {
-	stream<<"#!number_of_crosslinkers=" << (this->getSource().getNumberofCrossLinkers()) << std::endl<< std::endl;
+	stream<<"#!number_of_crosslinkers=" << (this->getSource().getNumOfCrosslinks()) << std::endl<< std::endl;
 }
 /*****************************************************************/
 /**
@@ -387,7 +365,7 @@ public:
 template<class IngredientsType>
 void WriterChainLength<IngredientsType>::writeStream(std::ostream& stream)
 {
-	stream<<"#!chainLength=" << (this->getSource().getChainLength()) << std::endl<< std::endl;
+	stream<<"#!chainLength=" << (this->getSource().getNumOfMonomersPerChain()) << std::endl<< std::endl;
 }
 /*****************************************************************/
 /**
@@ -435,7 +413,7 @@ public:
 template<class IngredientsType>
 void WriterNMonomersPerCrossLink<IngredientsType>::writeStream(std::ostream& stream)
 {
-	stream<<"#!nMonomersPerCrossLink=" << (this->getSource().getNMonomersPerCrossLink()) << std::endl<< std::endl;
+	stream<<"#!nMonomersPerCrossLink=" << (this->getSource().getNumOfMonomersPerCrosslink()) << std::endl<< std::endl;
 }
 /**
  * @details The function is called by the Ingredients class when an object of type Ingredients
