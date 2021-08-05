@@ -440,12 +440,15 @@ void WriteAddBonds<IngredientsType>::writeStream(std::ostream& strm){
 			}
 		}
 		
-		//write only the bonds that were added since the last update	
-		strm<<"!add_bonds\n";
-		for(it=AddBonds.begin();it!=AddBonds.end();++it){
+		//write only the bonds that were added since the last update - if there any	
+		if(AddBonds.size() > 0)
+        {
+            strm<<"!add_bonds\n";
+            for(it=AddBonds.begin();it!=AddBonds.end();++it){
 			  strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
-		}
-		strm<<"\n";
+            }
+            strm<<"\n";
+        }
 		old_ingredients=this->getSource();
 		break;}
 	  case C_OVERWRITE: {break;} 
@@ -532,13 +535,15 @@ void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
                   RemovedBonds.erase(RemovedBonds.find(it->first));
             }
           }
-          //write only the breaks that were removed since the last update
-          strm<<"!remove_bonds\n";
-          for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
-              strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+          //write only the breaks that were removed since the last update - if there any
+          if(RemovedBonds.size() > 0)
+          {
+            strm<<"!remove_bonds\n";
+            for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
+                strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+            }
+            strm<<"\n";
           }
-          strm<<"\n";
-          
           old_ingredients=this->getSource();
           break;
       }
@@ -561,13 +566,15 @@ void WriteRemoveBonds<IngredientsType>::writeStream(std::ostream& strm){
                 }
             }
             
-            //write only the breaks that were removed since the last update
-            strm<<"!remove_bonds\n";
-            for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
-                strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+            //write only the breaks that were removed since the last update - if there any
+            if(RemovedBonds.size() > 0)
+            {
+                strm<<"!remove_bonds\n";
+                for(it=RemovedBonds.begin();it!=RemovedBonds.end();++it){
+                    strm<<it->first.first+1<<" "<<it->first.second+1<<"\n";
+                }
+                strm<<"\n";
             }
-            strm<<"\n";
-            
             old_ingredients=this->getSource();
 	      break;  
       }
