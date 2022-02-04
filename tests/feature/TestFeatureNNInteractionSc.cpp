@@ -35,7 +35,7 @@ private:
 
 TEST_F(NNInteractionScTest,CheckApplyScMovePowerOfTwoLattice)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc<FeatureLatticePowerOfTwo>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;
@@ -67,8 +67,8 @@ TEST_F(NNInteractionScTest,CheckApplyScMovePowerOfTwoLattice)
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
     molecules1.resize(2);
     molecules1[0].setAllCoordinates(9,10,10);
-    molecules1[0].setAttributeTag(1);
-    molecules1[1].setAttributeTag(2);
+    molecules1[0].setInteractionTag(1);
+    molecules1[1].setInteractionTag(2);
 
 
     //now check EV for move in positive x-direction
@@ -85,7 +85,7 @@ TEST_F(NNInteractionScTest,CheckApplyScMovePowerOfTwoLattice)
     backmove.init(myIngredients1);
     while((backmove.getDir().getX()!=-1) || (backmove.getIndex()!=0)){ backmove.init(myIngredients1);}
     //std::cout<<"and move in negativ x direction..."<<backmove.getDir()<<" monomer index "<<backmove.getIndex()<<std::endl;
-
+    
     testmove.check(myIngredients1);
     EXPECT_DOUBLE_EQ(testmove.getProbability(),exp(-2.0*epsilon0));
     EXPECT_EQ(molecules1[0].getX(),9);
@@ -1085,7 +1085,7 @@ TEST_F(NNInteractionScTest,CheckApplyScMovePowerOfTwoLattice)
 
 TEST_F(NNInteractionScTest,CheckApplyScMoveAnyLattice)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;
@@ -1117,8 +1117,8 @@ TEST_F(NNInteractionScTest,CheckApplyScMoveAnyLattice)
     typename Ing1::molecules_type& molecules1=myIngredients1.modifyMolecules();
     molecules1.resize(2);
     molecules1[0].setAllCoordinates(9,10,10);
-    molecules1[0].setAttributeTag(1);
-    molecules1[1].setAttributeTag(2);
+    molecules1[0].setInteractionTag(1);
+    molecules1[1].setInteractionTag(2);
 
 
     //now check EV for move in positive x-direction
@@ -2134,7 +2134,7 @@ TEST_F(NNInteractionScTest,CheckApplyScMoveAnyLattice)
 
 TEST_F(NNInteractionScTest,getSetInteraction)
 {
-    typedef LOKI_TYPELIST_2(FeatureBondset<>,FeatureNNInteractionSc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_2(FeatureBondset<>,FeatureNNInteractionSc) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients;
@@ -2167,7 +2167,7 @@ TEST_F(NNInteractionScTest,getSetInteraction)
 
 TEST_F(NNInteractionScTest,Synchronize)
 {
-    typedef LOKI_TYPELIST_2(FeatureBondset<>,FeatureNNInteractionSc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureBondset<>,FeatureNNInteractionSc,FeatureExcludedVolumeSc<>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;
@@ -2183,8 +2183,8 @@ TEST_F(NNInteractionScTest,Synchronize)
     molecules1.resize(2);
     molecules1[0].setAllCoordinates(9,10,10);
     molecules1[1].setAllCoordinates(1,1,1);
-    molecules1[0].setAttributeTag(1);
-    molecules1[1].setAttributeTag(2);
+    molecules1[0].setInteractionTag(1);
+    molecules1[1].setInteractionTag(2);
 
     myIngredients1.synchronize(myIngredients1);
 
@@ -2199,39 +2199,39 @@ TEST_F(NNInteractionScTest,Synchronize)
                 //get the lattice entry
                 pos.setAllCoordinates(x,y,z);
                 if(pos==VectorInt3(9,10,10))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(9,11,10))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(9,10,11))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(9,11,11))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(10,10,10))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(10,11,10))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(10,10,11))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(10,11,11))
-                    EXPECT_EQ(1,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(1,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(1,1,1))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(1,2,1))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(1,1,2))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(1,2,2))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(2,1,1))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(2,2,1))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(2,1,2))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else if(pos==VectorInt3(2,2,2))
-                    EXPECT_EQ(2,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(pos));
                 else
-                    EXPECT_EQ(0,myIngredients1.getLatticeEntry(pos));
+                    EXPECT_EQ(0,myIngredients1.getInteractionLatticeEntry(pos));
 
 
             }
@@ -2240,7 +2240,7 @@ TEST_F(NNInteractionScTest,Synchronize)
 
     molecules1.resize(3);
     molecules1[2].setAllCoordinates(1,1,1);
-    molecules1[2].setAttributeTag(2);
+    molecules1[2].setInteractionTag(2);
     EXPECT_THROW(myIngredients1.synchronize(myIngredients1),std::runtime_error);
 
 
@@ -2248,7 +2248,7 @@ TEST_F(NNInteractionScTest,Synchronize)
 
 TEST_F(NNInteractionScTest,ReadWrite)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients;
@@ -2272,8 +2272,8 @@ TEST_F(NNInteractionScTest,ReadWrite)
     molecules1.resize(2);
     molecules1[0].setAllCoordinates(9,10,10);
     molecules1[1].setAllCoordinates(1,1,1);
-    molecules1[0].setAttributeTag(1);
-    molecules1[1].setAttributeTag(2);
+    molecules1[0].setInteractionTag(1);
+    molecules1[1].setInteractionTag(2);
 
     myIngredients.synchronize(myIngredients);
 
@@ -2304,7 +2304,7 @@ TEST_F(NNInteractionScTest,ReadWrite)
 
 TEST_F(NNInteractionScTest,ApplyMoveAddMonomerSc)
 {
-    typedef LOKI_TYPELIST_3(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc<FeatureLattice>) Features1;
+    typedef LOKI_TYPELIST_4(FeatureMoleculesIO, FeatureBondset<>,FeatureNNInteractionSc, FeatureExcludedVolumeSc<>) Features1;
     typedef ConfigureSystem<VectorInt3,Features1> Config1;
     typedef Ingredients<Config1> Ing1;
     Ing1 myIngredients1;
@@ -2325,46 +2325,46 @@ TEST_F(NNInteractionScTest,ApplyMoveAddMonomerSc)
 
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setTag(256);
+    addMonomer.setInteractionTag(256);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
 
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setTag(0);
+    addMonomer.setInteractionTag(0);
+    EXPECT_NO_THROW(addMonomer.apply(myIngredients1));
+
+    addMonomer.init(myIngredients1);
+    addMonomer.setPosition(5,6,7);
+    addMonomer.setInteractionTag(-1);
     EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
 
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setTag(-1);
-    EXPECT_THROW(addMonomer.apply(myIngredients1),std::runtime_error);
-
-    addMonomer.init(myIngredients1);
-    addMonomer.setPosition(5,6,7);
-    addMonomer.setTag(2);
+    addMonomer.setInteractionTag(2);
     addMonomer.apply(myIngredients1);
 
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,6,7));
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(6,6,7));
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,7,7));
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(6,7,7));
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,6,8));
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(6,6,8));
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(5,7,8));
-    EXPECT_EQ(2,myIngredients1.getLatticeEntry(6,7,8));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(5,6,7));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(6,6,7));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(5,7,7));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(6,7,7));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(5,6,8));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(6,6,8));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(5,7,8));
+    EXPECT_EQ(2,myIngredients1.getInteractionLatticeEntry(6,7,8));
 
     addMonomer.init(myIngredients1);
     addMonomer.setPosition(5,6,7);
-    addMonomer.setTag(255);
+    addMonomer.setInteractionTag(255);
     addMonomer.apply(myIngredients1);
 
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,6,7)));
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(6,6,7)));
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,7,7)));
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(6,7,7)));
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,6,8)));
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(6,6,8)));
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(5,7,8)));
-    EXPECT_EQ(255,int32_t(myIngredients1.getLatticeEntry(6,7,8)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(5,6,7)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(6,6,7)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(5,7,7)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(6,7,7)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(5,6,8)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(6,6,8)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(5,7,8)));
+    EXPECT_EQ(255,int32_t(myIngredients1.getInteractionLatticeEntry(6,7,8)));
 
 
 }

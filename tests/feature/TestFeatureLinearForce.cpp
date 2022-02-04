@@ -47,15 +47,15 @@ public:
     Ing ingredients;
 
     //redirect cout output
-    // virtual void SetUp(){
-    //     originalBuffer=std::cout.rdbuf();
-    //     std::cout.rdbuf(tempStream.rdbuf());
-    // };
+    virtual void SetUp(){
+        originalBuffer=std::cout.rdbuf();
+        std::cout.rdbuf(tempStream.rdbuf());
+    };
 
-    // //restore original output
-    // virtual void TearDown(){
-    //     std::cout.rdbuf(originalBuffer);
-    // };
+    //restore original output
+    virtual void TearDown(){
+        std::cout.rdbuf(originalBuffer);
+    };
     //tension force
     const double force=1.212;
     //! filename for output 

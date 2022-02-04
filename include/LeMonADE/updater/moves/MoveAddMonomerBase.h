@@ -60,7 +60,7 @@ template<class SpecializedMove, class TagType>
 class MoveAddMonomerBase:public MoveBase
 {
 public:
-  MoveAddMonomerBase():monomerTag(TagType()),reactivity(false), numMaxLinks(0), label(0){};
+  MoveAddMonomerBase():monomerTag(TagType()),reactivity(false), numMaxLinks(0), label(0),interactionTag(0){};
   //here come the functions that are implemented by the specialization
   //! Reset the probability
   template <class IngredientsType> void init(const IngredientsType& ingredients);
@@ -81,6 +81,8 @@ public:
   void setNumMaxLinks(uint32_t numMaxLinks_){numMaxLinks=numMaxLinks_;}
   //! setter function for the label 
   void setLabel(uint32_t label_){label=label_;}
+  //! setter function for interaction Tag of new monomer
+  void setInteractionTag(int32_t tag){interactionTag=tag;}
   //! getter function for the monomerTag of the new monomer
   TagType getTag() const{return monomerTag;}
   //! getter function for the position of the new monomer returning a VectorInt3
@@ -93,6 +95,8 @@ public:
   uint32_t getNumMaxLinks() const {return numMaxLinks;}
   //! getter function for the label 
   uint32_t getLabel() const {return label;}
+  //! getter function for the monomerTag of the new monomer
+  int32_t getInteractionTag() const{return interactionTag;}
   
 protected:
   void setMonomerIndex(size_t index){monomerIndex=index;}
@@ -102,6 +106,8 @@ private:
   VectorInt3 position;
   //! monomerTag that is applied to the new monomer and is required in  feature FeatureAttributes with TagType
   TagType monomerTag;
+  //! interaction Tag used in the FeatureNNinteraction
+  int32_t interactionTag;
   /**
    * @brief Index of new PartileThis is ing.getMolecules().size() before applying and ing.getMolecules().size()-1 after applying the move.
    * @details It is set when apply is called. useful if Features want to alter the particle when applying the move

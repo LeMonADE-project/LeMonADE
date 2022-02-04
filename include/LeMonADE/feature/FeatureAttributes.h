@@ -45,6 +45,7 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
  * @class MonomerAttributeTag
  * @brief Extends monomers by an signed integer (int32_t) as tag along with getter and setter\n
  * 		  Initially the tag is set to NULL.
+ * @details not working with uint8!
  * */
 template<class TagType=int32_t>
 class MonomerAttributeTag
@@ -110,6 +111,7 @@ public:
 /**
  * @class FeatureAttributes
  * @brief Extends vertex/monomer by an attribute tag (MonomerAttributeTag) and provides read/write functionality.
+ * @details not working with uint8!
  **/
 template<class TagType=int32_t>
 class FeatureAttributes:public Feature
