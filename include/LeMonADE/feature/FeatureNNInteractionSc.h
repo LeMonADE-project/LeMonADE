@@ -26,8 +26,8 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 --------------------------------------------------------------------------------*/
 
 
-#ifndef FEATURE_NN_INTERACTION_H
-#define FEATURE_NN_INTERACTION_H
+#ifndef LEMONADE_FEATURE_FEATURE_NN_INTERACTION_H
+#define LEMONADE_FEATURE_FEATURE_NN_INTERACTION_H
 
 /**
  * @file
@@ -814,4 +814,4 @@ double FeatureNNInteractionSc::getNNInteraction(int32_t typeA,
     }
 
 }
-#endif /*FEATURE_CONTACT_INTERACTION_H*/
+#endif /*LEMONADE_FEATURE_FEATURE_NN_INTERACTION_H*/

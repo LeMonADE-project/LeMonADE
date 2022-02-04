@@ -2368,3 +2368,172 @@ TEST_F(NNInteractionScTest,ApplyMoveAddMonomerSc)
 
 
 }
+
+class InteractionTagTest: public ::testing::Test{
+  
+public:
+  typedef LOKI_TYPELIST_2(FeatureMoleculesIO, FeatureNNInteractionSc) Features;
+  typedef ConfigureSystem<VectorInt3,Features> Config;
+  typedef Ingredients<Config> MyIngredients;
+  
+  //redirect cout output
+  virtual void SetUp(){
+    originalBuffer=cout.rdbuf();
+    cout.rdbuf(tempStream.rdbuf());
+  };
+
+  //restore original output
+  virtual void TearDown(){
+    cout.rdbuf(originalBuffer);
+  };
+
+  private:
+    std::streambuf* originalBuffer;
+    std::ostringstream tempStream;
+};
+
+TEST_F(InteractionTagTest,MonomerInteractionTagGetSet)
+{
+  MonomerInteractionTag tag;
+  EXPECT_EQ(0,static_cast<int32_t>(tag.getInteractionTag()));
+  tag.setInteractionTag(-1);
+  //castet to uint8_t
+  EXPECT_EQ(255,static_cast<int32_t>(tag.getInteractionTag()));
+  tag.setInteractionTag(15);
+  EXPECT_EQ(15,static_cast<int32_t>(tag.getInteractionTag()));
+}
+
+TEST_F(InteractionTagTest,exportRead)
+{
+    MyIngredients ingredients;
+    MyIngredients::molecules_type const& molecules= ingredients.getMolecules();
+    FileImport<MyIngredients> file ("tests/interactionTagTest.test",ingredients);
+
+    //scan file for !mcs and read-in first frame
+    file.initialize();
+
+    EXPECT_EQ(molecules[0].getInteractionTag(),0); /*this one has the default value*/
+    EXPECT_EQ(molecules[1].getInteractionTag(),5);
+    EXPECT_EQ(molecules[2].getInteractionTag(),5);
+    EXPECT_EQ(molecules[3].getInteractionTag(),5);
+    EXPECT_EQ(molecules[4].getInteractionTag(),2);
+    EXPECT_EQ(molecules[6].getInteractionTag(),5);
+    EXPECT_EQ(molecules[14].getInteractionTag(),5);
+    EXPECT_EQ(molecules[15].getInteractionTag(),2);
+        
+    //remove the temporary file
+    EXPECT_EQ(0,remove("tests/interactionTagTest.test"));
+
+}
+
+TEST_F(InteractionTagTest,exportWrite)
+{
+    MyIngredients setupIngrediens;
+    MyIngredients ingredients;
+
+    MyIngredients::molecules_type const& setupMolecules= setupIngrediens.getMolecules();
+    MyIngredients::molecules_type const& molecules= ingredients.getMolecules();
+
+    setupIngrediens.setBoxX(100);
+    setupIngrediens.setPeriodicX(true);
+    setupIngrediens.setBoxY(100);
+    setupIngrediens.setPeriodicY(true);
+    setupIngrediens.setBoxZ(100);
+    setupIngrediens.setPeriodicZ(true);
+    setupIngrediens.modifyMolecules().resize(5);
+    setupIngrediens.modifyMolecules()[0].setInteractionTag(1);
+    setupIngrediens.modifyMolecules()[1].setInteractionTag(1);
+    setupIngrediens.modifyMolecules()[4].setInteractionTag(2);
+    //write to file and read back in
+    AnalyzerWriteBfmFile<MyIngredients> outfile("tests/interactionTagTestOut.test",setupIngrediens,AnalyzerWriteBfmFile<MyIngredients>::NEWFILE);
+    outfile.initialize();
+
+    FileImport<MyIngredients> infile ("tests/interactionTagTestOut.test",ingredients);
+
+    //scan file for !mcs and read-in first frame
+    infile.initialize();
+
+    EXPECT_EQ(molecules[0].getInteractionTag(),1);
+    EXPECT_EQ(molecules[1].getInteractionTag(),1);
+    EXPECT_EQ(molecules[2].getInteractionTag(),0); /*has default value*/
+    EXPECT_EQ(molecules[3].getInteractionTag(),0); /*has default value*/
+    EXPECT_EQ(molecules[4].getInteractionTag(),2);
+
+    //remove the temporary file
+    EXPECT_EQ(0,remove("tests/interactionTagTestOut.test"));
+}
+
+TEST_F(InteractionTagTest,ReadInteractionTagsClass)
+{
+    //this test is for testing the reaction of the read class to incorrectly
+    //formatted input
+    MyIngredients ingredients;
+    ReadInteractionTags<MyIngredients> read(ingredients);
+
+    ingredients.modifyMolecules().resize(10);
+
+    std::stringstream stream1;
+    read.setInputStream(&stream1);
+    stream1<<"\ni am a parrot\n";
+    EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+    std::stringstream stream2;
+    read.setInputStream(&stream2);
+    stream2<<"\n1:2:2\n";
+    EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+    std::stringstream stream3;
+    read.setInputStream(&stream3);
+    stream3<<"\n1-2-3\n";
+    EXPECT_THROW(read.execute(),std::runtime_error);
+
+
+    std::stringstream stream4;
+    read.setInputStream(&stream4);
+    stream4<<"\n1-a:4\n";
+    EXPECT_THROW(read.execute(),std::runtime_error);
+
+    std::stringstream stream5;
+    read.setInputStream(&stream5);
+    stream5<<"\n1-5:c\n";
+    EXPECT_THROW(read.execute(),std::runtime_error);
+}
+
+TEST_F(InteractionTagTest,CopyConstructor)
+{
+	typedef MyIngredients::molecules_type MyMolecules;
+	MyMolecules molecules1;
+
+	//check if attributes are copied corriectly by copy constructor
+	molecules1.resize(5);
+	molecules1[0].setInteractionTag(1);
+	molecules1[1].setInteractionTag(2);
+	molecules1[2].setInteractionTag(3);
+	molecules1[3].setInteractionTag(4);
+	molecules1[4].setInteractionTag(5);
+	//create new objects from molecules1
+
+	typedef ConfigureSystem<VectorInt3,Features,8> Config8;
+	typedef Ingredients<Config8> MyIngredients8;
+	typedef MyIngredients8::molecules_type MyMolecules8;
+	MyMolecules molecules2(molecules1);
+	MyMolecules8 molecules3(molecules2);
+
+	EXPECT_EQ(molecules1[0].getInteractionTag(),molecules2[0].getInteractionTag());
+	EXPECT_EQ(molecules1[0].getInteractionTag(),molecules3[0].getInteractionTag());
+
+	EXPECT_EQ(molecules1[1].getInteractionTag(),molecules2[1].getInteractionTag());
+	EXPECT_EQ(molecules1[1].getInteractionTag(),molecules3[1].getInteractionTag());
+
+	EXPECT_EQ(molecules1[2].getInteractionTag(),molecules2[2].getInteractionTag());
+	EXPECT_EQ(molecules1[2].getInteractionTag(),molecules3[2].getInteractionTag());
+
+	EXPECT_EQ(molecules1[3].getInteractionTag(),molecules2[3].getInteractionTag());
+	EXPECT_EQ(molecules1[3].getInteractionTag(),molecules3[3].getInteractionTag());
+
+	EXPECT_EQ(molecules1[4].getInteractionTag(),molecules2[4].getInteractionTag());
+	EXPECT_EQ(molecules1[4].getInteractionTag(),molecules3[4].getInteractionTag());
+
+}

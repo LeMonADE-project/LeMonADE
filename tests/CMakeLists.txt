@@ -31,6 +31,7 @@ add_dependencies(${GTEST_LIBRARY} googletest)
 
 # copy all .test to build directory
 configure_file(attributesTest.test tests/attributesTest.test COPYONLY)
+configure_file(interactionTagTest.test tests/interactionTagTest.test COPYONLY)
 configure_file(featureBondsetTest.test tests/featureBondsetTest.test COPYONLY)
 configure_file(featureBoxTest.test tests/featureBoxTest.test COPYONLY)
 configure_file(fileImportTest.test tests/fileImportTest.test COPYONLY)
