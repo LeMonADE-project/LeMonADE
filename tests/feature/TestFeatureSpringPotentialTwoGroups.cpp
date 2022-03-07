@@ -187,8 +187,8 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
     }
   }
   // monomers should be close
-  std::cout << (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength() <<std::endl;
-  EXPECT_TRUE(abs( abs( (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength()-2 ) ) < 2 );
+  std::cout << (ingredients.getMolecules()[0].getVector3D()-ingredients.getMolecules()[1].getVector3D()).getLength() <<std::endl;
+  EXPECT_TRUE( fabs( (ingredients.getMolecules()[0].getVector3D()-ingredients.getMolecules()[1].getVector3D()).getLength()-2.0 )  < 2 );
 
   // add a nonaffected monomer and check the movement
   ingredients.modifyMolecules().addMonomer(8,8,8);
