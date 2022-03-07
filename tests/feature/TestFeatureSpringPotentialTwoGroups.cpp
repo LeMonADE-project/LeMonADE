@@ -208,9 +208,9 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
     }
   }
   // monomers should still be close
-  std::cout << (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength() <<std::endl
+  std::cout << (ingredients.getMolecules()[0].getVector3D()-ingredients.getMolecules()[1].getVector3D()).getLength() <<std::endl
   <<", move counter = "<<counter<<std::endl;
-  EXPECT_TRUE(abs( abs( (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength()-2 ) ) < 2 );
+  EXPECT_TRUE( fabs( (ingredients.getMolecules()[0].getVector3D()-ingredients.getMolecules()[1].getVector3D()).getLength()-2.0 )  < 2 );
   // there should have been some moves of the unaffected monomer
   EXPECT_TRUE(counter>0);
   
@@ -227,8 +227,8 @@ TEST_F(TestFeatureSpringPotentialTwoGroups,MoveChecks){
     }
   }
   // monomers should be close
-  std::cout << (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength() <<std::endl;
-  EXPECT_TRUE(abs( abs( (ingredients.getMolecules()[0]-ingredients.getMolecules()[1]).getLength()-2 ) ) < 2 );
+  std::cout << (ingredients.getMolecules()[0].getVector3D()-ingredients.getMolecules()[1].getVector3D()).getLength() <<std::endl;
+  EXPECT_TRUE( fabs( (ingredients.getMolecules()[0].getVector3D()-ingredients.getMolecules()[1].getVector3D()).getLength()-2.0 )  < 2 );
   
 }
 
