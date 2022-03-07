@@ -2420,9 +2420,6 @@ TEST_F(InteractionTagTest,exportRead)
     EXPECT_EQ(molecules[6].getInteractionTag(),5);
     EXPECT_EQ(molecules[14].getInteractionTag(),5);
     EXPECT_EQ(molecules[15].getInteractionTag(),2);
-        
-    //remove the temporary file
-    EXPECT_EQ(0,remove("tests/interactionTagTest.test"));
 
 }
 
