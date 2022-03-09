@@ -29,3 +29,7 @@ LeMonADE 2.2.2
 * HotFix for default R250 values
 * ColdFix for implementation of RNG Mersenne Twister 
 * ColdFix for ResultFormattingTools
+
+LeMonADE 2.3.0
+* add *MonomerInteractionTag* for feature FeatureNNInteractionSc
+* add additional lattice for interactions in FeatureNNInteractionSc

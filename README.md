@@ -103,7 +103,8 @@ Find the information about active developers, former contributors, and people wh
 ## References
 
 This library has been used in the following publications (without guarantee for completeness)
-* *"Multimolecular Structure Formation with Linear Dendritic Copolymers"*; M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules XX, XXXX-XXXX (2021)](https://doi.org/10.1021/acs.macromol.1c00226)
+* *"Swelling of Tendomer Gels"*"; T. M&uuml;ller, J.-U. Sommer, M. Lang; [Macromolecules 54, 4601-4614 (2021)](https://doi.org/10.1021/acs.macromol.1c00258)
+* *"Multimolecular Structure Formation with Linear Dendritic Copolymers"*; M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 54, 6937-6946 (2021)](https://doi.org/10.1021/acs.macromol.1c00226)
 * *"Analysis of the Gel Point of Polymer Model Networks by Computer Simulations"*; M. Lang, T. M&uuml;ller; [Macromolecules 53, 498-512 (2020)](https://doi.org/10.1021/acs.macromol.9b02217)
 * *"Polyolefins Formed by Chain Walking Catalysis—A Matter of Branching Density Only?"*; R. Dockhorn, L. Pl&uuml;schke, M. Geisler, J. Zessin, P. Lindner, R. Mundil, J. Merna, J.-U. Sommer, A. Lederer; [J. Am. Chem. Soc. 141, 15586–15596 (2019)](https://pubs.acs.org/doi/10.1021/jacs.9b06785)
 * *"Tendomers – force sensitive bis-rotaxanes with jump-like deformation behavior"*; T. M&uuml;ller, J.-U. Sommer, M. Lang; [Soft Matter, 15, 3671-3679  (2019)](https://doi.org/10.1039/C9SM00292H)
