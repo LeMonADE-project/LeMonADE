@@ -56,7 +56,11 @@ template metaprogramming in `C++`.
 * If you also want to compile and run the tests, there is another option, which can be
   passed to either the configure script (first build method), or to cmake (second build method)
   This option is `-DLEMONADE_TESTS=ON` . You need internet access, because the process will
-  download the googletest library
+  download the googletest library. After compilation you find the executable `LeMonADE-tests`
+  in your `BUILDDIR/tests`.  
+  `./LeMonADE-tests --gtest_list_tests` prints all tests.  
+  `./LeMonADE-tests` runs all test modules.  
+  `./LeMonADE-tests --gtest_filter=TestFeatureLinearForce*` runs a specific test module.  
 * Another option that can be passed is `-DCMAKE_BUILD_TYPE=Release/Debug`. The default value 
   is Release, which uses compiler flags for optimization. If the option "Debug" is chosen,
   no compiler optimizations are used, compiler warnings are enabled by -Wall, and 
@@ -102,8 +106,16 @@ Find the information about active developers, former contributors, and people wh
 
 ## References
 
-This library has been used in the following publications (without guarantee for completeness)
-* *"Multimolecular Structure Formation with Linear Dendritic Copolymers"*; M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules XX, XXXX-XXXX (2021)](https://doi.org/10.1021/acs.macromol.1c00226)
+* *"Structural Characterization of Model Gels under Preparation Conditions and at Swelling Equilibrium"*; R. Scholz, M. Lang; [Macromolecules 57, 2539-2555 (2024)](https://doi.org/10.1021/acs.macromol.3c02607)
+* *"On the Swelling of Polymer Network Strands"*; M. Lang, R. Scholz; [Macromol. Rapid Commun 45, 2400025 (2024)](https://doi.org/10.1002/marc.202400025)
+* *"Machine learning of an implicit solvent for dynamic Monte Carlo simulations"*; A. Checkervarty, J.-U. Sommer, M. Werner; [J. Chem. Phys. 158, 124904 (2023)](https://doi.org/10.1063/5.0116618)
+* *"Theory of chain walking catalysis: From disordered dendrimers to dendritic bottle-brushes"*; R. Dockhorn, J.-U. Sommer; [J. Chem. Phys. 157, 044902 (2022)](https://doi.org/10.1063/5.0098263)
+* *"On the Reference Size of Chains in a Network and the Shear Modulus of Unentangled Networks Made of Real Chains"*; M. Lang, T. M&uuml;ller; [Macromolecules 55, 8950-8959 (2022)](https://doi.org/10.1021/acs.macromol.2c00660)
+* *"Elasticity of Tendomer Gels"*; T. M&uuml;ller, J.-U. Sommer, M. Lang; [Macromolecules 55, 7540-7555 (2022)](https://doi.org/10.1021/acs.macromol.2c01229)
+* *"Amphiphilic Model Networks Based on PEG and PCL Tetra-arm Star Polymers with Complementary Reactivity"*; C. Bunk, L. Löser, N. Fribiczer, H. Komber, L. Jakisch, R. Scholz, B. Voit, S. Seiffert, K. Saalwächter, M. Lang, F. Böhme; [Macromolecules 55, 6573-6589 (2022)](https://doi.org/10.1021/acs.macromol.2c00693)
+* *"Swelling and Residual Bond Orientations of Polymer Model Gels: The Entanglement-Free Limit"*; M. Lang, R. Scholz, L. Löser, C. Bunk, N. Fribiczer, S. Seiffert, F. Böhme, K. Saalwächter; [Macromolecules 55, 5997-6014 (2022)](https://doi.org/10.1021/acs.macromol.2c00589)
+* *"Multimolecular Structure Formation with Linear Dendritic Copolymers"*; M. Wengenmayr, R. Dockhorn, J.-U. Sommer; [Macromolecules 54, 6937–6946 (2021)](https://doi.org/10.1021/acs.macromol.1c00226)
+* *"Swelling of Tendomer Gels"*; T. M&uuml;ller, J.-U. Sommer, M. Lang; [Macromolecules 54, 4601-4614 (2021)](https://doi.org/10.1021/acs.macromol.1c00258)
 * *"Analysis of the Gel Point of Polymer Model Networks by Computer Simulations"*; M. Lang, T. M&uuml;ller; [Macromolecules 53, 498-512 (2020)](https://doi.org/10.1021/acs.macromol.9b02217)
 * *"Polyolefins Formed by Chain Walking Catalysis—A Matter of Branching Density Only?"*; R. Dockhorn, L. Pl&uuml;schke, M. Geisler, J. Zessin, P. Lindner, R. Mundil, J. Merna, J.-U. Sommer, A. Lederer; [J. Am. Chem. Soc. 141, 15586–15596 (2019)](https://pubs.acs.org/doi/10.1021/jacs.9b06785)
 * *"Tendomers – force sensitive bis-rotaxanes with jump-like deformation behavior"*; T. M&uuml;ller, J.-U. Sommer, M. Lang; [Soft Matter, 15, 3671-3679  (2019)](https://doi.org/10.1039/C9SM00292H)
