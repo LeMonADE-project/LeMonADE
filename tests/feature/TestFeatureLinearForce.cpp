@@ -134,7 +134,7 @@ TEST_F(TestFeatureLinearForce,checkMoveLocalSc){
     EXPECT_TRUE(move.check(ingredients));
     EXPECT_EQ(move.getProbability() , 1.0);
     
-    move.init(ingredients,1,VectorInt3(0,-1,0)); 
+    move.init(ingredients,0,VectorInt3(0,-1,0)); 
     EXPECT_TRUE(move.check(ingredients));
     EXPECT_EQ(move.getProbability() , 1.0);
 
@@ -185,7 +185,7 @@ TEST_F(TestFeatureLinearForce,checkMoveLocalSc){
 
     move.init(ingredients,1,VectorInt3(-1,0,0)); 
     EXPECT_TRUE(move.check(ingredients));
-    EXPECT_EQ(move.getProbability() , 1.0);
+    EXPECT_EQ(move.getProbability() , 1.0/exp(-2.0)); // still allowed move
 
     move.init(ingredients,1,VectorInt3( 1,0,0)); 
     // as we seed with default R250, FeatureBoltzmann returns 0.721772 > 0.13533528
@@ -194,7 +194,7 @@ TEST_F(TestFeatureLinearForce,checkMoveLocalSc){
     
     move.init(ingredients,2,VectorInt3(1,0,0)); 
     EXPECT_TRUE(move.check(ingredients));
-    EXPECT_EQ(move.getProbability() , 1.0);
+    EXPECT_EQ(move.getProbability() , 1.0/exp(-2.0)); // still allowed move
     
     move.init(ingredients,2,VectorInt3(-1,0,0)); 
     // as we seed with default R250, FeatureBoltzmann returns 0.983861 > 0.13533528

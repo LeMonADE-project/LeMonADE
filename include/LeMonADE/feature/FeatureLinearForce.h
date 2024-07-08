@@ -3,7 +3,7 @@
   o\.|./o    e   xtensible     | LeMonADE: An Open Source Implementation of the
  o\.\|/./o   Mon te-Carlo      |           Bond-Fluctuation-Model for Polymers
 oo---0---oo  A   lgorithm and  |
- o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015 by
+ o/./|\.\o   D   evelopment    | Copyright (C) 2013-2015, 2024 by
   o/.|.\o    E   nvironment    | LeMonADE Principal Developers (see AUTHORS)
     ooo                        |
 ----------------------------------------------------------------------------------
@@ -40,7 +40,9 @@ along with LeMonADE.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * @file
  * @date   2021/03/18
- * @author Toni & Bodonki 
+ * @author Toni & Bondoki 
+ * @date   2024/07/08, Ron
+ * - Coldfix: returning acceptance probability >= 1 
  *
  * @class FeatureLinearForce
  * @brief This Feature applies a force on certain monomers. 
@@ -102,9 +104,8 @@ private:
 	bool ForceOn; 
 	//! force in x direction 
 	double Amplitude_Force; 
-    //!probability
+    //!probability againest not prefered direction
     double prob;
-	
 };
 ////////////////////////////////////////////////////////////////////////////////
 //////////define member functions //////////////////////////////////////////////
@@ -120,12 +121,20 @@ bool FeatureLinearForce::checkMove(const IngredientsType& ingredients, MoveLocal
         //Metropolis: zeta = exp (-dV)
         //dV=f*dr
         // positive force applied on attribute 4 and negative force on attribute 5
-        if( ( tag == 4 ) && ( dx  == 1 ) ){
+        if( ( tag == 4 ) && ( dx  == 1 ) ){ // move direction is NOT prefered
             move.multiplyProbability(prob);
             return true; 
         }
-        if( ( tag == 5 ) && ( dx  == -1 ) ){
+        if( ( tag == 4 ) && ( dx  == -1 ) ){ // move direction is prefered
+            move.multiplyProbability(1.0/prob);
+            return true; 
+            }
+        if( ( tag == 5 ) && ( dx  == -1 ) ){ // move direction is NOT prefered
             move.multiplyProbability(prob);
+            return true; 
+        }
+        if( ( tag == 5 ) && ( dx  == 1 ) ){ // move direction is prefered
+            move.multiplyProbability(1.0/prob);
             return true; 
         }
 	}
@@ -141,12 +150,20 @@ bool FeatureLinearForce::checkMove(const IngredientsType& ingredients, MoveLocal
         //Metropolis: zeta = exp (-dV)
         //dV=f*dr
         // positive force applied on attribute 4 and negative force on attribute 5
-        if( ( tag == 4 ) && ( dx  == 1 ) ){
+        if( ( tag == 4 ) && ( dx  == 1 ) ){ // move direction is NOT prefered
             move.multiplyProbability(prob);
             return true; 
         }
-        if( ( tag == 5 ) && ( dx  == -1 ) ){
+        if( ( tag == 4 ) && ( dx  == -1 ) ){ // move direction is prefered
+            move.multiplyProbability(1.0/prob);
+            return true; 
+            }
+        if( ( tag == 5 ) && ( dx  == -1 ) ){ // move direction is NOT prefered
             move.multiplyProbability(prob);
+            return true; 
+        }
+        if( ( tag == 5 ) && ( dx  == 1 ) ){ // move direction is prefered
+            move.multiplyProbability(1.0/prob);
             return true; 
         }
 	}
