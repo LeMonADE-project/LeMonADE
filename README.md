@@ -1,5 +1,6 @@
 [![Build Status(CircleCI)](https://circleci.com/gh/LeMonADE-project/LeMonADE.svg?style=svg)](https://circleci.com/gh/LeMonADE-project/LeMonADE)
-[![DOI](https://zenodo.org/badge/47562779.svg)](https://zenodo.org/badge/latestdoi/47562779)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5061542.svg)](https://doi.org/10.5281/zenodo.5061542)
+![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)
 # LeMonADE 
 The abbreviation LeMonADE stands for 
 "**L**attice-based **e**xtensible **Mon**te-Carlo **A**lgorithm and **D**evelopment **E**nvironment".
@@ -106,6 +107,10 @@ Find the information about active developers, former contributors, and people wh
 
 ## References
 
+* *"Hysteresis and Dynamic Response of a Polymer Chain under Oscillatory Force"*; B. Szostak, J. Paturej, J.-U. Sommer, R. Dockhorn; [Macromolecules 59 (6), 3418-3430 (2026)](https://doi.org/10.1021/acs.macromol.5c03368)
+* *"Unravelling the molecular network structure of biohybrid hydrogels"*; J. Sievers-Liebschner, R. Dockhorn, J. Friedrichs, T. Kurth, P. Fratzl, J.-U. Sommer, C. Werner, U. Freudenberg,
+[Materials Today Bio 34, 102249 (2025)](https://doi.org/10.1016/j.mtbio.2025.102249).
+* *"Design and Self-Assembly of Second-Generation Dendrimer-Like Block Copolymers"*; F. Hartmann, R. Dockhorn, S. Pusse, B.-J. Niebuur, M. Koch, T. Kraus, A. Schießer, B. N. Balzer, and M. Gallei, [Macromolecules 57, 7098–7111 (2024)](https://doi.org/10.1021/acs.macromol.4c00944)
 * *"Structural Characterization of Model Gels under Preparation Conditions and at Swelling Equilibrium"*; R. Scholz, M. Lang; [Macromolecules 57, 2539-2555 (2024)](https://doi.org/10.1021/acs.macromol.3c02607)
 * *"On the Swelling of Polymer Network Strands"*; M. Lang, R. Scholz; [Macromol. Rapid Commun 45, 2400025 (2024)](https://doi.org/10.1002/marc.202400025)
 * *"Machine learning of an implicit solvent for dynamic Monte Carlo simulations"*; A. Checkervarty, J.-U. Sommer, M. Werner; [J. Chem. Phys. 158, 124904 (2023)](https://doi.org/10.1063/5.0116618)
