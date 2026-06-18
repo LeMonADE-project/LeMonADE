@@ -1,6 +1,7 @@
 [![Build Status(CircleCI)](https://circleci.com/gh/LeMonADE-project/LeMonADE.svg?style=svg)](https://circleci.com/gh/LeMonADE-project/LeMonADE)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5061542.svg)](https://doi.org/10.5281/zenodo.5061542)
-![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)
+[![DOI with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.5061542-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.5061542)
+[![HiRSE Code Promo Badge](https://img.shields.io/badge/Promo-8db427?label=HiRSE&labelColor=005aa0&link=https%3A%2F%2Fgo.fzj.de%2FCodePromo)](https://go.fzj.de/CodePromo)
+
 # LeMonADE 
 The abbreviation LeMonADE stands for 
 "**L**attice-based **e**xtensible **Mon**te-Carlo **A**lgorithm and **D**evelopment **E**nvironment".
